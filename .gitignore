@@ -10,3 +10,16 @@ pnpm-debug.log*
 # Canvas de design — arquivos gerados pelo seed (as fontes .dc.html + canvas.json reproduzem)
 /trip-app-design.html
 /brand/farol-brand.html
+
+# Env
+.env
+.env.local
+
+# Build
+dist/
+.next/
+.turbo/
+coverage/
+reports/
+playwright-report/
+test-results/
