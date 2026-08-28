@@ -13,10 +13,10 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@farol/shared": ["packages/shared/src"],
-      "@farol/db": ["packages/db/src"],
-      "@farol/domain": ["packages/domain/src"],
-      "@farol/providers": ["packages/providers/src"]
+      "@farol/shared": ["packages/shared/dist", "packages/shared/src"],
+      "@farol/db": ["packages/db/dist", "packages/db/src"],
+      "@farol/domain": ["packages/domain/dist", "packages/domain/src"],
+      "@farol/providers": ["packages/providers/dist", "packages/providers/src"]
     }
   }
 }
