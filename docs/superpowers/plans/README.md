@@ -4,52 +4,35 @@ Um plano por passo do backlog do `CLAUDE.md`. Cada plano é bite-sized (tasks TD
 teste que falha → implementação → teste passa → mutação → commit) e cobre a
 **Definition of Done** do projeto (cobertura 100% por pacote + unidade/integração/e2e/mutação).
 
-## Escritos
+## Planos
 
-| Passo | Plano | Arquivo |
-|---|---|---|
-| 1 | Fundação do monorepo | `2026-08-28-fundacao-monorepo.md` |
-| 2 | Auth + Perfil de gosto | `2026-08-28-auth-perfil.md` |
-| 3 | Viagens + Descoberta de destino | `2026-08-28-viagens-descoberta.md` |
-| 4 | Roteiro + Jobs (pg-boss) | `2026-08-28-roteiro-jobs.md` |
+| Passo | Plano | Arquivo | Depende de |
+|---|---|---|---|
+| 1 | Fundação do monorepo | `2026-08-28-fundacao-monorepo.md` | — |
+| 2 | Auth + Perfil de gosto | `2026-08-28-auth-perfil.md` | 1 |
+| 3 | Viagens + Descoberta de destino | `2026-08-28-viagens-descoberta.md` | 2 |
+| 4 | Roteiro + Jobs (pg-boss) | `2026-08-28-roteiro-jobs.md` | 3 |
+| 5 | Providers Amadeus (voo + hotel) | `2026-08-28-providers-amadeus.md` | 3 |
+| 6 | Google Places + enrich | `2026-08-28-places-enrich.md` | 4, 5 |
+| 7 | Chat IA (tool-calling) | `2026-08-28-chat-ia.md` | 4, 5, 6 |
+| 8 | UI web + E2E | `2026-08-28-ui-web-e2e.md` | 7, 9 |
+| 9 | `packages/ui` | `2026-08-28-packages-ui.md` | 1 |
 
-## A escrever (just-in-time, antes de puxar o passo)
+## Paralelismo
 
-Os planos abaixo são **esboços**. O plano detalhado de cada um é escrito quando o
-passo anterior estiver perto de concluir — decisões de um passo mudam o próximo,
-então detalhar tudo agora só cria documento que envelhece.
+```
+1 ──┬── 2 ── 3 ──┬── 4 ──┐
+    │             └── 5 ──┼── 6 ── 7 ── 8
+    └── 9 ────────────────────────────┘
+```
 
-### Passo 5 — Providers Amadeus (voo + hotel)
-- **Objetivo:** buscar voos e hotéis reais de uma trip, com cache, retry e deep link.
-- **Arquivos:** `packages/providers` (interfaces `FlightProvider`/`HotelProvider`; `AmadeusFlightProvider`, `AmadeusHotelProvider`; OAuth2 client-credentials com token em cache; `AMADEUS_BASE_URL` configurável; `p-retry` + circuit breaker simples); `packages/db` (`provider_cache`, `flight_selections`, `hotel_selections` + migration); `apps/api` `FlightsModule`/`HotelsModule`.
-- **Tasks previstas:** (1) schema cache/selections + migration; (2) contratos + DTOs normalizados em shared; (3) AmadeusAuth (token cache) + testes; (4) AmadeusFlightProvider contra fixtures gravadas do sandbox; (5) AmadeusHotelProvider idem; (6) provider_cache (chave=hash, TTL); (7) FlightsModule/HotelsModule + e2e com fixtures.
-- **Riscos:** rate limit do sandbox; formato de deep link (site parceiro — pendência do PRD); gravar fixtures reais uma vez.
-- **Testes:** contrato contra `__fixtures__`, sem rede no CI.
+- **9** pode ser puxado logo após o **1**.
+- **4** e **5** podem ser puxados em paralelo depois do **3**.
+- **8** é o último — precisa do **7** e do **9**.
 
-### Passo 6 — Google Places + enrich
-- **Objetivo:** itens do roteiro ganham lugar real (place_id, coords, avaliação); refeições preenchidas; `swap_restaurant`.
-- **Arquivos:** `packages/providers` (`GooglePlacesProvider`: text search + details); `apps/api` `PlacesModule`; passo de **enrich** plugado no job `itinerary.generate` (Passo 4); job `places.enrich` para reprocessar `needs_review`.
-- **Tasks previstas:** (1) GooglePlacesProvider + fixtures; (2) PlacesModule; (3) enrich no handler do roteiro (item sem place_id → text search; sem match → `needs_review`); (4) preenchimento de refeição por cozinha/preço perto do centroide do dia; (5) `swap_restaurant`; (6) job `places.enrich`; (7) e2e "roteiro tem itens com place real".
-- **Riscos:** custo por chamada Places (cachear 24 h); degradação graciosa (item renderiza sem lugar).
-- **Depende do Passo 4.**
+## Regra
 
-### Passo 7 — Chat IA (tool-calling)
-- **Objetivo:** "tira o dia de museu" muta o `TripState`; `chat_messages` persistido.
-- **Arquivos:** `packages/db` (`chat_messages` + migration); `apps/api` `ChatModule` (`POST /trips/:id/chat`, loop de tool-calling do Claude, 9 tools mapeadas 1:1 para métodos de serviço — `set_destination`, `shift_dates`, `set_duration`, `set_budget`, `add_interest`/`remove_interest`, `regenerate_day`, `remove_item`/`pin_item`, `find_hotel`, `swap_restaurant`, `search_flights`).
-- **Tasks previstas:** (1) schema chat_messages + migration; (2) definição das tools (schemas zod de input) + roteador para os serviços; (3) loop de tool-calling com fake determinístico; (4) cada tool ligada ao serviço real (Trips/Itinerary/Flights/Hotels/Places); (5) guard-rails (turnos/min, tokens/turno, timeout por tool); (6) persistência de mensagens; (7) e2e "mensagem → TripState muda".
-- **Riscos:** estado da viagem no Postgres é a fonte da verdade (chat só dispara mutação); undo = versões de itinerário; custo do loop.
-- **Depende dos Passos 4, 5, 6.**
-
-### Passo 8 — UI web + E2E
-- **Objetivo:** telas hi-fi (`*.dc.html`) realizadas em React, ligadas ao `apps/api`; fluxo Playwright completo.
-- **Arquivos:** `apps/web/src/app/*` (descoberta input + resultados, roteiro, voo/hotel, modo autônomo), consumindo `apiFetch`; `AppShell`, `AdvisorChat`, `DestinationCard` etc. do `packages/ui` (Passo 9).
-- **Tasks previstas:** uma por tela (input, resultados, roteiro, voo/hotel, autônomo), cada uma com componentes de lógica testados em unidade + a tela coberta por e2e; task final = e2e ponta a ponta login→onboarding→descoberta→destino→roteiro e o fluxo autônomo.
-- **Riscos:** paridade com o design; estados de loading/polling do roteiro; responsivo < 1080 px (shell colapsa).
-- **Depende do Passo 7.**
-
-### Passo 9 — `packages/ui`
-- **Objetivo:** tokens de `docs/design-system.md` + componentes base implementados e testados.
-- **Arquivos:** `packages/ui/src/tokens` (CSS vars claro/escuro), `Button`, `TextField` (+ Stepper, Slider), `Chip`, `MatchBadge`, `DestinationCard`, `AppShell`, `StepNav`, `AdvisorChat` — cada um `Componente.tsx` + `.stories.tsx` + `.spec.tsx`.
-- **Tasks previstas:** (1) tokens + tema; (2) Button (variantes/tamanhos/estados); (3) TextField + derivados; (4) Chip; (5) MatchBadge + barra; (6) DestinationCard; (7) AppShell + StepNav; (8) AdvisorChat.
-- **Riscos:** decidir lib headless (Radix p/ overlays — pendência do `CLAUDE.md`); estratégia de tokens em runtime (CSS vars + `data-theme`).
-- **Pode começar em paralelo a partir do Passo 1.**
+Antes de implementar qualquer passo, "puxar o passo N" (guideline do `CLAUDE.md`):
+commit de claim na `main` → branch `<nome>/passo-N-<slug>` → executar as tasks em ordem.
+Os planos foram escritos com o contexto atual; se ao puxar um passo o anterior tiver
+mudado alguma decisão, ajustar o plano no início da branch antes de executar.
