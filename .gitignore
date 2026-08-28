@@ -23,3 +23,6 @@ coverage/
 reports/
 playwright-report/
 test-results/
+
+# TS incremental
+*.tsbuildinfo
