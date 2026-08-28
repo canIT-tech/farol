@@ -120,7 +120,7 @@ Backlog de implementação. Ordem = dependência. Puxe pelo número.
 
 | # | Passo | Status | Responsável | Branch | Depende de |
 |---|---|---|---|---|---|
-| 1 | Fundação do monorepo — scaffold Turborepo, `packages/shared` + `packages/db` (Drizzle), `apps/api` NestJS boot + `ConfigModule` + `/health`, `apps/web` Next.js boot, 1 migration no Supabase, **harness de testes (Vitest, Playwright, Stryker) + gates de cobertura 100% / mutação no CI** | 🟢 livre | — | — | — |
+| 1 | Fundação do monorepo — scaffold Turborepo, `packages/shared` + `packages/db` (Drizzle), `apps/api` NestJS boot + `ConfigModule` + `/health`, `apps/web` Next.js boot, 1 migration no Supabase, **harness de testes (Vitest, Playwright, Stryker) + gates de cobertura 100% / mutação no CI** | 🟡 em andamento | felippebutland | `felippebutland/passo-1-fundacao` | — | (2026-08-28) |
 | 2 | Auth + Perfil de gosto — `AuthModule` (JWT Supabase via JWKS), upsert `users`, `ProfileModule` CRUD, login + onboarding no web | 🟢 livre | — | — | 1 |
 | 3 | Viagens + Descoberta de destino — `TripsModule`, catálogo seed (~200 cidades), `LlmModule`, `DiscoveryModule` (pré-filtro + ranking Claude) | 🟢 livre | — | — | 2 |
 | 4 | Roteiro + Jobs — `JobsModule` (pg-boss), `apps/worker`, `ItineraryModule`, job `itinerary.generate`, polling no web | 🟢 livre | — | — | 3 |
