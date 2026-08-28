@@ -11,19 +11,13 @@ teste que falha → implementação → teste passa → mutação → commit) e 
 | 1 | Fundação do monorepo | `2026-08-28-fundacao-monorepo.md` |
 | 2 | Auth + Perfil de gosto | `2026-08-28-auth-perfil.md` |
 | 3 | Viagens + Descoberta de destino | `2026-08-28-viagens-descoberta.md` |
+| 4 | Roteiro + Jobs (pg-boss) | `2026-08-28-roteiro-jobs.md` |
 
 ## A escrever (just-in-time, antes de puxar o passo)
 
 Os planos abaixo são **esboços**. O plano detalhado de cada um é escrito quando o
 passo anterior estiver perto de concluir — decisões de um passo mudam o próximo,
 então detalhar tudo agora só cria documento que envelhece.
-
-### Passo 4 — Roteiro + Jobs (pg-boss)
-- **Objetivo:** escolher destino → job assíncrono gera roteiro dia a dia → web faz polling até `ready`.
-- **Arquivos:** `packages/db` (`itineraries`, `itinerary_days`, `itinerary_items` + migration; schema `pgboss`); `apps/worker` (bootstrap real: Config + Jobs + Itinerary + Llm + db, sem HTTP); `apps/api` `JobsModule` (setup pg-boss, retry/backoff, dead-letter log), `ItineraryModule` (cria `itineraries(pending)`, enfileira `itinerary.generate`, serve o itinerário).
-- **Tasks previstas:** (1) schema itinerary* + migration; (2) JobsModule/pg-boss + teste com fila real; (3) worker bootstrap; (4) LlmService.buildItinerary (JSON schema forçado) + fake; (5) job handler `itinerary.generate` (sem enrich ainda); (6) ItineraryModule + endpoint + polling; (7) e2e.
-- **Riscos:** latência p95 ≤ 15 s (design §1.3); idempotência do job; itens `pinned` preservados na regeneração.
-- **Pode paralelizar com o Passo 5 depois do 3.**
 
 ### Passo 5 — Providers Amadeus (voo + hotel)
 - **Objetivo:** buscar voos e hotéis reais de uma trip, com cache, retry e deep link.
