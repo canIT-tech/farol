@@ -10,19 +10,13 @@ teste que falha → implementação → teste passa → mutação → commit) e 
 |---|---|---|
 | 1 | Fundação do monorepo | `2026-08-28-fundacao-monorepo.md` |
 | 2 | Auth + Perfil de gosto | `2026-08-28-auth-perfil.md` |
+| 3 | Viagens + Descoberta de destino | `2026-08-28-viagens-descoberta.md` |
 
 ## A escrever (just-in-time, antes de puxar o passo)
 
 Os planos abaixo são **esboços**. O plano detalhado de cada um é escrito quando o
 passo anterior estiver perto de concluir — decisões de um passo mudam o próximo,
 então detalhar tudo agora só cria documento que envelhece.
-
-### Passo 3 — Viagens + Descoberta de destino
-- **Objetivo:** criar viagem → catálogo seed + pré-filtro determinístico + ranking via Claude → 3–5 destinos com justificativa persistidos.
-- **Pacotes/arquivos:** `packages/db` (`trips`, `trip_destinations`, `destination_catalog` + migration + seed CSV ~200 cidades); `packages/domain` (pré-filtro: orçamento, melhor época, visto); `apps/api` `LlmModule` (client Claude + roteamento de modelo + log de custo/tokens), `TripsModule` (CRUD + `TripState`), `DiscoveryModule` (shortlist → `LlmService.rankDestinations` com saída zod-validada + 1 retry).
-- **Tasks previstas:** (1) schema trips/trip_destinations + migration; (2) destination_catalog + seed script; (3) shared DTOs (trip input, destination result); (4) domain pré-filtro; (5) LlmModule + fake determinístico de teste; (6) TripsModule CRUD; (7) DiscoveryModule + e2e.
-- **Riscos:** formato/curadoria do catálogo (começar CSV); teto de custo de LLM por chamada (definir número — pendência do PRD); validação estrita da saída do LLM.
-- **Testes:** LLM sempre em fake determinístico; e2e "cria trip → recebe 3–5 destinos".
 
 ### Passo 4 — Roteiro + Jobs (pg-boss)
 - **Objetivo:** escolher destino → job assíncrono gera roteiro dia a dia → web faz polling até `ready`.
