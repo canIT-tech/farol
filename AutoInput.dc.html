@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .page { width: 1512px; box-sizing: border-box; min-height: 1000px; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; align-items: center; padding: 40px 0 72px; }
+    .top { width: 640px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 60px; }
+    .logo { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.03em; display: flex; align-items: center; gap: 10px; }
+    .logo svg { width: 22px; height: 22px; color: #c25a38; }
+    .top .mode { font-size: 12px; color: #9b9992; border: 1px solid #e6e3dc; border-radius: 999px; padding: 6px 12px; }
+    .card { width: 640px; }
+    h1 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 38px; line-height: 1.08; letter-spacing: -0.02em; margin: 0 0 14px; }
+    .sub { font-size: 15.5px; line-height: 1.6; color: #57554f; margin: 0 0 40px; }
+    .row { margin-bottom: 22px; }
+    .flabel { font-size: 13px; font-weight: 600; color: #57554f; margin-bottom: 9px; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .input { border: 1.5px solid #e6e3dc; border-radius: 12px; background: #fff; padding: 14px 15px; font-size: 14.5px; color: #2f2d28; display: flex; align-items: center; gap: 11px; }
+    .input svg { width: 18px; height: 18px; stroke: #9b9992; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .slider { margin-top: 14px; }
+    .track { height: 5px; border-radius: 999px; background: #ece9e2; position: relative; }
+    .track > i { position: absolute; left: 0; top: 0; bottom: 0; width: 58%; background: #c25a38; border-radius: 999px; }
+    .track > b { position: absolute; left: 58%; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: #fff; border: 1.5px solid #c25a38; box-shadow: 0 1px 3px rgba(28,27,25,.14); }
+    .scale { display: flex; justify-content: space-between; font-size: 11.5px; color: #a29f97; margin-top: 9px; }
+    .scale b { font-size: 15px; font-weight: 600; color: #1c1b19; }
+    .chips { display: flex; gap: 10px; flex-wrap: wrap; }
+    .chip { border: 1.5px solid #e6e3dc; border-radius: 999px; padding: 10px 16px; font-size: 13.5px; color: #6b6963; background: #fff; }
+    .chip.on { background: #f9efe9; color: #8f3f26; border-color: #e2c1b3; font-weight: 500; }
+    .hint { font-size: 12px; color: #a29f97; margin-top: 8px; }
+    .cta { margin-top: 34px; width: 100%; background: #c25a38; color: #fff; border-radius: 13px; padding: 17px 0; font-size: 15.5px; font-weight: 600; text-align: center; display: flex; align-items: center; justify-content: center; gap: 9px; }
+    .cta svg { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+    .reassure { margin-top: 18px; font-size: 13px; color: #78766f; text-align: center; line-height: 1.6; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="page">
+  <div class="top">
+    <div class="logo"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/></svg>Farol</div>
+    <span class="mode">Modo autônomo</span>
+  </div>
+
+  <div class="card">
+    <h1>Diga quando.<br>O resto é comigo.</h1>
+    <p class="sub">Farol escolhe o destino, monta o roteiro dia a dia e acha voo e hotel. Você recebe um plano fechado e ajusta o que quiser conversando — sem ficar comparando opções.</p>
+
+    <div class="row">
+      <div class="flabel">Quando &amp; de onde</div>
+      <div class="two">
+        <div class="input"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>10 – 17 mai 2026</div>
+        <div class="input"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>São Paulo · GRU</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="flabel">Orçamento por pessoa</div>
+      <div class="slider">
+        <div class="track"><i></i><b></b></div>
+        <div class="scale"><span>R$ 1.500</span><b>R$ 4.500</b><span>R$ 12.000+</span></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="flabel">O que você curte <span style="font-weight:400;color:#a29f97">— até 3</span></div>
+      <div class="chips">
+        <span class="chip on">Praia</span>
+        <span class="chip on">Gastronomia</span>
+        <span class="chip on">Sossego</span>
+        <span class="chip">Cultura</span>
+        <span class="chip">Natureza</span>
+        <span class="chip">Vida noturna</span>
+      </div>
+      <div class="hint">É só um empurrão inicial. O plano se ajusta depois conforme você reage a ele.</div>
+    </div>
+
+    <div class="cta">Montar minha viagem <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    <p class="reassure">Nada é reservado agora. Você revisa o plano inteiro antes de qualquer compra.</p>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

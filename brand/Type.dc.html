@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .doc { width: 1400px; box-sizing: border-box; min-height: 1240px; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; padding: 64px 72px; }
+    .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #c25a38; margin-bottom: 14px; }
+    h1.title { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -0.02em; margin: 0 0 10px; }
+    .intro { font-size: 15px; line-height: 1.6; color: #57554f; max-width: 660px; margin: 0 0 42px; }
+    h2.sec { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 18px; }
+    .hr { height: 1px; background: #e9e7e1; margin: 42px 0; }
+    .families { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .fam { border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; padding: 28px 30px; }
+    .fam .name { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -0.02em; }
+    .fam .name.txt { font-family: "Instrument Sans", sans-serif; font-weight: 600; }
+    .fam .use { font-size: 13px; color: #78766f; margin-top: 8px; line-height: 1.55; }
+    .fam .aa { font-size: 40px; margin-top: 18px; letter-spacing: -0.01em; }
+    .fam .glyphs { font-size: 14px; color: #9b9992; margin-top: 12px; letter-spacing: 0.04em; }
+    .fam .weights { display: flex; gap: 16px; margin-top: 16px; font-size: 15px; }
+    .fam .weights span { color: #45433d; }
+    .ramp { border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; overflow: hidden; }
+    .rrow { display: grid; grid-template-columns: 1fr 250px; align-items: baseline; gap: 24px; padding: 18px 28px; border-top: 1px solid #f1efe9; }
+    .rrow:first-child { border-top: 0; }
+    .rrow .spec { font-size: 12px; color: #9b9992; text-align: right; line-height: 1.5; }
+    .d-l { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 40px; line-height: 1.1; letter-spacing: -0.02em; }
+    .d-m { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 34px; line-height: 1.12; letter-spacing: -0.02em; }
+    .h1 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 28px; line-height: 1.2; letter-spacing: -0.02em; }
+    .h2 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 22px; line-height: 1.27; letter-spacing: -0.01em; }
+    .h3 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 18px; line-height: 1.33; }
+    .body { font-size: 15px; line-height: 1.6; }
+    .body-s { font-size: 15px; line-height: 1.6; font-weight: 600; }
+    .small { font-size: 13px; line-height: 1.54; }
+    .cap { font-size: 12px; line-height: 1.33; font-weight: 500; }
+    .over { font-size: 11px; line-height: 1.45; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #78766f; }
+    .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 40px; }
+    .rule { font-size: 13.5px; line-height: 1.55; color: #45433d; padding-left: 20px; position: relative; }
+    .rule::before { content: ""; position: absolute; left: 0; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: #c25a38; }
+    .foot { margin-top: 56px; font-size: 11px; color: #9b9992; display: flex; justify-content: space-between; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="doc">
+  <div class="eyebrow">04 · Tipografia</div>
+  <h1 class="title">Tipografia</h1>
+  <p class="intro">Duas famílias, ambas do Google Fonts. Bricolage Grotesque dá personalidade aos títulos sem gritar; Instrument Sans mantém o texto de interface calmo e muito legível. Na exportação PNG/PDF a fonte cai para o fallback do sistema — mantenha stacks com métricas próximas.</p>
+
+  <div class="families">
+    <div class="fam">
+      <div class="name">Bricolage Grotesque</div>
+      <div class="use">Títulos, números de destaque, wordmark. Pesos 600 e 700. Tracking −0.02em. Nunca em texto corrido.<br>Fallback: <code>"Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif</code></div>
+      <div class="aa" style="font-family:'Bricolage Grotesque',system-ui,sans-serif;font-weight:700">Aa Bb Cc</div>
+      <div class="glyphs" style="font-family:'Bricolage Grotesque',system-ui,sans-serif">0 1 2 3 4 5 6 7 8 9 &amp; ? !</div>
+      <div class="weights" style="font-family:'Bricolage Grotesque',system-ui,sans-serif"><span style="font-weight:500">Medium 500</span><span style="font-weight:600">Semibold 600</span><span style="font-weight:700">Bold 700</span></div>
+    </div>
+    <div class="fam">
+      <div class="name txt">Instrument Sans</div>
+      <div class="use">Todo o texto de interface e corpo: rótulos, botões, parágrafos, tabelas. Pesos 400, 500 e 600.<br>Fallback: <code>"Instrument Sans", system-ui, -apple-system, sans-serif</code></div>
+      <div class="aa" style="font-weight:400">Aa Bb Cc</div>
+      <div class="glyphs">0 1 2 3 4 5 6 7 8 9 &amp; ? !</div>
+      <div class="weights"><span style="font-weight:400">Regular 400</span><span style="font-weight:500">Medium 500</span><span style="font-weight:600">Semibold 600</span></div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Escala tipográfica</h2>
+  <div class="ramp">
+    <div class="rrow"><div class="d-l">Para onde ir agora</div><div class="spec">Display L<br>Bricolage 700 · 40/44 · −0.02em</div></div>
+    <div class="rrow"><div class="d-m">Cartagena · 7 dias</div><div class="spec">Display M<br>Bricolage 600 · 34/38 · −0.02em</div></div>
+    <div class="rrow"><div class="h1">4 destinos pra você</div><div class="spec">H1<br>Bricolage 600 · 28/34 · −0.02em</div></div>
+    <div class="rrow"><div class="h2">Roteiro dia a dia</div><div class="spec">H2<br>Bricolage 600 · 22/28 · −0.01em</div></div>
+    <div class="rrow"><div class="h3">Hotéis bem posicionados</div><div class="spec">H3<br>Bricolage 600 · 18/24</div></div>
+    <div class="rrow"><div class="body">Maio é época seca em Cartagena, com voo direto de cinco horas saindo de São Paulo.</div><div class="spec">Body<br>Instrument 400 · 15/24</div></div>
+    <div class="rrow"><div class="body-s">Total estimado R$ 4.100 para duas pessoas</div><div class="spec">Body strong<br>Instrument 600 · 15/24</div></div>
+    <div class="rrow"><div class="small">Preço estimado, confirmado no site do parceiro no momento da reserva.</div><div class="spec">Small<br>Instrument 400 · 13/20</div></div>
+    <div class="rrow"><div class="cap">5h 25 · direto</div><div class="spec">Caption<br>Instrument 500 · 12/16</div></div>
+    <div class="rrow"><div class="over">Sua viagem</div><div class="spec">Overline<br>Instrument 600 · 11/16 · +0.09em · caixa alta</div></div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Regras de uso</h2>
+  <div class="rules">
+    <div class="rule">Um só nível de display por tela. Títulos de seção usam H2/H3.</div>
+    <div class="rule">Números que são dado (preço, %, horário) podem subir para Bricolage; números em frase ficam em Instrument.</div>
+    <div class="rule">Comprimento de linha do corpo: 60–75 caracteres.</div>
+    <div class="rule">Nada de itálico para ênfase — use peso 600 ou a cor de acento.</div>
+    <div class="rule">Caixa alta só em overline, com o tracking de +0.09em. Nunca em títulos.</div>
+    <div class="rule">PT-BR com acentuação correta sempre, inclusive em rótulos curtos.</div>
+  </div>
+
+  <div class="foot"><span>Farol — Manual de marca</span><span>04 · Tipografia</span></div>
+</div>
+</x-dc>
+</body>
+</html>

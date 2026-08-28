@@ -1,0 +1,31 @@
+{
+  "pages": [
+    { "id": "page-1", "name": "App hi-fi" },
+    { "id": "page-2", "name": "Exploracao lo-fi" },
+    { "id": "page-3", "name": "Modo autonomo" },
+    { "id": "page-4", "name": "B2B agencias" }
+  ],
+  "artboards": [
+    { "file": "Onboarding.dc.html", "page": "page-1", "x": 0, "y": 0, "w": 1512, "h": 1080, "title": "1 · Onboarding de gosto" },
+    { "file": "DiscoveryInput.dc.html", "page": "page-1", "x": 1622, "y": 0, "w": 1512, "h": 1040, "title": "2 · Descoberta — formulario" },
+    { "file": "Main.dc.html", "page": "page-1", "x": 3244, "y": 0, "w": 1512, "h": 1220, "title": "3 · Descoberta — resultados" },
+    { "file": "Itinerary.dc.html", "page": "page-1", "x": 4866, "y": 0, "w": 1512, "h": 1220, "title": "4 · Roteiro dia a dia" },
+    { "file": "FlightsHotels.dc.html", "page": "page-1", "x": 6488, "y": 0, "w": 1512, "h": 1020, "title": "5 · Voo & hotel" },
+    { "file": "DirectionB.dc.html", "page": "page-2", "x": 0, "y": 0, "w": 1280, "h": 1500, "title": "B · Editorial (nao escolhida)" },
+    { "file": "DirectionC.dc.html", "page": "page-2", "x": 1360, "y": 0, "w": 1280, "h": 1720, "title": "C · Console (base da estrutura)" },
+    { "file": "AutoInput.dc.html", "page": "page-3", "x": 0, "y": 0, "w": 1512, "h": 1040, "title": "A1 · Entrada minima" },
+    { "file": "AutoPlan.dc.html", "page": "page-3", "x": 1622, "y": 0, "w": 1512, "h": 1220, "title": "A2 · Plano unico (sem seletor de destino)" },
+    { "file": "B2BLanding.dc.html", "page": "page-4", "x": 0, "y": 0, "w": 1400, "h": 2200, "title": "B1 · Landing para agencias", "print": "flow" },
+    { "file": "B2BConsole.dc.html", "page": "page-4", "x": 1560, "y": 0, "w": 1512, "h": 1220, "title": "B2 · Console — carteira de clientes" },
+    { "file": "B2BNewClient.dc.html", "page": "page-4", "x": 3200, "y": 0, "w": 1512, "h": 1220, "title": "B3 · Novo cliente" },
+    { "file": "B2BBuildItinerary.dc.html", "page": "page-4", "x": 4840, "y": 0, "w": 1512, "h": 1340, "title": "B4 · Montar roteiro" },
+    { "file": "B2BReviewProposal.dc.html", "page": "page-4", "x": 6480, "y": 0, "w": 1512, "h": 1480, "title": "B5 · Revisar & enviar proposta" }
+  ],
+  "annotations": [
+    { "id": "note-flow", "page": "page-1", "x": 0, "y": -232, "w": 1500, "text": "App Farol - hi-fi, direcao hibrida A+C.\nShell fixo: sidebar (viagem + etapas) | miolo | trilho de chat sempre presente.\nSistema: Bricolage Grotesque (titulos) + Instrument Sans (texto), neutro quente, terracota de acento, verde so no match.\nPlaceholders: fotos sao blocos de gradiente rotulados; nomes de restaurante/hotel e precos sao exemplos." },
+    { "id": "note-sketch", "page": "page-2", "x": 0, "y": -188, "w": 1200, "text": "Sketches lo-fi da rodada anterior, mantidos para referencia. A direcao escolhida foi o hibrido A+C, realizado na pagina App hi-fi." },
+    { "id": "note-auto", "page": "page-3", "x": 0, "y": -196, "w": 1400, "text": "Modo autonomo. Entrada minima (datas + origem + orcamento + ate 3 gostos) -> UM plano fechado.\nSem seletor de destino e sem telas de comparacao: o Farol decide e explica o porque. Toda mudanca (inclusive trocar o destino) acontece pelo chat.\nA2 mostra a passagem em dinheiro e em milhas." },
+    { "id": "note-b2b", "page": "page-4", "x": 0, "y": -232, "w": 1600, "text": "B2B - venda para agencias de viagem.\nB1: landing de vendas (numeros e precos sao placeholders entre [colchetes]).\nFluxo do operador: B2 carteira de clientes com status -> B3 cadastra um novo cliente (dados + viagem + briefing) -> B4 monta o roteiro (editor de dias, catalogo, painel de custos com markup e alternativa em milhas, nota interna) -> B5 revisa a proposta (marca da agencia, capa, o que incluir) e envia por PDF / link / e-mail.\nFarol nao aparece na proposta enviada ao cliente." }
+  ],
+  "launch": { "view": "canvas", "page": "page-4" }
+}

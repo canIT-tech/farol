@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .app { width: 1512px; box-sizing: border-box; min-height: 1440px; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .topbar { height: 56px; border-bottom: 1px solid #e9e7e1; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .agencybrand { display: flex; align-items: center; gap: 10px; }
+    .agencybrand .lg { width: 26px; height: 26px; border-radius: 7px; background: #2f4858; display: flex; align-items: center; justify-content: center; color: #fff; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 13px; }
+    .agencybrand .nm { font-weight: 600; font-size: 14px; }
+    .poweredby { font-size: 11px; color: #a29f97; display: flex; align-items: center; gap: 6px; }
+    .poweredby svg { width: 13px; height: 13px; color: #c25a38; }
+    .u { width: 30px; height: 30px; border-radius: 50%; background: #ece9e2; }
+
+    .chd { display: flex; align-items: center; justify-content: space-between; padding: 16px 30px; border-bottom: 1px solid #e9e7e1; background: #fff; }
+    .chd .back { font-size: 13px; color: #57554f; display: flex; align-items: center; gap: 7px; }
+    .chd .back svg { width: 15px; height: 15px; stroke: #9b9992; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .chd h1 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 18px; letter-spacing: -0.02em; margin: 0; }
+
+    .body { display: grid; grid-template-columns: 380px 1fr; min-height: 1290px; }
+
+    .settings { border-right: 1px solid #e9e7e1; background: #f7f5f0; padding: 24px 24px 40px; }
+    .settings h2 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 13px; font-weight: 600; margin: 0 0 14px; }
+    .settings .grp { margin-bottom: 26px; }
+    .fl { font-size: 12px; font-weight: 600; color: #57554f; margin-bottom: 8px; }
+    .brandrow { display: flex; gap: 12px; align-items: center; }
+    .logoslot { width: 52px; height: 52px; border-radius: 10px; background: #2f4858; color: #fff; display: flex; align-items: center; justify-content: center; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 16px; }
+    .swatchrow { display: flex; gap: 8px; }
+    .swatch { width: 26px; height: 26px; border-radius: 7px; }
+    .swatch.on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1c1b19; }
+    .input { border: 1.5px solid #e6e3dc; border-radius: 10px; background: #fff; padding: 10px 12px; font-size: 13px; color: #2f2d28; }
+    .textarea { border: 1.5px solid #e6e3dc; border-radius: 10px; background: #fff; padding: 10px 12px; font-size: 12.5px; color: #78766f; line-height: 1.55; min-height: 64px; }
+    .checks { display: flex; flex-direction: column; gap: 3px; }
+    .chk { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #45433d; padding: 7px 0; }
+    .chk .b { width: 32px; height: 19px; border-radius: 999px; background: #d9d5cb; position: relative; flex: none; }
+    .chk .b::after { content: ""; position: absolute; width: 15px; height: 15px; border-radius: 50%; background: #fff; top: 2px; left: 2px; }
+    .chk.on .b { background: #c25a38; }
+    .chk.on .b::after { left: 15px; }
+
+    .preview { padding: 30px 40px; display: flex; justify-content: center; }
+    .doc { width: 620px; background: #fff; border: 1px solid #e6e3dc; border-radius: 12px; box-shadow: 0 24px 56px -28px rgba(28,27,25,.22); overflow: hidden; }
+    .doc .cover { background: #2f4858; color: #fff; padding: 34px; }
+    .doc .cover .lg { width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 14px; margin-bottom: 20px; }
+    .doc .cover h3 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 24px; letter-spacing: -0.01em; margin: 0 0 6px; }
+    .doc .cover .to { font-size: 12.5px; opacity: 0.82; }
+    .doc .cover .msg { font-size: 12.5px; line-height: 1.6; opacity: 0.92; margin-top: 16px; border-top: 1px solid rgba(255,255,255,.16); padding-top: 14px; }
+    .doc .sec { padding: 20px 34px; border-top: 1px solid #f1efe9; }
+    .doc .sh { font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: #9b9992; font-weight: 600; margin-bottom: 8px; }
+    .doc .big { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 15px; font-weight: 600; }
+    .doc .p { font-size: 12.5px; color: #57554f; line-height: 1.6; margin: 6px 0 0; }
+    .doc .imgband { height: 92px; border-radius: 8px; background: linear-gradient(155deg,#bcd6e0,#7fa9b8); margin-top: 10px; }
+    .doc .ln { font-size: 12.5px; color: #45433d; padding: 5px 0; border-top: 1px solid #f6f4ef; }
+    .doc .ln:first-child { border-top: 0; }
+    .doc .invest { display: flex; justify-content: space-between; font-size: 12.5px; color: #57554f; padding: 6px 0; }
+    .doc .invest.total { font-weight: 700; color: #1c1b19; border-top: 1.5px solid #e0ddd4; padding-top: 9px; margin-top: 4px; font-family: "Bricolage Grotesque", system-ui, sans-serif; }
+    .doc .invest.miles { color: #2f6252; }
+    .doc .df { padding: 16px 34px 22px; font-size: 10.5px; color: #9b9992; }
+
+    .sendbar { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #e9e7e1; padding: 14px 40px; display: flex; align-items: center; gap: 12px; }
+    .sendbar .hint { font-size: 12px; color: #78766f; }
+    .sendbar .spacer { flex-grow: 1; }
+    .btn { font-size: 13.5px; font-weight: 600; border-radius: 10px; padding: 11px 18px; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-ghost { border: 1.5px solid #e0ddd4; color: #1c1b19; background: #fff; }
+    .btn-primary { background: #c25a38; color: #fff; }
+    .btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="app">
+  <div class="topbar">
+    <div class="agencybrand"><span class="lg">SA</span><span class="nm">Sua Agência de Viagens</span></div>
+    <div class="poweredby"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M20 43 L22 25 h4 l2 18"/><rect x="21" y="18" width="6" height="7" rx="1"/></svg>com tecnologia Farol</div>
+    <span class="u"></span>
+  </div>
+
+  <div class="chd">
+    <span class="back"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Voltar a editar</span>
+    <h1>Revisar proposta · Família Almeida</h1>
+    <span style="width:120px"></span>
+  </div>
+
+  <div class="body">
+    <aside class="settings">
+      <h2>Marca</h2>
+      <div class="grp">
+        <div class="fl">Logo da agência</div>
+        <div class="brandrow"><span class="logoslot">SA</span><span style="font-size:12px;color:#78766f">PNG ou SVG · aparece na capa e no rodapé</span></div>
+      </div>
+      <div class="grp">
+        <div class="fl">Cor primária</div>
+        <div class="swatchrow">
+          <span class="swatch on" style="background:#2f4858"></span>
+          <span class="swatch" style="background:#7a5b3a"></span>
+          <span class="swatch" style="background:#3d5a45"></span>
+          <span class="swatch" style="background:#5a3a4a"></span>
+          <span class="swatch" style="background:#1c1b19"></span>
+        </div>
+      </div>
+
+      <h2>Capa</h2>
+      <div class="grp">
+        <div class="fl">Título da proposta</div>
+        <div class="input">Lua de mel nas Maldivas</div>
+      </div>
+      <div class="grp">
+        <div class="fl">Mensagem ao cliente</div>
+        <div class="textarea">Oi, Almeida! Montamos esta proposta pensando no descanso de vocês, com quarto sobre a água e voo sem conexão longa. Qualquer ajuste é só falar.</div>
+      </div>
+
+      <h2>Incluir na proposta</h2>
+      <div class="checks">
+        <div class="chk on"><span class="b"></span>Roteiro dia a dia</div>
+        <div class="chk on"><span class="b"></span>Opções de voo</div>
+        <div class="chk on"><span class="b"></span>Alternativa com milhas</div>
+        <div class="chk on"><span class="b"></span>Investimento com condições de pagamento</div>
+        <div class="chk"><span class="b"></span>Política de cancelamento</div>
+        <div class="chk"><span class="b"></span>Dados bancários da agência</div>
+      </div>
+
+      <div class="grp" style="margin-top:22px">
+        <div class="fl">Validade da proposta</div>
+        <div class="input">7 dias — expira em 19 set</div>
+      </div>
+    </aside>
+
+    <div>
+      <div class="preview">
+        <div class="doc">
+          <div class="cover">
+            <div class="lg">SA</div>
+            <h3>Lua de mel nas Maldivas</h3>
+            <div class="to">Preparado para Família Almeida · por Sua Agência de Viagens</div>
+            <div class="msg">Oi, Almeida! Montamos esta proposta pensando no descanso de vocês, com quarto sobre a água e voo sem conexão longa. Qualquer ajuste é só falar.</div>
+          </div>
+          <div class="sec">
+            <div class="sh">Destino</div>
+            <div class="big">Maldivas — atol de Baa · 12 a 20 de setembro</div>
+            <p class="p">Resort pé na areia com meia pensão, gastronomia assinada e traslado de hidroavião. Setembro é ombro de estação, com mar calmo e menos movimento.</p>
+            <div class="imgband"></div>
+          </div>
+          <div class="sec">
+            <div class="sh">Roteiro — resumo</div>
+            <div class="ln">Dia 1 — Chegada, traslado de hidroavião e jantar de boas-vindas</div>
+            <div class="ln">Dia 2 — Mergulho com cilindro no recife da casa (opcional)</div>
+            <div class="ln">Dia 4 — Passeio privativo ao pôr do sol com golfinhos</div>
+            <div class="ln">Dias 3, 5–7 — Livres no resort · Dia 8 — Retorno</div>
+          </div>
+          <div class="sec">
+            <div class="sh">Voo</div>
+            <div class="ln">GIG → MLE · via Doha (Qatar Airways) · 1 conexão de 1h40</div>
+            <div class="ln" style="color:#2f6252">Alternativa: emitir com 180.000 milhas + R$ 2.640 de taxas (casal)</div>
+          </div>
+          <div class="sec">
+            <div class="sh">Investimento</div>
+            <div class="invest"><span>Aéreo · 2 passageiros</span><span>R$ 12.960</span></div>
+            <div class="invest"><span>Hospedagem · 8 noites, meia pensão</span><span>R$ 39.200</span></div>
+            <div class="invest"><span>Passeios e traslados</span><span>R$ 3.500</span></div>
+            <div class="invest"><span>Serviços da agência</span><span>R$ 6.679</span></div>
+            <div class="invest total"><span>Total</span><span>R$ 62.339 · em até 10x</span></div>
+            <div class="invest miles"><span>Com o aéreo em milhas</span><span>R$ 51.759 + 180k milhas</span></div>
+          </div>
+          <div class="df">Sua Agência de Viagens · CNPJ 00.000.000/0001-00 · contato@suaagencia.com · Proposta válida até 19/09/2026.</div>
+        </div>
+      </div>
+
+      <div class="sendbar">
+        <span class="hint">O cliente vê a marca da agência. Farol não aparece na proposta enviada.</span>
+        <span class="spacer"></span>
+        <span class="btn btn-ghost"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Baixar PDF</span>
+        <span class="btn btn-ghost"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Copiar link</span>
+        <span class="btn btn-primary"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>Enviar por e-mail</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

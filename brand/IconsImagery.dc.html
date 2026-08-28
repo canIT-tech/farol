@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .doc { width: 1400px; box-sizing: border-box; min-height: 1200px; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; padding: 64px 72px; }
+    .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #c25a38; margin-bottom: 14px; }
+    h1.title { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -0.02em; margin: 0 0 10px; }
+    .intro { font-size: 15px; line-height: 1.6; color: #57554f; max-width: 660px; margin: 0 0 42px; }
+    h2.sec { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 18px; }
+    .hr { height: 1px; background: #e9e7e1; margin: 42px 0; }
+    .cols { display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; }
+    .card { border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; padding: 26px 28px; }
+    .iconset { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px 12px; margin-top: 6px; }
+    .ic { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .ic svg { width: 24px; height: 24px; color: #1c1b19; }
+    .ic span { font-size: 10.5px; color: #9b9992; }
+    .spec-list { list-style: none; padding: 0; margin: 12px 0 0; }
+    .spec-list li { font-size: 13.5px; line-height: 1.5; color: #45433d; padding: 8px 0 8px 20px; position: relative; border-top: 1px solid #f1efe9; }
+    .spec-list li:first-child { border-top: 0; }
+    .spec-list li::before { content: ""; position: absolute; left: 0; top: 15px; width: 8px; height: 8px; border-radius: 50%; background: #c25a38; }
+    .grid-demo { width: 120px; height: 120px; margin-top: 10px; background:
+      linear-gradient(#f1efe9 1px, transparent 1px) 0 0 / 20px 20px,
+      linear-gradient(90deg, #f1efe9 1px, transparent 1px) 0 0 / 20px 20px; border: 1px solid #eceae3; position: relative; }
+    .grid-demo svg { position: absolute; inset: 20px; width: 80px; height: 80px; color: #c25a38; }
+    .photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .ph { border-radius: 14px; height: 150px; position: relative; overflow: hidden; }
+    .ph span { position: absolute; left: 12px; bottom: 10px; font-size: 11px; color: rgba(255,255,255,.92); text-shadow: 0 1px 3px rgba(0,0,0,.3); }
+    .p1 { background: linear-gradient(155deg,#e8caa6,#c98a63 55%,#a9683f); }
+    .p2 { background: linear-gradient(155deg,#c2ccd0,#91a7af 55%,#6f8b95); }
+    .p3 { background: linear-gradient(155deg,#bdd8ce,#8fbcae 55%,#659c92); }
+    .do-dont { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 40px; margin-top: 4px; }
+    .dd { font-size: 13.5px; line-height: 1.55; color: #45433d; padding-left: 22px; position: relative; }
+    .dd.y::before { content: "✓"; position: absolute; left: 0; top: 0; color: #3d7a67; font-weight: 700; }
+    .dd.n::before { content: "×"; position: absolute; left: 0; top: -1px; color: #c25a38; font-weight: 700; font-size: 16px; }
+    .foot { margin-top: 56px; font-size: 11px; color: #9b9992; display: flex; justify-content: space-between; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="doc">
+  <div class="eyebrow">05 · Ícones &amp; imagem</div>
+  <h1 class="title">Ícones &amp; imagem</h1>
+  <p class="intro">Ícones desenhados à mão em traço aberto, mesma família do símbolo. Fotografia com luz natural, gente dentro do lugar — não cartão-postal vazio. Onde não há foto, um duotone quente rotulado, nunca uma caixa cinza sem contexto.</p>
+
+  <div class="cols">
+    <div class="card">
+      <h2 class="sec">Sistema de ícones</h2>
+      <div class="iconset">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg><span>local</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>datas</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12l8-2 5-8 2 1-3 8 6 3v2l-7-1-3 5-2-1 1-5-4-2z"/></svg><span>voo</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a2 2 0 0 1 2-2h10a4 4 0 0 1 4 4v4"/><path d="M3 14h18M6 10V7a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/><path d="M4 18v2M20 18v2"/></svg><span>hotel</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a3 3 0 0 0 6 0V3M9 11v10M17 3c-1.5 1-2 3-2 6s.5 4 2 4v8"/></svg><span>refeição</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg><span>clima</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span>horário</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg><span>assessor</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.6-9.3-9C1 8.5 3 5 6.5 5 9 5 12 7.5 12 7.5S15 5 17.5 5C21 5 23 8.5 21.3 12 19 16.4 12 21 12 21z"/></svg><span>salvar</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span>avançar</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg><span>expandir</span></div>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg><span>concluído</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="sec">Especificação</h2>
+      <ul class="spec-list">
+        <li>ViewBox 24 · traço 1.6 · <code>stroke-linecap</code> e <code>linejoin</code> round.</li>
+        <li>Sem preenchimento. Cor via <code>currentColor</code>, herda do texto.</li>
+        <li>Tamanhos de render: 14, 16, 18, 20, 24. Acima de 24, prefira ilustração.</li>
+        <li>Área ativa: 2 unidades de respiro dentro do viewBox.</li>
+        <li>Um conceito por ícone. Nada de metáforas empilhadas.</li>
+        <li>Nunca emoji na interface.</li>
+      </ul>
+      <div class="grid-demo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg></div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Fotografia</h2>
+  <div class="photos">
+    <div class="ph p1"><span>Luz natural, hora dourada</span></div>
+    <div class="ph p2"><span>Rua viva, escala humana</span></div>
+    <div class="ph p3"><span>Detalhe do lugar, não pin de mapa</span></div>
+  </div>
+  <div class="do-dont" style="margin-top:20px">
+    <div class="dd y">Cor quente e natural, contraste suave — conversa com a base neutra.</div>
+    <div class="dd n">HDR saturado, céu turbinado, filtro pesado.</div>
+    <div class="dd y">Pessoas fazendo algo real no destino.</div>
+    <div class="dd n">Ponto turístico vazio e simétrico de cartão-postal.</div>
+    <div class="dd y">Enquadramento que sobra respiro para texto sobreposto.</div>
+    <div class="dd n">Texto cravado no meio de área ocupada da imagem.</div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Placeholder (sem foto)</h2>
+  <p class="intro" style="margin:0 0 4px">Gradiente duotone de 155°, dois tons da mesma faixa quente ou fria, saturação baixa. Sempre rotulado com o nome do lugar e um ícone de câmera tênue. Nunca uma caixa cinza sem legenda — o placeholder também comunica calma e cuidado.</p>
+
+  <div class="foot"><span>Farol — Manual de marca</span><span>05 · Ícones &amp; imagem</span></div>
+</div>
+</x-dc>
+</body>
+</html>

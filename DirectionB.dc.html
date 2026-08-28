@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Instrument+Sans:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    .root {
+      width: 1280px; box-sizing: border-box; padding: 56px 0 72px;
+      background: #fbfaf7; color: #221f1b;
+      font-family: "Instrument Sans", system-ui, sans-serif;
+    }
+    .col { max-width: 780px; margin: 0 auto; padding: 0 40px; }
+    .topbar { max-width: 780px; margin: 0 auto 56px; padding: 0 40px; display: flex; justify-content: space-between; align-items: baseline; }
+    .logo { font-family: "Fraunces", serif; font-size: 22px; font-weight: 600; }
+    .nav { display: flex; gap: 22px; color: #8f8a80; font-size: 13px; }
+    .hand { font-family: "Caveat", cursive; color: #a49f93; font-size: 22px; }
+    .kicker { font-family: "Caveat", cursive; font-size: 23px; color: #6d6759; margin-bottom: 10px; }
+    h1.head { font-family: "Fraunces", serif; font-weight: 500; font-size: 46px; line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 14px; }
+    .sub { color: #7c766a; font-size: 15px; line-height: 1.5; margin: 0 0 40px; max-width: 560px; }
+    .params { font-size: 13px; color: #928c7f; border-top: 1px solid #e5e1d7; border-bottom: 1px solid #e5e1d7; padding: 12px 0; margin-bottom: 8px; letter-spacing: 0.01em; }
+    .entry { display: grid; grid-template-columns: 44px 84px 1fr auto; gap: 20px; align-items: start; padding: 28px 0; border-bottom: 1px solid #e5e1d7; }
+    .num { font-family: "Fraunces", serif; font-size: 20px; color: #b9542f; }
+    .thumb { width: 84px; height: 84px; border: 1px dashed #cdc7b8; background: repeating-linear-gradient(135deg, #efeadd 0 10px, #f5f1e7 10px 20px); display: flex; align-items: center; justify-content: center; font-family: "Caveat", cursive; font-size: 14px; color: #ada695; text-align: center; }
+    .place h3 { font-family: "Fraunces", serif; font-weight: 500; font-size: 24px; margin: 0 0 6px; letter-spacing: -0.01em; }
+    .place p { font-family: "Fraunces", serif; font-style: italic; font-size: 15px; line-height: 1.5; color: #6b6558; margin: 0; max-width: 420px; }
+    .meta { text-align: right; font-size: 12px; color: #8f8a80; text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.7; }
+    .meta b { display: block; font-size: 15px; color: #3a362f; text-transform: none; letter-spacing: 0; font-weight: 500; }
+    .rule-strong { height: 1px; background: #d8d3c6; margin: 64px auto 0; max-width: 780px; }
+    .plan { max-width: 780px; margin: 0 auto; padding: 0 40px; display: grid; grid-template-columns: 1fr 220px; gap: 40px; }
+    .kicker2 { font-family: "Caveat", cursive; font-size: 23px; color: #6d6759; margin: 40px 0 20px; }
+    .dayblock { display: grid; grid-template-columns: 64px 1fr; gap: 20px; padding: 22px 0; border-top: 1px solid #e5e1d7; }
+    .daynum { font-family: "Fraunces", serif; font-size: 34px; color: #cdc7b8; line-height: 1; }
+    .line { padding: 7px 0; font-size: 14px; color: #3a362f; border-bottom: 1px solid #f0ece2; }
+    .line:last-child { border-bottom: 0; }
+    .line span { color: #9a948700; }
+    .line em { font-style: normal; color: #a49f93; font-size: 12.5px; }
+    .sidenote { border-left: 2px solid #b9542f; padding-left: 16px; align-self: start; margin-top: 62px; }
+    .sidenote .lbl { font-family: "Caveat", cursive; font-size: 20px; color: #6d6759; margin-bottom: 12px; }
+    .sidenote .q { font-size: 13px; color: #4a453d; line-height: 1.5; margin-bottom: 14px; }
+    .sidenote .a { font-family: "Fraunces", serif; font-style: italic; font-size: 13.5px; color: #6b6558; line-height: 1.5; }
+    .ask { margin-top: 18px; font-family: "Caveat", cursive; font-size: 18px; color: #ada695; border-top: 1px dashed #d8d3c6; padding-top: 10px; }
+    a { color: #b9542f; } a:hover { color: #8f3f22; }
+  </style>
+</helmet>
+<div class="root">
+  <div class="topbar">
+    <div class="logo">trip</div>
+    <div class="nav"><span>Viagens</span><span>Milhas</span><span>Conta</span></div>
+  </div>
+
+  <div class="col">
+    <div class="kicker">1 · Descoberta — resultados</div>
+    <h1 class="head">Onde ir agora.</h1>
+    <p class="sub">Quatro destinos escolhidos pelo seu perfil de gosto, ordenados por aderência. Cada um traz o porquê.</p>
+    <div class="params">7 NOITES · 10–17 MAIO · DE GRU · ATÉ R$ 5.000/PESSOA · CASAL · PRAIA, GASTRONOMIA</div>
+  </div>
+
+  <div class="col">
+    <div class="entry">
+      <div class="num">01</div>
+      <div class="thumb">foto</div>
+      <div class="place"><h3>Cartagena, Colômbia</h3><p>Praia e um centro histórico que é, ele mesmo, um roteiro gastronômico. Maio é seco.</p></div>
+      <div class="meta">match<b>94%</b>custo<b>R$ 3,2–4,1k</b></div>
+    </div>
+    <div class="entry">
+      <div class="num">02</div>
+      <div class="thumb">foto</div>
+      <div class="place"><h3>Cidade do México</h3><p>Para comer bem a semana inteira, andar por bairros e gastar pouco em diária.</p></div>
+      <div class="meta">match<b>88%</b>custo<b>R$ 3,8–4,6k</b></div>
+    </div>
+    <div class="entry">
+      <div class="num">03</div>
+      <div class="thumb">foto</div>
+      <div class="place"><h3>Lisboa, Portugal</h3><p>Clima ameno, ladeiras históricas e praia a trinta minutos quando bater vontade.</p></div>
+      <div class="meta">match<b>85%</b>custo<b>R$ 4,4–5,0k</b></div>
+    </div>
+    <div class="entry">
+      <div class="num">04</div>
+      <div class="thumb">foto</div>
+      <div class="place"><h3>Maceió, Brasil</h3><p>Água calma, menos deslocamento e a opção mais econômica desta seleção.</p></div>
+      <div class="meta">match<b>81%</b>custo<b>R$ 2,1–2,9k</b></div>
+    </div>
+  </div>
+
+  <div class="rule-strong"></div>
+
+  <div class="plan">
+    <div>
+      <div class="kicker2">2 · Roteiro dia a dia</div>
+      <div class="dayblock">
+        <div class="daynum">1</div>
+        <div>
+          <div class="line">Manhã — Cidade Amuralhada a pé <em>· 2h · começa 9h</em></div>
+          <div class="line">Almoço — frutos do mar, 400m adiante <em>· $$</em></div>
+          <div class="line">Tarde — Praia de Bocagrande <em>· livre</em></div>
+          <div class="line">Noite — jantar em Getsemaní <em>· reservar</em></div>
+        </div>
+      </div>
+      <div class="dayblock">
+        <div class="daynum">2</div>
+        <div>
+          <div class="line">Manhã — Ilhas do Rosário, saída de barco <em>· dia inteiro</em></div>
+          <div class="line">Tarde — praia e almoço na ilha <em>· incluso</em></div>
+          <div class="line">Noite — retorno, jantar leve <em>· $</em></div>
+        </div>
+      </div>
+    </div>
+    <div class="sidenote">
+      <div class="lbl">Assessor</div>
+      <div class="q">"tira o dia de museu e põe mais praia"</div>
+      <div class="a">Feito. O Dia 4 virou praia com passeio de barco; o resto do roteiro ficou igual.</div>
+      <div class="ask">peça um ajuste…</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

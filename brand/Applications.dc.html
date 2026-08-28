@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .doc { width: 1400px; box-sizing: border-box; min-height: 1180px; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; padding: 64px 72px; }
+    .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #c25a38; margin-bottom: 14px; }
+    h1.title { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -0.02em; margin: 0 0 10px; }
+    .intro { font-size: 15px; line-height: 1.6; color: #57554f; max-width: 660px; margin: 0 0 42px; }
+    h2.sec { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 18px; }
+    .hr { height: 1px; background: #e9e7e1; margin: 42px 0; }
+    .row { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+    .tile { border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; padding: 24px; }
+    .tile .cap { font-size: 12px; color: #78766f; margin-top: 14px; }
+    .favset { display: flex; align-items: flex-end; gap: 20px; }
+    .fav { border-radius: 6px; background: #c25a38; display: flex; align-items: center; justify-content: center; color: #fff; }
+    .fav svg { width: 62%; height: 62%; }
+    .f16 { width: 16px; height: 16px; border-radius: 3px; }
+    .f32 { width: 32px; height: 32px; border-radius: 6px; }
+    .f64 { width: 64px; height: 64px; border-radius: 12px; }
+    .appicon { width: 132px; height: 132px; border-radius: 30px; background: linear-gradient(160deg, #d0673f, #b34e2c); display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 32px -16px rgba(28,27,25,.4); }
+    .appicon svg { width: 66px; height: 66px; color: #fdeee7; }
+    .og { width: 600px; height: 315px; border-radius: 16px; background: #fbfaf8; border: 1px solid #e9e7e1; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 44px; box-sizing: border-box; position: relative; }
+    .og .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+    .og .brand svg { width: 26px; height: 26px; color: #c25a38; }
+    .og .brand b { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.03em; }
+    .og h3 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -0.02em; margin: 0 0 10px; max-width: 440px; line-height: 1.12; }
+    .og p { font-size: 15px; color: #57554f; margin: 0; max-width: 420px; }
+    .og .beam { position: absolute; right: -60px; top: -60px; width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle, #f9efe9, transparent 70%); }
+    .sig { border: 1px solid #e9e7e1; border-radius: 12px; background: #fff; padding: 20px 24px; display: flex; gap: 16px; align-items: center; max-width: 460px; }
+    .sig .m { width: 40px; height: 40px; border-radius: 9px; background: #f9efe9; display: flex; align-items: center; justify-content: center; }
+    .sig .m svg { width: 22px; height: 22px; color: #c25a38; }
+    .sig .txt { font-size: 12.5px; line-height: 1.6; color: #57554f; }
+    .sig .txt b { color: #1c1b19; font-size: 13.5px; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; }
+    .sig .txt .role { color: #9b9992; }
+    .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 40px; }
+    .rule { font-size: 13.5px; line-height: 1.55; color: #45433d; padding-left: 20px; position: relative; }
+    .rule::before { content: ""; position: absolute; left: 0; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: #c25a38; }
+    .foot { margin-top: 56px; font-size: 11px; color: #9b9992; display: flex; justify-content: space-between; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="doc">
+  <div class="eyebrow">07 · Aplicações</div>
+  <h1 class="title">Aplicações</h1>
+  <p class="intro">O símbolo funciona sozinho em espaços pequenos. Em 16 px use a versão sem feixes de luz — só torre e lâmpada — para não empastar. O acento terracota é o fundo padrão das peças de ícone.</p>
+
+  <h2 class="sec">Favicon</h2>
+  <div class="favset">
+    <div class="tile"><div class="favset">
+      <div class="fav f16"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 42h12"/><path d="M20 42 L22 24 h4 l2 18"/><rect x="21" y="18" width="6" height="6" rx="1"/></svg></div>
+      <div class="fav f32"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 42h12"/><path d="M20 42 L22 24 h4 l2 18"/><path d="M21 24h6"/><rect x="21" y="17" width="6" height="7" rx="1"/></svg></div>
+      <div class="fav f64"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/></svg></div>
+    </div><div class="cap">16 · 32 · 64 px — feixes some abaixo de 24 px</div></div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Ícone de app</h2>
+  <div class="row">
+    <div class="tile"><div class="appicon"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/><path d="M15 15 l4.5 3 M33 15 l-4.5 3 M12 22 l5 1.2 M36 22 l-5 1.2"/></svg></div><div class="cap">Superellipse iOS · raio 30 em 132 · lâmpada quente sobre gradiente terracota</div></div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Card social / OG (1200 × 630, mostrado a 50%)</h2>
+  <div class="og">
+    <div class="beam"></div>
+    <div class="brand"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/><path d="M15 15 l4.5 3 M33 15 l-4.5 3"/></svg><b>Farol</b></div>
+    <h3>O assessor que guia a viagem inteira.</h3>
+    <p>Descobre o destino pelo seu gosto, monta o roteiro e ajusta tudo por conversa.</p>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Assinatura de e-mail</h2>
+  <div class="sig">
+    <div class="m"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/></svg></div>
+    <div class="txt"><b>Nome Sobrenome</b><br><span class="role">Produto · Farol</span><br>farol.app · [e-mail]</div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Regras gerais</h2>
+  <div class="rules">
+    <div class="rule">Peça de ícone: fundo terracota, símbolo em #fdeee7 (branco tostado).</div>
+    <div class="rule">Nunca colocar o símbolo terracota sobre fundo terracota.</div>
+    <div class="rule">OG e capas sempre com o feixe radial suave no canto — assinatura visual da marca.</div>
+    <div class="rule">Domínio de trabalho: <code>farol.app</code> (confirmar disponibilidade).</div>
+  </div>
+
+  <div class="foot"><span>Farol — Manual de marca</span><span>07 · Aplicações</span></div>
+</div>
+</x-dc>
+</body>
+</html>

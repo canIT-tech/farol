@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .app { width: 1512px; box-sizing: border-box; min-height: 1180px; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .topbar { height: 56px; border-bottom: 1px solid #e9e7e1; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .agencybrand { display: flex; align-items: center; gap: 10px; }
+    .agencybrand .lg { width: 26px; height: 26px; border-radius: 7px; background: #2f4858; display: flex; align-items: center; justify-content: center; color: #fff; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 13px; }
+    .agencybrand .nm { font-weight: 600; font-size: 14px; }
+    .poweredby { font-size: 11px; color: #a29f97; display: flex; align-items: center; gap: 6px; }
+    .poweredby svg { width: 13px; height: 13px; color: #c25a38; }
+    .u { width: 30px; height: 30px; border-radius: 50%; background: #ece9e2; }
+
+    .wrap { max-width: 760px; margin: 0 auto; padding: 34px 24px 64px; }
+    .crumb { font-size: 13px; color: #9b9992; margin-bottom: 12px; }
+    .crumb b { color: #57554f; font-weight: 500; }
+    h1 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 28px; letter-spacing: -0.02em; margin: 0 0 6px; }
+    .lede { font-size: 14px; color: #78766f; margin: 0 0 32px; }
+
+    .group { border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; padding: 24px 26px; margin-bottom: 18px; }
+    .group h2 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 14px; font-weight: 600; margin: 0 0 18px; }
+    .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .frow.one { grid-template-columns: 1fr; }
+    .frow:last-child { margin-bottom: 0; }
+    .field .flabel { font-size: 12.5px; font-weight: 600; color: #57554f; margin-bottom: 7px; }
+    .input { border: 1.5px solid #e6e3dc; border-radius: 11px; background: #fff; padding: 11px 13px; font-size: 14px; color: #2f2d28; display: flex; align-items: center; gap: 10px; min-height: 20px; }
+    .input.sel::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-right: 1.5px solid #9b9992; border-bottom: 1.5px solid #9b9992; transform: rotate(45deg) translateY(-2px); }
+    .input .ph { color: #b6b3aa; }
+    .input svg { width: 16px; height: 16px; stroke: #9b9992; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .chips { display: flex; gap: 9px; flex-wrap: wrap; }
+    .chip { border: 1.5px solid #e6e3dc; border-radius: 999px; padding: 8px 14px; font-size: 12.5px; color: #6b6963; background: #fff; }
+    .chip.on { background: #f9efe9; color: #8f3f26; border-color: #e2c1b3; font-weight: 500; }
+    .textarea { border: 1.5px solid #e6e3dc; border-radius: 11px; background: #fff; padding: 12px 13px; font-size: 13.5px; color: #78766f; line-height: 1.55; min-height: 76px; }
+    .toggle { display: inline-flex; border: 1.5px solid #e6e3dc; border-radius: 10px; overflow: hidden; background: #fff; }
+    .toggle span { padding: 8px 14px; font-size: 12.5px; color: #78766f; }
+    .toggle span.on { background: #1c1b19; color: #fff; }
+
+    .foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+    .btn { font-size: 14px; font-weight: 600; border-radius: 11px; padding: 12px 20px; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-ghost { border: 1.5px solid #e0ddd4; color: #1c1b19; background: #fff; }
+    .btn-primary { background: #c25a38; color: #fff; }
+    .btn-primary svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="app">
+  <div class="topbar">
+    <div class="agencybrand"><span class="lg">SA</span><span class="nm">Sua Agência de Viagens</span></div>
+    <div class="poweredby"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M20 43 L22 25 h4 l2 18"/><rect x="21" y="18" width="6" height="7" rx="1"/></svg>com tecnologia Farol</div>
+    <span class="u"></span>
+  </div>
+
+  <div class="wrap">
+    <div class="crumb"><b>Clientes</b> / Novo cliente</div>
+    <h1>Novo cliente</h1>
+    <p class="lede">Preencha o que já sabe. O que faltar, o Farol pergunta ou assume um padrão — dá para ajustar depois.</p>
+
+    <div class="group">
+      <h2>Dados do cliente</h2>
+      <div class="frow">
+        <div class="field"><div class="flabel">Nome</div><div class="input">Família Almeida</div></div>
+        <div class="field"><div class="flabel">Tipo de viagem</div><div class="input sel">Lua de mel</div></div>
+      </div>
+      <div class="frow">
+        <div class="field"><div class="flabel">E-mail</div><div class="input">contato@familiaalmeida.com</div></div>
+        <div class="field"><div class="flabel">Telefone</div><div class="input"><span class="ph">(00) 00000-0000</span></div></div>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2>A viagem</h2>
+      <div class="frow">
+        <div class="field"><div class="flabel">Saindo de</div><div class="input"><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>Rio de Janeiro · GIG</div></div>
+        <div class="field"><div class="flabel">Viajantes</div><div class="input">2 adultos · 0 crianças</div></div>
+      </div>
+      <div class="frow">
+        <div class="field"><div class="flabel">Datas</div><div class="input"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>12 – 20 set 2026</div><div class="toggle" style="margin-top:9px"><span class="on">Datas exatas</span><span>Mês aproximado</span></div></div>
+        <div class="field"><div class="flabel">Orçamento</div><div class="input">R$ 22.000 <span class="ph">· total do casal</span></div></div>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2>Perfil de gosto</h2>
+      <div class="frow one">
+        <div class="field">
+          <div class="flabel">O que o cliente busca</div>
+          <div class="chips">
+            <span class="chip on">Praia</span><span class="chip on">Gastronomia</span><span class="chip on">Conforto</span><span class="chip on">Sossego</span>
+            <span class="chip">Cultura</span><span class="chip">Natureza</span><span class="chip">Vida noturna</span><span class="chip">Aventura</span>
+          </div>
+        </div>
+      </div>
+      <div class="frow one">
+        <div class="field">
+          <div class="flabel">Observações / briefing do cliente</div>
+          <div class="textarea">"Queremos um lugar paradisíaco, sem muita agitação. Ela não curte voo com conexão longa. Comemoração de casamento — capricha no hotel."</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot">
+      <span class="btn btn-ghost">Cancelar</span>
+      <span class="btn btn-primary">Criar e montar com o Farol <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

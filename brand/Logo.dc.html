@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .doc { width: 1400px; box-sizing: border-box; min-height: 1320px; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; padding: 64px 72px; }
+    .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #c25a38; margin-bottom: 14px; }
+    h1.title { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -0.02em; margin: 0 0 10px; }
+    .intro { font-size: 15px; line-height: 1.6; color: #57554f; max-width: 640px; margin: 0 0 44px; }
+    h2.sec { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 16px; }
+    .hr { height: 1px; background: #e9e7e1; margin: 44px 0; }
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .panel { border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 200px; }
+    .panel.dark { background: #171614; }
+    .panel .cap { font-size: 12px; color: #9b9992; margin-top: 18px; align-self: flex-start; }
+    .panel.dark .cap { color: #6f6d66; }
+    .lockup-h { display: flex; align-items: center; gap: 16px; }
+    .lockup-v { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .mark { color: #c25a38; }
+    .m64 { width: 64px; height: 64px; }
+    .m40 { width: 40px; height: 40px; }
+    .m28 { width: 28px; height: 28px; }
+    .word { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; letter-spacing: -0.03em; color: #1c1b19; }
+    .dark .word { color: #f4f2ec; }
+    .w48 { font-size: 48px; }
+    .w32 { font-size: 32px; }
+    .w22 { font-size: 22px; }
+    .construct { border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; padding: 36px; display: flex; gap: 48px; align-items: center; }
+    .grid-mark { position: relative; width: 200px; height: 200px; flex: none; background:
+      linear-gradient(#f1efe9 1px, transparent 1px) 0 0 / 25px 25px,
+      linear-gradient(90deg, #f1efe9 1px, transparent 1px) 0 0 / 25px 25px; border: 1px solid #eceae3; }
+    .grid-mark svg { position: absolute; inset: 25px; width: 150px; height: 150px; color: #c25a38; }
+    .clear { position: relative; width: 200px; height: 200px; flex: none; }
+    .clear .box { position: absolute; inset: 0; border: 1.5px dashed #d9b3a4; border-radius: 8px; }
+    .clear svg { position: absolute; inset: 42px; width: 116px; height: 116px; color: #c25a38; }
+    .ctext { font-size: 13.5px; line-height: 1.65; color: #57554f; }
+    .ctext b { color: #1c1b19; font-weight: 600; }
+    .sizes { display: flex; align-items: flex-end; gap: 40px; border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; padding: 30px 36px; }
+    .sizes .u { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .sizes .u .lab { font-size: 11.5px; color: #9b9992; }
+    .misuse { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .mis { border: 1px solid #e9e7e1; border-radius: 14px; background: #fff; padding: 22px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+    .mis .box { height: 84px; display: flex; align-items: center; justify-content: center; }
+    .mis .no { font-size: 12px; color: #8f3f26; }
+    .mis .x { width: 16px; height: 16px; color: #c25a38; }
+    .stretch .word { transform: scaleX(1.7); }
+    .rot { transform: rotate(-12deg); }
+    .foot { margin-top: 56px; font-size: 11px; color: #9b9992; display: flex; justify-content: space-between; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="doc">
+  <div class="eyebrow">02 · Logo</div>
+  <h1 class="title">Logo</h1>
+  <p class="intro">O símbolo é um farol estilizado: torre afunilada, casa da lâmpada e feixes curtos de luz. Traço aberto, mesmo peso do sistema de ícones. O wordmark usa Bricolage Grotesque 700 com tracking fechado (−0.03em).</p>
+
+  <h2 class="sec">Lockups</h2>
+  <div class="panels">
+    <div class="panel">
+      <div class="lockup-h">
+        <svg class="mark m64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/><path d="M15 15 l4.5 3 M33 15 l-4.5 3 M12 22 l5 1.2 M36 22 l-5 1.2"/></svg>
+        <span class="word w48">Farol</span>
+      </div>
+      <span class="cap">Horizontal — uso padrão</span>
+    </div>
+    <div class="panel">
+      <div class="lockup-v">
+        <svg class="mark m64" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/><path d="M15 15 l4.5 3 M33 15 l-4.5 3 M12 22 l5 1.2 M36 22 l-5 1.2"/></svg>
+        <span class="word w32">Farol</span>
+      </div>
+      <span class="cap">Empilhado — espaços quadrados</span>
+    </div>
+    <div class="panel">
+      <div class="lockup-h"><svg class="mark m40" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/><path d="M15 15 l4.5 3 M33 15 l-4.5 3 M12 22 l5 1.2 M36 22 l-5 1.2"/></svg><span class="word w22">Farol</span></div>
+      <span class="cap">Compacto — barra de topo do app</span>
+    </div>
+    <div class="panel dark">
+      <div class="lockup-h"><svg class="mark m40" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="color:#d9714f"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/><path d="M15 15 l4.5 3 M33 15 l-4.5 3 M12 22 l5 1.2 M36 22 l-5 1.2"/></svg><span class="word w22">Farol</span></div>
+      <span class="cap">Sobre fundo escuro — acento sobe para #d9714f</span>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Construção &amp; área de proteção</h2>
+  <div class="construct">
+    <div class="grid-mark"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/><path d="M15 15 l4.5 3 M33 15 l-4.5 3 M12 22 l5 1.2 M36 22 l-5 1.2"/></svg></div>
+    <div class="clear"><div class="box"></div><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/><path d="M15 15 l4.5 3 M33 15 l-4.5 3 M12 22 l5 1.2 M36 22 l-5 1.2"/></svg></div>
+    <p class="ctext">O símbolo é desenhado numa grade de <b>24 unidades</b>, traço de <b>2.6</b>. A base fica a 1 unidade da borda inferior.<br><br>Área de proteção: no mínimo <b>a largura da casa da lâmpada</b> (≈ 0.3× a altura do símbolo) livre em todos os lados. Nada de texto, imagem ou borda dentro dessa margem.</p>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Tamanhos mínimos</h2>
+  <div class="sizes">
+    <div class="u"><div class="lockup-h"><svg class="mark m28" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/><path d="M15 15 l4.5 3 M33 15 l-4.5 3"/></svg><span class="word" style="font-size:16px">Farol</span></div><span class="lab">Digital — 16 px de altura do símbolo</span></div>
+    <div class="u"><svg class="mark" style="width:20px;height:20px" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M20 43 L22 25 h4 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/></svg><span class="lab">Símbolo isolado — mín. 20 px<br>(favicon: versão sem feixes)</span></div>
+    <div class="u"><div class="lockup-h"><svg class="mark" style="width:22px;height:22px" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/><path d="M15 15 l4.5 3 M33 15 l-4.5 3 M12 22 l5 1.2 M36 22 l-5 1.2"/></svg><span class="word" style="font-size:13px">Farol</span></div><span class="lab">Impresso — mín. 8 mm de altura</span></div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Usos indevidos</h2>
+  <div class="misuse">
+    <div class="mis"><div class="box stretch"><span class="word w22">Farol</span></div><span class="no">Não distorcer nem esticar</span></div>
+    <div class="mis"><div class="box"><span class="word w22" style="color:#3d7a67">Farol</span></div><span class="no">Não recolorir fora da paleta</span></div>
+    <div class="mis"><div class="box rot"><span class="word w22">Farol</span></div><span class="no">Não girar</span></div>
+    <div class="mis"><div class="box" style="background:#c25a38;border-radius:8px;padding:0 14px"><span class="word w22" style="color:#c25a38">Farol</span></div><span class="no">Contraste insuficiente</span></div>
+  </div>
+
+  <div class="foot"><span>Farol — Manual de marca</span><span>02 · Logo</span></div>
+</div>
+</x-dc>
+</body>
+</html>

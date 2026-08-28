@@ -1,0 +1,228 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .app {
+      width: 1512px; box-sizing: border-box; min-height: 1180px;
+      background: #fbfaf8; color: #1c1b19;
+      font-family: "Instrument Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: grid; grid-template-columns: 248px 1fr 340px;
+    }
+    .side { border-right: 1px solid #e9e7e1; background: #f7f5f0; padding: 26px 20px; }
+    .logo { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 19px; letter-spacing: -0.02em; margin-bottom: 30px; }
+    .logo i { color: #c25a38; font-style: normal; }
+    .side h5 { font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #a29f97; margin: 0 0 12px; font-weight: 600; }
+    .tripcard { background: #fff; border: 1px solid #e9e7e1; border-radius: 12px; padding: 4px 14px; margin-bottom: 24px; }
+    .tf { font-size: 12.5px; color: #78766f; padding: 11px 0; border-bottom: 1px solid #f1efe9; }
+    .tf:last-child { border-bottom: 0; }
+    .tf b { display: block; color: #1c1b19; font-weight: 500; font-size: 13.5px; margin-top: 3px; }
+    .steps { display: flex; flex-direction: column; gap: 2px; }
+    .step { font-size: 13px; color: #8a8882; padding: 9px 10px; border-radius: 9px; display: flex; gap: 10px; align-items: center; }
+    .step .b { width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid currentColor; flex: none; display: flex; align-items: center; justify-content: center; }
+    .step .b svg { width: 9px; height: 9px; stroke: currentColor; fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .step.done { color: #6b6963; }
+    .step.done .b { background: #6b6963; border-color: #6b6963; color: #fff; }
+    .step.on { background: #1c1b19; color: #fff; font-weight: 500; }
+
+    .main { padding: 34px 40px 56px; }
+    .head-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; }
+    h1 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 27px; letter-spacing: -0.02em; margin: 0; }
+    h1 + p { margin: 5px 0 0; color: #78766f; font-size: 13.5px; }
+    .actions { display: flex; gap: 9px; }
+    .gbtn { font-size: 13px; color: #6b6963; border: 1.5px solid #e6e3dc; border-radius: 10px; padding: 9px 14px; display: inline-flex; align-items: center; gap: 7px; background: #fff; }
+    .gbtn svg { width: 14px; height: 14px; stroke: #9b9992; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+    .daystrip { display: flex; gap: 8px; margin-bottom: 24px; }
+    .dp { border: 1.5px solid #e6e3dc; border-radius: 12px; background: #fff; padding: 10px 14px; text-align: center; min-width: 62px; }
+    .dp .dn { font-size: 13px; font-weight: 600; color: #3a3833; }
+    .dp .dd { font-size: 11px; color: #9b9992; margin-top: 2px; }
+    .dp.on { background: #1c1b19; border-color: #1c1b19; }
+    .dp.on .dn { color: #fff; }
+    .dp.on .dd { color: rgba(255,255,255,.6); }
+
+    .dayhead { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .dayhead h2 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 19px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+    .wchip { font-size: 12px; color: #78766f; background: #fff; border: 1px solid #e9e7e1; border-radius: 999px; padding: 5px 11px; display: inline-flex; align-items: center; gap: 6px; }
+    .wchip svg { width: 13px; height: 13px; stroke: #c9a24a; fill: none; stroke-width: 1.7; }
+    .costchip { font-size: 12px; color: #57554f; background: #f2efe9; border-radius: 999px; padding: 5px 11px; }
+
+    .block { margin-bottom: 26px; }
+    .bt { font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #a29f97; font-weight: 600; margin-bottom: 12px; }
+    .entry { display: grid; grid-template-columns: 58px 1fr; gap: 14px; margin-bottom: 12px; }
+    .entry .time { font-size: 12.5px; color: #9b9992; padding-top: 14px; }
+    .pcard { border: 1px solid #e9e7e1; border-radius: 13px; background: #fff; padding: 13px; display: flex; gap: 13px; align-items: flex-start; }
+    .pthumb { width: 76px; height: 76px; border-radius: 10px; flex: none; }
+    .pt1 { background: linear-gradient(150deg,#e0cbb0,#bb906a); }
+    .pt2 { background: linear-gradient(150deg,#d8c6b4,#b59a83); }
+    .pt3 { background: linear-gradient(150deg,#cdd3d1,#9aa9a5); }
+    .pt4 { background: linear-gradient(150deg,#e2c9be,#c39a8c); }
+    .pbody { flex-grow: 1; }
+    .pbody .pn { font-size: 14.5px; font-weight: 600; color: #1c1b19; }
+    .pbody .pmeta { font-size: 12.5px; color: #78766f; margin-top: 4px; line-height: 1.5; }
+    .pbody .ptags { display: flex; gap: 8px; margin-top: 9px; }
+    .ptag { font-size: 11.5px; color: #6b6963; background: #f4f1eb; border-radius: 6px; padding: 3px 8px; }
+    .pmore { color: #b6b3aa; font-size: 18px; align-self: flex-start; padding: 0 4px; }
+    .transfer { grid-column: 2; font-size: 12px; color: #9b9992; display: flex; align-items: center; gap: 8px; margin: -4px 0 12px; }
+    .transfer svg { width: 14px; height: 14px; stroke: #b6b3aa; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .free { border: 1.5px dashed #e0ddd4; border-radius: 13px; padding: 14px; font-size: 13px; color: #9b9992; background: #fbfaf7; }
+    .addbtn { grid-column: 2; font-size: 12.5px; color: #c25a38; border: 1.5px dashed #e2c1b3; border-radius: 10px; padding: 10px; text-align: center; }
+
+    .rail { border-left: 1px solid #e9e7e1; background: #f7f5f0; display: flex; flex-direction: column; }
+    .map { margin: 14px 14px 0; height: 150px; border-radius: 12px; background: linear-gradient(140deg,#e9e5db,#dcd7ca); border: 1px solid #e2ded3; position: relative; overflow: hidden; }
+    .map .mlbl { position: absolute; left: 12px; bottom: 10px; font-size: 11px; color: #8a8882; background: rgba(255,255,255,.8); border-radius: 6px; padding: 3px 8px; }
+    .map .pin { position: absolute; width: 9px; height: 9px; border-radius: 50%; background: #c25a38; border: 2px solid #fff; }
+    .rh { padding: 16px 18px; border-bottom: 1px solid #e9e7e1; border-top: 1px solid #e9e7e1; margin-top: 14px; display: flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #6b6963; }
+    .rh svg { width: 15px; height: 15px; stroke: #c25a38; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .rb { padding: 18px; display: flex; flex-direction: column; gap: 13px; flex-grow: 1; }
+    .bub { font-size: 13px; line-height: 1.5; padding: 11px 13px; border-radius: 13px; max-width: 92%; }
+    .bub.a { align-self: flex-start; background: #fff; border: 1px solid #ece9e2; color: #3a3833; }
+    .bub.u { align-self: flex-end; background: #1c1b19; color: #fff; }
+    .rin { margin: 14px; border: 1.5px solid #e6e3dc; border-radius: 12px; background: #fff; padding: 12px 13px; font-size: 13px; color: #b6b3aa; display: flex; align-items: center; justify-content: space-between; }
+    .rin b { width: 30px; height: 30px; border-radius: 8px; background: #c25a38; display: flex; align-items: center; justify-content: center; }
+    .rin b svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="app">
+
+  <aside class="side">
+    <div class="logo">trip<i>.</i></div>
+    <h5>Sua viagem</h5>
+    <div class="tripcard">
+      <div class="tf">Destino <b>Cartagena, Colômbia</b></div>
+      <div class="tf">Datas <b>10 – 17 mai · 7 noites</b></div>
+      <div class="tf">Viajantes <b>2 adultos</b></div>
+      <div class="tf">Gasto estimado <b>R$ 3.980 / pessoa</b></div>
+    </div>
+    <h5>Etapas</h5>
+    <div class="steps">
+      <div class="step done"><span class="b"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>Perfil de gosto</div>
+      <div class="step done"><span class="b"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>Escolher destino</div>
+      <div class="step on"><span class="b"></span>Roteiro</div>
+      <div class="step"><span class="b"></span>Voo &amp; hotel</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="head-row">
+      <div>
+        <h1>Cartagena · 7 dias</h1>
+        <p>10 – 17 de maio · ritmo moderado · foco em praia e gastronomia</p>
+      </div>
+      <div class="actions">
+        <span class="gbtn"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Exportar</span>
+        <span class="gbtn"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8 11l8-4M8 13l8 4"/></svg>Compartilhar</span>
+      </div>
+    </div>
+
+    <div class="daystrip">
+      <span class="dp on"><span class="dn">Dia 1</span><span class="dd">10 mai</span></span>
+      <span class="dp"><span class="dn">Dia 2</span><span class="dd">11 mai</span></span>
+      <span class="dp"><span class="dn">Dia 3</span><span class="dd">12 mai</span></span>
+      <span class="dp"><span class="dn">Dia 4</span><span class="dd">13 mai</span></span>
+      <span class="dp"><span class="dn">Dia 5</span><span class="dd">14 mai</span></span>
+      <span class="dp"><span class="dn">Dia 6</span><span class="dd">15 mai</span></span>
+      <span class="dp"><span class="dn">Dia 7</span><span class="dd">16 mai</span></span>
+    </div>
+
+    <div class="dayhead">
+      <h2>Dia 1 — Chegada e Cidade Amuralhada</h2>
+      <span class="wchip"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M6 6l1 1M17 17l1 1M18 6l-1 1M7 17l-1 1"/></svg>31° ensolarado</span>
+      <span class="costchip">R$ 210 estimado no dia</span>
+    </div>
+
+    <div class="block">
+      <div class="bt">Manhã</div>
+      <div class="entry">
+        <span class="time">09:00</span>
+        <div class="pcard">
+          <div class="pthumb pt1"></div>
+          <div class="pbody">
+            <div class="pn">Cidade Amuralhada a pé</div>
+            <div class="pmeta">Centro histórico · comece cedo para evitar o calor do meio-dia.</div>
+            <div class="ptags"><span class="ptag">Passeio</span><span class="ptag">~2h</span><span class="ptag">Grátis</span></div>
+          </div>
+          <span class="pmore">⋯</span>
+        </div>
+      </div>
+      <div class="transfer"><svg viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></svg>8 min a pé até o almoço</div>
+      <div class="entry">
+        <span class="time">12:30</span>
+        <div class="pcard">
+          <div class="pthumb pt2"></div>
+          <div class="pbody">
+            <div class="pn">Almoço — La Cevichería</div>
+            <div class="pmeta">Frutos do mar · muito procurado, chegar antes das 13h.</div>
+            <div class="ptags"><span class="ptag">Restaurante</span><span class="ptag">$$</span><span class="ptag">4.5 ★</span></div>
+          </div>
+          <span class="pmore">⋯</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="bt">Tarde</div>
+      <div class="entry">
+        <span class="time">15:00</span>
+        <div class="pcard">
+          <div class="pthumb pt3"></div>
+          <div class="pbody">
+            <div class="pn">Praia de Bocagrande</div>
+            <div class="pmeta">Tarde livre à beira-mar. Guarda-sol e água por conta do quiosque.</div>
+            <div class="ptags"><span class="ptag">Praia</span><span class="ptag">Livre</span></div>
+          </div>
+          <span class="pmore">⋯</span>
+        </div>
+      </div>
+      <div class="entry"><span class="time"></span><div class="free">17:30 — 19:00 · espaço livre para descanso no hotel</div></div>
+    </div>
+
+    <div class="block">
+      <div class="bt">Noite</div>
+      <div class="entry">
+        <span class="time">19:30</span>
+        <div class="pcard">
+          <div class="pthumb pt4"></div>
+          <div class="pbody">
+            <div class="pn">Jantar em Getsemaní + caminhada</div>
+            <div class="pmeta">Bairro de vida noturna, murais e praças. Reservar mesa recomendado.</div>
+            <div class="ptags"><span class="ptag">Restaurante</span><span class="ptag">$$</span><span class="ptag">Reservar</span></div>
+          </div>
+          <span class="pmore">⋯</span>
+        </div>
+      </div>
+      <div class="entry"><span class="time"></span><div class="addbtn">+ adicionar parada</div></div>
+    </div>
+  </div>
+
+  <aside class="rail">
+    <div class="map">
+      <span class="pin" style="left:38%;top:34%"></span>
+      <span class="pin" style="left:52%;top:46%"></span>
+      <span class="pin" style="left:44%;top:62%"></span>
+      <span class="mlbl">Mapa do Dia 1</span>
+    </div>
+    <div class="rh"><svg viewBox="0 0 24 24"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>Assessor</div>
+    <div class="rb">
+      <div class="bub a">Montei 7 dias com foco em praia e gastronomia. Deixei o Dia 1 mais leve pra você se adaptar ao calor.</div>
+      <div class="bub u">tira o dia de museu e põe mais praia</div>
+      <div class="bub a">Feito — o Dia 4 virou praia com passeio de barco às Ilhas do Rosário. O custo do dia caiu R$ 120.</div>
+      <div class="bub u">adianta o jantar de hoje pras 19h</div>
+      <div class="bub a">Pronto. Jantar às 19:00 e reservei a caminhada em Getsemaní logo depois.</div>
+    </div>
+    <div class="rin">peça um ajuste…<b><svg viewBox="0 0 24 24"><path d="M7 12h10M12 7l5 5-5 5"/></svg></b></div>
+  </aside>
+
+</div>
+</x-dc>
+</body>
+</html>

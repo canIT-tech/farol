@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .app { width: 1512px; box-sizing: border-box; min-height: 1180px; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .topbar { height: 56px; border-bottom: 1px solid #e9e7e1; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .agencybrand { display: flex; align-items: center; gap: 10px; }
+    .agencybrand .lg { width: 26px; height: 26px; border-radius: 7px; background: #2f4858; display: flex; align-items: center; justify-content: center; color: #fff; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 13px; }
+    .agencybrand .nm { font-weight: 600; font-size: 14px; }
+    .poweredby { font-size: 11px; color: #a29f97; display: flex; align-items: center; gap: 6px; }
+    .poweredby svg { width: 13px; height: 13px; color: #c25a38; }
+    .u { width: 30px; height: 30px; border-radius: 50%; background: #ece9e2; }
+
+    .body { display: grid; grid-template-columns: 268px 1fr 320px; min-height: 1124px; }
+
+    .clients { border-right: 1px solid #e9e7e1; background: #f7f5f0; padding: 20px 16px; }
+    .clients .hd { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .clients .hd h5 { font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #a29f97; margin: 0; font-weight: 600; }
+    .clients .add { width: 24px; height: 24px; border: 1.5px solid #d9d5cb; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: #78766f; }
+    .cli { border-radius: 10px; padding: 12px; margin-bottom: 6px; }
+    .cli.on { background: #fff; border: 1px solid #e6e3dc; box-shadow: 0 1px 2px rgba(28,27,25,.04); }
+    .cli .nm { font-size: 13.5px; font-weight: 600; }
+    .cli .mt { font-size: 11.5px; color: #9b9992; margin-top: 3px; }
+    .cli .st { display: inline-block; margin-top: 8px; font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 999px; }
+    .st.draft { background: #f2efe9; color: #8a8882; }
+    .st.sent { background: #f9efe9; color: #8f3f26; }
+    .st.won { background: #e8f0ec; color: #2f6252; }
+
+    .work { padding: 26px 30px; }
+    .chd { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+    .chd h1 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 24px; letter-spacing: -0.02em; margin: 0 0 4px; }
+    .chd .sub { font-size: 13px; color: #78766f; }
+    .chd .acts { display: flex; gap: 8px; }
+    .btn { font-size: 13px; font-weight: 600; border-radius: 10px; padding: 9px 15px; display: inline-flex; align-items: center; gap: 7px; }
+    .btn-primary { background: #c25a38; color: #fff; }
+    .btn-ghost { border: 1.5px solid #e0ddd4; color: #1c1b19; background: #fff; }
+    .btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .brief { border: 1px solid #e9e7e1; border-radius: 14px; background: #fff; padding: 16px 20px; margin-bottom: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; position: relative; }
+    .brief .bf { font-size: 12px; color: #78766f; }
+    .brief .bf b { display: block; color: #1c1b19; font-size: 13px; font-weight: 500; margin-top: 2px; }
+    .brief .edit { position: absolute; top: 14px; right: 16px; font-size: 12px; color: #c25a38; }
+
+    .out { border: 1px solid #e9e7e1; border-radius: 14px; background: #fff; overflow: hidden; }
+    .out .sec { padding: 16px 20px; border-top: 1px solid #f1efe9; }
+    .out .sec:first-child { border-top: 0; }
+    .out .sh { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #9b9992; font-weight: 600; margin-bottom: 8px; }
+    .out .big { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 16px; font-weight: 600; }
+    .out .row { display: flex; align-items: center; justify-content: space-between; }
+    .out .m { font-size: 13px; color: #57554f; margin-top: 4px; }
+    .out .m b { color: #1c1b19; font-weight: 600; }
+    .miles { background: #f7f9f8; border: 1px solid #dce8e3; border-radius: 10px; padding: 12px 14px; margin-top: 10px; }
+    .miles .t { font-size: 12px; font-weight: 600; color: #2f6252; display: flex; align-items: center; gap: 7px; }
+    .miles .t svg { width: 14px; height: 14px; stroke: #3d7a67; fill: none; stroke-width: 1.8; }
+    .miles .d { font-size: 12.5px; color: #45433d; line-height: 1.5; margin-top: 5px; }
+    .miles .d b { color: #2f6252; }
+
+    .proposal { border-left: 1px solid #e9e7e1; background: #f7f5f0; padding: 22px 20px; }
+    .proposal h5 { font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #a29f97; margin: 0 0 14px; font-weight: 600; }
+    .doc { background: #fff; border: 1px solid #e6e3dc; border-radius: 10px; box-shadow: 0 8px 24px -14px rgba(28,27,25,.18); overflow: hidden; }
+    .doc .dh { background: #2f4858; padding: 16px; color: #fff; }
+    .doc .dh .lg { width: 22px; height: 22px; border-radius: 6px; background: rgba(255,255,255,.16); display: flex; align-items: center; justify-content: center; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 11px; margin-bottom: 10px; }
+    .doc .dh .t { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 15px; }
+    .doc .dh .s { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+    .doc .db { padding: 14px 16px; }
+    .doc .db .ln { height: 8px; background: #ece9e2; border-radius: 3px; margin-bottom: 7px; }
+    .doc .db .ln.s { width: 55%; }
+    .doc .db .img { height: 66px; border-radius: 7px; background: linear-gradient(155deg,#e8caa6,#c98a63); margin: 10px 0; }
+    .doc .df { border-top: 1px solid #f1efe9; padding: 12px 16px; font-size: 10.5px; color: #9b9992; }
+    .propafter { font-size: 12px; color: #78766f; line-height: 1.5; margin-top: 14px; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="app">
+  <div class="topbar">
+    <div class="agencybrand"><span class="lg">SA</span><span class="nm">Sua Agência de Viagens</span></div>
+    <div class="poweredby"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M20 43 L22 25 h4 l2 18"/><rect x="21" y="18" width="6" height="7" rx="1"/></svg>com tecnologia Farol</div>
+    <span class="u"></span>
+  </div>
+
+  <div class="body">
+    <aside class="clients">
+      <div class="hd"><h5>Clientes</h5><span class="add">+</span></div>
+      <div class="cli on"><div class="nm">Família Almeida</div><div class="mt">Lua de mel · set 2026</div><span class="st draft">Rascunho</span></div>
+      <div class="cli"><div class="nm">Ricardo &amp; Paula</div><div class="mt">Europa · jul 2026</div><span class="st sent">Enviado</span></div>
+      <div class="cli"><div class="nm">Grupo Fernandes (6)</div><div class="mt">Chile · abr 2026</div><span class="st won">Fechado</span></div>
+      <div class="cli"><div class="nm">Juliana Costa</div><div class="mt">Nordeste · fev 2026</div><span class="st won">Fechado</span></div>
+      <div class="cli"><div class="nm">Empresa Beta (RH)</div><div class="mt">Incentivo · nov 2026</div><span class="st draft">Rascunho</span></div>
+    </aside>
+
+    <div class="work">
+      <div class="chd">
+        <div>
+          <h1>Família Almeida · Lua de mel</h1>
+          <div class="sub">2 adultos · 8 noites · setembro 2026 · saindo de GIG</div>
+        </div>
+        <div class="acts">
+          <span class="btn btn-ghost"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Exportar PDF</span>
+          <span class="btn btn-ghost"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>Enviar por link</span>
+          <span class="btn btn-primary"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>Gerar proposta</span>
+        </div>
+      </div>
+
+      <div class="brief">
+        <span class="edit">editar</span>
+        <div class="bf">Orçamento <b>R$ 22.000 / casal</b></div>
+        <div class="bf">Perfil <b>Praia, gastronomia, conforto</b></div>
+        <div class="bf">Ritmo <b>Relaxado</b></div>
+        <div class="bf">Observações <b>Sem conexões longas</b></div>
+      </div>
+
+      <div class="out">
+        <div class="sec">
+          <div class="sh">Destino recomendado</div>
+          <div class="row"><span class="big">Maldivas — atol de Baa</span><span class="m"><b>91%</b> pro briefing</span></div>
+          <div class="m">Resort pé na areia, gastronomia assinada, voo com 1 conexão curta em Doha. Setembro é ombro de estação — 20% mais barato que a alta.</div>
+        </div>
+        <div class="sec">
+          <div class="sh">Roteiro</div>
+          <div class="row"><span class="big">8 dias · chegada tranquila + 2 passeios opcionais</span><span class="m">ver dia a dia</span></div>
+        </div>
+        <div class="sec">
+          <div class="sh">Voo</div>
+          <div class="row"><span class="big">GIG → MLE · via DOH · 1 conexão</span><span class="m"><b>R$ 6.480</b> / pessoa em dinheiro</span></div>
+          <div class="miles">
+            <div class="t"><svg viewBox="0 0 24 24"><path d="M12 3l2.5 6H21l-5 4 2 7-6-4-6 4 2-7-5-4h6.5z"/></svg>Alternativa com milhas</div>
+            <div class="d">Emitir com <b>180k Qatar Avios</b> + R$ 1.320 de taxas por pessoa. Economia de <b>R$ 3.840 no casal</b> — apresentável direto na proposta.</div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sh">Hospedagem</div>
+          <div class="row"><span class="big">Resort no atol de Baa · meia pensão</span><span class="m"><b>R$ 4.900</b> / noite</span></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="proposal">
+      <h5>Proposta</h5>
+      <div class="doc">
+        <div class="dh"><div class="lg">SA</div><div class="t">Lua de mel nas Maldivas</div><div class="s">Preparado para Família Almeida · Sua Agência</div></div>
+        <div class="db">
+          <div class="ln"></div><div class="ln s"></div>
+          <div class="img"></div>
+          <div class="ln"></div><div class="ln"></div><div class="ln s"></div>
+        </div>
+        <div class="df">Sua Agência de Viagens · CNPJ 00.000.000/0001-00 · contato@suaagencia.com</div>
+      </div>
+      <p class="propafter">O cliente recebe com a marca da agência. Farol não aparece na proposta enviada.</p>
+    </aside>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

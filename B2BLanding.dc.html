@@ -1,0 +1,210 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .lp { width: 1400px; box-sizing: border-box; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 48px; }
+    .nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 48px; max-width: 1080px; margin: 0 auto; }
+    .logo { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.03em; display: flex; align-items: center; gap: 9px; }
+    .logo svg { width: 21px; height: 21px; color: #c25a38; }
+    .logo .sfx { font-family: "Instrument Sans", sans-serif; font-weight: 500; font-size: 13px; color: #9b9992; letter-spacing: 0; margin-left: 2px; }
+    .navlinks { display: flex; align-items: center; gap: 22px; font-size: 13.5px; color: #57554f; }
+    .btn { font-size: 13.5px; font-weight: 600; border-radius: 10px; padding: 10px 16px; display: inline-flex; align-items: center; gap: 7px; }
+    .btn-primary { background: #c25a38; color: #fff; }
+    .btn-ghost { border: 1.5px solid #e0ddd4; color: #1c1b19; background: #fff; }
+    .btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .hero { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 44px; align-items: center; padding: 60px 0 64px; }
+    .hero h1 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 44px; line-height: 1.08; letter-spacing: -0.025em; margin: 0 0 18px; }
+    .hero p { font-size: 16px; line-height: 1.6; color: #57554f; margin: 0 0 28px; max-width: 460px; }
+    .hero .actions { display: flex; gap: 12px; }
+    .hero .actions .btn { padding: 13px 22px; font-size: 14.5px; }
+    .mock { border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; box-shadow: 0 20px 48px -24px rgba(28,27,25,.22); overflow: hidden; }
+    .mock .bar { height: 34px; background: #f7f5f0; border-bottom: 1px solid #e9e7e1; display: flex; align-items: center; padding: 0 12px; gap: 6px; }
+    .mock .bar i { width: 8px; height: 8px; border-radius: 50%; background: #dcd8cf; }
+    .mock .body { display: grid; grid-template-columns: 92px 1fr; height: 236px; }
+    .mock .mc1 { background: #f7f5f0; border-right: 1px solid #e9e7e1; padding: 12px; }
+    .mock .rowline { height: 9px; background: #ece9e2; border-radius: 3px; margin-bottom: 8px; }
+    .mock .rowline.s { width: 60%; }
+    .mock .mc2 { padding: 16px; }
+    .mock .mc2 .h { height: 12px; width: 45%; background: #d9d4c9; border-radius: 3px; margin-bottom: 14px; }
+    .mock .chipmini { display: inline-block; height: 20px; width: 68px; background: #f9efe9; border: 1px solid #e2c1b3; border-radius: 999px; margin: 0 6px 10px 0; }
+    .mock .card2 { border: 1px solid #eceae3; border-radius: 10px; height: 74px; margin-top: 6px; background: linear-gradient(155deg,#efe6d7,#e0cdb6); }
+
+    .proof { display: flex; gap: 48px; justify-content: center; padding: 30px 0 54px; border-top: 1px solid #e9e7e1; }
+    .proof .stat { text-align: center; }
+    .proof .stat b { display: block; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+    .proof .stat span { font-size: 12.5px; color: #78766f; }
+
+    .section { padding: 58px 0; border-top: 1px solid #e9e7e1; }
+    .section h2 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 28px; letter-spacing: -0.02em; margin: 0 0 8px; }
+    .section .lede { font-size: 15px; color: #57554f; margin: 0 0 34px; max-width: 560px; }
+    .benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .ben { border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; padding: 24px; }
+    .ben .ic { width: 34px; height: 34px; border-radius: 9px; background: #f9efe9; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+    .ben .ic svg { width: 18px; height: 18px; stroke: #c25a38; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .ben h3 { font-size: 15.5px; font-weight: 600; margin: 0 0 7px; }
+    .ben p { font-size: 13.5px; line-height: 1.55; color: #57554f; margin: 0; }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: s; }
+    .stepc { border-left: 2px solid #e2c1b3; padding-left: 18px; }
+    .stepc .n { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; color: #c25a38; font-size: 15px; }
+    .stepc h3 { font-size: 15px; font-weight: 600; margin: 8px 0 6px; }
+    .stepc p { font-size: 13.5px; line-height: 1.55; color: #57554f; margin: 0; }
+
+    .pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .plan { border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; padding: 26px; }
+    .plan.featured { border-color: #c25a38; box-shadow: 0 0 0 3px #f9efe9; }
+    .plan .pn { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 17px; font-weight: 600; }
+    .plan .pp { font-size: 26px; font-weight: 700; font-family: "Bricolage Grotesque", system-ui, sans-serif; margin: 12px 0 2px; letter-spacing: -0.02em; }
+    .plan .pp span { font-size: 13px; font-weight: 400; color: #9b9992; font-family: "Instrument Sans", sans-serif; }
+    .plan ul { list-style: none; padding: 0; margin: 16px 0 20px; }
+    .plan li { font-size: 13px; color: #45433d; padding: 7px 0 7px 22px; position: relative; border-top: 1px solid #f1efe9; }
+    .plan li:first-child { border-top: 0; }
+    .plan li::before { content: ""; position: absolute; left: 0; top: 13px; width: 12px; height: 2px; background: #c25a38; }
+    .plan .btn { width: 100%; justify-content: center; padding: 12px 0; }
+
+    .cta-band { background: #1c1b19; border-radius: 20px; padding: 44px; text-align: center; margin: 58px 0; }
+    .cta-band h2 { color: #f4f2ec; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 28px; letter-spacing: -0.02em; margin: 0 0 10px; }
+    .cta-band p { color: #a8a59d; font-size: 14.5px; margin: 0 0 22px; }
+    .foot { border-top: 1px solid #e9e7e1; padding: 30px 0 48px; font-size: 12px; color: #9b9992; display: flex; justify-content: space-between; max-width: 1080px; margin: 0 auto; padding-left: 48px; padding-right: 48px; }
+    .placeholder { color: #b06a4f; background: #f7ece7; border-radius: 4px; padding: 0 4px; font-size: 0.92em; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="lp">
+  <div class="nav">
+    <div class="logo"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M19.5 43 L21.5 25 h5 l2 18"/><path d="M20.5 25 h7"/><rect x="20.5" y="18" width="7" height="7" rx="1.2"/><path d="M22 18 h4 l-1 -3 h-2 z"/></svg>Farol <span class="sfx">para Agências</span></div>
+    <div class="navlinks">
+      <span>Como funciona</span><span>Planos</span><span>Entrar</span>
+      <span class="btn btn-primary">Falar com vendas</span>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>Roteiros completos em minutos, com a marca da sua agência.</h1>
+        <p>Farol faz a pesquisa de destino, milhas, voo, hotel e roteiro dia a dia. Seu consultor revisa, aplica a identidade da agência e envia a proposta pronta — e fecha mais rápido.</p>
+        <div class="actions">
+          <span class="btn btn-primary">Agendar demonstração <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+          <span class="btn btn-ghost">Ver planos</span>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="bar"><i></i><i></i><i></i></div>
+        <div class="body">
+          <div class="mc1"><div class="rowline"></div><div class="rowline s"></div><div class="rowline"></div><div class="rowline s"></div><div class="rowline"></div></div>
+          <div class="mc2">
+            <div class="h"></div>
+            <span class="chipmini"></span><span class="chipmini"></span><span class="chipmini"></span>
+            <div class="card2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="proof">
+    <div class="stat"><b><span class="placeholder">[N]</span></b><span>agências ativas</span></div>
+    <div class="stat"><b><span class="placeholder">[N]</span></b><span>roteiros montados / mês</span></div>
+    <div class="stat"><b>−<span class="placeholder">[X]</span>%</b><span>no tempo de montagem</span></div>
+    <div class="stat"><b><span class="placeholder">[X]</span> min</b><span>do briefing à proposta</span></div>
+  </div>
+
+  <div class="wrap">
+    <div class="section" style="border-top:0;padding-top:0">
+      <h2>O que a sua agência ganha</h2>
+      <p class="lede">Feito para os três atritos que travam a venda de um roteiro personalizado.</p>
+      <div class="benefits">
+        <div class="ben">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12M9 20v-6h6v6"/></svg></div>
+          <h3>Sua marca, não a nossa</h3>
+          <p>Proposta com o logo, as cores e o contato da agência. Exporta em PDF ou link para o cliente. O nome Farol fica nos bastidores.</p>
+        </div>
+        <div class="ben">
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l2.5 6H21l-5 4 2 7-6-4-6 4 2-7-5-4h6.5z"/></svg></div>
+          <h3>Milhas sem planilha</h3>
+          <p>Compara emitir em dinheiro, com milhas ou transferindo pontos, e mostra a economia em reais que o consultor apresenta ao cliente.</p>
+        </div>
+        <div class="ben">
+          <div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></div>
+          <h3>Do briefing ao roteiro numa tela</h3>
+          <p>Datas e perfil do cliente entram; destino, roteiro dia a dia, voo e hotel saem. O consultor ajusta o que quiser conversando.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Como funciona</h2>
+      <p class="lede">Três passos, sem sair do Farol.</p>
+      <div class="steps">
+        <div class="stepc"><div class="n">01</div><h3>Cadastre o cliente</h3><p>Origem, datas, orçamento e o perfil de gosto — ou cole o briefing que o cliente já mandou.</p></div>
+        <div class="stepc"><div class="n">02</div><h3>Farol monta</h3><p>Destino recomendado com justificativa, roteiro completo, opções de voo com cálculo de milhas e hotéis bem posicionados.</p></div>
+        <div class="stepc"><div class="n">03</div><h3>Revise e envie</h3><p>Ajuste pelo chat, aplique a marca da agência e mande a proposta por PDF ou link. Acompanhe o status até fechar.</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Planos</h2>
+      <p class="lede">Cobrança por assento de consultor. Preços a definir — <span class="placeholder">[VALOR]</span> abaixo é ilustrativo.</p>
+      <div class="pricing">
+        <div class="plan">
+          <div class="pn">Studio</div>
+          <div class="pp">R$ <span class="placeholder">[VALOR]</span><span> / mês</span></div>
+          <ul>
+            <li>1 a 2 consultores</li>
+            <li>Roteiros e cálculo de milhas ilimitados</li>
+            <li>Exportação em PDF</li>
+            <li>Marca da agência na proposta</li>
+          </ul>
+          <span class="btn btn-ghost">Começar</span>
+        </div>
+        <div class="plan featured">
+          <div class="pn">Agência</div>
+          <div class="pp">R$ <span class="placeholder">[VALOR]</span><span> / assento / mês</span></div>
+          <ul>
+            <li>A partir de 3 consultores</li>
+            <li>Tudo do Studio</li>
+            <li>Proposta por link com acompanhamento</li>
+            <li>Vários perfis de marca</li>
+            <li>Suporte prioritário</li>
+          </ul>
+          <span class="btn btn-primary">Agendar demonstração</span>
+        </div>
+        <div class="plan">
+          <div class="pn">Rede</div>
+          <div class="pp">Sob consulta</div>
+          <ul>
+            <li>Múltiplas unidades / franquias</li>
+            <li>SSO e gestão centralizada</li>
+            <li>Relatórios de produtividade</li>
+            <li>Onboarding assistido</li>
+          </ul>
+          <span class="btn btn-ghost">Falar com vendas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="cta-band">
+      <h2>Teste com a sua próxima proposta.</h2>
+      <p>14 dias grátis, sem cartão. Monte um roteiro real de um cliente e veja o tempo que economiza.</p>
+      <span class="btn btn-primary" style="padding:13px 24px">Agendar demonstração</span>
+    </div>
+  </div>
+
+  <div class="foot"><span>Farol para Agências</span><span>farol.app · comercial@farol.app · <span class="placeholder">[telefone]</span></span></div>
+</div>
+</x-dc>
+</body>
+</html>

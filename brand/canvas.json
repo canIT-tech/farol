@@ -1,0 +1,16 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1400, "h": 1220, "title": "01 · Fundacao" },
+    { "file": "Logo.dc.html", "x": 1520, "y": 0, "w": 1400, "h": 1360, "title": "02 · Logo" },
+    { "file": "Color.dc.html", "x": 3040, "y": 0, "w": 1400, "h": 1280, "title": "03 · Cor" },
+    { "file": "Type.dc.html", "x": 4560, "y": 0, "w": 1400, "h": 1280, "title": "04 · Tipografia" },
+    { "file": "IconsImagery.dc.html", "x": 0, "y": 1580, "w": 1400, "h": 1240, "title": "05 · Icones & imagem" },
+    { "file": "Voice.dc.html", "x": 1520, "y": 1580, "w": 1400, "h": 1320, "title": "06 · Voz & tom" },
+    { "file": "Applications.dc.html", "x": 3040, "y": 1580, "w": 1400, "h": 1220, "title": "07 · Aplicacoes" },
+    { "file": "Components.dc.html", "x": 4560, "y": 1580, "w": 1400, "h": 1600, "title": "08 · Componentes & tokens" }
+  ],
+  "annotations": [
+    { "id": "brand-intro", "x": 0, "y": -196, "w": 1400, "text": "Farol - manual de marca (v0.1).\nNome de trabalho aprovado: Farol. Dominio farol.app a confirmar.\nDirecao: assessor calmo e confiavel. Sistema visual herdado das telas hi-fi e formalizado aqui.\nOs tokens da prancha 08 sao a fonte da verdade; a versao em codigo fica em docs/design-system.md no repo." }
+  ],
+  "launch": { "view": "canvas" }
+}

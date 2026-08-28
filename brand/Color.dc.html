@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .doc { width: 1400px; box-sizing: border-box; min-height: 1240px; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; padding: 64px 72px; }
+    .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #c25a38; margin-bottom: 14px; }
+    h1.title { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -0.02em; margin: 0 0 10px; }
+    .intro { font-size: 15px; line-height: 1.6; color: #57554f; max-width: 660px; margin: 0 0 42px; }
+    h2.sec { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 16px; }
+    .hr { height: 1px; background: #e9e7e1; margin: 42px 0; }
+    .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .sw { border: 1px solid #e9e7e1; border-radius: 14px; overflow: hidden; background: #fff; }
+    .sw .chip { height: 96px; }
+    .sw .meta { padding: 13px 15px 16px; }
+    .sw .role { font-size: 13px; font-weight: 600; }
+    .sw .token { font-size: 11.5px; color: #78766f; font-family: "Instrument Sans", monospace; margin-top: 3px; }
+    .sw .hex { font-size: 11.5px; color: #9b9992; margin-top: 6px; letter-spacing: 0.02em; }
+    .accents { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .bigsw { border-radius: 16px; padding: 22px; min-height: 130px; display: flex; flex-direction: column; justify-content: space-between; }
+    .bigsw .r { font-size: 14px; font-weight: 600; }
+    .bigsw .c { font-size: 12px; opacity: 0.85; line-height: 1.5; }
+    .dark-strip { background: #171614; border-radius: 16px; padding: 26px 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .dsw { border-radius: 12px; overflow: hidden; border: 1px solid #302e2a; }
+    .dsw .chip { height: 64px; }
+    .dsw .meta { padding: 10px 12px 12px; background: #1f1e1b; }
+    .dsw .role { font-size: 12px; font-weight: 600; color: #f4f2ec; }
+    .dsw .hex { font-size: 10.5px; color: #8a877f; margin-top: 4px; }
+    .pairs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .pair { border-radius: 14px; padding: 20px; font-size: 14px; line-height: 1.5; }
+    .pair .lb { font-size: 11px; opacity: 0.7; margin-top: 10px; }
+    .foot { margin-top: 56px; font-size: 11px; color: #9b9992; display: flex; justify-content: space-between; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="doc">
+  <div class="eyebrow">03 · Cor</div>
+  <h1 class="title">Cor</h1>
+  <p class="intro">Base neutra quente — brancos e pretos levemente tostados, saturação baixíssima. Um único acento terracota carrega ação e marca. Um verde discreto, só para indicadores de aderência (match). Nada mais colorido entra na interface.</p>
+
+  <h2 class="sec">Neutros (tema claro)</h2>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#fbfaf8"></div><div class="meta"><div class="role">Fundo</div><div class="token">--bg</div><div class="hex">#fbfaf8 · oklch(0.985 0.004 85)</div></div></div>
+    <div class="sw"><div class="chip" style="background:#ffffff;box-shadow:inset 0 0 0 1px #ececec"></div><div class="meta"><div class="role">Superfície</div><div class="token">--surface</div><div class="hex">#ffffff</div></div></div>
+    <div class="sw"><div class="chip" style="background:#f7f5f0"></div><div class="meta"><div class="role">Superfície recuada</div><div class="token">--surface-sunk</div><div class="hex">#f7f5f0 · sidebar / trilho</div></div></div>
+    <div class="sw"><div class="chip" style="background:#e9e7e1"></div><div class="meta"><div class="role">Linha</div><div class="token">--line</div><div class="hex">#e9e7e1</div></div></div>
+    <div class="sw"><div class="chip" style="background:#1c1b19"></div><div class="meta"><div class="role">Tinta</div><div class="token">--ink</div><div class="hex">#1c1b19 · oklch(0.22 0.006 75)</div></div></div>
+    <div class="sw"><div class="chip" style="background:#57554f"></div><div class="meta"><div class="role">Tinta suave</div><div class="token">--ink-muted</div><div class="hex">#57554f</div></div></div>
+    <div class="sw"><div class="chip" style="background:#78766f"></div><div class="meta"><div class="role">Texto secundário</div><div class="token">--text-muted</div><div class="hex">#78766f</div></div></div>
+    <div class="sw"><div class="chip" style="background:#9b9992"></div><div class="meta"><div class="role">Texto tênue</div><div class="token">--text-faint</div><div class="hex">#9b9992</div></div></div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Acentos</h2>
+  <div class="accents">
+    <div class="bigsw" style="background:#c25a38;color:#fff"><span class="r">Acento — terracota</span><span class="c">--accent · #c25a38 · oklch(0.585 0.115 42)<br>Ação primária, marca, estados ativos.</span></div>
+    <div class="bigsw" style="background:#f9efe9;color:#8f3f26"><span class="r">Acento — lavado</span><span class="c">--accent-wash · #f9efe9<br>Fundo de item selecionado, anel de foco.</span></div>
+    <div class="bigsw" style="background:#3d7a67;color:#fff"><span class="r">Positivo — verde</span><span class="c">--positive · #3d7a67 · oklch(0.52 0.068 165)<br>Somente % de match e confirmações.</span></div>
+  </div>
+  <p class="intro" style="margin:18px 0 0">Sobre fundo escuro o acento sobe para <b>#d9714f</b> e o positivo para <b>#5fa38c</b>, mantendo o contraste. Hover em texto/links usa <b>--accent-ink #8f3f26</b>.</p>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Tema escuro — papéis</h2>
+  <div class="dark-strip">
+    <div class="dsw"><div class="chip" style="background:#171614"></div><div class="meta"><div class="role">--bg</div><div class="hex">#171614</div></div></div>
+    <div class="dsw"><div class="chip" style="background:#1f1e1b"></div><div class="meta"><div class="role">--surface</div><div class="hex">#1f1e1b</div></div></div>
+    <div class="dsw"><div class="chip" style="background:#302e2a"></div><div class="meta"><div class="role">--line</div><div class="hex">#302e2a</div></div></div>
+    <div class="dsw"><div class="chip" style="background:#f4f2ec"></div><div class="meta"><div class="role">--ink</div><div class="hex">#f4f2ec</div></div></div>
+    <div class="dsw"><div class="chip" style="background:#a8a59d"></div><div class="meta"><div class="role">--text-muted</div><div class="hex">#a8a59d</div></div></div>
+    <div class="dsw"><div class="chip" style="background:#d9714f"></div><div class="meta"><div class="role">--accent</div><div class="hex">#d9714f</div></div></div>
+    <div class="dsw"><div class="chip" style="background:#5fa38c"></div><div class="meta"><div class="role">--positive</div><div class="hex">#5fa38c</div></div></div>
+    <div class="dsw"><div class="chip" style="background:#2a231f"></div><div class="meta"><div class="role">--accent-wash</div><div class="hex">#2a231f</div></div></div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Pares de contraste aprovados (WCAG AA)</h2>
+  <div class="pairs">
+    <div class="pair" style="background:#fbfaf8;color:#1c1b19">Tinta sobre fundo<div class="lb">15.8:1 · corpo e títulos</div></div>
+    <div class="pair" style="background:#fbfaf8;color:#78766f">Texto secundário sobre fundo<div class="lb">4.7:1 · rótulos, legendas</div></div>
+    <div class="pair" style="background:#c25a38;color:#ffffff">Branco sobre acento<div class="lb">4.6:1 · botão primário</div></div>
+    <div class="pair" style="background:#f9efe9;color:#8f3f26">Acento-tinta sobre lavado<div class="lb">6.1:1 · chip selecionado</div></div>
+    <div class="pair" style="background:#ffffff;color:#2f6252">Positivo-tinta sobre superfície<div class="lb">4.8:1 · selo de match</div></div>
+    <div class="pair" style="background:#171614;color:#f4f2ec">Tinta escura sobre fundo escuro<div class="lb">14.2:1 · tema escuro</div></div>
+  </div>
+
+  <div class="foot"><span>Farol — Manual de marca</span><span>03 · Cor</span></div>
+</div>
+</x-dc>
+</body>
+</html>

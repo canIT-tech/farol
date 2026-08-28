@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .root {
+      width: 1280px; box-sizing: border-box;
+      background: #fcfcfb; color: #1e1e1c;
+      font-family: "Instrument Sans", system-ui, sans-serif;
+      display: grid; grid-template-columns: 244px 1fr;
+    }
+    .side { border-right: 1px solid #e9e8e3; padding: 28px 22px; min-height: 1660px; background: #faf9f6; }
+    .logo { font-size: 18px; font-weight: 600; margin-bottom: 30px; }
+    .side h5 { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #a3a29b; margin: 0 0 12px; font-weight: 600; }
+    .trip-field { font-size: 13px; color: #55544e; padding: 8px 0; border-bottom: 1px solid #eeede7; }
+    .trip-field b { display: block; color: #1e1e1c; font-weight: 500; font-size: 14px; margin-top: 2px; }
+    .steps { margin-top: 28px; display: flex; flex-direction: column; gap: 2px; }
+    .step { font-size: 13px; color: #8a8983; padding: 8px 10px; border-radius: 8px; display: flex; gap: 9px; align-items: center; }
+    .step.done { color: #55544e; }
+    .step.on { background: #1e1e1c; color: #fff; }
+    .step .b { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+    .main { padding: 30px 34px 56px; }
+    .hand { font-family: "Caveat", cursive; color: #a3a29b; font-size: 22px; }
+    .screen-label { font-family: "Caveat", cursive; font-size: 23px; color: #6f6e67; margin-bottom: 16px; }
+    h1.head { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 6px; }
+    .note { color: #8a8983; font-size: 13.5px; margin: 0 0 22px; }
+    .tbl { border: 1px solid #e6e5df; border-radius: 12px; overflow: hidden; background: #fff; }
+    .tr { display: grid; grid-template-columns: 1.6fr 0.8fr 1fr 0.9fr 0.9fr 0.9fr 84px; align-items: center; }
+    .th { background: #f6f5f1; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: #9a998f; font-weight: 600; }
+    .th > div, .td > div { padding: 12px 14px; }
+    .td { border-top: 1px solid #eeede7; font-size: 13.5px; color: #45443f; }
+    .td .city { font-weight: 600; color: #1e1e1c; font-size: 14px; }
+    .td .city span { display: block; font-weight: 400; color: #9a998f; font-size: 12px; }
+    .bar { height: 6px; border-radius: 999px; background: #ecebe4; position: relative; margin-top: 6px; }
+    .bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: #3f7d6a; }
+    .pct { font-weight: 600; color: #2f6252; }
+    .go { margin: 8px 12px; text-align: center; font-size: 12.5px; color: #fff; background: #1e1e1c; border-radius: 8px; padding: 8px 0; }
+    .split { display: grid; grid-template-columns: 90px 1fr 300px; gap: 0; border: 1px solid #e6e5df; border-radius: 12px; overflow: hidden; background: #fff; margin-top: 18px; }
+    .daycol { border-right: 1px solid #eeede7; padding: 14px 0; }
+    .daycol .d { text-align: center; font-size: 13px; color: #8a8983; padding: 9px 0; }
+    .daycol .d.on { color: #1e1e1c; font-weight: 600; box-shadow: inset 2px 0 0 #d97555; }
+    .tl { padding: 16px 18px; }
+    .tl .row { display: grid; grid-template-columns: 54px 1fr; gap: 12px; padding: 11px 0; border-top: 1px solid #f0efe9; }
+    .tl .row:first-child { border-top: 0; }
+    .tl .time { font-size: 12px; color: #a3a29b; padding-top: 2px; }
+    .tl .ev { font-size: 13.5px; color: #3a3934; line-height: 1.4; }
+    .tl .ev span { display: block; color: #9a998f; font-size: 12px; margin-top: 2px; }
+    .cpanel { border-left: 1px solid #eeede7; display: flex; flex-direction: column; background: #fbfaf8; }
+    .cpanel .h { padding: 13px 15px; border-bottom: 1px solid #eeede7; font-size: 12px; font-weight: 600; color: #6f6e67; letter-spacing: 0.04em; text-transform: uppercase; }
+    .cpanel .body { padding: 15px; display: flex; flex-direction: column; gap: 11px; flex-grow: 1; }
+    .bub { font-size: 13px; line-height: 1.45; padding: 9px 11px; border-radius: 11px; max-width: 88%; }
+    .bub.u { align-self: flex-end; background: #eeede7; color: #3a3934; }
+    .bub.a { align-self: flex-start; background: #fbf1ec; color: #6b4636; }
+    .cpanel .in { margin: 12px; border: 1px solid #dcdbd5; border-radius: 10px; padding: 10px 12px; font-family: "Caveat", cursive; font-size: 14px; color: #a3a29b; background: #fff; }
+    a { color: #d97555; } a:hover { color: #b45a3c; }
+  </style>
+</helmet>
+<div class="root">
+  <aside class="side">
+    <div class="logo">trip<span style="color:#d97555">.</span></div>
+    <h5>Sua viagem</h5>
+    <div class="trip-field">Origem <b>São Paulo (GRU)</b></div>
+    <div class="trip-field">Datas <b>10 – 17 mai · 7 noites</b></div>
+    <div class="trip-field">Viajantes <b>2 adultos</b></div>
+    <div class="trip-field">Orçamento <b>R$ 5.000 / pessoa</b></div>
+    <div class="trip-field">Gostos <b>Praia · gastronomia</b></div>
+    <div class="steps">
+      <div class="step done"><span class="b"></span>Perfil de gosto</div>
+      <div class="step on"><span class="b"></span>Escolher destino</div>
+      <div class="step"><span class="b"></span>Roteiro</div>
+      <div class="step"><span class="b"></span>Voo &amp; hotel</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="screen-label">1 · Descoberta — resultados</div>
+    <h1 class="head">4 destinos para o seu perfil</h1>
+    <p class="note">Ordenados por aderência ao gosto. Custo = voo + diária média × 7.</p>
+
+    <div class="tbl">
+      <div class="tr th">
+        <div>Destino</div><div>Match</div><div>Clima em maio</div><div>Voo est.</div><div>Diária</div><div>Total est.</div><div></div>
+      </div>
+      <div class="tr td">
+        <div><div class="city">Cartagena<span>Colômbia · voo 5h direto</span></div></div>
+        <div><div><span class="pct">94%</span><div class="bar"><i style="width:94%"></i></div></div></div>
+        <div><div>Seco · 31°C</div></div>
+        <div><div>R$ 2.100</div></div>
+        <div><div>R$ 280</div></div>
+        <div><div>R$ 4.060</div></div>
+        <div><div class="go">abrir</div></div>
+      </div>
+      <div class="tr td">
+        <div><div class="city">Cidade do México<span>México · voo 9h · 1 escala</span></div></div>
+        <div><div><span class="pct">88%</span><div class="bar"><i style="width:88%"></i></div></div></div>
+        <div><div>Ameno · 24°C</div></div>
+        <div><div>R$ 2.600</div></div>
+        <div><div>R$ 240</div></div>
+        <div><div>R$ 4.280</div></div>
+        <div><div class="go">abrir</div></div>
+      </div>
+      <div class="tr td">
+        <div><div class="city">Lisboa<span>Portugal · voo 9h30 direto</span></div></div>
+        <div><div><span class="pct">85%</span><div class="bar"><i style="width:85%"></i></div></div></div>
+        <div><div>Ameno · 21°C</div></div>
+        <div><div>R$ 3.400</div></div>
+        <div><div>R$ 320</div></div>
+        <div><div>R$ 5.640</div></div>
+        <div><div class="go">abrir</div></div>
+      </div>
+      <div class="tr td">
+        <div><div class="city">Maceió<span>Brasil · voo 2h30 direto</span></div></div>
+        <div><div><span class="pct">81%</span><div class="bar"><i style="width:81%"></i></div></div></div>
+        <div><div>Sol · 29°C</div></div>
+        <div><div>R$ 900</div></div>
+        <div><div>R$ 190</div></div>
+        <div><div>R$ 2.230</div></div>
+        <div><div class="go">abrir</div></div>
+      </div>
+    </div>
+
+    <div class="screen-label" style="margin-top:44px">2 · Roteiro dia a dia</div>
+    <div class="split">
+      <div class="daycol">
+        <div class="d on">Dia 1</div><div class="d">Dia 2</div><div class="d">Dia 3</div>
+        <div class="d">Dia 4</div><div class="d">Dia 5</div><div class="d">Dia 6</div><div class="d">Dia 7</div>
+      </div>
+      <div class="tl">
+        <div class="row"><div class="time">09:00</div><div class="ev">Cidade Amuralhada a pé<span>2h · grátis · antes do calor</span></div></div>
+        <div class="row"><div class="time">12:30</div><div class="ev">Almoço — frutos do mar<span>$$ · 400m adiante</span></div></div>
+        <div class="row"><div class="time">14:30</div><div class="ev">Praia de Bocagrande<span>livre</span></div></div>
+        <div class="row"><div class="time">19:30</div><div class="ev">Jantar em Getsemaní + caminhada<span>$$ · reservar</span></div></div>
+      </div>
+      <div class="cpanel">
+        <div class="h">Assessor</div>
+        <div class="body">
+          <div class="bub a">Roteiro de 7 dias pronto. Dia 1 mais leve para adaptar ao fuso e ao calor.</div>
+          <div class="bub u">tira o dia de museu, quero mais praia</div>
+          <div class="bub a">Ajustado. Dia 4 agora é praia + passeio de barco. Custo do dia caiu R$ 120.</div>
+        </div>
+        <div class="in">peça um ajuste…</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

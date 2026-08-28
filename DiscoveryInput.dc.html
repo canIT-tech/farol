@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .app {
+      width: 1512px; box-sizing: border-box; min-height: 1000px;
+      background: #fbfaf8; color: #1c1b19;
+      font-family: "Instrument Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: grid; grid-template-columns: 248px 1fr 340px;
+    }
+
+    /* sidebar */
+    .side { border-right: 1px solid #e9e7e1; background: #f7f5f0; padding: 26px 20px; }
+    .logo { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 19px; letter-spacing: -0.02em; margin-bottom: 30px; }
+    .logo i { color: #c25a38; font-style: normal; }
+    .side h5 { font-size: 11px; letter-spacing: 0.09em; text-transform: uppercase; color: #a29f97; margin: 0 0 12px; font-weight: 600; }
+    .tripcard { background: #fff; border: 1px solid #e9e7e1; border-radius: 12px; padding: 4px 14px; margin-bottom: 24px; }
+    .tf { font-size: 12.5px; color: #78766f; padding: 11px 0; border-bottom: 1px solid #f1efe9; }
+    .tf:last-child { border-bottom: 0; }
+    .tf b { display: block; color: #1c1b19; font-weight: 500; font-size: 13.5px; margin-top: 3px; }
+    .tf.pending b { color: #b6b3aa; font-weight: 400; }
+    .steps { display: flex; flex-direction: column; gap: 2px; }
+    .step { font-size: 13px; color: #8a8882; padding: 9px 10px; border-radius: 9px; display: flex; gap: 10px; align-items: center; }
+    .step .b { width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid currentColor; flex: none; display: flex; align-items: center; justify-content: center; }
+    .step .b svg { width: 9px; height: 9px; stroke: currentColor; fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+    .step.done { color: #6b6963; }
+    .step.done .b { background: #6b6963; border-color: #6b6963; color: #fff; }
+    .step.on { background: #1c1b19; color: #fff; font-weight: 500; }
+
+    /* main */
+    .main { padding: 40px 48px 56px; }
+    .crumb { font-size: 13px; color: #9b9992; margin-bottom: 14px; }
+    h1 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 30px; letter-spacing: -0.02em; margin: 0 0 6px; }
+    .lede { color: #78766f; font-size: 14.5px; margin: 0 0 34px; }
+    .form { max-width: 620px; }
+    .row { margin-bottom: 24px; }
+    .flabel { font-size: 13px; font-weight: 600; color: #57554f; margin-bottom: 9px; }
+    .input {
+      border: 1.5px solid #e6e3dc; border-radius: 12px; background: #fff;
+      padding: 13px 15px; font-size: 14.5px; color: #2f2d28;
+      display: flex; align-items: center; gap: 11px; min-height: 22px;
+    }
+    .input .ic { width: 18px; height: 18px; stroke: #9b9992; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+    .input .muted { color: #b6b3aa; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .toggle { display: inline-flex; border: 1.5px solid #e6e3dc; border-radius: 10px; overflow: hidden; background: #fff; margin-top: 10px; }
+    .toggle span { padding: 8px 14px; font-size: 12.5px; color: #78766f; }
+    .toggle span.on { background: #1c1b19; color: #fff; }
+    .stepper { display: flex; align-items: center; justify-content: space-between; }
+    .stepper .val { font-size: 14.5px; color: #2f2d28; }
+    .stepper .ctrls { display: flex; gap: 8px; }
+    .stepper .ctrls b { width: 34px; height: 34px; border: 1.5px solid #e6e3dc; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: #78766f; font-weight: 400; font-size: 17px; }
+    .slider { margin-top: 16px; }
+    .slidertrack { height: 5px; border-radius: 999px; background: #ece9e2; position: relative; }
+    .slidertrack > i { position: absolute; left: 0; top: 0; bottom: 0; width: 62%; background: #c25a38; border-radius: 999px; }
+    .slidertrack > b { position: absolute; left: 62%; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: #fff; border: 1.5px solid #c25a38; box-shadow: 0 1px 3px rgba(28,27,25,.14); }
+    .sliderscale { display: flex; justify-content: space-between; font-size: 11.5px; color: #a29f97; margin-top: 9px; }
+    .valbig { font-size: 15px; font-weight: 600; color: #1c1b19; }
+    .tastes { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .chip { border: 1px solid #e3e0d8; border-radius: 999px; padding: 7px 13px; font-size: 12.5px; color: #57554f; background: #fff; }
+    .cta {
+      margin-top: 34px; width: 100%; max-width: 620px;
+      background: #c25a38; color: #fff; border-radius: 13px; padding: 16px 0;
+      font-size: 15px; font-weight: 600; text-align: center;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+    }
+    .cta svg { width: 17px; height: 17px; stroke: #fff; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* chat rail */
+    .rail { border-left: 1px solid #e9e7e1; background: #f7f5f0; display: flex; flex-direction: column; }
+    .rh { padding: 16px 18px; border-bottom: 1px solid #e9e7e1; display: flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #6b6963; }
+    .rh svg { width: 15px; height: 15px; stroke: #c25a38; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .rb { padding: 18px; display: flex; flex-direction: column; gap: 13px; flex-grow: 1; }
+    .bub { font-size: 13px; line-height: 1.5; padding: 11px 13px; border-radius: 13px; max-width: 92%; }
+    .bub.a { align-self: flex-start; background: #fff; border: 1px solid #ece9e2; color: #3a3833; }
+    .bub.u { align-self: flex-end; background: #1c1b19; color: #fff; }
+    .rin { margin: 14px; border: 1.5px solid #e6e3dc; border-radius: 12px; background: #fff; padding: 12px 13px; font-size: 13px; color: #b6b3aa; display: flex; align-items: center; justify-content: space-between; }
+    .rin b { width: 30px; height: 30px; border-radius: 8px; background: #c25a38; display: flex; align-items: center; justify-content: center; }
+    .rin b svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="app">
+
+  <aside class="side">
+    <div class="logo">trip<i>.</i></div>
+    <h5>Sua viagem</h5>
+    <div class="tripcard">
+      <div class="tf">Origem <b>São Paulo · GRU</b></div>
+      <div class="tf pending">Datas <b>a definir</b></div>
+      <div class="tf pending">Destino <b>a definir</b></div>
+      <div class="tf">Gostos <b>Praia, gastronomia +2</b></div>
+    </div>
+    <h5>Etapas</h5>
+    <div class="steps">
+      <div class="step done"><span class="b"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>Perfil de gosto</div>
+      <div class="step on"><span class="b"></span>Escolher destino</div>
+      <div class="step"><span class="b"></span>Roteiro</div>
+      <div class="step"><span class="b"></span>Voo &amp; hotel</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="crumb">Descoberta de destino</div>
+    <h1>Vamos achar seu destino</h1>
+    <p class="lede">Alguns detalhes e o assessor cruza com o seu perfil pra sugerir para onde ir.</p>
+
+    <div class="form">
+      <div class="row">
+        <div class="flabel">Saindo de</div>
+        <div class="input"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>São Paulo — Guarulhos (GRU)</div>
+      </div>
+
+      <div class="row">
+        <div class="flabel">Quando</div>
+        <div class="two">
+          <div class="input"><svg class="ic" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>10 – 17 mai 2026</div>
+          <div class="input"><span class="muted">7 noites</span></div>
+        </div>
+        <div class="toggle"><span class="on">Datas exatas</span><span>Mês aproximado</span></div>
+      </div>
+
+      <div class="row">
+        <div class="flabel">Viajantes</div>
+        <div class="input stepper"><span class="val">2 adultos · 0 crianças</span><span class="ctrls"><b>–</b><b>+</b></span></div>
+      </div>
+
+      <div class="row">
+        <div class="flabel">Orçamento por pessoa <span style="color:#a29f97;font-weight:400">(voo + hospedagem + gastos locais)</span></div>
+        <div class="slider">
+          <div class="slidertrack"><i></i><b></b></div>
+          <div class="sliderscale"><span>R$ 1.500</span><span class="valbig">R$ 5.000</span><span>R$ 12.000+</span></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="flabel">Seus gostos <a style="font-weight:400;margin-left:6px">ajustar</a></div>
+        <div class="tastes">
+          <span class="chip">Praia</span><span class="chip">Gastronomia</span><span class="chip">Aventura</span><span class="chip">Natureza</span>
+          <span class="chip">Ritmo moderado</span><span class="chip">Casal</span>
+        </div>
+      </div>
+
+      <div class="cta">Buscar destinos <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </div>
+  </div>
+
+  <aside class="rail">
+    <div class="rh"><svg viewBox="0 0 24 24"><path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>Assessor</div>
+    <div class="rb">
+      <div class="bub a">Oi! Me diz quando e de onde você sai que eu já cruzo com o seu perfil — praia, gastronomia e aventura, ritmo moderado.</div>
+      <div class="bub u">saindo de SP, 7 noites em maio, até R$ 5 mil por pessoa</div>
+      <div class="bub a">Perfeito. Com esse orçamento em maio dá pra Caribe, México ou Nordeste. Clica em <b>Buscar destinos</b> que eu ranqueio.</div>
+    </div>
+    <div class="rin">peça um ajuste…<b><svg viewBox="0 0 24 24"><path d="M7 12h10M12 7l5 5-5 5"/></svg></b></div>
+  </aside>
+
+</div>
+</x-dc>
+</body>
+</html>

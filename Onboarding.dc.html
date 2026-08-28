@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .page {
+      width: 1512px; box-sizing: border-box; min-height: 1040px;
+      background: #fbfaf8; color: #1c1b19;
+      font-family: "Instrument Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 34px 0 64px;
+    }
+    .topbar { width: 760px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 34px; }
+    .logo { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.02em; }
+    .logo i { color: #c25a38; font-style: normal; }
+    .stepcount { font-size: 13px; color: #9b9992; }
+    .progress { width: 760px; height: 4px; border-radius: 999px; background: #ece9e2; margin-bottom: 44px; overflow: hidden; }
+    .progress > i { display: block; height: 100%; width: 50%; background: #c25a38; border-radius: 999px; }
+    .card { width: 760px; }
+    h1 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 34px; line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 10px; }
+    .sub { color: #78766f; font-size: 15px; line-height: 1.5; margin: 0 0 30px; }
+    .interests { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 36px; }
+    .tile {
+      border: 1.5px solid #e9e7e1; border-radius: 14px; background: #fff;
+      padding: 18px 16px; display: flex; flex-direction: column; gap: 12px;
+      min-height: 92px; position: relative;
+    }
+    .tile .ic { width: 22px; height: 22px; stroke: #78766f; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .tile .lbl { font-size: 14.5px; font-weight: 500; color: #3a3833; }
+    .tile.on { border-color: #c25a38; background: #f9efe9; }
+    .tile.on .ic { stroke: #a5482c; }
+    .tile.on .lbl { color: #8f3f26; }
+    .tile .check { position: absolute; top: 12px; right: 12px; width: 18px; height: 18px; border-radius: 50%; background: #c25a38; display: none; align-items: center; justify-content: center; }
+    .tile .check svg { width: 11px; height: 11px; stroke: #fff; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .tile.on .check { display: flex; }
+    .field { margin-bottom: 26px; }
+    .field > .flabel { font-size: 13px; font-weight: 600; color: #57554f; margin-bottom: 10px; letter-spacing: 0.01em; }
+    .seg { display: inline-flex; border: 1.5px solid #e9e7e1; border-radius: 12px; overflow: hidden; background: #fff; }
+    .seg > span { padding: 11px 20px; font-size: 14px; color: #6b6963; border-right: 1px solid #e9e7e1; }
+    .seg > span:last-child { border-right: 0; }
+    .seg > span.on { background: #1c1b19; color: #fff; }
+    .pills { display: flex; gap: 10px; }
+    .pill { border: 1.5px solid #e9e7e1; border-radius: 999px; padding: 10px 18px; font-size: 14px; color: #6b6963; background: #fff; }
+    .pill.on { border-color: #c25a38; color: #8f3f26; background: #f9efe9; font-weight: 500; }
+    .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; }
+    .btn-ghost { font-size: 14.5px; color: #78766f; padding: 13px 4px; }
+    .btn-primary {
+      font-family: "Instrument Sans", sans-serif; font-size: 15px; font-weight: 600; color: #fff;
+      background: #c25a38; border-radius: 12px; padding: 14px 26px;
+      display: inline-flex; align-items: center; gap: 9px;
+    }
+    .btn-primary svg { width: 17px; height: 17px; stroke: #fff; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="page">
+  <div class="topbar">
+    <div class="logo">trip<i>.</i></div>
+    <div class="stepcount">Passo 2 de 4</div>
+  </div>
+  <div class="progress"><i></i></div>
+
+  <div class="card">
+    <h1>O que te move numa viagem?</h1>
+    <p class="sub">Escolha ao menos 3. Isso ajusta todas as recomendações de destino e de roteiro.</p>
+
+    <div class="interests">
+      <div class="tile on"><span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M3 18c2-1 4-1 6 0s4 1 6 0 4-1 6 0"/><path d="M8 14a4 4 0 1 1 8 0"/><path d="M12 3v3"/></svg>
+        <span class="lbl">Praia</span></div>
+      <div class="tile on"><span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M6 3v8a3 3 0 0 0 6 0V3"/><path d="M9 11v10"/><path d="M17 3c-1.5 1-2 3-2 6s.5 4 2 4v8"/></svg>
+        <span class="lbl">Gastronomia</span></div>
+      <div class="tile"><span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M4 9l8-5 8 5"/><path d="M5 9v9m14-9v9M9 9v9m6-9v9"/><path d="M3 20h18"/></svg>
+        <span class="lbl">Cultura &amp; história</span></div>
+      <div class="tile on"><span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M3 20l6-14 5 9 3-5 4 10z"/></svg>
+        <span class="lbl">Natureza &amp; trilha</span></div>
+      <div class="tile"><span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M6 3l1.5 6h9L18 3"/><path d="M5 9h14l-1 12H6z"/></svg>
+        <span class="lbl">Vida noturna</span></div>
+      <div class="tile"><span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M5 7h14l-1 13H6z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+        <span class="lbl">Compras</span></div>
+      <div class="tile"><span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+        <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8m-4-4h8"/></svg>
+        <span class="lbl">Bem-estar</span></div>
+      <div class="tile on"><span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M4 16l5-9 4 6 2-3 5 6z"/><circle cx="17" cy="6" r="1.6"/></svg>
+        <span class="lbl">Aventura</span></div>
+      <div class="tile"><span class="check"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></span>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12"/><path d="M9 20v-6h6v6"/></svg>
+        <span class="lbl">Arquitetura</span></div>
+    </div>
+
+    <div class="field">
+      <div class="flabel">Ritmo da viagem</div>
+      <div class="seg"><span>Relaxado</span><span class="on">Moderado</span><span>Intenso</span></div>
+    </div>
+    <div class="field">
+      <div class="flabel">Companhia</div>
+      <div class="seg"><span>Sozinho</span><span class="on">Casal</span><span>Família</span><span>Amigos</span></div>
+    </div>
+    <div class="field">
+      <div class="flabel">Orçamento por pessoa</div>
+      <div class="pills"><span class="pill">Econômico</span><span class="pill on">Médio</span><span class="pill">Conforto</span><span class="pill">Luxo</span></div>
+    </div>
+
+    <div class="foot">
+      <span class="btn-ghost">Voltar</span>
+      <span class="btn-primary">Continuar <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

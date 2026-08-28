@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .doc { width: 1400px; box-sizing: border-box; min-height: 1560px; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; padding: 64px 72px; }
+    .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #c25a38; margin-bottom: 14px; }
+    h1.title { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 32px; letter-spacing: -0.02em; margin: 0 0 10px; }
+    .intro { font-size: 15px; line-height: 1.6; color: #57554f; max-width: 660px; margin: 0 0 40px; }
+    h2.sec { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 15px; font-weight: 600; margin: 0 0 16px; }
+    .hr { height: 1px; background: #e9e7e1; margin: 40px 0; }
+    .card { border: 1px solid #e9e7e1; border-radius: 16px; background: #fff; padding: 26px 28px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .specline { font-size: 12px; color: #9b9992; margin-top: 14px; line-height: 1.55; }
+    .btnrow { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .btn { font-size: 14px; font-weight: 600; border-radius: 12px; display: inline-flex; align-items: center; gap: 8px; }
+    .btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .btn-primary { background: #c25a38; color: #fff; padding: 13px 22px; }
+    .btn-primary.hover { background: #ac4d2f; }
+    .btn-primary.disabled { background: #e6d6cf; color: #fff; }
+    .btn-ghost { background: #fff; color: #1c1b19; border: 1.5px solid #e0ddd4; padding: 11px 18px; }
+    .btn-ghost.hover { border-color: #c9c5ba; background: #faf8f4; }
+    .btn-text { color: #c25a38; padding: 10px 4px; }
+    .btn-sm { padding: 9px 14px; font-size: 13px; }
+    .field { max-width: 340px; }
+    .flabel { font-size: 13px; font-weight: 600; color: #57554f; margin-bottom: 8px; }
+    .input { border: 1.5px solid #e6e3dc; border-radius: 12px; background: #fff; padding: 12px 14px; font-size: 14px; color: #2f2d28; display: flex; align-items: center; gap: 10px; }
+    .input.focus { border-color: #c25a38; box-shadow: 0 0 0 3px #f9efe9; }
+    .input.error { border-color: #c25a38; }
+    .input svg { width: 16px; height: 16px; stroke: #9b9992; fill: none; stroke-width: 1.6; }
+    .errtext { font-size: 12px; color: #8f3f26; margin-top: 6px; }
+    .chips { display: flex; gap: 9px; flex-wrap: wrap; }
+    .chip { border: 1.5px solid #e6e3dc; border-radius: 999px; padding: 8px 14px; font-size: 12.5px; color: #6b6963; background: #fff; }
+    .chip.on { background: #1c1b19; color: #fff; border-color: #1c1b19; }
+    .chip.sel { background: #f9efe9; color: #8f3f26; border-color: #e2c1b3; }
+    .badge { display: inline-flex; align-items: center; gap: 5px; background: #fff; border-radius: 999px; padding: 5px 11px; font-size: 12px; font-weight: 700; color: #2f6252; box-shadow: 0 1px 4px rgba(28,27,25,.12); }
+    .badge i { width: 6px; height: 6px; border-radius: 50%; background: #3d7a67; }
+    .demo-card { width: 300px; border: 1px solid #e9e7e1; border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(28,27,25,.04); }
+    .demo-card .ph { height: 130px; background: linear-gradient(155deg,#e8caa6,#c98a63 55%,#a9683f); }
+    .demo-card .b { padding: 15px 17px 17px; }
+    .demo-card .t { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 17px; font-weight: 600; }
+    .demo-card .s { font-size: 12.5px; color: #9b9992; margin-top: 2px; }
+    .demo-card .r { font-size: 12.5px; color: #6b6963; line-height: 1.5; margin: 10px 0 0; }
+    .shell { border: 1px solid #e9e7e1; border-radius: 14px; overflow: hidden; display: grid; grid-template-columns: 150px 1fr 190px; height: 220px; }
+    .shell .s1 { background: #f7f5f0; border-right: 1px solid #e9e7e1; padding: 14px; font-size: 11px; color: #9b9992; }
+    .shell .s2 { padding: 14px; font-size: 11px; color: #9b9992; }
+    .shell .s3 { background: #f7f5f0; border-left: 1px solid #e9e7e1; padding: 14px; font-size: 11px; color: #9b9992; }
+    .shell b { display: block; color: #57554f; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    .tokens { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .ttable { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .ttable td { padding: 8px 6px; border-top: 1px solid #f1efe9; color: #45433d; }
+    .ttable tr:first-child td { border-top: 0; }
+    .ttable td:first-child { color: #9b9992; font-family: monospace; white-space: nowrap; }
+    .ttable td:last-child { text-align: right; color: #1c1b19; font-weight: 500; }
+    .scale { display: flex; align-items: flex-end; gap: 8px; margin-top: 6px; }
+    .scale i { background: #f2ded4; border: 1px solid #e2c1b3; display: block; }
+    .foot { margin-top: 52px; font-size: 11px; color: #9b9992; display: flex; justify-content: space-between; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="doc">
+  <div class="eyebrow">08 · Componentes &amp; tokens</div>
+  <h1 class="title">Componentes &amp; tokens</h1>
+  <p class="intro">Anatomia e estados dos componentes que compõem o app. Os valores abaixo são a fonte da verdade para o <code>packages/ui</code> do monorepo — a versão em código vive em <code>docs/design-system.md</code>.</p>
+
+  <h2 class="sec">Botões</h2>
+  <div class="card">
+    <div class="btnrow">
+      <span class="btn btn-primary">Buscar destinos <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      <span class="btn btn-primary hover">Hover</span>
+      <span class="btn btn-primary disabled">Desabilitado</span>
+      <span class="btn btn-ghost">Ver roteiro</span>
+      <span class="btn btn-ghost hover">Hover</span>
+      <span class="btn btn-text">Ajustar</span>
+      <span class="btn btn-primary btn-sm">Selecionar</span>
+    </div>
+    <p class="specline">Alturas: sm 36 · md 44 · lg 52. Raio 12. Primário = <code>--accent</code>, texto #fff (4.6:1). Fantasma = borda <code>--line</code> + superfície. Foco: anel <code>0 0 0 3px --accent-wash</code>. Um único botão primário por visão.</p>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Campos</h2>
+  <div class="grid3">
+    <div class="card"><div class="field"><div class="flabel">Saindo de</div><div class="input"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>São Paulo · GRU</div></div><p class="specline">Repouso</p></div>
+    <div class="card"><div class="field"><div class="flabel">Saindo de</div><div class="input focus">São Paulo · GRU</div></div><p class="specline">Foco — anel <code>--accent-wash</code></p></div>
+    <div class="card"><div class="field"><div class="flabel">Orçamento</div><div class="input error">R$ 500</div><div class="errtext">Mínimo R$ 1.500 por pessoa.</div></div><p class="specline">Erro — borda de acento + texto <code>--accent-ink</code></p></div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Chips &amp; selo de match</h2>
+  <div class="card">
+    <div class="chips" style="margin-bottom:16px">
+      <span class="chip on">Todos</span><span class="chip">Só nacional</span><span class="chip">Sem escala</span><span class="chip sel">Praia</span><span class="chip sel">Gastronomia</span>
+    </div>
+    <span class="badge"><i></i>94%</span>
+    <p class="specline">Filtro ativo = <code>--ink</code> sólido. Gosto selecionado = <code>--accent-wash</code>. Selo de match é o único uso de <code>--positive</code> na interface.</p>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Card de destino &amp; shell</h2>
+  <div class="grid2">
+    <div class="card">
+      <div class="demo-card">
+        <div class="ph"></div>
+        <div class="b"><div class="t">Cartagena</div><div class="s">Colômbia</div><p class="r">Praia e centro histórico gastronômico. Maio é seco.</p></div>
+      </div>
+      <p class="specline">Foto 16:10 · raio 16 · sombra e1. Card "top" ganha anel <code>0 0 0 3px --accent-wash</code>.</p>
+    </div>
+    <div class="card">
+      <div class="shell">
+        <div class="s1"><b>Sidebar · 248</b>Viagem + etapas. Sempre visível.</div>
+        <div class="s2"><b>Miolo · fluido</b>Máx. de conteúdo ~1120. Gutter 40.</div>
+        <div class="s3"><b>Trilho · 340</b>Assessor. Sempre presente.</div>
+      </div>
+      <p class="specline">Colapsa para 1 coluna abaixo de 1080 px: trilho vira aba, sidebar vira menu.</p>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <h2 class="sec">Tokens primitivos</h2>
+  <div class="tokens">
+    <div class="card">
+      <h2 class="sec" style="font-size:13px">Espaçamento (base 4)</h2>
+      <div class="scale">
+        <i style="width:2px;height:16px"></i><i style="width:4px;height:16px"></i><i style="width:8px;height:16px"></i><i style="width:12px;height:16px"></i><i style="width:16px;height:16px"></i><i style="width:20px;height:16px"></i><i style="width:24px;height:16px"></i><i style="width:32px;height:16px"></i><i style="width:40px;height:16px"></i><i style="width:48px;height:16px"></i><i style="width:64px;height:16px"></i>
+      </div>
+      <p class="specline">2 · 4 · 8 · 12 · 16 · 20 · 24 · 32 · 40 · 48 · 64 · 80</p>
+    </div>
+    <div class="card">
+      <h2 class="sec" style="font-size:13px">Raio, elevação, movimento</h2>
+      <table class="ttable">
+        <tr><td>--radius-sm</td><td>10 px</td></tr>
+        <tr><td>--radius-md</td><td>14 px</td></tr>
+        <tr><td>--radius-lg</td><td>16 px</td></tr>
+        <tr><td>--elev-1</td><td>0 1px 2px rgba(28,27,25,.04)</td></tr>
+        <tr><td>--elev-2</td><td>0 1px 2px /.04 + 0 12px 32px -16px /.12</td></tr>
+        <tr><td>--motion-fast</td><td>120 ms</td></tr>
+        <tr><td>--motion-base</td><td>200 ms</td></tr>
+        <tr><td>--ease</td><td>cubic-bezier(.2,.6,.2,1)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="foot"><span>Farol — Manual de marca</span><span>08 · Componentes &amp; tokens</span></div>
+</div>
+</x-dc>
+</body>
+</html>

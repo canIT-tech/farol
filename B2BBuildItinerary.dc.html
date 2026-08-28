@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; }
+    .app { width: 1512px; box-sizing: border-box; min-height: 1300px; background: #fbfaf8; color: #1c1b19; font-family: "Instrument Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .topbar { height: 56px; border-bottom: 1px solid #e9e7e1; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .agencybrand { display: flex; align-items: center; gap: 10px; }
+    .agencybrand .lg { width: 26px; height: 26px; border-radius: 7px; background: #2f4858; display: flex; align-items: center; justify-content: center; color: #fff; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 700; font-size: 13px; }
+    .agencybrand .nm { font-weight: 600; font-size: 14px; }
+    .poweredby { font-size: 11px; color: #a29f97; display: flex; align-items: center; gap: 6px; }
+    .poweredby svg { width: 13px; height: 13px; color: #c25a38; }
+    .u { width: 30px; height: 30px; border-radius: 50%; background: #ece9e2; }
+
+    .chd { display: flex; align-items: center; justify-content: space-between; padding: 18px 30px; border-bottom: 1px solid #e9e7e1; background: #fff; }
+    .chd h1 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 600; font-size: 20px; letter-spacing: -0.02em; margin: 0; display: flex; align-items: center; gap: 12px; }
+    .st { font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #f2efe9; color: #8a8882; }
+    .chd .acts { display: flex; gap: 8px; }
+    .btn { font-size: 13px; font-weight: 600; border-radius: 10px; padding: 9px 15px; display: inline-flex; align-items: center; gap: 7px; }
+    .btn-primary { background: #c25a38; color: #fff; }
+    .btn-ghost { border: 1.5px solid #e0ddd4; color: #1c1b19; background: #fff; }
+    .btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .destbar { display: flex; align-items: center; gap: 12px; padding: 12px 30px; background: #f7f9f8; border-bottom: 1px solid #e4ece9; font-size: 13px; }
+    .destbar b { font-weight: 600; }
+    .destbar .match { color: #2f6252; font-weight: 600; }
+    .destbar .change { margin-left: auto; font-size: 12.5px; color: #c25a38; border: 1.5px solid #e2c1b3; border-radius: 8px; padding: 6px 11px; }
+
+    .body { display: grid; grid-template-columns: 168px 1fr 340px; min-height: 1120px; }
+
+    .days { border-right: 1px solid #e9e7e1; background: #f7f5f0; padding: 16px 12px; }
+    .day { border-radius: 9px; padding: 10px 12px; margin-bottom: 4px; }
+    .day.on { background: #fff; border: 1px solid #e6e3dc; }
+    .day .dn { font-size: 13px; font-weight: 600; }
+    .day .dc { font-size: 11px; color: #9b9992; margin-top: 2px; }
+    .day .dcost { font-size: 11px; color: #78766f; margin-top: 4px; }
+    .addday { text-align: center; font-size: 12px; color: #c25a38; border: 1.5px dashed #e2c1b3; border-radius: 9px; padding: 9px; margin-top: 8px; }
+
+    .editor { padding: 22px 26px; }
+    .dayhead { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+    .dayhead h2 { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 17px; font-weight: 600; margin: 0; }
+    .wchip { font-size: 11.5px; color: #78766f; background: #fff; border: 1px solid #e9e7e1; border-radius: 999px; padding: 4px 10px; }
+    .bt { font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase; color: #a29f97; font-weight: 600; margin: 16px 0 10px; }
+    .item { border: 1px solid #e9e7e1; border-radius: 12px; background: #fff; padding: 12px; display: grid; grid-template-columns: 20px 60px 1fr auto; gap: 12px; align-items: center; margin-bottom: 8px; }
+    .item .drag { color: #cfccc3; font-size: 15px; cursor: grab; }
+    .item .time { font-size: 12px; color: #9b9992; }
+    .item .nm { font-size: 13.5px; font-weight: 600; }
+    .item .mt { font-size: 12px; color: #78766f; margin-top: 2px; }
+    .item .ops { display: flex; gap: 6px; }
+    .item .ops b { width: 26px; height: 26px; border: 1.5px solid #e6e3dc; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: #9b9992; font-weight: 400; font-size: 12px; }
+    .adds { display: flex; gap: 8px; margin-top: 10px; }
+    .adds span { font-size: 12.5px; font-weight: 600; border: 1.5px dashed #e0ddd4; border-radius: 9px; padding: 9px 14px; color: #57554f; }
+    .adds span.farol { color: #8f3f26; border-color: #e2c1b3; }
+
+    .panel { border-left: 1px solid #e9e7e1; background: #f7f5f0; display: flex; flex-direction: column; }
+    .ptabs { display: flex; border-bottom: 1px solid #e9e7e1; }
+    .ptab { flex: 1; text-align: center; font-size: 12px; font-weight: 600; color: #9b9992; padding: 12px 0; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .ptab.on { color: #1c1b19; border-color: #c25a38; }
+    .pbody { padding: 16px 18px; flex-grow: 1; }
+    .costline { display: flex; justify-content: space-between; font-size: 12.5px; color: #57554f; padding: 8px 0; border-top: 1px solid #ece9e2; }
+    .costline:first-child { border-top: 0; }
+    .costline.sub { color: #2f6252; font-size: 11.5px; padding-top: 2px; border-top: 0; }
+    .costline.total { font-weight: 600; color: #1c1b19; border-top: 1.5px solid #ddd8cd; padding-top: 10px; margin-top: 3px; }
+    .markup { margin-top: 14px; border: 1px solid #e6e3dc; border-radius: 10px; background: #fff; padding: 12px; }
+    .markup .l { font-size: 11.5px; color: #78766f; }
+    .markup .v { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+    .markup .v b { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 16px; font-weight: 600; }
+    .markup .v .pct { font-size: 12px; color: #8f3f26; background: #f9efe9; border-radius: 6px; padding: 3px 8px; }
+    .final { margin-top: 12px; font-size: 12.5px; color: #57554f; }
+    .final b { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 17px; color: #1c1b19; display: block; margin-top: 2px; }
+    .note { margin-top: 16px; }
+    .note .l { font-size: 11.5px; color: #78766f; margin-bottom: 6px; }
+    .note .box { border: 1.5px solid #e6e3dc; border-radius: 10px; background: #fff; padding: 10px 12px; font-size: 12.5px; color: #78766f; line-height: 1.5; }
+    a { color: #c25a38; } a:hover { color: #8f3f26; }
+  </style>
+</helmet>
+<div class="app">
+  <div class="topbar">
+    <div class="agencybrand"><span class="lg">SA</span><span class="nm">Sua Agência de Viagens</span></div>
+    <div class="poweredby"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 43h14"/><path d="M20 43 L22 25 h4 l2 18"/><rect x="21" y="18" width="6" height="7" rx="1"/></svg>com tecnologia Farol</div>
+    <span class="u"></span>
+  </div>
+
+  <div class="chd">
+    <h1>Família Almeida · Lua de mel <span class="st">Rascunho</span></h1>
+    <div class="acts">
+      <span class="btn btn-ghost"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Salvar</span>
+      <span class="btn btn-primary"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Prévia da proposta</span>
+    </div>
+  </div>
+
+  <div class="destbar">
+    <span>Destino: <b>Maldivas — atol de Baa</b></span>
+    <span class="match">91% pro briefing</span>
+    <span>· setembro é ombro de estação (−20% vs. alta)</span>
+    <span class="change">Trocar destino ▾</span>
+  </div>
+
+  <div class="body">
+    <aside class="days">
+      <div class="day on"><div class="dn">Dia 1</div><div class="dc">12 set</div><div class="dcost">R$ 0</div></div>
+      <div class="day"><div class="dn">Dia 2</div><div class="dc">13 set</div><div class="dcost">R$ 1.900</div></div>
+      <div class="day"><div class="dn">Dia 3</div><div class="dc">14 set</div><div class="dcost">R$ 0</div></div>
+      <div class="day"><div class="dn">Dia 4</div><div class="dc">15 set</div><div class="dcost">R$ 2.400</div></div>
+      <div class="day"><div class="dn">Dia 5</div><div class="dc">16 set</div><div class="dcost">R$ 0</div></div>
+      <div class="day"><div class="dn">Dia 6</div><div class="dc">17 set</div><div class="dcost">R$ 1.100</div></div>
+      <div class="day"><div class="dn">Dia 7</div><div class="dc">18 set</div><div class="dcost">R$ 0</div></div>
+      <div class="day"><div class="dn">Dia 8</div><div class="dc">19 set</div><div class="dcost">R$ 0</div></div>
+      <div class="addday">+ dia</div>
+    </aside>
+
+    <div class="editor">
+      <div class="dayhead">
+        <h2>Dia 1 — Chegada e resort</h2>
+        <span class="wchip">30° · parcialmente nublado</span>
+      </div>
+
+      <div class="bt">Tarde</div>
+      <div class="item">
+        <span class="drag">⣿</span>
+        <span class="time">15:00</span>
+        <div><div class="nm">Check-in + traslado de hidroavião</div><div class="mt">Incluso no pacote do resort · ~40 min de voo panorâmico</div></div>
+        <div class="ops"><b>✎</b><b>✕</b></div>
+      </div>
+      <div class="item">
+        <span class="drag">⣿</span>
+        <span class="time">18:30</span>
+        <div><div class="nm">Jantar de boas-vindas na praia</div><div class="mt">Cortesia da agência · reservar mesa ao pôr do sol</div></div>
+        <div class="ops"><b>✎</b><b>✕</b></div>
+      </div>
+
+      <div class="bt">Noite</div>
+      <div class="item" style="grid-template-columns:20px 60px 1fr;color:#9b9992">
+        <span class="drag">⣿</span>
+        <span class="time">—</span>
+        <div><div class="nm" style="font-weight:500;color:#78766f">Livre — descanso após a viagem</div></div>
+      </div>
+
+      <div class="adds">
+        <span>+ adicionar parada</span>
+        <span class="farol">+ sugerir com o Farol</span>
+        <span>+ do catálogo</span>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <div class="ptabs">
+        <span class="ptab on">Custos</span>
+        <span class="ptab">Assistente</span>
+        <span class="ptab">Notas</span>
+      </div>
+      <div class="pbody">
+        <div class="costline"><span>Voo GIG → MLE · 2 pax</span><span>R$ 12.960</span></div>
+        <div class="costline sub">ou 180k Qatar Avios + R$ 2.640 taxas</div>
+        <div class="costline"><span>Resort · 8 noites · meia pensão</span><span>R$ 39.200</span></div>
+        <div class="costline"><span>Passeios (2 opcionais)</span><span>R$ 3.500</span></div>
+        <div class="costline"><span>Traslados</span><span>inclusos</span></div>
+        <div class="costline total"><span>Custo (dinheiro)</span><span>R$ 55.660</span></div>
+
+        <div class="markup">
+          <div class="l">Markup da agência</div>
+          <div class="v"><b>R$ 6.679</b><span class="pct">12%</span></div>
+        </div>
+        <div class="final">Valor ao cliente<b>R$ 62.339 · R$ 31.170 / pessoa</b></div>
+        <div class="final" style="color:#2f6252;margin-top:8px">Com milhas no voo, cai para <b style="color:#2f6252;display:inline;font-size:13px">R$ 51.759</b> + 180k milhas</div>
+
+        <div class="note">
+          <div class="l">Nota interna (não vai na proposta)</div>
+          <div class="box">Cliente pediu quarto sobre a água. Confirmar disponibilidade antes de enviar. Aniversário de casamento dia 15 — pedir cortesia de espumante.</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
