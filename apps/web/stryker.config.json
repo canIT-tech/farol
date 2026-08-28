@@ -1,0 +1,9 @@
+{
+  "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/api/schema/stryker-schema.json",
+  "testRunner": "vitest",
+  "plugins": ["@stryker-mutator/vitest-runner"],
+  "reporters": ["progress", "clear-text", "html"],
+  "mutate": ["src/lib/**/*.ts", "!src/**/*.spec.ts"],
+  "htmlReporter": { "fileName": "reports/mutation/web.html" },
+  "thresholds": { "high": 100, "low": 80, "break": 90 }
+}
