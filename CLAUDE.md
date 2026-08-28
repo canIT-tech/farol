@@ -73,6 +73,61 @@ Canvases publicados (Claude Artifacts):
 - Confirmar domínio `farol.app` e travar o nome antes de produção.
 - Escolher lib base de componentes (recomendação: Radix para overlays).
 
-## Próximo passo planejado
+## Próximos passos
 
-Plano de implementação **Fase 1 — Fundação do monorepo** (scaffold Turborepo, `packages/shared` + `packages/db`, `apps/api` NestJS boot, `apps/web` Next.js boot, 1 migration Drizzle no Supabase, `/health` verde).
+Backlog de implementação. Ordem = dependência. Puxe pelo número.
+
+| # | Passo | Status | Responsável | Branch | Depende de |
+|---|---|---|---|---|---|
+| 1 | Fundação do monorepo — scaffold Turborepo, `packages/shared` + `packages/db` (Drizzle), `apps/api` NestJS boot + `ConfigModule` + `/health`, `apps/web` Next.js boot, 1 migration no Supabase | 🟢 livre | — | — | — |
+| 2 | Auth + Perfil de gosto — `AuthModule` (JWT Supabase via JWKS), upsert `users`, `ProfileModule` CRUD, login + onboarding no web | 🟢 livre | — | — | 1 |
+| 3 | Viagens + Descoberta de destino — `TripsModule`, catálogo seed (~200 cidades), `LlmModule`, `DiscoveryModule` (pré-filtro + ranking Claude) | 🟢 livre | — | — | 2 |
+| 4 | Roteiro + Jobs — `JobsModule` (pg-boss), `apps/worker`, `ItineraryModule`, job `itinerary.generate`, polling no web | 🟢 livre | — | — | 3 |
+| 5 | Providers Amadeus — `packages/providers`, auth OAuth2, `AmadeusFlightProvider` / `AmadeusHotelProvider`, `provider_cache`, resiliência, `FlightsModule` / `HotelsModule` | 🟢 livre | — | — | 3 |
+| 6 | Google Places + enrich — `GooglePlacesProvider`, `PlacesModule`, passo de enrich no job do roteiro, `swap_restaurant` | 🟢 livre | — | — | 4 |
+| 7 | Chat IA — `ChatModule`, loop de tool-calling, as 9 tools mapeadas para serviços, `chat_messages` | 🟢 livre | — | — | 4, 5, 6 |
+| 8 | UI web + E2E — telas ligadas ao `apps/api`, fluxo Playwright login→onboarding→descoberta→destino→roteiro | 🟢 livre | — | — | 7 |
+| 9 | `packages/ui` — implementar tokens (`docs/design-system.md`) + componentes base (`Button`, `TextField`, `Chip`, `MatchBadge`, `DestinationCard`, `AppShell`, `StepNav`, `AdvisorChat`) | 🟢 livre | — | — | 1 |
+
+Legenda de status: 🟢 livre · 🟡 em andamento · ✅ concluído · 🔴 bloqueado.
+
+Detalhe de cada passo vem do design técnico (`docs/superpowers/specs/2026-08-27-mvp-trip-design.md`).
+Passos 4 e 5 podem rodar em paralelo depois do 3. Passo 9 pode começar em paralelo a partir do 1.
+
+---
+
+## Guideline — modo gerenciador de tarefas
+
+Quando alguém disser **"puxar o próximo passo N"** (ou "pego o passo N", "vou no passo N"),
+o Claude age como gerenciador de tarefas, nesta ordem, **antes de escrever qualquer código**:
+
+1. **Identifica quem puxou.** Usa `git config user.name`. Se a pessoa disser um nome
+   diferente na mensagem, usa esse.
+2. **Valida o passo.** Confere na tabela **Próximos passos** que o passo N está `🟢 livre`
+   e que todos os passos em "Depende de" estão `✅ concluído`. Se estiver ocupado ou
+   bloqueado, **avisa e para** — não implementa.
+3. **Sincroniza.** `git checkout main && git pull` para pegar claims recentes de outra pessoa.
+   Revalida o passo N depois do pull.
+4. **Marca o claim** editando a linha do passo N na tabela:
+   - Status → `🟡 em andamento`
+   - Responsável → nome de quem puxou
+   - Branch → `<nome>/passo-N-<slug-curto>`
+   - Acrescenta a data no fim da linha entre parênteses.
+5. **Commita só o CLAUDE.md** e dá push na `main`:
+   `git add CLAUDE.md && git commit -m "chore(tasks): <nome> puxou o passo N — <título curto>" && git push`
+   - Fechar com as linhas `Co-Authored-By` / `Claude-Session` de sempre.
+   - Se o push for rejeitado (alguém commitou antes), `git pull --rebase`, revalidar o
+     passo N na tabela, e repetir. Se nesse meio-tempo o passo foi tomado, avisar e parar.
+6. **Cria a branch** `<nome>/passo-N-<slug>` a partir da `main` atualizada.
+7. **Implementa** o passo nessa branch, seguindo o pipeline TDD do projeto
+   (spec primeiro). Commits pequenos e frequentes na branch.
+8. **Ao concluir:** abre PR para a `main`. Quando o PR entrar, numa mensagem seguinte
+   o Claude atualiza a tabela: Status → `✅ concluído`, Responsável fica como quem
+   entregou, e commita essa atualização do CLAUDE.md (pode ir junto no PR).
+
+Regras:
+- Uma pessoa pode ter no máximo **um passo `🟡 em andamento`** por vez.
+- Nunca implementar um passo sem antes ter feito o commit de claim na `main`.
+- Se pedirem "próximo passo" sem número, pegar o menor `#` que esteja `🟢 livre`
+  com dependências `✅`.
+- O commit de claim mexe **só no CLAUDE.md** — nada de código junto.
