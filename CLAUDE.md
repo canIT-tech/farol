@@ -56,6 +56,10 @@ Canvases publicados (Claude Artifacts):
 - **B2C autônomo:** entrada mínima (datas + origem + orçamento + até 3 gostos) → UM plano fechado, sem seletor de destino, ajustável só pelo chat.
 - **B2B (v2):** landing de vendas + console do consultor (carteira de clientes → novo cliente → montar roteiro com markup e alternativa em milhas → revisar e enviar proposta com a marca da agência). Farol não aparece na proposta enviada.
 
+**Qualidade / testes** (baseline — ver seção "Baseline de testes")
+- Cobertura **100%** (statements/branches/functions/lines) em back e front, gate no CI.
+- Testes de **unidade, integração, e2e e mutação** obrigatórios. Mutation score alvo **≥ 90%**.
+
 ---
 
 ## Como trabalhar em conjunto
@@ -64,6 +68,43 @@ Canvases publicados (Claude Artifacts):
 - Para frentes paralelas na mesma máquina, usar `git worktree`.
 - Ao concluir uma decisão/descoberta relevante, registrar em `docs/` (não em vault pessoal) para o contexto ficar no repo.
 - Canvas de design: editar as fontes `.dc.html` + `canvas.json`, re-seedar e republicar no mesmo artifact (ver histórico da sessão). Não editar os `.html` gerados (estão no `.gitignore`).
+
+---
+
+## Baseline de testes
+
+**Regra:** nenhum passo do backlog é dado como concluído sem testes. Todo PR passa
+por CI que falha se qualquer limiar abaixo não for atingido.
+
+### Cobertura
+
+- **100%** de `statements`, `branches`, `functions` e `lines` — em `apps/api`,
+  `apps/worker`, `apps/web` e em cada `packages/*`.
+- Medida por pacote (não média do monorepo). O gate é por pacote.
+- **Exclusões permitidas** (só estas, e cada uma comentada no config):
+  arquivos de bootstrap (`main.ts`, `main.worker.ts`), migrations do Drizzle,
+  `*.config.*`, `*.stories.tsx`, tipos puros (`*.d.ts`), barrels (`index.ts` só de re-export).
+  Qualquer outra exclusão precisa de aprovação no PR.
+
+### Tipos de teste (todos obrigatórios)
+
+| Tipo | Escopo | Ferramenta |
+|---|---|---|
+| **Unidade** | função/serviço isolado, dependências mockadas. `domain/` é 100% puro, sem mock. `.spec.ts` primeiro (TDD). | Vitest |
+| **Integração** | módulo Nest com DB real (Postgres de teste efêmero) + providers/LLM em fake determinístico. Fluxos: descoberta, geração de roteiro, mutação de trip via chat. | Vitest + Testcontainers (ou Supabase local) |
+| **Contrato de provider** | Amadeus / Google Places contra fixtures gravadas em `__fixtures__`, sem rede no CI. | Vitest |
+| **E2E — API** | `apps/api` de pé + Postgres de teste, chamadas HTTP reais ponta a ponta. | Vitest + Supertest |
+| **E2E — Web** | fluxo real no browser: login → onboarding → descoberta → destino → roteiro; e o fluxo B2B (novo cliente → montar → proposta). | Playwright |
+| **Mutação** | back e front. Mutation score **≥ 90%** por pacote; meta é matar todos os mutantes. Mutante sobrevivente sem teste = corrigir ou justificar no PR. | StrykerJS |
+
+### Convenção
+
+- Arquivos: `*.spec.ts` (unidade/integração), `*.e2e-spec.ts` (e2e API), `*.spec.ts` em `e2e/` (Playwright).
+- `pnpm test` roda unidade + integração; `pnpm test:e2e`; `pnpm test:mutation`.
+- CI: cobertura e mutação rodam em todo PR e no merge para `main`. PR vermelho não entra.
+- LLM em teste sempre via fake determinístico (retorna JSON fixo por chave de prompt) — nunca chamada real.
+
+O **Passo 1** monta esse harness (Vitest, Playwright, Stryker) e liga os gates no CI antes de qualquer feature.
 
 ## Pendências abertas (do PRD / design técnico)
 
@@ -79,7 +120,7 @@ Backlog de implementação. Ordem = dependência. Puxe pelo número.
 
 | # | Passo | Status | Responsável | Branch | Depende de |
 |---|---|---|---|---|---|
-| 1 | Fundação do monorepo — scaffold Turborepo, `packages/shared` + `packages/db` (Drizzle), `apps/api` NestJS boot + `ConfigModule` + `/health`, `apps/web` Next.js boot, 1 migration no Supabase | 🟢 livre | — | — | — |
+| 1 | Fundação do monorepo — scaffold Turborepo, `packages/shared` + `packages/db` (Drizzle), `apps/api` NestJS boot + `ConfigModule` + `/health`, `apps/web` Next.js boot, 1 migration no Supabase, **harness de testes (Vitest, Playwright, Stryker) + gates de cobertura 100% / mutação no CI** | 🟢 livre | — | — | — |
 | 2 | Auth + Perfil de gosto — `AuthModule` (JWT Supabase via JWKS), upsert `users`, `ProfileModule` CRUD, login + onboarding no web | 🟢 livre | — | — | 1 |
 | 3 | Viagens + Descoberta de destino — `TripsModule`, catálogo seed (~200 cidades), `LlmModule`, `DiscoveryModule` (pré-filtro + ranking Claude) | 🟢 livre | — | — | 2 |
 | 4 | Roteiro + Jobs — `JobsModule` (pg-boss), `apps/worker`, `ItineraryModule`, job `itinerary.generate`, polling no web | 🟢 livre | — | — | 3 |
@@ -93,6 +134,9 @@ Legenda de status: 🟢 livre · 🟡 em andamento · ✅ concluído · 🔴 blo
 
 Detalhe de cada passo vem do design técnico (`docs/superpowers/specs/2026-08-27-mvp-trip-design.md`).
 Passos 4 e 5 podem rodar em paralelo depois do 3. Passo 9 pode começar em paralelo a partir do 1.
+
+**Definition of Done de todo passo:** cobertura 100% + testes de unidade, integração, e2e e
+mutação passando (ver "Baseline de testes"). PR que não bate os gates de CI não entra.
 
 ---
 
