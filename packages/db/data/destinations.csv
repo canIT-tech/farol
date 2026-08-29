@@ -1,0 +1,24 @@
+city,country,iata,tags,bestMonths,avgFlightCostFromGru,avgLodgingNight,avgDailyLocal,region,visaFreeBr
+Maceió,Brasil,MCZ,praia;relaxar;gastronomia,1;2;3;7;8;9;10;12,900,320,180,brasil,true
+Fernando de Noronha,Brasil,FEN,praia;natureza;aventura;mergulho,4;5;6;7;8;9,2200,650,300,brasil,true
+Foz do Iguaçu,Brasil,IGU,natureza;aventura;familia,3;4;5;8;9;10,700,260,150,brasil,true
+Jericoacoara,Brasil,JJD,praia;vida noturna;relaxar;natureza,7;8;9;10;11;12,1100,300,160,brasil,true
+Bonito,Brasil,BYO,natureza;aventura;mergulho,4;5;6;7;8;9,900,280,170,brasil,true
+Gramado,Brasil,CXJ,gastronomia;relaxar;compras;cultura e museus,4;5;6;7;12,650,340,200,brasil,true
+Salvador,Brasil,SSA,cultura e museus;praia;vida noturna;história;gastronomia,1;2;9;10;11;12,800,240,140,brasil,true
+Rio de Janeiro,Brasil,GIG,praia;vida noturna;cultura e museus;natureza,3;4;5;9;10;11,600,320,180,brasil,true
+Buenos Aires,Argentina,EZE,gastronomia;cultura e museus;vida noturna;compras;arquitetura,3;4;5;9;10;11,1200,260,160,south-america,true
+Bariloche,Argentina,BRC,natureza;aventura;montanha;relaxar,1;2;7;8;12,1500,300,170,south-america,true
+Mendoza,Argentina,MDZ,vinhos;gastronomia;natureza;relaxar,3;4;5;9;10,1400,240,150,south-america,true
+Santiago,Chile,SCL,montanha;gastronomia;vinhos;cultura e museus,3;4;5;9;10;11,1300,270,170,south-america,true
+Cusco,Peru,CUZ,história;aventura;montanha;cultura e museus,5;6;7;8;9,1600,220,120,south-america,true
+Cartagena,Colômbia,CTG,praia;história;vida noturna;gastronomia,1;2;3;7;12,1900,300,150,south-america,true
+Montevidéu,Uruguai,MVD,praia;gastronomia;relaxar;cultura e museus,1;2;3;11;12,1000,250,160,south-america,true
+Lisboa,Portugal,LIS,cultura e museus;gastronomia;história;arquitetura;vinhos,4;5;6;9;10,3200,180,140,europe,true
+Porto,Portugal,OPO,vinhos;gastronomia;cultura e museus;arquitetura,5;6;7;9;10,3300,170,130,europe,true
+Madri,Espanha,MAD,cultura e museus;gastronomia;vida noturna;arquitetura,4;5;6;9;10,3600,190,150,europe,true
+Cidade do México,México,MEX,cultura e museus;gastronomia;história;arquitetura,3;4;5;10;11,1800,200,130,north-america,true
+Cancún,México,CUN,praia;vida noturna;relaxar;mergulho,1;2;3;11;12,2100,420,220,north-america,true
+Punta Cana,República Dominicana,PUJ,praia;relaxar;vida noturna,1;2;3;4;12,2600,500,260,north-america,true
+Cidade do Cabo,África do Sul,CPT,natureza;aventura;vinhos;praia;montanha,1;2;3;11;12,4200,220,160,africa,true
+Orlando,Estados Unidos,MCO,familia;compras;parques;gastronomia,3;4;5;9;10;11,2400,260,200,north-america,false

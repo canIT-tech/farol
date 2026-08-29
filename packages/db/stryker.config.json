@@ -1,10 +1,16 @@
 {
   "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/api/schema/stryker-schema.json",
-  "_note": "break=60 só no Passo 1: db ainda é só glue de I/O (client/migrate). schema.ts fica em 100%. Volta a 90 quando o Plano 3 adiciona lógica real (repos, seed).",
+  "_comment": "schema.ts em 100%. client.ts/migrate.ts são glue de I/O (pool/timeout/caminho de migração) sem efeito observável em teste unitário — puxam a agregada pra baixo, por isso break=85. O grosso da mutação vive em schema.ts e no seed.",
   "testRunner": "vitest",
   "plugins": ["@stryker-mutator/vitest-runner"],
   "reporters": ["progress", "clear-text", "html"],
-  "mutate": ["src/**/*.ts", "!src/**/*.spec.ts", "!src/index.ts", "!src/migrate-cli.ts"],
+  "mutate": [
+    "src/**/*.ts",
+    "!src/**/*.spec.ts",
+    "!src/index.ts",
+    "!src/migrate-cli.ts",
+    "!src/seed-catalog-cli.ts"
+  ],
   "htmlReporter": { "fileName": "reports/mutation/db.html" },
-  "thresholds": { "high": 100, "low": 70, "break": 60 }
+  "thresholds": { "high": 100, "low": 85, "break": 85 }
 }
