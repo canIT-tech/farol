@@ -86,6 +86,68 @@ export const tripDestinations = pgTable(
   })
 );
 
+// Roteiro versionado de uma viagem (design §5.1). status: pending | ready | failed.
+export const itineraries = pgTable(
+  "itineraries",
+  {
+    id: uuid("id").primaryKey(),
+    tripId: uuid("trip_id")
+      .notNull()
+      .references(() => trips.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    status: text("status").notNull().default("pending"),
+    error: text("error"),
+    generatedAt: timestamp("generated_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (t) => ({
+    tripVersionIdx: index("itineraries_trip_version_idx").on(t.tripId, t.version)
+  })
+);
+
+// Um dia do roteiro (design §5.1).
+export const itineraryDays = pgTable(
+  "itinerary_days",
+  {
+    id: uuid("id").primaryKey(),
+    itineraryId: uuid("itinerary_id")
+      .notNull()
+      .references(() => itineraries.id, { onDelete: "cascade" }),
+    dayIndex: integer("day_index").notNull(),
+    date: date("date"),
+    notes: text("notes")
+  },
+  (t) => ({
+    itineraryDayIdx: index("itinerary_days_itinerary_day_idx").on(t.itineraryId, t.dayIndex)
+  })
+);
+
+// Item de um dia (design §5.1). placeId/lat/lng/rating vêm do enrich do Passo 6.
+export const itineraryItems = pgTable(
+  "itinerary_items",
+  {
+    id: uuid("id").primaryKey(),
+    dayId: uuid("day_id")
+      .notNull()
+      .references(() => itineraryDays.id, { onDelete: "cascade" }),
+    slot: text("slot").notNull(),
+    type: text("type").notNull(),
+    title: text("title").notNull(),
+    description: text("description"),
+    placeId: text("place_id"),
+    lat: numeric("lat"),
+    lng: numeric("lng"),
+    rating: numeric("rating"),
+    durationMin: integer("duration_min"),
+    estCost: numeric("est_cost"),
+    sortOrder: integer("sort_order").notNull(),
+    pinned: boolean("pinned").notNull().default(false)
+  },
+  (t) => ({
+    daySortIdx: index("itinerary_items_day_sort_idx").on(t.dayId, t.sortOrder)
+  })
+);
+
 // Catálogo curado de destinos (design §6.1). Base determinística da descoberta.
 export const destinationCatalog = pgTable(
   "destination_catalog",

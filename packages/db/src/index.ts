@@ -7,5 +7,8 @@ export {
   tasteProfiles,
   trips,
   tripDestinations,
-  destinationCatalog
+  destinationCatalog,
+  itineraries,
+  itineraryDays,
+  itineraryItems
 } from "./schema";
