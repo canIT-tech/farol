@@ -7,5 +7,8 @@ export {
   tasteProfiles,
   trips,
   tripDestinations,
-  destinationCatalog
+  destinationCatalog,
+  providerCache,
+  flightSelections,
+  hotelSelections
 } from "./schema";
