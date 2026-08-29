@@ -2,7 +2,8 @@ import { z } from "zod";
 
 export const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
-  API_PORT: z.coerce.number().int().positive().default(3333)
+  API_PORT: z.coerce.number().int().positive().default(3333),
+  SUPABASE_JWKS_URL: z.string().url()
 });
 
 export type Env = z.infer<typeof envSchema>;
