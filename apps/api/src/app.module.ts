@@ -5,6 +5,9 @@ import { HealthModule } from "./health/health.module";
 import { AuthModule } from "./auth/auth.module";
 import { MeModule } from "./me/me.module";
 import { ProfileModule } from "./profile/profile.module";
+import { LlmModule } from "./llm/llm.module";
 
-@Module({ imports: [ConfigModule, DbModule, HealthModule, AuthModule, MeModule, ProfileModule] })
+@Module({
+  imports: [ConfigModule, DbModule, HealthModule, AuthModule, MeModule, ProfileModule, LlmModule]
+})
 export class AppModule {}

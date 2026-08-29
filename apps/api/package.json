@@ -13,6 +13,7 @@
     "test:mutation": "stryker run"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.122.0",
     "@farol/db": "workspace:*",
     "@farol/shared": "workspace:*",
     "@nestjs/common": "^10.4.0",
