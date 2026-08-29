@@ -109,7 +109,7 @@ O **Passo 1** monta esse harness (Vitest, Playwright, Stryker) e liga os gates n
 ## Pendências abertas (do PRD / design técnico)
 
 - Teto de custo de LLM por roteiro (definir número).
-- Catálogo de destinos: começar com CSV curado (~200 cidades).
+- Catálogo de destinos: CSV curado em `packages/db/data/destinations.csv` (23 cidades no Passo 3; `pnpm --filter @farol/db db:seed`). Expandir para ~200 é curadoria contínua.
 - Site parceiro para o deep-link de voo/hotel no MVP.
 - Confirmar domínio `farol.app` e travar o nome antes de produção.
 - Escolher lib base de componentes (recomendação: Radix para overlays).
@@ -122,7 +122,7 @@ Backlog de implementação. Ordem = dependência. Puxe pelo número.
 |---|---|---|---|---|---|
 | 1 | Fundação do monorepo — scaffold Turborepo, `packages/shared` + `packages/db` (Drizzle), `apps/api` NestJS boot + `ConfigModule` + `/health`, `apps/web` Next.js boot, 1 migration no Supabase, **harness de testes (Vitest, Playwright, Stryker) + gates de cobertura 100% / mutação no CI** | ✅ concluído | felippebutland | — | — | (2026-08-28) |
 | 2 | Auth + Perfil de gosto — `AuthModule` (JWT Supabase via JWKS), upsert `users`, `ProfileModule` CRUD, login + onboarding no web | ✅ concluído | felippebutland | — | 1 | (2026-08-29) |
-| 3 | Viagens + Descoberta de destino — `TripsModule`, catálogo seed (~200 cidades), `LlmModule`, `DiscoveryModule` (pré-filtro + ranking Claude) | 🟡 em andamento | felippebutland | `felippebutland/passo-3-viagens-descoberta` | 2 | (2026-08-29) |
+| 3 | Viagens + Descoberta de destino — `TripsModule`, catálogo seed (~200 cidades), `LlmModule`, `DiscoveryModule` (pré-filtro + ranking Claude) | ✅ concluído | felippebutland | — | 2 | (2026-08-29) |
 | 4 | Roteiro + Jobs — `JobsModule` (pg-boss), `apps/worker`, `ItineraryModule`, job `itinerary.generate`, polling no web | 🟢 livre | — | — | 3 |
 | 5 | Providers Amadeus — `packages/providers`, auth OAuth2, `AmadeusFlightProvider` / `AmadeusHotelProvider`, `provider_cache`, resiliência, `FlightsModule` / `HotelsModule` | 🟢 livre | — | — | 3 |
 | 6 | Google Places + enrich — `GooglePlacesProvider`, `PlacesModule`, passo de enrich no job do roteiro, `swap_restaurant` | 🟢 livre | — | — | 4 |
