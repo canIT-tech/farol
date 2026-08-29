@@ -66,3 +66,7 @@ export const buildItineraryOutputSchema = z.object({
 });
 export type BuildItinerarySlot = z.infer<typeof buildItinerarySlotSchema>;
 export type BuildItineraryOutput = z.infer<typeof buildItineraryOutputSchema>;
+
+// Body de POST /trips/:id/destination.
+export const chooseDestinationSchema = z.object({ iata: z.string().length(3) });
+export type ChooseDestinationInput = z.infer<typeof chooseDestinationSchema>;
