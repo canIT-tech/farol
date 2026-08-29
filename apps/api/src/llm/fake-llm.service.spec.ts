@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { FakeLlmService } from "./fake-llm.service";
-import type { RankDestinationsInput } from "./llm.types";
+import { FakeLlmService, fakeSlotTitle } from "./fake-llm.service";
+import type { BuildItineraryInput, RankDestinationsInput } from "./llm.types";
 
 const input: RankDestinationsInput = {
   shortlist: [
@@ -31,5 +31,73 @@ describe("FakeLlmService", () => {
     const ranking = await new FakeLlmService().rankDestinations(input);
     const allowed = new Set(input.shortlist.map((s) => s.iata));
     expect(ranking.every((r) => allowed.has(r.iata))).toBe(true);
+  });
+});
+
+const itineraryInput: BuildItineraryInput = {
+  destination: { city: "Lisboa", country: "Portugal" },
+  nights: 4,
+  pace: "moderado",
+  interests: ["gastronomia"],
+  party: { adults: 2, children: 1 }
+};
+
+describe("fakeSlotTitle", () => {
+  it("usa 'Refeição' para meal e 'Atividade' para o resto, com cidade e dia", () => {
+    expect(fakeSlotTitle("meal", "Lisboa", 2)).toBe("Refeição de teste — Lisboa dia 2");
+    expect(fakeSlotTitle("activity", "Lisboa", 1)).toBe("Atividade de teste — Lisboa dia 1");
+    expect(fakeSlotTitle("transfer", "Porto", 3)).toBe("Atividade de teste — Porto dia 3");
+  });
+});
+
+describe("FakeLlmService.buildItinerary", () => {
+  it("gera um dia por noite, com 3 slots e títulos determinísticos", async () => {
+    const out = await new FakeLlmService().buildItinerary(itineraryInput);
+    expect(out.days.map((d) => d.dayIndex)).toEqual([1, 2, 3, 4]);
+    for (const day of out.days) {
+      expect(day.slots.map((s) => s.slot)).toEqual(["morning", "afternoon", "evening"]);
+      expect(day.slots.map((s) => s.type)).toEqual(["activity", "meal", "activity"]);
+      expect(day.slots.map((s) => s.title)).toEqual([
+        fakeSlotTitle("activity", "Lisboa", day.dayIndex),
+        fakeSlotTitle("meal", "Lisboa", day.dayIndex),
+        fakeSlotTitle("activity", "Lisboa", day.dayIndex)
+      ]);
+    }
+  });
+
+  it("recoloca o item pinned no dia e slot certos, sem tocar nos demais slots", async () => {
+    const out = await new FakeLlmService().buildItinerary({
+      ...itineraryInput,
+      pinned: [{ dayIndex: 2, slot: "afternoon", type: "activity", title: "Almoço fixo do usuário" }]
+    });
+    const day2 = out.days.find((d) => d.dayIndex === 2)!;
+    const pinnedSlot = day2.slots.find((s) => s.slot === "afternoon")!;
+    expect(pinnedSlot).toEqual({ slot: "afternoon", type: "activity", title: "Almoço fixo do usuário" });
+    // o slot morning do dia 2 continua o título gerado
+    expect(day2.slots.find((s) => s.slot === "morning")!.title).toBe(
+      fakeSlotTitle("activity", "Lisboa", 2)
+    );
+    // o dia 1 não é afetado
+    expect(out.days.find((d) => d.dayIndex === 1)!.slots.find((s) => s.slot === "afternoon")!.title).toBe(
+      fakeSlotTitle("meal", "Lisboa", 1)
+    );
+  });
+
+  it("um pinned com slot que não existe naquele dia é ignorado (slot fica gerado)", async () => {
+    const out = await new FakeLlmService().buildItinerary({
+      ...itineraryInput,
+      pinned: [{ dayIndex: 1, slot: "evening", type: "meal", title: "só à noite" }]
+    });
+    const day1 = out.days.find((d) => d.dayIndex === 1)!;
+    expect(day1.slots.find((s) => s.slot === "morning")!.title).toBe(
+      fakeSlotTitle("activity", "Lisboa", 1)
+    );
+    expect(day1.slots.find((s) => s.slot === "evening")!.title).toBe("só à noite");
+  });
+
+  it("aceita ausência de pinned", async () => {
+    const out = await new FakeLlmService().buildItinerary({ ...itineraryInput, pinned: undefined });
+    expect(out.days).toHaveLength(4);
+    expect(out.days[0]!.slots[0]!.title).toBe(fakeSlotTitle("activity", "Lisboa", 1));
   });
 });

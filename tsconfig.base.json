@@ -16,7 +16,8 @@
       "@farol/shared": ["packages/shared/dist", "packages/shared/src"],
       "@farol/db": ["packages/db/dist", "packages/db/src"],
       "@farol/domain": ["packages/domain/dist", "packages/domain/src"],
-      "@farol/providers": ["packages/providers/dist", "packages/providers/src"]
+      "@farol/providers": ["packages/providers/dist", "packages/providers/src"],
+      "@farol/api": ["apps/api/dist/worker-exports.d.ts", "apps/api/src/worker-exports.ts"]
     }
   }
 }

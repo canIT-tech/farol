@@ -8,6 +8,9 @@ export {
   trips,
   tripDestinations,
   destinationCatalog,
+  itineraries,
+  itineraryDays,
+  itineraryItems,
   providerCache,
   flightSelections,
   hotelSelections

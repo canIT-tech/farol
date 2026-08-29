@@ -1,4 +1,10 @@
-import type { LlmRanking, TasteProfileInput } from "@farol/shared";
+import type {
+  BuildItineraryOutput,
+  ItemType,
+  LlmRanking,
+  Slot,
+  TasteProfileInput
+} from "@farol/shared";
 
 // Token de injeção do port de LLM.
 export const LLM = Symbol("LLM");
@@ -25,8 +31,26 @@ export interface RankDestinationsInput {
   trip: RankTripContext;
 }
 
+// Item que a versão anterior fixou e que precisa voltar igual na nova versão.
+export interface PinnedItem {
+  dayIndex: number;
+  slot: Slot;
+  type: ItemType;
+  title: string;
+}
+
+export interface BuildItineraryInput {
+  destination: { city: string; country: string };
+  nights: number;
+  pace: TasteProfileInput["pace"];
+  interests: string[];
+  party: { adults: number; children: number };
+  pinned?: PinnedItem[];
+}
+
 export interface LlmPort {
   rankDestinations(input: RankDestinationsInput): Promise<LlmRanking>;
+  buildItinerary(input: BuildItineraryInput): Promise<BuildItineraryOutput>;
 }
 
 // Preços aproximados em USD por 1M de tokens — revisar periodicamente.

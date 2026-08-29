@@ -8,6 +8,8 @@ import { ProfileModule } from "./profile/profile.module";
 import { LlmModule } from "./llm/llm.module";
 import { TripsModule } from "./trips/trips.module";
 import { DiscoveryModule } from "./discovery/discovery.module";
+import { JobsModule } from "./jobs/jobs.module";
+import { ItineraryModule } from "./itinerary/itinerary.module";
 import { ProvidersModule } from "./providers/providers.module";
 import { FlightsModule } from "./flights/flights.module";
 import { HotelsModule } from "./hotels/hotels.module";
@@ -23,6 +25,8 @@ import { HotelsModule } from "./hotels/hotels.module";
     LlmModule,
     TripsModule,
     DiscoveryModule,
+    JobsModule,
+    ItineraryModule,
     ProvidersModule,
     FlightsModule,
     HotelsModule

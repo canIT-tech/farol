@@ -3,11 +3,13 @@
   "testRunner": "vitest",
   "plugins": ["@stryker-mutator/vitest-runner"],
   "reporters": ["progress", "clear-text", "html"],
-  "_comment": "prompts/ é texto de prompt (não lógica) — coberto por teste mas fora da mutação.",
+  "_comment": "prompts/ é texto de prompt (não lógica), fora da mutação. jobs/pgboss-queue.ts: os helpers puros (buildQueueOptions/assertJobId/pollingSeconds/deadLetterName) ficam em 100%; a classe PgBossQueue é glue de I/O do pg-boss (start/stop/createQueue/work), como client.ts/migrate.ts em @farol/db — sobreviventes ali não abaixam a agregada abaixo do break. timeoutMS alto por causa da integração real do pg-boss (retry/dead-letter levam segundos).",
+  "timeoutMS": 90000,
   "mutate": [
     "src/**/*.ts",
     "!src/**/*.spec.ts",
     "!src/main.ts",
+    "!src/worker-exports.ts",
     "!src/**/*.module.ts",
     "!src/**/prompts/**"
   ],

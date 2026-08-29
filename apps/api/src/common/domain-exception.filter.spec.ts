@@ -47,6 +47,12 @@ describe("DomainExceptionFilter", () => {
     expect(status).toHaveBeenCalledWith(502);
   });
 
+  it("mapeia itinerary_not_ready para 409", () => {
+    const { host, status } = makeHost();
+    new DomainExceptionFilter().catch(new DomainError("itinerary_not_ready", "ainda não"), host);
+    expect(status).toHaveBeenCalledWith(409);
+  });
+
   it("mapeia no_destination_chosen para 422", () => {
     const { host, status } = makeHost();
     new DomainExceptionFilter().catch(new DomainError("no_destination_chosen", "escolha um destino"), host);

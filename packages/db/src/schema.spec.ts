@@ -9,7 +9,10 @@ import {
   destinationCatalog,
   providerCache,
   flightSelections,
-  hotelSelections
+  hotelSelections,
+  itineraries,
+  itineraryDays,
+  itineraryItems
 } from "./schema";
 
 type ColSpec = {
@@ -256,5 +259,91 @@ describe("schema.hotelSelections", () => {
     expect(ref.foreignTable).toBe(trips);
     expect(ref.foreignColumns[0]!.name).toBe("id");
     expect(fk.onDelete).toBe("cascade");
+  });
+});
+
+describe("schema.itineraries", () => {
+  checkColumns(itineraries, "itineraries", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    tripId: { name: "trip_id", sqlType: "uuid", notNull: true },
+    version: { name: "version", sqlType: "integer", notNull: true },
+    status: { name: "status", sqlType: "text", notNull: true, hasDefault: true, default: "pending" },
+    error: { name: "error", sqlType: "text", notNull: false },
+    generatedAt: { name: "generated_at", sqlType: TS, notNull: false },
+    createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true }
+  });
+
+  it("referencia trips.id com ON DELETE cascade", () => {
+    const fk = getTableConfig(itineraries).foreignKeys[0]!;
+    const ref = fk.reference();
+    expect(ref.foreignTable).toBe(trips);
+    expect(ref.foreignColumns[0]!.name).toBe("id");
+    expect(fk.onDelete).toBe("cascade");
+  });
+
+  it("indexa (tripId, version)", () => {
+    expect(indexColumnNames(itineraries, "itineraries_trip_version_idx")).toEqual([
+      "trip_id",
+      "version"
+    ]);
+  });
+});
+
+describe("schema.itineraryDays", () => {
+  checkColumns(itineraryDays, "itinerary_days", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    itineraryId: { name: "itinerary_id", sqlType: "uuid", notNull: true },
+    dayIndex: { name: "day_index", sqlType: "integer", notNull: true },
+    date: { name: "date", sqlType: "date", notNull: false },
+    notes: { name: "notes", sqlType: "text", notNull: false }
+  });
+
+  it("referencia itineraries.id com ON DELETE cascade", () => {
+    const fk = getTableConfig(itineraryDays).foreignKeys[0]!;
+    const ref = fk.reference();
+    expect(ref.foreignTable).toBe(itineraries);
+    expect(ref.foreignColumns[0]!.name).toBe("id");
+    expect(fk.onDelete).toBe("cascade");
+  });
+
+  it("indexa (itineraryId, dayIndex)", () => {
+    expect(indexColumnNames(itineraryDays, "itinerary_days_itinerary_day_idx")).toEqual([
+      "itinerary_id",
+      "day_index"
+    ]);
+  });
+});
+
+describe("schema.itineraryItems", () => {
+  checkColumns(itineraryItems, "itinerary_items", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    dayId: { name: "day_id", sqlType: "uuid", notNull: true },
+    slot: { name: "slot", sqlType: "text", notNull: true },
+    type: { name: "type", sqlType: "text", notNull: true },
+    title: { name: "title", sqlType: "text", notNull: true },
+    description: { name: "description", sqlType: "text", notNull: false },
+    placeId: { name: "place_id", sqlType: "text", notNull: false },
+    lat: { name: "lat", sqlType: "numeric", notNull: false },
+    lng: { name: "lng", sqlType: "numeric", notNull: false },
+    rating: { name: "rating", sqlType: "numeric", notNull: false },
+    durationMin: { name: "duration_min", sqlType: "integer", notNull: false },
+    estCost: { name: "est_cost", sqlType: "numeric", notNull: false },
+    sortOrder: { name: "sort_order", sqlType: "integer", notNull: true },
+    pinned: { name: "pinned", sqlType: "boolean", notNull: true, hasDefault: true, default: false }
+  });
+
+  it("referencia itinerary_days.id com ON DELETE cascade", () => {
+    const fk = getTableConfig(itineraryItems).foreignKeys[0]!;
+    const ref = fk.reference();
+    expect(ref.foreignTable).toBe(itineraryDays);
+    expect(ref.foreignColumns[0]!.name).toBe("id");
+    expect(fk.onDelete).toBe("cascade");
+  });
+
+  it("indexa (dayId, sortOrder)", () => {
+    expect(indexColumnNames(itineraryItems, "itinerary_items_day_sort_idx")).toEqual([
+      "day_id",
+      "sort_order"
+    ]);
   });
 });

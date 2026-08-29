@@ -7,6 +7,7 @@ export const envSchema = z.object({
   ANTHROPIC_API_KEY: z.string().min(1),
   LLM_MODEL_CAPABLE: z.string().min(1).default("claude-sonnet-5"),
   LLM_MODEL_CHEAP: z.string().min(1).default("claude-haiku-4-5-20251001"),
+  JOBS_SCHEMA: z.string().min(1).default("pgboss"),
   AMADEUS_BASE_URL: z.string().url().default("https://test.api.amadeus.com"),
   AMADEUS_CLIENT_ID: z.string().min(1),
   AMADEUS_CLIENT_SECRET: z.string().min(1),
