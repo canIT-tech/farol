@@ -1,0 +1,71 @@
+.farol-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.farol-field__label {
+  font-family: var(--font-text);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-8);
+}
+
+.farol-field__control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: var(--control-h-md);
+  padding: 0 var(--space-16);
+  background: var(--surface);
+  border: 1.5px solid var(--field-border);
+  border-radius: var(--radius-control);
+}
+
+.farol-field__control:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+}
+
+.farol-field__control--error {
+  border-color: var(--accent);
+}
+
+.farol-field__icon {
+  display: inline-flex;
+  color: var(--text-faint);
+}
+
+.farol-field__input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-family: var(--font-text);
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.farol-field__input::placeholder {
+  color: var(--text-faint);
+}
+
+.farol-field__input:disabled {
+  cursor: not-allowed;
+}
+
+.farol-field__error,
+.farol-field__hint {
+  font-family: var(--font-text);
+  font-size: 13px;
+  line-height: 1.4;
+  margin: var(--space-8) 0 0;
+}
+
+.farol-field__error {
+  color: var(--accent-ink);
+}
+
+.farol-field__hint {
+  color: var(--text-muted);
+}

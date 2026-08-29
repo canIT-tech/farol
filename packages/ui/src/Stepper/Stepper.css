@@ -1,0 +1,50 @@
+.farol-stepper {
+  display: flex;
+  flex-direction: column;
+}
+
+.farol-stepper__label {
+  font-family: var(--font-text);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-8);
+}
+
+.farol-stepper__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+}
+
+.farol-stepper__btn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1.5px solid var(--field-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.farol-stepper__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.farol-stepper__btn:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+.farol-stepper__value {
+  font-family: var(--font-text);
+  font-size: 14px;
+  color: var(--ink);
+  min-width: 32px;
+  text-align: center;
+}
