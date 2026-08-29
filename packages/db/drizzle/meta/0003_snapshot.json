@@ -1,5 +1,5 @@
 {
-  "id": "ad30d245-0559-4fac-a2ba-b67c23611aea",
+  "id": "8e7aee35-b477-4ad4-8d84-b3c9c41bde53",
   "prevId": "df1f2527-7b31-4231-b007-08e572789a66",
   "version": "7",
   "dialect": "postgresql",
@@ -104,8 +104,8 @@
         }
       }
     },
-    "public.itineraries": {
-      "name": "itineraries",
+    "public.flight_selections": {
+      "name": "flight_selections",
       "schema": "",
       "columns": {
         "id": {
@@ -120,66 +120,67 @@
           "primaryKey": false,
           "notNull": true
         },
-        "version": {
-          "name": "version",
-          "type": "integer",
+        "offer": {
+          "name": "offer",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": true
         },
-        "status": {
-          "name": "status",
+        "price": {
+          "name": "price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'pending'"
+          "notNull": true
         },
-        "error": {
-          "name": "error",
+        "carrier": {
+          "name": "carrier",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "generated_at": {
-          "name": "generated_at",
+        "stops": {
+          "name": "stops",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "depart_at": {
+          "name": "depart_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
         },
-        "created_at": {
-          "name": "created_at",
+        "return_at": {
+          "name": "return_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deep_link": {
+          "name": "deep_link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "selected_at": {
+          "name": "selected_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         }
       },
-      "indexes": {
-        "itineraries_trip_version_idx": {
-          "name": "itineraries_trip_version_idx",
-          "columns": [
-            {
-              "expression": "trip_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "version",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
-        "itineraries_trip_id_trips_id_fk": {
-          "name": "itineraries_trip_id_trips_id_fk",
-          "tableFrom": "itineraries",
+        "flight_selections_trip_id_trips_id_fk": {
+          "name": "flight_selections_trip_id_trips_id_fk",
+          "tableFrom": "flight_selections",
           "tableTo": "trips",
           "columnsFrom": [
             "trip_id"
@@ -194,8 +195,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.itinerary_days": {
-      "name": "itinerary_days",
+    "public.hotel_selections": {
+      "name": "hotel_selections",
       "schema": "",
       "columns": {
         "id": {
@@ -204,61 +205,76 @@
           "primaryKey": true,
           "notNull": true
         },
-        "itinerary_id": {
-          "name": "itinerary_id",
+        "trip_id": {
+          "name": "trip_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "day_index": {
-          "name": "day_index",
-          "type": "integer",
+        "offer": {
+          "name": "offer",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": true
         },
-        "date": {
-          "name": "date",
-          "type": "date",
+        "name": {
+          "name": "name",
+          "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "notes": {
-          "name": "notes",
+        "region": {
+          "name": "region",
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "price_per_night": {
+          "name": "price_per_night",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "price_total": {
+          "name": "price_total",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currency": {
+          "name": "currency",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rating": {
+          "name": "rating",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deep_link": {
+          "name": "deep_link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "selected_at": {
+          "name": "selected_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
-      "indexes": {
-        "itinerary_days_itinerary_day_idx": {
-          "name": "itinerary_days_itinerary_day_idx",
-          "columns": [
-            {
-              "expression": "itinerary_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "day_index",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
-        "itinerary_days_itinerary_id_itineraries_id_fk": {
-          "name": "itinerary_days_itinerary_id_itineraries_id_fk",
-          "tableFrom": "itinerary_days",
-          "tableTo": "itineraries",
+        "hotel_selections_trip_id_trips_id_fk": {
+          "name": "hotel_selections_trip_id_trips_id_fk",
+          "tableFrom": "hotel_selections",
+          "tableTo": "trips",
           "columnsFrom": [
-            "itinerary_id"
+            "trip_id"
           ],
           "columnsTo": [
             "id"
@@ -270,108 +286,48 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "public.itinerary_items": {
-      "name": "itinerary_items",
+    "public.provider_cache": {
+      "name": "provider_cache",
       "schema": "",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
+        "key": {
+          "name": "key",
+          "type": "text",
           "primaryKey": true,
           "notNull": true
         },
-        "day_id": {
-          "name": "day_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "slot": {
-          "name": "slot",
+        "provider": {
+          "name": "provider",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "type": {
-          "name": "type",
-          "type": "text",
+        "payload": {
+          "name": "payload",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": true
         },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "place_id": {
-          "name": "place_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "lat": {
-          "name": "lat",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "lng": {
-          "name": "lng",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "rating": {
-          "name": "rating",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "duration_min": {
-          "name": "duration_min",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "est_cost": {
-          "name": "est_cost",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "sort_order": {
-          "name": "sort_order",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pinned": {
-          "name": "pinned",
-          "type": "boolean",
+        "fetched_at": {
+          "name": "fetched_at",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
-          "default": false
+          "default": "now()"
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {
-        "itinerary_items_day_sort_idx": {
-          "name": "itinerary_items_day_sort_idx",
+        "provider_cache_expires_idx": {
+          "name": "provider_cache_expires_idx",
           "columns": [
             {
-              "expression": "day_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "sort_order",
+              "expression": "expires_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -383,21 +339,7 @@
           "with": {}
         }
       },
-      "foreignKeys": {
-        "itinerary_items_day_id_itinerary_days_id_fk": {
-          "name": "itinerary_items_day_id_itinerary_days_id_fk",
-          "tableFrom": "itinerary_items",
-          "tableTo": "itinerary_days",
-          "columnsFrom": [
-            "day_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },

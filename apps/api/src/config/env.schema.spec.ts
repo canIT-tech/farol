@@ -4,7 +4,9 @@ import { parseEnv } from "./env.schema";
 const valid = {
   DATABASE_URL: "postgres://x",
   SUPABASE_JWKS_URL: "https://proj.supabase.co/auth/v1/.well-known/jwks.json",
-  ANTHROPIC_API_KEY: "sk-ant-test"
+  ANTHROPIC_API_KEY: "sk-ant-test",
+  AMADEUS_CLIENT_ID: "amadeus-id",
+  AMADEUS_CLIENT_SECRET: "amadeus-secret"
 };
 
 describe("parseEnv", () => {
@@ -51,6 +53,37 @@ describe("parseEnv", () => {
     ).toThrow(/ANTHROPIC_API_KEY/);
   });
 
+  it("lança quando as credenciais do Amadeus faltam", () => {
+    expect(() =>
+      parseEnv({
+        DATABASE_URL: "postgres://x",
+        SUPABASE_JWKS_URL: valid.SUPABASE_JWKS_URL,
+        ANTHROPIC_API_KEY: "k"
+      })
+    ).toThrow(/AMADEUS_CLIENT_ID/);
+  });
+
+  it("aplica defaults de Amadeus (base url, templates de deep link, TTLs)", () => {
+    const env = parseEnv({ ...valid });
+    expect(env.AMADEUS_BASE_URL).toBe("https://test.api.amadeus.com");
+    expect(env.FLIGHT_DEEPLINK_TEMPLATE).toContain("{origin}");
+    expect(env.HOTEL_DEEPLINK_TEMPLATE).toContain("{cityCode}");
+    expect(env.FLIGHT_CACHE_TTL_SECONDS).toBe(600);
+    expect(env.HOTEL_CACHE_TTL_SECONDS).toBe(3600);
+  });
+
+  it("respeita AMADEUS_BASE_URL e TTLs informados", () => {
+    const env = parseEnv({
+      ...valid,
+      AMADEUS_BASE_URL: "https://api.amadeus.com",
+      FLIGHT_CACHE_TTL_SECONDS: "120",
+      HOTEL_CACHE_TTL_SECONDS: "7200"
+    });
+    expect(env.AMADEUS_BASE_URL).toBe("https://api.amadeus.com");
+    expect(env.FLIGHT_CACHE_TTL_SECONDS).toBe(120);
+    expect(env.HOTEL_CACHE_TTL_SECONDS).toBe(7200);
+  });
+
   it("lança quando SUPABASE_JWKS_URL não é uma URL", () => {
     expect(() =>
       parseEnv({ DATABASE_URL: "postgres://x", SUPABASE_JWKS_URL: "nao-e-url", ANTHROPIC_API_KEY: "k" })
@@ -63,7 +96,7 @@ describe("parseEnv", () => {
 
   it("lista os campos inválidos separados por vírgula", () => {
     expect(() => parseEnv({ API_PORT: "-1" })).toThrow(
-      "Env inválida: DATABASE_URL, API_PORT, SUPABASE_JWKS_URL, ANTHROPIC_API_KEY"
+      "Env inválida: DATABASE_URL, API_PORT, SUPABASE_JWKS_URL, ANTHROPIC_API_KEY, AMADEUS_CLIENT_ID, AMADEUS_CLIENT_SECRET"
     );
   });
 });

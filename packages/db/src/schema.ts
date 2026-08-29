@@ -147,6 +147,54 @@ export const itineraryItems = pgTable(
     daySortIdx: index("itinerary_items_day_sort_idx").on(t.dayId, t.sortOrder)
   })
 );
+// Cache de respostas de provider (design §5.1). key = hash(provider+endpoint+params).
+export const providerCache = pgTable(
+  "provider_cache",
+  {
+    key: text("key").primaryKey(),
+    provider: text("provider").notNull(),
+    payload: jsonb("payload").$type<unknown>().notNull(),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull()
+  },
+  (t) => ({
+    expiresIdx: index("provider_cache_expires_idx").on(t.expiresAt)
+  })
+);
+
+// Seleção de voo do usuário (design §5.1). Guarda a oferta crua + deep link.
+export const flightSelections = pgTable("flight_selections", {
+  id: uuid("id").primaryKey(),
+  tripId: uuid("trip_id")
+    .notNull()
+    .references(() => trips.id, { onDelete: "cascade" }),
+  offer: jsonb("offer").$type<unknown>().notNull(),
+  price: numeric("price").notNull(),
+  currency: text("currency").notNull(),
+  carrier: text("carrier"),
+  stops: integer("stops"),
+  departAt: timestamp("depart_at", { withTimezone: true }),
+  returnAt: timestamp("return_at", { withTimezone: true }),
+  deepLink: text("deep_link").notNull(),
+  selectedAt: timestamp("selected_at", { withTimezone: true }).notNull().defaultNow()
+});
+
+// Seleção de hotel do usuário (design §5.1). Guarda a oferta crua + deep link.
+export const hotelSelections = pgTable("hotel_selections", {
+  id: uuid("id").primaryKey(),
+  tripId: uuid("trip_id")
+    .notNull()
+    .references(() => trips.id, { onDelete: "cascade" }),
+  offer: jsonb("offer").$type<unknown>().notNull(),
+  name: text("name").notNull(),
+  region: text("region"),
+  pricePerNight: numeric("price_per_night").notNull(),
+  priceTotal: numeric("price_total"),
+  currency: text("currency").notNull(),
+  rating: numeric("rating"),
+  deepLink: text("deep_link").notNull(),
+  selectedAt: timestamp("selected_at", { withTimezone: true }).notNull().defaultNow()
+});
 
 // Catálogo curado de destinos (design §6.1). Base determinística da descoberta.
 export const destinationCatalog = pgTable(

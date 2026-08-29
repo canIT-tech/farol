@@ -110,7 +110,8 @@ O **Passo 1** monta esse harness (Vitest, Playwright, Stryker) e liga os gates n
 
 - Teto de custo de LLM por roteiro (definir número).
 - Catálogo de destinos: CSV curado em `packages/db/data/destinations.csv` (23 cidades no Passo 3; `pnpm --filter @farol/db db:seed`). Expandir para ~200 é curadoria contínua.
-- Site parceiro para o deep-link de voo/hotel no MVP.
+- Site parceiro para o deep-link de voo/hotel no MVP (template configurável via `FLIGHT_/HOTEL_DEEPLINK_TEMPLATE` desde o Passo 5).
+- Re-gravar as fixtures Amadeus (`packages/providers/**/__fixtures__/*.json`) a partir do sandbox real — hoje são escritas à mão (Passo 5, sem credenciais).
 - Confirmar domínio `farol.app` e travar o nome antes de produção.
 - Escolher lib base de componentes (recomendação: Radix para overlays).
 
@@ -124,7 +125,7 @@ Backlog de implementação. Ordem = dependência. Puxe pelo número.
 | 2 | Auth + Perfil de gosto — `AuthModule` (JWT Supabase via JWKS), upsert `users`, `ProfileModule` CRUD, login + onboarding no web | ✅ concluído | felippebutland | — | 1 | (2026-08-29) |
 | 3 | Viagens + Descoberta de destino — `TripsModule`, catálogo seed (~200 cidades), `LlmModule`, `DiscoveryModule` (pré-filtro + ranking Claude) | ✅ concluído | felippebutland | — | 2 | (2026-08-29) |
 | 4 | Roteiro + Jobs — `JobsModule` (pg-boss), `apps/worker`, `ItineraryModule`, job `itinerary.generate`, polling no web | 🟡 em andamento | felippebutland | `felippebutland/passo-4-roteiro-jobs` | 3 | (2026-08-29) |
-| 5 | Providers Amadeus — `packages/providers`, auth OAuth2, `AmadeusFlightProvider` / `AmadeusHotelProvider`, `provider_cache`, resiliência, `FlightsModule` / `HotelsModule` | 🟡 em andamento | felippebutland | `felippebutland/passo-5-providers-amadeus` | 3 | (2026-08-29) |
+| 5 | Providers Amadeus — `packages/providers`, auth OAuth2, `AmadeusFlightProvider` / `AmadeusHotelProvider`, `provider_cache`, resiliência, `FlightsModule` / `HotelsModule` | ✅ concluído | felippebutland | — | 3 | (2026-08-29) |
 | 6 | Google Places + enrich — `GooglePlacesProvider`, `PlacesModule`, passo de enrich no job do roteiro, `swap_restaurant` | 🟢 livre | — | — | 4 |
 | 7 | Chat IA — `ChatModule`, loop de tool-calling, as 9 tools mapeadas para serviços, `chat_messages` | 🟢 livre | — | — | 4, 5, 6 |
 | 8 | UI web + E2E — telas ligadas ao `apps/api`, fluxo Playwright login→onboarding→descoberta→destino→roteiro | 🟢 livre | — | — | 7 |

@@ -10,5 +10,8 @@ export {
   destinationCatalog,
   itineraries,
   itineraryDays,
-  itineraryItems
+  itineraryItems,
+  providerCache,
+  flightSelections,
+  hotelSelections
 } from "./schema";
