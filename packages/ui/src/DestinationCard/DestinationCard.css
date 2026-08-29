@@ -1,0 +1,136 @@
+.farol-dcard {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--elev-1);
+  display: flex;
+  flex-direction: column;
+}
+
+.farol-dcard--featured {
+  border-color: var(--accent-border);
+  box-shadow: var(--elev-1), 0 0 0 3px var(--accent-wash);
+}
+
+.farol-dcard__photo {
+  position: relative;
+  aspect-ratio: 16 / 10;
+}
+
+.farol-dcard__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.farol-dcard__placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-12) var(--space-16);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--on-accent);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  background: linear-gradient(155deg, var(--surface-sunk), var(--field-border));
+}
+
+.farol-dcard__badge {
+  position: absolute;
+  top: var(--space-12);
+  right: var(--space-12);
+}
+
+.farol-dcard__body {
+  padding: var(--space-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.farol-dcard__city {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--ink);
+  margin: 0;
+}
+
+.farol-dcard__country {
+  font-family: var(--font-text);
+  font-size: 12px;
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.farol-dcard__rationale {
+  font-family: var(--font-text);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-muted);
+  margin: 0;
+  text-wrap: pretty;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.farol-dcard__stats {
+  display: flex;
+  gap: var(--space-16);
+  margin: 0;
+  padding-top: var(--space-12);
+  border-top: 1px solid var(--line-soft);
+}
+
+.farol-dcard__stat {
+  font-family: var(--font-text);
+  font-size: 12px;
+}
+
+.farol-dcard__stat dt {
+  color: var(--text-muted);
+  display: inline;
+}
+
+.farol-dcard__stat dd {
+  color: var(--ink);
+  font-weight: 600;
+  margin: 0;
+  display: inline;
+}
+
+.farol-dcard__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-8);
+}
+
+.farol-dcard__save {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-faint);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.farol-dcard__save[aria-pressed="true"] {
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+
+.farol-dcard__save:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
