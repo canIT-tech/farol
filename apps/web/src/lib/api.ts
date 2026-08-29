@@ -1,8 +1,7 @@
 import { healthResponseSchema, type HealthResponse } from "@farol/shared";
+import { apiBase } from "./api-client";
 
-export function apiBase(): string {
-  return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333";
-}
+export { apiBase };
 
 export async function fetchHealth(fetchImpl: typeof fetch = fetch): Promise<HealthResponse> {
   const res = await fetchImpl(`${apiBase()}/health`, { cache: "no-store" });

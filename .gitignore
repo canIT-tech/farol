@@ -26,3 +26,6 @@ test-results/
 
 # TS incremental
 *.tsbuildinfo
+
+# Stryker sandbox
+.stryker-tmp/

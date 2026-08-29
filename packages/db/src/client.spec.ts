@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { sql } from "drizzle-orm";
 import { createDbClient } from "./client";
 import { runMigrations } from "./migrate";
-import { users } from "./schema";
+import { users, tasteProfiles } from "./schema";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/db");
@@ -10,23 +10,21 @@ if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/db");
 const { db, close } = createDbClient(url);
 afterAll(() => close());
 
-// Zera o schema para que runMigrations tenha que fazer trabalho de verdade
+// Zera o schema uma vez para que runMigrations faça trabalho de verdade
 // (mata o mutante de "corpo vazio" mesmo com o banco compartilhado do Stryker).
 beforeAll(async () => {
+  await db.execute(sql`drop table if exists "taste_profiles" cascade`);
   await db.execute(sql`drop table if exists "users" cascade`);
   await db.execute(sql`drop schema if exists drizzle cascade`);
+  await runMigrations(url);
 });
 
 describe("createDbClient + runMigrations", () => {
-  it("aplica as migrations e a tabela users existe", async () => {
-    await db.execute(sql`select 1 from information_schema.tables where table_name = 'users'`).then(
-      (r) => expect(r.length).toBe(0) // antes da migração, não existe
-    );
-    await runMigrations(url);
+  it("aplica as migrations e as tabelas existem", async () => {
     const rows = await db.execute(
-      sql`select 1 from information_schema.tables where table_name = 'users'`
+      sql`select table_name from information_schema.tables where table_name in ('users', 'taste_profiles')`
     );
-    expect(rows.length).toBe(1);
+    expect(rows.length).toBe(2);
   });
 
   it("faz insert e select de um usuário", async () => {
@@ -60,5 +58,43 @@ describe("createDbClient + runMigrations", () => {
   it("expõe a query API com o schema registrado", async () => {
     const rows = await db.query.users.findMany({ limit: 1 });
     expect(Array.isArray(rows)).toBe(true);
+  });
+
+  it("runMigrations é idempotente (roda de novo sem erro)", async () => {
+    await expect(runMigrations(url)).resolves.toBeUndefined();
+  });
+});
+
+describe("taste_profiles", () => {
+  it("insere um perfil ligado a um usuário e lê de volta", async () => {
+    const uid = crypto.randomUUID();
+    await db.insert(users).values({ id: uid, email: `tp_${uid}@farol.test` });
+    const pid = crypto.randomUUID();
+    await db.insert(tasteProfiles).values({
+      id: pid,
+      userId: uid,
+      pace: "moderado",
+      partyType: "casal",
+      budgetBand: "medio"
+    });
+    const rows = await db.select().from(tasteProfiles).where(sql`${tasteProfiles.id} = ${pid}`);
+    expect(rows[0]?.userId).toBe(uid);
+    expect(rows[0]?.interests).toEqual([]);
+    expect(rows[0]?.constraints).toEqual({});
+  });
+
+  it("apaga em cascata quando o usuário é removido", async () => {
+    const uid = crypto.randomUUID();
+    await db.insert(users).values({ id: uid, email: `c_${uid}@farol.test` });
+    await db.insert(tasteProfiles).values({
+      id: crypto.randomUUID(),
+      userId: uid,
+      pace: "relaxado",
+      partyType: "sozinho",
+      budgetBand: "economico"
+    });
+    await db.delete(users).where(sql`${users.id} = ${uid}`);
+    const rows = await db.select().from(tasteProfiles).where(sql`${tasteProfiles.userId} = ${uid}`);
+    expect(rows).toHaveLength(0);
   });
 });

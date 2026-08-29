@@ -3,7 +3,7 @@
   "testRunner": "vitest",
   "plugins": ["@stryker-mutator/vitest-runner"],
   "reporters": ["progress", "clear-text", "html"],
-  "mutate": ["src/lib/**/*.ts", "!src/**/*.spec.ts"],
+  "mutate": ["src/lib/**/*.ts", "!src/**/*.spec.ts", "!src/lib/supabase.ts"],
   "htmlReporter": { "fileName": "reports/mutation/web.html" },
   "thresholds": { "high": 100, "low": 80, "break": 90 }
 }

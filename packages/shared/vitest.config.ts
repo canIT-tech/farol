@@ -6,7 +6,8 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/**/*.ts"],
-      exclude: ["src/index.ts", "src/**/*.spec.ts"],
+      // src/index.ts: barrel só de re-export. src/auth.ts: tipo puro (some no build).
+      exclude: ["src/index.ts", "src/auth.ts", "src/**/*.spec.ts"],
       thresholds: { statements: 100, branches: 100, functions: 100, lines: 100 }
     }
   }
