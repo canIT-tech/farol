@@ -6,6 +6,7 @@ import { ProfileService } from "./profile.service";
 
 @Module({
   controllers: [ProfileController],
-  providers: [ProfileService, { provide: APP_FILTER, useClass: DomainExceptionFilter }]
+  providers: [ProfileService, { provide: APP_FILTER, useClass: DomainExceptionFilter }],
+  exports: [ProfileService]
 })
 export class ProfileModule {}

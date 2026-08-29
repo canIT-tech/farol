@@ -32,6 +32,21 @@ describe("DomainExceptionFilter", () => {
     expect(status).toHaveBeenCalledWith(403);
   });
 
+  it("mapeia no_destinations_in_budget para 422", () => {
+    const { host, status } = makeHost();
+    new DomainExceptionFilter().catch(
+      new DomainError("no_destinations_in_budget", "sem opções"),
+      host
+    );
+    expect(status).toHaveBeenCalledWith(422);
+  });
+
+  it("mapeia llm_invalid_output para 502", () => {
+    const { host, status } = makeHost();
+    new DomainExceptionFilter().catch(new DomainError("llm_invalid_output", "modelo ruim"), host);
+    expect(status).toHaveBeenCalledWith(502);
+  });
+
   it("usa 400 para código de domínio sem mapeamento", () => {
     const { host, status, json } = makeHost();
     new DomainExceptionFilter().catch(new DomainError("outro", "estranho"), host);

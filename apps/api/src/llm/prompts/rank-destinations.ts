@@ -7,8 +7,9 @@ export const RANK_SYSTEM =
 
 export function buildRankUserPrompt(input: RankDestinationsInput, previousError?: string): string {
   const { profile, trip, shortlist } = input;
+  const budget = trip.budgetTotal ?? "não informado";
   const lines = [
-    `Origem: ${trip.originIata}. Orçamento total: ${trip.budgetTotal} ${trip.currency} para ${trip.party.adults} adulto(s).`,
+    `Origem: ${trip.originIata}. Orçamento total: ${budget} ${trip.currency} para ${trip.party.adults} adulto(s).`,
     `Perfil: ritmo ${profile.pace}, companhia ${profile.partyType}, faixa de gasto ${profile.budgetBand}.`,
     `Interesses: ${profile.interests.join(", ")}.`,
     "Destinos candidatos:",

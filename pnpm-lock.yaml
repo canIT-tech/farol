@@ -41,6 +41,9 @@ importers:
       '@farol/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@farol/domain':
+        specifier: workspace:^
+        version: link:../../packages/domain
       '@farol/shared':
         specifier: workspace:*
         version: link:../../packages/shared

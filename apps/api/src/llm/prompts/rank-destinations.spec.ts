@@ -14,14 +14,7 @@ const input: RankDestinationsInput = {
     budgetBand: "medio",
     constraints: {}
   },
-  trip: {
-    originIata: "GRU",
-    party: { adults: 2, children: 0 },
-    budgetTotal: 18000,
-    currency: "BRL",
-    durationDays: 7,
-    targetMonth: "2026-09"
-  }
+  trip: { originIata: "GRU", budgetTotal: 18000, currency: "BRL", party: { adults: 2 } }
 };
 
 describe("RANK_SYSTEM", () => {
@@ -50,5 +43,10 @@ describe("buildRankUserPrompt", () => {
   it("acrescenta o erro anterior quando informado", () => {
     const prompt = buildRankUserPrompt(input, "iata fora da shortlist: XXX");
     expect(prompt).toContain("rejeitada: iata fora da shortlist: XXX");
+  });
+
+  it("mostra 'não informado' quando o orçamento é nulo", () => {
+    const prompt = buildRankUserPrompt({ ...input, trip: { ...input.trip, budgetTotal: null } });
+    expect(prompt).toContain("Orçamento total: não informado BRL");
   });
 });

@@ -16,14 +16,7 @@ const input: RankDestinationsInput = {
     budgetBand: "medio",
     constraints: {}
   },
-  trip: {
-    originIata: "GRU",
-    party: { adults: 2, children: 0 },
-    budgetTotal: 18000,
-    currency: "BRL",
-    durationDays: 7,
-    targetMonth: "2026-09"
-  }
+  trip: { originIata: "GRU", budgetTotal: 18000, currency: "BRL", party: { adults: 2 } }
 };
 
 const R = (rationale = "Justificativa longa o suficiente para o schema.") => rationale;

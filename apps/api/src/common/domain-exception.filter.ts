@@ -6,7 +6,9 @@ import { DomainError } from "@farol/shared";
 const STATUS_BY_CODE: Record<string, number> = {
   not_found: HttpStatus.NOT_FOUND,
   forbidden: HttpStatus.FORBIDDEN,
-  validation: HttpStatus.BAD_REQUEST
+  validation: HttpStatus.BAD_REQUEST,
+  no_destinations_in_budget: HttpStatus.UNPROCESSABLE_ENTITY,
+  llm_invalid_output: HttpStatus.BAD_GATEWAY
 };
 
 interface ResponseLike {

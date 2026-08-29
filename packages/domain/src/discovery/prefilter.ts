@@ -1,20 +1,30 @@
-import type { TasteProfileInput, TripInput } from "@farol/shared";
+import type { TasteProfileInput } from "@farol/shared";
 import { BRAZIL_REGION, type CatalogEntry } from "./types";
 
 const MS_PER_DAY = 86_400_000;
 const DEFAULT_LIMIT = 20;
 
-// Número de diárias da viagem: usa durationDays quando informado, senão a
-// diferença entre dateEnd e dateStart. tripInputSchema garante um dos dois.
-export function nightsOf(trip: TripInput): number {
-  if (trip.durationDays !== undefined) {
+// Critério de viagem que o pré-filtro precisa. Tanto TripInput (@farol/shared)
+// quanto o TripState da api satisfazem esta forma estruturalmente.
+export interface TripCriteria {
+  party: { adults: number };
+  budgetTotal: number;
+  durationDays?: number | null;
+  dateStart?: string | null;
+  dateEnd?: string | null;
+  targetMonth?: string | null;
+}
+
+// Número de diárias: usa durationDays quando presente, senão a diferença de datas.
+export function nightsOf(trip: TripCriteria): number {
+  if (trip.durationDays != null) {
     return trip.durationDays;
   }
   return Math.round((Date.parse(trip.dateEnd!) - Date.parse(trip.dateStart!)) / MS_PER_DAY);
 }
 
 // Mês alvo (1..12): do targetMonth ou do mês de dateStart.
-export function targetMonthOf(trip: TripInput): number {
+export function targetMonthOf(trip: TripCriteria): number {
   const source = trip.targetMonth ?? trip.dateStart!;
   return Number(source.slice(5, 7));
 }
@@ -31,7 +41,7 @@ export function affinityScore(interests: string[], tags: string[]): number {
 
 export interface PrefilterArgs {
   catalog: CatalogEntry[];
-  trip: TripInput;
+  trip: TripCriteria;
   profile: TasteProfileInput;
   excludeIata?: string[];
   limit?: number;

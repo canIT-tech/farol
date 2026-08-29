@@ -1,4 +1,4 @@
-import type { LlmRanking, TasteProfileInput, TripInput } from "@farol/shared";
+import type { LlmRanking, TasteProfileInput } from "@farol/shared";
 
 // Token de injeção do port de LLM.
 export const LLM = Symbol("LLM");
@@ -11,10 +11,18 @@ export interface DestinationSeed {
   tags: string[];
 }
 
+// Só o que o prompt de ranking precisa da viagem (sem PII).
+export interface RankTripContext {
+  originIata: string;
+  budgetTotal: number | null;
+  currency: string;
+  party: { adults: number };
+}
+
 export interface RankDestinationsInput {
   shortlist: DestinationSeed[];
   profile: TasteProfileInput;
-  trip: TripInput;
+  trip: RankTripContext;
 }
 
 export interface LlmPort {
