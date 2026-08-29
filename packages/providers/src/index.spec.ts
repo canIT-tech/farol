@@ -17,4 +17,10 @@ describe("isFlightProvider", () => {
   it("rejeita quando search não é função", () => {
     expect(isFlightProvider({ search: 42 })).toBe(false);
   });
+
+  it("rejeita primitivos que não são objeto", () => {
+    expect(isFlightProvider(42)).toBe(false);
+    expect(isFlightProvider("search")).toBe(false);
+    expect(isFlightProvider(undefined)).toBe(false);
+  });
 });

@@ -1,0 +1,111 @@
+{
+  "meta": { "count": 4 },
+  "data": [
+    {
+      "type": "flight-offer",
+      "id": "4",
+      "source": "GDS",
+      "itineraries": [
+        {
+          "duration": "PT9H55M",
+          "segments": [
+            {
+              "departure": { "iataCode": "GRU", "at": "2026-09-10T21:15:00" },
+              "arrival": { "iataCode": "LIS", "at": "2026-09-11T11:10:00" },
+              "carrierCode": "TP",
+              "number": "82",
+              "numberOfStops": 0
+            }
+          ]
+        }
+      ],
+      "price": { "currency": "BRL", "total": "5555.00" },
+      "validatingAirlineCodes": ["TP"]
+    },
+    {
+      "type": "flight-offer",
+      "id": "1",
+      "source": "GDS",
+      "itineraries": [
+        {
+          "duration": "PT10H15M",
+          "segments": [
+            {
+              "departure": { "iataCode": "GRU", "at": "2026-09-10T23:05:00" },
+              "arrival": { "iataCode": "LIS", "at": "2026-09-11T13:20:00" },
+              "carrierCode": "TP",
+              "number": "88",
+              "numberOfStops": 0
+            }
+          ]
+        }
+      ],
+      "price": { "currency": "BRL", "total": "4210.55", "grandTotal": "4210.55" },
+      "validatingAirlineCodes": ["TP"]
+    },
+    {
+      "type": "flight-offer",
+      "id": "2",
+      "source": "GDS",
+      "itineraries": [
+        {
+          "duration": "PT14H40M",
+          "segments": [
+            {
+              "departure": { "iataCode": "GRU", "at": "2026-09-10T18:30:00" },
+              "arrival": { "iataCode": "CDG", "at": "2026-09-11T09:50:00" },
+              "carrierCode": "AF",
+              "number": "459",
+              "numberOfStops": 0
+            },
+            {
+              "departure": { "iataCode": "CDG", "at": "2026-09-11T12:10:00" },
+              "arrival": { "iataCode": "LIS", "at": "2026-09-11T14:10:00" },
+              "carrierCode": "AF",
+              "number": "1024",
+              "numberOfStops": 0
+            }
+          ]
+        }
+      ],
+      "price": { "currency": "BRL", "total": "3890.00", "grandTotal": "3980.00" },
+      "validatingAirlineCodes": ["AF"]
+    },
+    {
+      "type": "flight-offer",
+      "id": "3",
+      "source": "GDS",
+      "itineraries": [
+        {
+          "duration": "PT10H30M",
+          "segments": [
+            {
+              "departure": { "iataCode": "GRU", "at": "2026-09-10T22:00:00" },
+              "arrival": { "iataCode": "LIS", "at": "2026-09-11T12:30:00" },
+              "carrierCode": "LA",
+              "number": "8072",
+              "numberOfStops": 0
+            }
+          ]
+        },
+        {
+          "duration": "PT11H05M",
+          "segments": [
+            {
+              "departure": { "iataCode": "LIS", "at": "2026-09-20T10:45:00" },
+              "arrival": { "iataCode": "GRU", "at": "2026-09-20T17:50:00" },
+              "carrierCode": "LA",
+              "number": "8073",
+              "numberOfStops": 0
+            }
+          ]
+        }
+      ],
+      "price": { "currency": "BRL", "total": "6120.90", "grandTotal": "6120.90" },
+      "validatingAirlineCodes": ["LA"]
+    }
+  ],
+  "dictionaries": {
+    "carriers": { "TP": "TAP AIR PORTUGAL", "AF": "AIR FRANCE", "LA": "LATAM AIRLINES" }
+  }
+}
