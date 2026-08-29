@@ -1,0 +1,97 @@
+.farol-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--surface-sunk);
+}
+
+.farol-chat__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.farol-chat__bubble {
+  margin: 0;
+  font-family: var(--font-text);
+  font-size: 13px;
+  line-height: 1.5;
+  padding: var(--space-12);
+  border-radius: var(--radius-md);
+  max-width: 92%;
+}
+
+.farol-chat__bubble--assistant {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  color: var(--ink-muted);
+}
+
+.farol-chat__bubble--user {
+  align-self: flex-end;
+  background: var(--ink);
+  color: var(--on-accent);
+}
+
+.farol-chat__typing {
+  display: inline-block;
+  width: 24px;
+  height: 8px;
+  background: var(--text-faint);
+  border-radius: var(--radius-pill);
+  opacity: 0.6;
+}
+
+.farol-chat__composer {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-8);
+  padding: var(--space-12);
+  border-top: 1px solid var(--line);
+}
+
+.farol-chat__input {
+  flex: 1;
+  resize: none;
+  border: 1.5px solid var(--field-border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  padding: var(--space-12);
+  font-family: var(--font-text);
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.farol-chat__input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+}
+
+.farol-chat__send {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-accent);
+  background: var(--accent);
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.farol-chat__send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.farol-chat__send:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}

@@ -1,0 +1,34 @@
+.farol-match-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  font-family: var(--font-text);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--positive-ink);
+  background: var(--surface);
+  border-radius: var(--radius-pill);
+  padding: var(--space-4) var(--space-12);
+  box-shadow: var(--elev-1);
+}
+
+.farol-match-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--positive);
+}
+
+.farol-match-bar {
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--line-soft);
+  overflow: hidden;
+}
+
+.farol-match-bar__fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--positive);
+}

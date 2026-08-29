@@ -1,0 +1,106 @@
+/* Farol — design tokens. Fonte da verdade: docs/design-system.md §2. */
+
+:root {
+  /* superfícies */
+  --bg: #fbfaf8;
+  --surface: #ffffff;
+  --surface-sunk: #f7f5f0;
+  --line: #e9e7e1;
+  --line-soft: #f1efe9;
+  --field-border: #e6e3dc;
+
+  /* texto */
+  --ink: #1c1b19;
+  --ink-muted: #57554f;
+  --text-muted: #78766f;
+  --text-faint: #9b9992;
+
+  /* acento */
+  --accent: #c25a38;
+  --accent-hover: #ac4d2f;
+  --accent-ink: #8f3f26;
+  --accent-wash: #f9efe9;
+  --accent-border: #e2c1b3;
+  --on-accent: #ffffff;
+
+  /* positivo (match / confirmação — uso restrito) */
+  --positive: #3d7a67;
+  --positive-ink: #2f6252;
+  --positive-wash: #e8f0ec;
+
+  /* foco */
+  --ring: 0 0 0 3px var(--accent-wash);
+
+  /* elevação */
+  --elev-1: 0 1px 2px rgba(28, 27, 25, 0.04);
+  --elev-2: 0 1px 2px rgba(28, 27, 25, 0.04), 0 12px 32px -16px rgba(28, 27, 25, 0.12);
+
+  /* raio */
+  --radius-sm: 10px;
+  --radius-control: 12px;
+  --radius-md: 14px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* movimento */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+
+  /* tipografia */
+  --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
+  --font-text: "Instrument Sans", system-ui, -apple-system, sans-serif;
+
+  /* espaçamento (base 4) */
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-80: 80px;
+
+  /* controles */
+  --control-h-sm: 36px;
+  --control-h-md: 44px;
+  --control-h-lg: 52px;
+
+  /* layout */
+  --shell-sidebar: 248px;
+  --shell-rail: 340px;
+  --content-max: 1120px;
+  --page-gutter: 40px;
+}
+
+:root[data-theme="dark"] {
+  --bg: #171614;
+  --surface: #1f1e1b;
+  --surface-sunk: #1a1917;
+  --line: #302e2a;
+  --line-soft: #262420;
+  --field-border: #302e2a;
+
+  --ink: #f4f2ec;
+  --ink-muted: #cdcabf;
+  --text-muted: #a8a59d;
+  --text-faint: #8a877f;
+
+  --accent: #d9714f;
+  --accent-hover: #e5825f;
+  --accent-ink: #e9a389;
+  --accent-wash: #2a231f;
+  --accent-border: #4a3a30;
+
+  --positive: #5fa38c;
+  --positive-ink: #8fc3b2;
+  --positive-wash: #1e2a26;
+
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --elev-2: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+}
