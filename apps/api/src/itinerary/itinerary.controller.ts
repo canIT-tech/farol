@@ -32,4 +32,14 @@ export class ItineraryController {
   ): Promise<Itinerary> {
     return this.itinerary.getLatest(user.id, tripId);
   }
+
+  @Post("itinerary/days/:dayIndex/regenerate")
+  @HttpCode(202)
+  regenerateDay(
+    @CurrentUser() user: CurrentUserType,
+    @Param("id") tripId: string,
+    @Param("dayIndex") dayIndex: string
+  ): Promise<void> {
+    return this.itinerary.regenerateDay(user.id, tripId, Number(dayIndex));
+  }
 }

@@ -9,7 +9,8 @@ const STATUS_BY_CODE: Record<string, number> = {
   validation: HttpStatus.BAD_REQUEST,
   no_destinations_in_budget: HttpStatus.UNPROCESSABLE_ENTITY,
   no_destination_chosen: HttpStatus.UNPROCESSABLE_ENTITY,
-  llm_invalid_output: HttpStatus.BAD_GATEWAY
+  llm_invalid_output: HttpStatus.BAD_GATEWAY,
+  itinerary_not_ready: HttpStatus.CONFLICT
 };
 
 interface ResponseLike {

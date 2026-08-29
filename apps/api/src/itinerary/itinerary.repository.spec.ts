@@ -192,4 +192,38 @@ describe("ItineraryRepository", () => {
     const tripId = await chosenTrip(userId);
     await expect(repo.generationContext(tripId, 1)).rejects.toThrow(/perfil de gosto/);
   });
+
+  it("replaceDayItems grava estCost/descrição de um dia e respeita os pinned; aceita lista vazia", async () => {
+    const userId = await makeUser();
+    const tripId = await chosenTrip(userId);
+    const itineraryId = await repo.createPending(tripId, 1);
+    await repo.replaceDays(itineraryId, [{ dayIndex: 1, slots: [] }], []);
+    const day = (await repo.latest(tripId))!.days[0]!;
+
+    await repo.replaceDayItems(
+      day.id,
+      [
+        {
+          slot: "morning",
+          type: "activity",
+          title: "Museu",
+          description: "manhã no museu",
+          durationMin: 90,
+          estCost: 45
+        },
+        { slot: "evening", type: "meal", title: "Jantar fixo" }
+      ],
+      new Set(["evening|meal|Jantar fixo"])
+    );
+
+    const after = (await repo.latest(tripId))!.days[0]!.items;
+    const museu = after.find((i) => i.title === "Museu")!;
+    expect(museu.estCost).toBe(45);
+    expect(museu.description).toBe("manhã no museu");
+    expect(museu.durationMin).toBe(90);
+    expect(after.find((i) => i.title === "Jantar fixo")!.pinned).toBe(true);
+
+    await repo.replaceDayItems(day.id, [], new Set());
+    expect((await repo.latest(tripId))!.days[0]!.items).toEqual([]);
+  });
 });

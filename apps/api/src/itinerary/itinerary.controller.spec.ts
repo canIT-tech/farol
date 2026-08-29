@@ -20,4 +20,11 @@ describe("ItineraryController", () => {
     await expect(controller.latest(user, "t-1")).resolves.toMatchObject({ status: "pending" });
     expect(getLatest).toHaveBeenCalledWith("u-1", "t-1");
   });
+
+  it("POST .../days/:dayIndex/regenerate delega convertendo dayIndex para número", async () => {
+    const regenerateDay = vi.fn().mockResolvedValue(undefined);
+    const controller = new ItineraryController({ regenerateDay } as unknown as ItineraryService);
+    await controller.regenerateDay(user, "t-1", "2");
+    expect(regenerateDay).toHaveBeenCalledWith("u-1", "t-1", 2);
+  });
 });

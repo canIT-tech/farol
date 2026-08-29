@@ -226,6 +226,58 @@ export class ItineraryRepository {
     });
   }
 
+  async dayOf(itineraryId: string, dayIndex: number): Promise<{ id: string } | null> {
+    const rows = await this.db
+      .select({ id: itineraryDays.id })
+      .from(itineraryDays)
+      .where(and(eq(itineraryDays.itineraryId, itineraryId), eq(itineraryDays.dayIndex, dayIndex)));
+    return rows[0] ?? null;
+  }
+
+  async pinnedOfDay(dayId: string): Promise<PinnedItem[]> {
+    const rows = await this.db
+      .select({
+        slot: itineraryItems.slot,
+        type: itineraryItems.type,
+        title: itineraryItems.title
+      })
+      .from(itineraryItems)
+      .where(and(eq(itineraryItems.dayId, dayId), eq(itineraryItems.pinned, true)));
+    return rows.map((row) => ({
+      dayIndex: 1,
+      slot: row.slot as PinnedItem["slot"],
+      type: row.type as PinnedItem["type"],
+      title: row.title
+    }));
+  }
+
+  // Regenera só os itens de um dia: preserva os pinned, troca o resto.
+  async replaceDayItems(
+    dayId: string,
+    slots: BuildItineraryOutput["days"][number]["slots"],
+    pinnedKeys: Set<string>
+  ): Promise<void> {
+    await this.db.transaction(async (tx) => {
+      await tx.delete(itineraryItems).where(eq(itineraryItems.dayId, dayId));
+      if (slots.length > 0) {
+        await tx.insert(itineraryItems).values(
+          slots.map((slot, index) => ({
+            id: crypto.randomUUID(),
+            dayId,
+            slot: slot.slot,
+            type: slot.type,
+            title: slot.title,
+            description: slot.description ?? null,
+            durationMin: slot.durationMin ?? null,
+            estCost: slot.estCost === undefined ? null : String(slot.estCost),
+            sortOrder: index,
+            pinned: pinnedKeys.has(`${slot.slot}|${slot.type}|${slot.title}`)
+          }))
+        );
+      }
+    });
+  }
+
   async markReady(itineraryId: string): Promise<void> {
     await this.db
       .update(itineraries)

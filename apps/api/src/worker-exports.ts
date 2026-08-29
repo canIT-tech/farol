@@ -12,3 +12,7 @@ export {
   ItineraryGenerateHandler,
   type ItineraryGenerateData
 } from "./itinerary/itinerary-generate.handler";
+export {
+  ItineraryRegenerateDayHandler,
+  type ItineraryRegenerateDayData
+} from "./itinerary/itinerary-regenerate-day.handler";

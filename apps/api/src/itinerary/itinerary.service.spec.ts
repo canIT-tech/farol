@@ -6,7 +6,8 @@ import {
   users,
   trips,
   tripDestinations,
-  itineraries
+  itineraries,
+  itineraryDays
 } from "@farol/db";
 import { isDomainError, type TripInput } from "@farol/shared";
 import { ItineraryService } from "./itinerary.service";
@@ -145,5 +146,54 @@ describe("ItineraryService.getLatest", () => {
     expect(latest.id).toBe(itineraryId);
     expect(latest.status).toBe("pending");
     expect(latest.days).toEqual([]);
+  });
+});
+
+describe("ItineraryService.regenerateDay", () => {
+  it("lança NotFoundError quando não há roteiro", async () => {
+    const userId = await makeUser();
+    const tripId = await tripWithCandidate(userId);
+    await expect(service.regenerateDay(userId, tripId, 1)).rejects.toMatchObject({
+      code: "not_found"
+    });
+  });
+
+  it("lança itinerary_not_ready quando a versão ainda está pending", async () => {
+    const userId = await makeUser();
+    const tripId = await tripWithCandidate(userId);
+    await service.chooseDestination(userId, tripId, "LIS");
+    await expect(service.regenerateDay(userId, tripId, 1)).rejects.toMatchObject({
+      code: "itinerary_not_ready"
+    });
+  });
+
+  it("lança NotFoundError quando o dia não existe e publica quando existe", async () => {
+    const userId = await makeUser();
+    const tripId = await tripWithCandidate(userId);
+    const { itineraryId } = await service.chooseDestination(userId, tripId, "LIS");
+    // marca ready + insere 1 dia direto
+    await db
+      .update(itineraries)
+      .set({ status: "ready", generatedAt: new Date() })
+      .where(inArray(itineraries.id, [itineraryId]));
+    await db.insert(itineraryDays).values({ id: crypto.randomUUID(), itineraryId, dayIndex: 1 });
+    publish.mockClear();
+
+    await expect(service.regenerateDay(userId, tripId, 5)).rejects.toMatchObject({
+      code: "not_found"
+    });
+    expect(publish).not.toHaveBeenCalled();
+
+    await service.regenerateDay(userId, tripId, 1);
+    expect(publish).toHaveBeenCalledWith(JOB_NAMES.itineraryRegenerateDay, { itineraryId, dayIndex: 1 });
+  });
+
+  it("propaga ForbiddenError de outro usuário", async () => {
+    const owner = await makeUser();
+    const intruder = await makeUser();
+    const tripId = await tripWithCandidate(owner);
+    await expect(service.regenerateDay(intruder, tripId, 1)).rejects.toMatchObject({
+      code: "forbidden"
+    });
   });
 });

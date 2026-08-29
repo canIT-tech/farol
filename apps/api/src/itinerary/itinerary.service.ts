@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { NotFoundError, type Itinerary } from "@farol/shared";
+import { DomainError, NotFoundError, type Itinerary } from "@farol/shared";
 import { JOB_NAMES } from "../jobs/job-names";
 import { JOB_QUEUE, type JobQueue } from "../jobs/job-queue";
 import { TripsService } from "../trips/trips.service";
@@ -33,6 +33,23 @@ export class ItineraryService {
 
   async getLatest(userId: string, tripId: string): Promise<Itinerary> {
     await this.trips.get(userId, tripId);
+    return this.requireLatest(tripId);
+  }
+
+  // Enfileira a regeneração de um único dia do roteiro pronto.
+  async regenerateDay(userId: string, tripId: string, dayIndex: number): Promise<void> {
+    await this.trips.get(userId, tripId);
+    const latest = await this.requireLatest(tripId);
+    if (latest.status !== "ready") {
+      throw new DomainError("itinerary_not_ready", "o roteiro ainda não está pronto");
+    }
+    if (!latest.days.some((day) => day.dayIndex === dayIndex)) {
+      throw new NotFoundError("esse dia não existe no roteiro");
+    }
+    await this.queue.publish(JOB_NAMES.itineraryRegenerateDay, { itineraryId: latest.id, dayIndex });
+  }
+
+  private async requireLatest(tripId: string): Promise<Itinerary> {
     const itinerary = await this.repo.latest(tripId);
     if (!itinerary) {
       throw new NotFoundError("roteiro ainda não foi iniciado para esta viagem");

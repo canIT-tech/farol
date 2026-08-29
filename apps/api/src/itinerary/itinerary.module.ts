@@ -4,11 +4,17 @@ import { ItineraryController } from "./itinerary.controller";
 import { ItineraryService } from "./itinerary.service";
 import { ItineraryRepository } from "./itinerary.repository";
 import { ItineraryGenerateHandler } from "./itinerary-generate.handler";
+import { ItineraryRegenerateDayHandler } from "./itinerary-regenerate-day.handler";
 
 @Module({
   imports: [TripsModule],
   controllers: [ItineraryController],
-  providers: [ItineraryService, ItineraryRepository, ItineraryGenerateHandler],
-  exports: [ItineraryRepository, ItineraryGenerateHandler]
+  providers: [
+    ItineraryService,
+    ItineraryRepository,
+    ItineraryGenerateHandler,
+    ItineraryRegenerateDayHandler
+  ],
+  exports: [ItineraryRepository, ItineraryGenerateHandler, ItineraryRegenerateDayHandler]
 })
 export class ItineraryModule {}

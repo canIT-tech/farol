@@ -115,6 +115,40 @@ describe("worker — itinerary.generate ponta a ponta", () => {
       .from(itineraryDays)
       .where(eq(itineraryDays.itineraryId, itineraryId));
     expect(days).toHaveLength(2);
+
+    // ---- regenerate-day ponta a ponta ----
+    const { itineraryItems } = await import("@farol/db");
+    const [day1] = await db
+      .select()
+      .from(itineraryDays)
+      .where(eq(itineraryDays.itineraryId, itineraryId))
+      .orderBy(itineraryDays.dayIndex)
+      .limit(1);
+    const day1Items = await db
+      .select()
+      .from(itineraryItems)
+      .where(eq(itineraryItems.dayId, day1!.id));
+    const pinnedItem = day1Items[0]!;
+    const swappable = day1Items[1]!;
+    await db.update(itineraryItems).set({ pinned: true }).where(eq(itineraryItems.id, pinnedItem.id));
+    await db
+      .update(itineraryItems)
+      .set({ title: "TITULO ANTIGO PARA TROCAR" })
+      .where(eq(itineraryItems.id, swappable.id));
+
+    await queue.publish(JOB_NAMES.itineraryRegenerateDay, { itineraryId, dayIndex: day1!.dayIndex });
+
+    await waitFor(async () => {
+      const now = await db
+        .select()
+        .from(itineraryItems)
+        .where(eq(itineraryItems.dayId, day1!.id));
+      return (
+        now.some((i) => i.pinned && i.title === pinnedItem.title) &&
+        !now.some((i) => i.title === "TITULO ANTIGO PARA TROCAR")
+      );
+    }, 20_000);
+
     await db.delete(users).where(eq(users.id, userId));
   });
 });

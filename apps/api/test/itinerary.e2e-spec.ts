@@ -108,4 +108,23 @@ describe("roteiro", () => {
       .set("Authorization", u.auth);
     expect(res.status).toBe(404);
   });
+
+  it("POST .../itinerary/days/1/regenerate sem auth responde 401", async () => {
+    const res = await request(app.getHttpServer()).post("/trips/x/itinerary/days/1/regenerate");
+    expect(res.status).toBe(401);
+  });
+
+  it("POST .../itinerary/days/1/regenerate responde 409 enquanto o roteiro está pending", async () => {
+    const u = await newUser();
+    const tripId = await tripWithCandidate(u.auth);
+    await request(app.getHttpServer())
+      .post(`/trips/${tripId}/destination`)
+      .set("Authorization", u.auth)
+      .send({ iata: "LIS" });
+    const res = await request(app.getHttpServer())
+      .post(`/trips/${tripId}/itinerary/days/1/regenerate`)
+      .set("Authorization", u.auth);
+    expect(res.status).toBe(409);
+    expect(res.body.code).toBe("itinerary_not_ready");
+  });
 });
