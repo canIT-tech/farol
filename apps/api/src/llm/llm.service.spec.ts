@@ -1,7 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
 import { isDomainError } from "@farol/shared";
-import { LlmService, extractJsonArray, type AnthropicLike } from "./llm.service";
-import type { RankDestinationsInput } from "./llm.types";
+import {
+  LlmService,
+  extractJsonArray,
+  extractJsonObject,
+  parseItineraryOutput,
+  parseRanking,
+  type AnthropicLike
+} from "./llm.service";
+import type { BuildItineraryInput, RankDestinationsInput } from "./llm.types";
 
 const input: RankDestinationsInput = {
   shortlist: [
@@ -186,5 +193,161 @@ describe("LlmService.rankDestinations", () => {
     const { client } = fakeClient([short, short]);
     const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
     await expect(service.rankDestinations(input)).rejects.toThrow();
+  });
+});
+
+describe("extractJsonObject", () => {
+  it("devolve o objeto quando o texto já é só o objeto", () => {
+    expect(extractJsonObject('{"a":1}')).toBe('{"a":1}');
+  });
+
+  it("recorta o objeto de dentro de prosa", () => {
+    expect(extractJsonObject('claro: {"days":[]} pronto')).toBe('{"days":[]}');
+  });
+
+  it("vai do primeiro '{' ao último '}'", () => {
+    expect(extractJsonObject("x {a} y {b} z")).toBe("{a} y {b}");
+  });
+
+  it("devolve o texto quando não há '{'", () => {
+    expect(extractJsonObject("sem chaves")).toBe("sem chaves");
+  });
+
+  it("devolve o texto quando '}' vem antes de '{'", () => {
+    expect(extractJsonObject("} antes de {")).toBe("} antes de {");
+  });
+});
+
+const VALID_ITINERARY = JSON.stringify({
+  days: [
+    {
+      dayIndex: 1,
+      slots: [
+        { slot: "morning", type: "activity", title: "Caminhada guiada pelo centro" },
+        { slot: "afternoon", type: "meal", title: "Almoço no mercado municipal" }
+      ]
+    }
+  ]
+});
+
+describe("parseRanking", () => {
+  const allowed = new Set(["LIS", "OPO", "MAD"]);
+
+  it("aceita um ranking válido dentro da shortlist", () => {
+    const result = parseRanking(VALID_JSON, allowed);
+    expect(result.ok).toBe(true);
+    expect(result.ok && result.value).toHaveLength(3);
+  });
+
+  it("erro de não-JSON", () => {
+    expect(parseRanking("nada", allowed)).toEqual({
+      ok: false,
+      error: "a resposta não era JSON válido"
+    });
+  });
+
+  it("junta várias mensagens do zod com '; '", () => {
+    const bad = JSON.stringify([
+      { iata: "LIS", score: 9, rationale: "x" },
+      { iata: "OPO", score: 0.8, rationale: R() },
+      { iata: "MAD", score: 0.7, rationale: R() }
+    ]);
+    const result = parseRanking(bad, allowed);
+    expect(result.ok).toBe(false);
+    expect(result.ok === false && result.error).toContain("; ");
+  });
+
+  it("lista os iata fora da shortlist separados por ', '", () => {
+    const strays = JSON.stringify([
+      { iata: "AAA", score: 0.9, rationale: R() },
+      { iata: "BBB", score: 0.8, rationale: R() },
+      { iata: "MAD", score: 0.7, rationale: R() }
+    ]);
+    const result = parseRanking(strays, allowed);
+    expect(result.ok === false && result.error).toBe("iata fora da shortlist: AAA, BBB");
+  });
+});
+
+describe("parseItineraryOutput", () => {
+  it("aceita um roteiro válido", () => {
+    const result = parseItineraryOutput(VALID_ITINERARY);
+    expect(result.ok).toBe(true);
+    expect(result.ok && result.value.days).toHaveLength(1);
+  });
+
+  it("falha quando não é JSON", () => {
+    expect(parseItineraryOutput("desculpe")).toEqual({
+      ok: false,
+      error: "a resposta não era JSON válido"
+    });
+  });
+
+  it("junta várias mensagens do zod com '; '", () => {
+    const bad = JSON.stringify({
+      days: [{ dayIndex: 1.5, slots: [{ slot: "night", type: "x", title: "a" }] }]
+    });
+    const result = parseItineraryOutput(bad);
+    expect(result.ok).toBe(false);
+    expect(result.ok === false && result.error).toContain("; ");
+  });
+});
+
+const itineraryInput: BuildItineraryInput = {
+  destination: { city: "Lisboa", country: "Portugal" },
+  nights: 3,
+  pace: "moderado",
+  interests: ["gastronomia", "história"],
+  party: { adults: 2, children: 0 },
+  pinned: [{ dayIndex: 2, slot: "morning", type: "activity", title: "Torre de Belém" }]
+};
+
+describe("LlmService.buildItinerary", () => {
+  it("resolve com o roteiro e loga métrica com kind build_itinerary", async () => {
+    const { client, calls } = fakeClient([VALID_ITINERARY]);
+    const logger = { info: vi.fn() };
+    const service = new LlmService(client, "claude-sonnet-5", logger);
+
+    const out = await service.buildItinerary(itineraryInput);
+
+    expect(out.days).toHaveLength(1);
+    expect(calls).toHaveLength(1);
+    expect(logger.info.mock.calls[0]![0].kind).toBe("build_itinerary");
+  });
+
+  it("coloca os itens pinned no prompt", async () => {
+    const { client, calls } = fakeClient([VALID_ITINERARY]);
+    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
+    await service.buildItinerary(itineraryInput);
+    expect(calls[0]!.content).toContain("dia 2, morning, activity: Torre de Belém");
+  });
+
+  it("não menciona itens fixados quando não há pinned", async () => {
+    const { client, calls } = fakeClient([VALID_ITINERARY]);
+    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
+    await service.buildItinerary({ ...itineraryInput, pinned: undefined });
+    expect(calls[0]!.content).not.toContain("já fixados");
+  });
+
+  it("faz 1 retry quando a 1ª resposta é inválida e depois resolve", async () => {
+    const { client, calls } = fakeClient(["não sei", VALID_ITINERARY]);
+    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
+    const out = await service.buildItinerary(itineraryInput);
+    expect(out.days).toHaveLength(1);
+    expect(calls).toHaveLength(2);
+    expect(calls[1]!.content).toContain("rejeitada");
+  });
+
+  it("rejeita com DomainError llm_invalid_output após 2 falhas", async () => {
+    const { client, calls } = fakeClient(["ruim", "também ruim"]);
+    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
+    await service.buildItinerary(itineraryInput).then(
+      () => expect.unreachable("deveria ter rejeitado"),
+      (err: unknown) => {
+        expect(isDomainError(err)).toBe(true);
+        expect((err as { code: string }).code).toBe("llm_invalid_output");
+        expect((err as Error).message).toBe("o modelo não devolveu um roteiro válido");
+      }
+    );
+    expect(calls).toHaveLength(2);
   });
 });
