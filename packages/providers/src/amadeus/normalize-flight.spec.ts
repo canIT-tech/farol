@@ -2,7 +2,8 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { flightOfferSchema } from "@farol/shared";
-import { parseIsoDurationMinutes, fillTemplate, normalizeFlight } from "./normalize-flight";
+import { parseIsoDurationMinutes, normalizeFlight } from "./normalize-flight";
+import { fillTemplate } from "./deep-link";
 
 const fixture = JSON.parse(
   readFileSync(fileURLToPath(new URL("./__fixtures__/flight-offers.json", import.meta.url)), "utf8")

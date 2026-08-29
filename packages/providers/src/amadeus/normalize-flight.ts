@@ -1,4 +1,5 @@
 import { flightOfferSchema, type FlightOffer } from "@farol/shared";
+import { fillTemplate } from "./deep-link";
 
 // ISO-8601 de duração (ex.: "PT12H30M", "P1DT2H") → minutos.
 export function parseIsoDurationMinutes(iso: string): number {
@@ -10,10 +11,6 @@ export function parseIsoDurationMinutes(iso: string): number {
   const hours = Number(match[2] ?? 0);
   const minutes = Number(match[3] ?? 0);
   return days * 1440 + hours * 60 + minutes;
-}
-
-export function fillTemplate(template: string, values: Record<string, string>): string {
-  return template.replace(/\{(\w+)\}/g, (_whole, key: string) => values[key] ?? "");
 }
 
 interface AmadeusSegment {
