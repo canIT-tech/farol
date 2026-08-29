@@ -43,6 +43,8 @@ Canvases publicados (Claude Artifacts):
 - LLM: **Claude**, roteamento de modelo por tarefa.
 - `api` stateless; autorização na camada de serviço (RLS desligada nas tabelas de app).
 - Hospedagem: agnóstica (container + Postgres + env).
+- **`apps/worker` reusa a `api`**: `apps/api/src/worker-exports.ts` é um barrel exposto pelo campo `exports` do `package.json` (path `@farol/api` no `tsconfig.base` aponta pro `dist/worker-exports.d.ts`). O `WorkerModule` importa `ConfigModule`/`DbModule`/`LlmModule`/`JobsModule` + declara `ItineraryRepository` e os handlers como providers — **sem** `ItineraryModule`/`TripsModule` (esses têm controllers com `AuthGuard`, que o worker não tem).
+- **Testes de integração compartilham um único Postgres.** `turbo.json` serializa `@farol/db#test → @farol/api#test → @farol/worker#test` (o `client.spec` do `db` dropa tabelas). pg-boss usa schema isolado por teste (`pgboss_*_<rnd>`, dropado no `afterAll`). Se o banco ficar sujo (run interrompido): `docker compose exec db psql -U postgres -d farol -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public; DROP SCHEMA IF EXISTS drizzle CASCADE"` + `db:migrate` + `db:seed`.
 
 **Marca / design**
 - Direção visual: híbrido — shell fixo (sidebar da viagem + miolo + trilho de chat sempre presente).
@@ -82,9 +84,14 @@ por CI que falha se qualquer limiar abaixo não for atingido.
   `apps/worker`, `apps/web` e em cada `packages/*`.
 - Medida por pacote (não média do monorepo). O gate é por pacote.
 - **Exclusões permitidas** (só estas, e cada uma comentada no config):
-  arquivos de bootstrap (`main.ts`, `main.worker.ts`), migrations do Drizzle,
-  `*.config.*`, `*.stories.tsx`, tipos puros (`*.d.ts`), barrels (`index.ts` só de re-export).
+  arquivos de bootstrap (`main.ts`, `main.worker.ts`), CLIs (`*-cli.ts` — `migrate-cli`, `seed-catalog-cli`),
+  migrations do Drizzle, `*.config.*`, `*.stories.tsx`, tipos puros (`*.d.ts`), barrels só de re-export
+  (`index.ts`, `worker-exports.ts`), `apps/api/src/**/prompts/**` (texto de prompt, não lógica; segue em coverage),
+  `apps/web/src/lib/supabase.ts` (wrapper de SDK do browser, coberto pelo e2e).
   Qualquer outra exclusão precisa de aprovação no PR.
+- **Break de mutação por pacote:** 90 em quase todos; **`@farol/db` = 85** (`client.ts`/`migrate.ts` são glue
+  de I/O — pool/timeout/caminho de migração — sem efeito observável em teste unitário; `schema.ts` e `seed-catalog.ts`
+  ficam ~100 e dominam a agregada).
 
 ### Tipos de teste (todos obrigatórios)
 
@@ -105,6 +112,28 @@ por CI que falha se qualquer limiar abaixo não for atingido.
 - LLM em teste sempre via fake determinístico (retorna JSON fixo por chave de prompt) — nunca chamada real.
 
 O **Passo 1** monta esse harness (Vitest, Playwright, Stryker) e liga os gates no CI antes de qualquer feature.
+
+## Débito técnico conhecido (Passos 2–5)
+
+Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correcao-debito-tecnico.md`.
+
+**Bloqueiam / arriscam o CI**
+- **`.github/workflows/ci.yml` sem as envs novas.** Só define `DATABASE_URL` e `NEXT_PUBLIC_API_URL`. Os e2e trazem defaults via `setup-e2e.ts` e o worker seta as suas no topo do spec, então *hoje passa por sorte*. Adicionar `SUPABASE_JWKS_URL`, `ANTHROPIC_API_KEY`, `AMADEUS_CLIENT_ID/SECRET`, `JOBS_SCHEMA` no bloco `env:`.
+- **CI roda `db:migrate` mas não `db:seed`.** Os specs que precisam do catálogo semeiam sozinhos no `beforeAll`; ainda assim vale um `db:seed` explícito no CI pra deixar o banco em estado conhecido.
+- **`pnpm test:mutation` no CI roda tudo** (api grande + worker + db + pg-boss real dentro da mutação). Lento e potencialmente instável. Avaliar rodar mutação só nos pacotes tocados no PR, ou mover pra job separado/nightly.
+- **Testes de integração e o Postgres único.** A serialização no `turbo.json` resolve o CI (Postgres novo a cada run), mas localmente exige banco limpo. Opção definitiva: `DATABASE_URL_TEST` apontando pra um banco `farol_test` dedicado (docker-compose cria; specs já preferem `DATABASE_URL_TEST`).
+
+**Placeholders da pipeline (fecham no Passo 6)**
+- `discovery`: `climate.expectedC = 22` fixo e `flightTimeHours = null` (sem fonte de clima/tempo de voo no MVP).
+- `itinerary_items.placeId/lat/lng/rating = null` — enrich do Google Places é o Passo 6.
+- `prefilterDestinations({ excludeIata })` existe mas não é usado (não há conceito de "destino rejeitado" no schema).
+
+**Qualidade / precisão**
+- `apps/api/src/llm/llm.types.ts` — `MODEL_PRICING` são valores **aproximados** (comentados como "revisar"); ligados ao "teto de custo de LLM por roteiro" ainda em aberto.
+- `packages/providers/**/__fixtures__/*.json` — escritas à mão (ver Pendências).
+- `apps/web` ainda **não** tem as telas de roteiro/voo/hotel ligadas ao `apps/api` (é o Passo 8); o "polling no web" citado no título do Passo 4 não foi implementado — a rota `GET /trips/:id/itinerary` já devolve `status: pending`, falta o front.
+- `packages/ui/src/AdvisorChat/AdvisorChat.tsx:26` — warning de `Unused eslint-disable directive` (pré-existente, Passo 9). Não quebra o CI (`eslint` sem `--max-warnings 0`).
+- `apps/api` mutação ~94,6% (equivalentes de `extractJson*` — `start === -1` vs `end <= start` — e strings de erro/prompt); documentado, dentro do break 90.
 
 ## Pendências abertas (do PRD / design técnico)
 
