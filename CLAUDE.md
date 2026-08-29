@@ -128,7 +128,7 @@ Backlog de implementação. Ordem = dependência. Puxe pelo número.
 | 6 | Google Places + enrich — `GooglePlacesProvider`, `PlacesModule`, passo de enrich no job do roteiro, `swap_restaurant` | 🟢 livre | — | — | 4 |
 | 7 | Chat IA — `ChatModule`, loop de tool-calling, as 9 tools mapeadas para serviços, `chat_messages` | 🟢 livre | — | — | 4, 5, 6 |
 | 8 | UI web + E2E — telas ligadas ao `apps/api`, fluxo Playwright login→onboarding→descoberta→destino→roteiro | 🟢 livre | — | — | 7 |
-| 9 | `packages/ui` — implementar tokens (`docs/design-system.md`) + componentes base (`Button`, `TextField`, `Chip`, `MatchBadge`, `DestinationCard`, `AppShell`, `StepNav`, `AdvisorChat`) | 🟡 em andamento | felippebutland | `felippebutland/passo-9-packages-ui` | 1 | (2026-08-28) |
+| 9 | `packages/ui` — implementar tokens (`docs/design-system.md`) + componentes base (`Button`, `TextField`, `Chip`, `MatchBadge`, `DestinationCard`, `AppShell`, `StepNav`, `AdvisorChat`) | ✅ concluído | felippebutland | — | 1 | (2026-08-28) |
 
 Legenda de status: 🟢 livre · 🟡 em andamento · ✅ concluído · 🔴 bloqueado.
 
