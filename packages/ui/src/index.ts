@@ -10,3 +10,5 @@ export * from "./DestinationCard/DestinationCard";
 export * from "./AppShell/AppShell";
 export * from "./StepNav/StepNav";
 export * from "./AdvisorChat/AdvisorChat";
+export * from "./Icon/Icon";
+export { iconNames } from "./Icon/icons";
