@@ -1,101 +1,185 @@
 import { describe, it, expect } from "vitest";
 import { getTableColumns, getTableName } from "drizzle-orm";
 import { getTableConfig } from "drizzle-orm/pg-core";
-import { users, tasteProfiles } from "./schema";
+import { users, tasteProfiles, trips, tripDestinations, destinationCatalog } from "./schema";
+
+type ColSpec = {
+  name: string;
+  sqlType: string;
+  notNull: boolean;
+  hasDefault?: boolean;
+  default?: unknown;
+};
+
+type AnyTable = Parameters<typeof getTableColumns>[0];
+
+function checkColumns(table: AnyTable, dbName: string, specs: Record<string, ColSpec>): void {
+  it(`${dbName}: nome da tabela e mapeamento completo de colunas`, () => {
+    expect(getTableName(table)).toBe(dbName);
+    const cols = getTableColumns(table);
+    expect(Object.keys(cols).sort()).toEqual(Object.keys(specs).sort());
+
+    for (const [prop, spec] of Object.entries(specs)) {
+      const col = cols[prop];
+      expect(col, prop).toBeDefined();
+      expect(col.name, `${prop}.name`).toBe(spec.name);
+      expect(col.getSQLType(), `${prop}.sqlType`).toBe(spec.sqlType);
+      expect(col.notNull, `${prop}.notNull`).toBe(spec.notNull);
+      if (spec.hasDefault !== undefined) {
+        expect(col.hasDefault, `${prop}.hasDefault`).toBe(spec.hasDefault);
+      }
+      if ("default" in spec) {
+        expect(col.default, `${prop}.default`).toEqual(spec.default);
+      }
+    }
+  });
+}
+
+function indexColumnNames(table: Parameters<typeof getTableConfig>[0], indexName: string): string[] {
+  const idx = getTableConfig(table).indexes.find((i) => i.config.name === indexName);
+  expect(idx, indexName).toBeDefined();
+  return idx!.config.columns.map((col) => (col as { name: string }).name);
+}
+
+const TS = "timestamp with time zone";
 
 describe("schema.users", () => {
-  it("a tabela se chama users", () => {
-    expect(getTableName(users)).toBe("users");
+  checkColumns(users, "users", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    email: { name: "email", sqlType: "text", notNull: true },
+    displayName: { name: "display_name", sqlType: "text", notNull: false },
+    createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true }
   });
 
-  it("tem as colunas mínimas do design (seção 5.1)", () => {
-    const cols = Object.keys(getTableColumns(users));
-    expect(cols.sort()).toEqual(["createdAt", "displayName", "email", "id"].sort());
-  });
-
-  it("mapeia os nomes de coluna do banco", () => {
-    const c = getTableColumns(users);
-    expect(c.id.name).toBe("id");
-    expect(c.email.name).toBe("email");
-    expect(c.displayName.name).toBe("display_name");
-    expect(c.createdAt.name).toBe("created_at");
-  });
-
-  it("id é a primary key uuid", () => {
-    const { id } = getTableColumns(users);
-    expect(id.primary).toBe(true);
-    expect(id.dataType).toBe("string");
-    expect(id.columnType).toBe("PgUUID");
-  });
-
-  it("email é notNull e displayName é opcional", () => {
-    const c = getTableColumns(users);
-    expect(c.email.notNull).toBe(true);
-    expect(c.displayName.notNull).toBe(false);
-  });
-
-  it("createdAt é notNull, timestamptz e default now()", () => {
-    const { createdAt } = getTableColumns(users);
-    expect(createdAt.notNull).toBe(true);
-    expect(createdAt.hasDefault).toBe(true);
-    expect(createdAt.getSQLType()).toBe("timestamp with time zone");
+  it("id é primary key", () => {
+    expect(getTableColumns(users).id.primary).toBe(true);
   });
 });
 
 describe("schema.tasteProfiles", () => {
-  it("tem as colunas do design §5.2", () => {
-    const cols = Object.keys(getTableColumns(tasteProfiles)).sort();
-    expect(cols).toEqual(
-      ["budgetBand", "constraints", "id", "interests", "pace", "partyType", "updatedAt", "userId"].sort()
-    );
+  checkColumns(tasteProfiles, "taste_profiles", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    userId: { name: "user_id", sqlType: "uuid", notNull: true },
+    interests: { name: "interests", sqlType: "jsonb", notNull: true, hasDefault: true, default: [] },
+    pace: { name: "pace", sqlType: "text", notNull: true },
+    partyType: { name: "party_type", sqlType: "text", notNull: true },
+    budgetBand: { name: "budget_band", sqlType: "text", notNull: true },
+    constraints: {
+      name: "constraints",
+      sqlType: "jsonb",
+      notNull: true,
+      hasDefault: true,
+      default: {}
+    },
+    updatedAt: { name: "updated_at", sqlType: TS, notNull: true, hasDefault: true }
   });
 
-  it("a tabela se chama taste_profiles com nomes de coluna snake_case", () => {
-    expect(getTableName(tasteProfiles)).toBe("taste_profiles");
-    const c = getTableColumns(tasteProfiles);
-    expect(c.userId.name).toBe("user_id");
-    expect(c.partyType.name).toBe("party_type");
-    expect(c.budgetBand.name).toBe("budget_band");
-    expect(c.updatedAt.name).toBe("updated_at");
+  it("userId é unique", () => {
+    expect(getTableColumns(tasteProfiles).userId.isUnique).toBe(true);
   });
 
-  it("userId é notNull e unique", () => {
-    const { userId } = getTableColumns(tasteProfiles);
-    expect(userId.notNull).toBe(true);
-    expect(userId.isUnique).toBe(true);
-  });
-
-  it("interests e constraints são jsonb notNull com default", () => {
-    const c = getTableColumns(tasteProfiles);
-    expect(c.interests.notNull).toBe(true);
-    expect(c.interests.hasDefault).toBe(true);
-    expect(c.constraints.notNull).toBe(true);
-    expect(c.constraints.hasDefault).toBe(true);
-  });
-
-  it("pace, partyType e budgetBand são text notNull", () => {
-    const c = getTableColumns(tasteProfiles);
-    for (const k of ["pace", "partyType", "budgetBand"] as const) {
-      expect(c[k].notNull).toBe(true);
-      expect(c[k].columnType).toBe("PgText");
-    }
-  });
-
-  it("updatedAt é timestamptz notNull com default", () => {
-    const { updatedAt } = getTableColumns(tasteProfiles);
-    expect(updatedAt.notNull).toBe(true);
-    expect(updatedAt.hasDefault).toBe(true);
-    expect(updatedAt.getSQLType()).toBe("timestamp with time zone");
+  it("referencia users.id com ON DELETE cascade", () => {
+    const fk = getTableConfig(tasteProfiles).foreignKeys[0]!;
+    const ref = fk.reference();
+    expect(ref.foreignTable).toBe(users);
+    expect(ref.foreignColumns[0]!.name).toBe("id");
+    expect(fk.onDelete).toBe("cascade");
   });
 });
 
-describe("taste_profiles FK", () => {
+describe("schema.trips", () => {
+  checkColumns(trips, "trips", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    userId: { name: "user_id", sqlType: "uuid", notNull: true },
+    status: { name: "status", sqlType: "text", notNull: true, hasDefault: true, default: "draft" },
+    title: { name: "title", sqlType: "text", notNull: false },
+    originIata: { name: "origin_iata", sqlType: "text", notNull: true },
+    dateStart: { name: "date_start", sqlType: "date", notNull: false },
+    dateEnd: { name: "date_end", sqlType: "date", notNull: false },
+    durationDays: { name: "duration_days", sqlType: "integer", notNull: false },
+    targetMonth: { name: "target_month", sqlType: "text", notNull: false },
+    party: {
+      name: "party",
+      sqlType: "jsonb",
+      notNull: true,
+      hasDefault: true,
+      default: { adults: 1, children: 0 }
+    },
+    budgetTotal: { name: "budget_total", sqlType: "numeric", notNull: false },
+    currency: { name: "currency", sqlType: "text", notNull: true, hasDefault: true, default: "BRL" },
+    chosenDestinationId: { name: "chosen_destination_id", sqlType: "uuid", notNull: false },
+    createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true },
+    updatedAt: { name: "updated_at", sqlType: TS, notNull: true, hasDefault: true }
+  });
+
   it("referencia users.id com ON DELETE cascade", () => {
-    const fks = getTableConfig(tasteProfiles).foreignKeys;
-    expect(fks).toHaveLength(1);
-    const ref = fks[0]!.reference();
+    const fk = getTableConfig(trips).foreignKeys[0]!;
+    const ref = fk.reference();
     expect(ref.foreignTable).toBe(users);
     expect(ref.foreignColumns[0]!.name).toBe("id");
-    expect(fks[0]!.onDelete).toBe("cascade");
+    expect(fk.onDelete).toBe("cascade");
+  });
+
+  it("indexa (userId, status)", () => {
+    expect(indexColumnNames(trips, "trips_user_status_idx")).toEqual(["user_id", "status"]);
+  });
+});
+
+describe("schema.tripDestinations", () => {
+  checkColumns(tripDestinations, "trip_destinations", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    tripId: { name: "trip_id", sqlType: "uuid", notNull: true },
+    city: { name: "city", sqlType: "text", notNull: true },
+    country: { name: "country", sqlType: "text", notNull: true },
+    iata: { name: "iata", sqlType: "text", notNull: true },
+    score: { name: "score", sqlType: "numeric", notNull: true },
+    rationale: { name: "rationale", sqlType: "text", notNull: true },
+    estCost: { name: "est_cost", sqlType: "jsonb", notNull: true },
+    climate: { name: "climate", sqlType: "jsonb", notNull: true },
+    flightTimeHours: { name: "flight_time_hours", sqlType: "numeric", notNull: false },
+    chosen: {
+      name: "chosen",
+      sqlType: "boolean",
+      notNull: true,
+      hasDefault: true,
+      default: false
+    },
+    createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true }
+  });
+
+  it("referencia trips.id com ON DELETE cascade", () => {
+    const fk = getTableConfig(tripDestinations).foreignKeys[0]!;
+    const ref = fk.reference();
+    expect(ref.foreignTable).toBe(trips);
+    expect(ref.foreignColumns[0]!.name).toBe("id");
+    expect(fk.onDelete).toBe("cascade");
+  });
+
+  it("indexa tripId", () => {
+    expect(indexColumnNames(tripDestinations, "trip_destinations_trip_idx")).toEqual(["trip_id"]);
+  });
+});
+
+describe("schema.destinationCatalog", () => {
+  checkColumns(destinationCatalog, "destination_catalog", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    city: { name: "city", sqlType: "text", notNull: true },
+    country: { name: "country", sqlType: "text", notNull: true },
+    iata: { name: "iata", sqlType: "text", notNull: true },
+    tags: { name: "tags", sqlType: "jsonb", notNull: true },
+    bestMonths: { name: "best_months", sqlType: "jsonb", notNull: true },
+    avgFlightCostFromGru: { name: "avg_flight_cost_from_gru", sqlType: "numeric", notNull: true },
+    avgLodgingNight: { name: "avg_lodging_night", sqlType: "numeric", notNull: true },
+    avgDailyLocal: { name: "avg_daily_local", sqlType: "numeric", notNull: true },
+    region: { name: "region", sqlType: "text", notNull: true },
+    visaFreeBr: { name: "visa_free_br", sqlType: "boolean", notNull: true }
+  });
+
+  it("iata é unique", () => {
+    expect(getTableColumns(destinationCatalog).iata.isUnique).toBe(true);
+  });
+
+  it("indexa iata", () => {
+    expect(indexColumnNames(destinationCatalog, "destination_catalog_iata_idx")).toEqual(["iata"]);
   });
 });
