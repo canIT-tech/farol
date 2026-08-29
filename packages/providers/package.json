@@ -14,6 +14,11 @@
   },
   "devDependencies": {
     "@stryker-mutator/core": "^8.6.0",
-    "@stryker-mutator/vitest-runner": "^8.6.0"
+    "@stryker-mutator/vitest-runner": "^8.6.0",
+    "@types/node": "^22.0.0"
+  },
+  "dependencies": {
+    "@farol/shared": "workspace:^",
+    "p-retry": "^8.0.0"
   }
 }
