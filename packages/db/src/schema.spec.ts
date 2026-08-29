@@ -1,7 +1,16 @@
 import { describe, it, expect } from "vitest";
 import { getTableColumns, getTableName } from "drizzle-orm";
 import { getTableConfig } from "drizzle-orm/pg-core";
-import { users, tasteProfiles, trips, tripDestinations, destinationCatalog } from "./schema";
+import {
+  users,
+  tasteProfiles,
+  trips,
+  tripDestinations,
+  destinationCatalog,
+  providerCache,
+  flightSelections,
+  hotelSelections
+} from "./schema";
 
 type ColSpec = {
   name: string;
@@ -181,5 +190,71 @@ describe("schema.destinationCatalog", () => {
 
   it("indexa iata", () => {
     expect(indexColumnNames(destinationCatalog, "destination_catalog_iata_idx")).toEqual(["iata"]);
+  });
+});
+
+describe("schema.providerCache", () => {
+  checkColumns(providerCache, "provider_cache", {
+    key: { name: "key", sqlType: "text", notNull: true },
+    provider: { name: "provider", sqlType: "text", notNull: true },
+    payload: { name: "payload", sqlType: "jsonb", notNull: true },
+    fetchedAt: { name: "fetched_at", sqlType: TS, notNull: true, hasDefault: true },
+    expiresAt: { name: "expires_at", sqlType: TS, notNull: true }
+  });
+
+  it("key é primary key", () => {
+    expect(getTableColumns(providerCache).key.primary).toBe(true);
+  });
+
+  it("indexa expiresAt", () => {
+    expect(indexColumnNames(providerCache, "provider_cache_expires_idx")).toEqual(["expires_at"]);
+  });
+});
+
+describe("schema.flightSelections", () => {
+  checkColumns(flightSelections, "flight_selections", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    tripId: { name: "trip_id", sqlType: "uuid", notNull: true },
+    offer: { name: "offer", sqlType: "jsonb", notNull: true },
+    price: { name: "price", sqlType: "numeric", notNull: true },
+    currency: { name: "currency", sqlType: "text", notNull: true },
+    carrier: { name: "carrier", sqlType: "text", notNull: false },
+    stops: { name: "stops", sqlType: "integer", notNull: false },
+    departAt: { name: "depart_at", sqlType: TS, notNull: false },
+    returnAt: { name: "return_at", sqlType: TS, notNull: false },
+    deepLink: { name: "deep_link", sqlType: "text", notNull: true },
+    selectedAt: { name: "selected_at", sqlType: TS, notNull: true, hasDefault: true }
+  });
+
+  it("referencia trips.id com ON DELETE cascade", () => {
+    const fk = getTableConfig(flightSelections).foreignKeys[0]!;
+    const ref = fk.reference();
+    expect(ref.foreignTable).toBe(trips);
+    expect(ref.foreignColumns[0]!.name).toBe("id");
+    expect(fk.onDelete).toBe("cascade");
+  });
+});
+
+describe("schema.hotelSelections", () => {
+  checkColumns(hotelSelections, "hotel_selections", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    tripId: { name: "trip_id", sqlType: "uuid", notNull: true },
+    offer: { name: "offer", sqlType: "jsonb", notNull: true },
+    name: { name: "name", sqlType: "text", notNull: true },
+    region: { name: "region", sqlType: "text", notNull: false },
+    pricePerNight: { name: "price_per_night", sqlType: "numeric", notNull: true },
+    priceTotal: { name: "price_total", sqlType: "numeric", notNull: false },
+    currency: { name: "currency", sqlType: "text", notNull: true },
+    rating: { name: "rating", sqlType: "numeric", notNull: false },
+    deepLink: { name: "deep_link", sqlType: "text", notNull: true },
+    selectedAt: { name: "selected_at", sqlType: TS, notNull: true, hasDefault: true }
+  });
+
+  it("referencia trips.id com ON DELETE cascade", () => {
+    const fk = getTableConfig(hotelSelections).foreignKeys[0]!;
+    const ref = fk.reference();
+    expect(ref.foreignTable).toBe(trips);
+    expect(ref.foreignColumns[0]!.name).toBe("id");
+    expect(fk.onDelete).toBe("cascade");
   });
 });
