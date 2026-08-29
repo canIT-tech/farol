@@ -6,8 +6,18 @@ import { AuthModule } from "./auth/auth.module";
 import { MeModule } from "./me/me.module";
 import { ProfileModule } from "./profile/profile.module";
 import { LlmModule } from "./llm/llm.module";
+import { TripsModule } from "./trips/trips.module";
 
 @Module({
-  imports: [ConfigModule, DbModule, HealthModule, AuthModule, MeModule, ProfileModule, LlmModule]
+  imports: [
+    ConfigModule,
+    DbModule,
+    HealthModule,
+    AuthModule,
+    MeModule,
+    ProfileModule,
+    LlmModule,
+    TripsModule
+  ]
 })
 export class AppModule {}
