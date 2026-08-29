@@ -8,6 +8,9 @@ import { ProfileModule } from "./profile/profile.module";
 import { LlmModule } from "./llm/llm.module";
 import { TripsModule } from "./trips/trips.module";
 import { DiscoveryModule } from "./discovery/discovery.module";
+import { ProvidersModule } from "./providers/providers.module";
+import { FlightsModule } from "./flights/flights.module";
+import { HotelsModule } from "./hotels/hotels.module";
 
 @Module({
   imports: [
@@ -19,7 +22,10 @@ import { DiscoveryModule } from "./discovery/discovery.module";
     ProfileModule,
     LlmModule,
     TripsModule,
-    DiscoveryModule
+    DiscoveryModule,
+    ProvidersModule,
+    FlightsModule,
+    HotelsModule
   ]
 })
 export class AppModule {}
