@@ -4,3 +4,4 @@ export * from "./taste-profile";
 export * from "./auth";
 export * from "./trip";
 export * from "./discovery";
+export * from "./itinerary";
