@@ -26,6 +26,13 @@ describe("AdvisorChat", () => {
     expect(input).toHaveValue("");
   });
 
+  it("Enter com só espaços não envia (guarda canSend)", async () => {
+    const onSend = vi.fn();
+    render(<AdvisorChat messages={msgs} onSend={onSend} />);
+    await userEvent.type(screen.getByLabelText("Mensagem para o assessor"), "   {Enter}");
+    expect(onSend).not.toHaveBeenCalled();
+  });
+
   it("Shift+Enter não envia", async () => {
     const onSend = vi.fn();
     render(<AdvisorChat messages={msgs} onSend={onSend} />);

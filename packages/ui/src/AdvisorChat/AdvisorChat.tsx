@@ -22,9 +22,9 @@ export function AdvisorChat({
   const canSend = draft.trim().length > 0 && !pending;
 
   useEffect(() => {
-    const el = listRef.current;
-    /* c8 ignore next -- ref sempre presente após mount; guarda defensiva */
-    if (!el) return;
+    // O container sempre renderiza, então a ref existe após o mount.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const el = listRef.current!;
     el.scrollTop = el.scrollHeight;
   }, [messages.length, pending]);
 
