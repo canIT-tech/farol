@@ -28,6 +28,11 @@ describe("parseEnv", () => {
     expect(env.LLM_MODEL_CHEAP).toBe("claude-haiku-4-5-20251001");
   });
 
+  it("aplica default de JOBS_SCHEMA e respeita o valor informado", () => {
+    expect(parseEnv({ ...valid }).JOBS_SCHEMA).toBe("pgboss");
+    expect(parseEnv({ ...valid, JOBS_SCHEMA: "pgboss_test" }).JOBS_SCHEMA).toBe("pgboss_test");
+  });
+
   it("respeita os modelos informados por env", () => {
     const env = parseEnv({ ...valid, LLM_MODEL_CAPABLE: "x-capable", LLM_MODEL_CHEAP: "x-cheap" });
     expect(env.LLM_MODEL_CAPABLE).toBe("x-capable");

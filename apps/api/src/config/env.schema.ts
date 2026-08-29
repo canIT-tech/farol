@@ -6,7 +6,8 @@ export const envSchema = z.object({
   SUPABASE_JWKS_URL: z.string().url(),
   ANTHROPIC_API_KEY: z.string().min(1),
   LLM_MODEL_CAPABLE: z.string().min(1).default("claude-sonnet-5"),
-  LLM_MODEL_CHEAP: z.string().min(1).default("claude-haiku-4-5-20251001")
+  LLM_MODEL_CHEAP: z.string().min(1).default("claude-haiku-4-5-20251001"),
+  JOBS_SCHEMA: z.string().min(1).default("pgboss")
 });
 
 export type Env = z.infer<typeof envSchema>;
