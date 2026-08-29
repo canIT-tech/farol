@@ -155,6 +155,58 @@ importers:
         specifier: ^4.3.1
         version: 4.7.0(vite@5.4.21(@types/node@22.20.1)(terser@5.51.2))
 
+  apps/worker:
+    dependencies:
+      '@farol/api':
+        specifier: workspace:*
+        version: link:../api
+      '@nestjs/common':
+        specifier: ^10.4.0
+        version: 10.4.22(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      '@nestjs/core':
+        specifier: ^10.4.0
+        version: 10.4.22(@nestjs/common@10.4.22(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@10.4.22)(reflect-metadata@0.2.2)(rxjs@7.8.2)
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      rxjs:
+        specifier: ^7.8.1
+        version: 7.8.2
+    devDependencies:
+      '@farol/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@farol/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      '@nestjs/testing':
+        specifier: ^10.4.0
+        version: 10.4.22(@nestjs/common@10.4.22(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@10.4.22)(@nestjs/platform-express@10.4.22)
+      '@stryker-mutator/core':
+        specifier: ^8.6.0
+        version: 8.7.1
+      '@stryker-mutator/vitest-runner':
+        specifier: ^8.6.0
+        version: 8.7.1(@stryker-mutator/core@8.7.1)(vitest@2.1.9(@types/node@22.20.1)(jsdom@25.0.1)(terser@5.51.2))
+      '@swc/core':
+        specifier: ^1.7.0
+        version: 1.16.1
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.1
+      drizzle-orm:
+        specifier: 0.33.0
+        version: 0.33.0(@types/react@18.3.31)(pg@8.23.0)(postgres@3.4.9)(react@18.3.1)
+      postgres:
+        specifier: ^3.4.4
+        version: 3.4.9
+      tsx:
+        specifier: ^4.19.0
+        version: 4.23.12
+      unplugin-swc:
+        specifier: ^1.5.1
+        version: 1.5.11(@swc/core@1.16.1)(esbuild@0.28.2)(rollup@4.63.1)(vite@5.4.21(@types/node@22.20.1)(terser@5.51.2))(webpack@5.97.1(@swc/core@1.16.1)(esbuild@0.28.2))
+
   packages/db:
     dependencies:
       drizzle-orm:

@@ -5,11 +5,13 @@ export default defineConfig({
   plugins: [swc.vite()],
   test: {
     environment: "node",
-    include: ["src/**/*.spec.ts"],
+    include: ["src/**/*.spec.ts", "test/**/*.spec.ts"],
+    testTimeout: 30_000,
     coverage: {
       provider: "v8",
       include: ["src/**/*.ts"],
-      exclude: ["src/main.ts", "src/worker-exports.ts", "src/**/*.module.ts", "src/**/*.spec.ts"],
+      // main.worker.ts: bootstrap (sem lógica testável). *.module.ts: fiação do Nest.
+      exclude: ["src/main.worker.ts", "src/**/*.module.ts", "src/**/*.spec.ts"],
       thresholds: { statements: 100, branches: 100, functions: 100, lines: 100 }
     }
   }
