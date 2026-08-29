@@ -12,7 +12,8 @@
     "test": "vitest run --coverage",
     "test:mutation": "stryker run",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/migrate-cli.ts"
+    "db:migrate": "tsx src/migrate-cli.ts",
+    "db:seed": "tsx src/seed-catalog-cli.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.33.0",
