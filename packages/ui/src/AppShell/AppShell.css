@@ -1,0 +1,66 @@
+.farol-shell {
+  display: grid;
+  grid-template-columns: var(--shell-sidebar) 1fr var(--shell-rail);
+  min-height: 100dvh;
+  background: var(--bg);
+}
+
+.farol-shell__nav-toggle {
+  display: none;
+}
+
+.farol-shell__sidebar,
+.farol-shell__rail {
+  background: var(--surface-sunk);
+  overflow-y: auto;
+}
+
+.farol-shell__sidebar {
+  border-right: 1px solid var(--line);
+}
+
+.farol-shell__rail {
+  border-left: 1px solid var(--line);
+}
+
+.farol-shell__main {
+  padding: var(--space-32) var(--page-gutter) var(--space-64);
+  overflow-y: auto;
+}
+
+.farol-shell__main > * {
+  max-width: var(--content-max);
+}
+
+@media (max-width: 1080px) {
+  .farol-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .farol-shell__nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-text);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: var(--space-8) var(--space-12);
+    margin: var(--space-12);
+  }
+
+  .farol-shell__sidebar {
+    display: none;
+  }
+
+  .farol-shell--sidebar-open .farol-shell__sidebar {
+    display: block;
+  }
+
+  .farol-shell__rail {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+}
