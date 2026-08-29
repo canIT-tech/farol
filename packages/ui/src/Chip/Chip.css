@@ -1,0 +1,32 @@
+.farol-chip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-text);
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1.5px solid var(--field-border);
+  border-radius: var(--radius-pill);
+  padding: var(--space-8) var(--space-16);
+}
+
+.farol-chip--interactive {
+  cursor: pointer;
+}
+
+.farol-chip--interactive:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+.farol-chip--filter.farol-chip--selected {
+  background: var(--ink);
+  color: var(--on-accent);
+  border-color: var(--ink);
+}
+
+.farol-chip--taste.farol-chip--selected {
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+  border-color: var(--accent-border);
+}
