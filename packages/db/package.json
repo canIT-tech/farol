@@ -1,0 +1,27 @@
+{
+  "name": "@farol/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run --coverage",
+    "test:mutation": "stryker run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/migrate-cli.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.33.0",
+    "postgres": "^3.4.4"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.24.0",
+    "tsx": "^4.19.0",
+    "@stryker-mutator/core": "^8.6.0",
+    "@stryker-mutator/vitest-runner": "^8.6.0"
+  }
+}

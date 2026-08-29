@@ -1,0 +1,27 @@
+{
+  "name": "farol",
+  "private": true,
+  "packageManager": "pnpm@9.14.4",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:e2e": "turbo run test:e2e",
+    "test:mutation": "turbo run test:mutation",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.11.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "eslint": "^9.11.0",
+    "prettier": "^3.3.0",
+    "turbo": "^2.1.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^2.1.0"
+  }
+}

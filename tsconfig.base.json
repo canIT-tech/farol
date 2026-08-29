@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@farol/shared": ["packages/shared/dist", "packages/shared/src"],
+      "@farol/db": ["packages/db/dist", "packages/db/src"],
+      "@farol/domain": ["packages/domain/dist", "packages/domain/src"],
+      "@farol/providers": ["packages/providers/dist", "packages/providers/src"]
+    }
+  }
+}
