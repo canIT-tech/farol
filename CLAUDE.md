@@ -18,8 +18,9 @@ monta o dia a dia e ajusta tudo por conversa.
 | PRD (visão, escopo faseado, personas, monetização) | `PRD.md` |
 | Design técnico do MVP (arquitetura, módulos, dados) | `docs/superpowers/specs/2026-08-27-mvp-trip-design.md` |
 | Design system (tokens + specs de componentes) | `docs/design-system.md` |
-| Manual de marca (fontes) | `brand/*.dc.html` + `brand/canvas.json` |
-| Telas do app (fontes) | `*.dc.html` + `canvas.json` na raiz |
+| Manual de marca (fontes) | `docs/design/brand/*.dc.html` + `docs/design/brand/canvas.json` |
+| Telas do app (fontes) | `docs/design/app/*.dc.html` + `docs/design/app/canvas.json` |
+| Hub da documentação | `docs/index.html` |
 
 Canvases publicados (Claude Artifacts):
 - App / telas hi-fi: https://claude.ai/code/artifact/0086b95c-831f-40d6-8310-a54b0a5974cd
@@ -50,7 +51,7 @@ Canvases publicados (Claude Artifacts):
 - Direção visual: híbrido — shell fixo (sidebar da viagem + miolo + trilho de chat sempre presente).
 - Tipografia: **Bricolage Grotesque** (títulos) + **Instrument Sans** (texto).
 - Cor: neutro quente; acento **terracota `#c25a38`**; verde `#3d7a67` só em indicador de match.
-- Personalidade: "assessor calmo e confiável" — específico, honesto sobre incerteza, assume o trabalho, sem euforia. Ver `brand/Voice.dc.html`.
+- Personalidade: "assessor calmo e confiável" — específico, honesto sobre incerteza, assume o trabalho, sem euforia. Ver `docs/design/brand/Voice.dc.html`.
 - Tokens completos em `docs/design-system.md` (fonte da verdade para `packages/ui`).
 
 **Modos de produto**
@@ -69,7 +70,7 @@ Canvases publicados (Claude Artifacts):
 - **Uma branch por pessoa/frente:** `git switch -c <nome>/<frente>`. Merge por PR. Nunca commitar direto na `main`.
 - Para frentes paralelas na mesma máquina, usar `git worktree`.
 - Ao concluir uma decisão/descoberta relevante, registrar em `docs/` (não em vault pessoal) para o contexto ficar no repo.
-- Canvas de design: editar as fontes `.dc.html` + `canvas.json`, re-seedar e republicar no mesmo artifact (ver histórico da sessão). Não editar os `.html` gerados (estão no `.gitignore`).
+- Canvas de design (`docs/design/app/` telas · `docs/design/brand/` marca): editar as fontes `.dc.html` + `canvas.json`, re-seedar e republicar no mesmo artifact (ver histórico da sessão). Não editar os `.html` gerados (estão no `.gitignore`).
 
 ---
 

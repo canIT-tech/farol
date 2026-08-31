@@ -25,7 +25,7 @@ eufórico e de "planejadores de IA" genéricos.
 
 **Voz em todo material:** assessor calmo e confiável — específico, honesto sobre
 incerteza, assume o trabalho, sem euforia, sem ponto de exclamação. Ver
-`brand/Voice.dc.html`.
+`docs/design/brand/Voice.dc.html`.
 
 ---
 
@@ -389,5 +389,5 @@ utm_content  = <slug-do-criativo-ou-post>
   (`https://claude.ai/code/artifact/a93aaa41-decb-4557-85bc-079195ade808`) e
   `scratchpad/farol-cost-model.html`.
 - Landing / waitlist: `apps/web` rota `/` (ver `CLAUDE.md` › "Landing / waitlist").
-- Voz e marca: `brand/Voice.dc.html`, `docs/design-system.md`.
+- Voz e marca: `docs/design/brand/Voice.dc.html`, `docs/design-system.md`.
 - PRD (personas, monetização, fases): `PRD.md`.
