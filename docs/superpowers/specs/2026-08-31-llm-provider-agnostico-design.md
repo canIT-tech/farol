@@ -130,18 +130,48 @@ tarefa nova só para exercitar o `cheap`.
 ### D4 — Env
 
 ```
-LLM_PROVIDER=anthropic|groq|openai     (novo, obrigatório)
-LLM_API_KEY=<chave do provider>        (novo, obrigatório — substitui ANTHROPIC_API_KEY)
-LLM_MODEL_CAPABLE=<id do modelo>       (mantém o nome; passa a ser obrigatório)
-LLM_MODEL_CHEAP=<id do modelo>         (mantém o nome; passa a ser obrigatório)
+LLM_PROVIDER=anthropic|groq|openai     (novo, opcional — ver D4.1)
+LLM_API_KEY=<chave do provider>        (novo, opcional — substitui ANTHROPIC_API_KEY)
+LLM_MODEL_CAPABLE=<id do modelo>       (mantém o nome; perde o default)
+LLM_MODEL_CHEAP=<id do modelo>         (mantém o nome; perde o default)
 ```
 
 `ANTHROPIC_API_KEY` é **removida**. Uma chave só, porque é um provider por vez (§2).
 
-Os dois `LLM_MODEL_*` mantêm o nome, mas **perdem o default**: hoje têm valor de modelo
-Anthropic embutido no schema, o que passa a estar errado sob outro provider. Um default
-inválido falha em runtime, no meio de um job; sem default, o zod barra no boot com
-`Env inválida: LLM_MODEL_CAPABLE`.
+Os dois `LLM_MODEL_*` mantêm o nome, mas **perdem o default**: hoje têm um id de modelo
+Anthropic embutido no schema, o que fica errado sob qualquer outro provider. Um default
+inválido falha em runtime, no meio de um job; sem default, o erro aparece no boot.
+
+Todas são opcionais, mas interdependentes — a regra está em D4.1.
+
+### D4.1 — LLM é opcional no boot
+
+As quatro envs de LLM são **opcionais**. A aplicação sobe sem nenhuma delas.
+
+Hoje `ANTHROPIC_API_KEY` é obrigatória, então nada roda sem chave de LLM: nem a landing,
+nem o login, nem viagens, nem Places. Isso acopla o app inteiro a um fornecedor pago só para
+existir, e é o que trava quem clona o repo para rodar local.
+
+Regra do schema, via `superRefine`:
+
+- Nenhuma das quatro presente → LLM desligado.
+- `LLM_PROVIDER` presente → `LLM_API_KEY`, `LLM_MODEL_CAPABLE` e `LLM_MODEL_CHEAP` passam a
+  ser obrigatórias. Meia configuração é erro de boot, não falha silenciosa em runtime.
+
+Com LLM desligado, `LlmModule` injeta um `DisabledLlmProvider` que lança
+`DomainError("llm_not_configured", ...)` **na chamada**, não no boot. Consequências:
+
+| Fluxo | Sem LLM |
+|---|---|
+| Landing, waitlist, login, onboarding, CRUD de viagem | funcionam |
+| Places, enrich, `swap_restaurant` | funcionam (não usam LLM) |
+| Descoberta de destino, geração de roteiro, chat | erro claro `llm_not_configured` |
+
+`llm_not_configured` mapeia para **503** no `DomainExceptionFilter` — é indisponibilidade de
+configuração, não erro do cliente. No job de roteiro, cai no caminho de falha que já existe:
+`itineraries.status = failed` com a mensagem.
+
+Isto é o que torna o LLM de fato um módulo desacoplado, e não só um fornecedor trocável.
 
 ### D5 — Saída estruturada de verdade
 
@@ -201,6 +231,7 @@ ItineraryGenerateHandler
 
 | Situação | Comportamento |
 |---|---|
+| LLM não configurado | `DomainError("llm_not_configured", ...)` na chamada → **503**. App sobe normal; só os fluxos de LLM recusam (D4.1) |
 | Provider fora do ar / rede | erro propaga; no job, `itineraries.status = failed` (igual hoje) |
 | Saída não bate o schema | `DomainError("llm_invalid_output", ...)`, mesmo código de hoje — contrato HTTP 502 preservado |
 | `iata` fora da shortlist | idem, `llm_invalid_output` |
@@ -227,7 +258,7 @@ superfície de terceiro, e é fino o bastante para cobrir inteiro.
 
 | Risco | Mitigação |
 |---|---|
-| **Bump de zod.** `ai@7` exige `zod ^3.25.76 \|\| ^4.1.8`; o projeto está em `^3.23.0`, e todo pacote usa zod. | Bump para `^3.25.76` (mesmo major, sem breaking change esperado) antes de tudo, com a suíte inteira verde como gate. Se quebrar, o refactor para aqui e vira decisão à parte. |
+| **Faixa de zod declarada abaixo do peer.** `ai@7` exige `zod ^3.25.76 \|\| ^4.1.8`; `apps/api`, `apps/web` e `packages/shared` declaram `^3.23.0`. | **Risco menor do que parecia:** o `pnpm-lock.yaml` já resolve `zod@3.25.76`, que satisfaz o peer. Só a faixa declarada sobe para `^3.25.76`; nenhuma dependência muda de versão instalada. Mesmo assim é o primeiro passo, com a suíte verde como gate. |
 | **Churn do AI SDK.** Major novo quebra API. | A porta isola: o estrago fica em `ai-sdk.provider.ts`. Versão pinada exata no `package.json`. |
 | **Modelo do Groq desobedece.** Modelos abertos erram mais em JSON estrito e tool-calling. | `generateObject` força schema, o que é estritamente melhor que o prompt+parse de hoje. Ainda assim, provider gratuito pode falhar mais; a decisão de qual modelo usar continua sendo config, não código. |
 | **Refatorar o chat recém-mergeado.** Passo 7 entrou hoje e seus testes de integração nunca rodaram fora do CI. | Rodar a suíte do Passo 7 verde **antes** de encostar nela, para separar bug pré-existente de regressão do refactor. |
