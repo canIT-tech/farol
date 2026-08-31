@@ -1,19 +1,13 @@
 "use client";
 
-import { type FormEvent, useCallback, useEffect, useState } from "react";
+import { type FormEvent, type ReactNode, useCallback, useEffect, useState } from "react";
 import { fetchWaitlistCount, submitWaitlist } from "../lib/waitlist";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 type Status = "idle" | "sending" | "ok" | "error";
 
-function WaitlistForm({
-  source,
-  onJoined
-}: {
-  source: string;
-  onJoined: () => void;
-}) {
+function WaitlistForm({ source, onJoined }: { source: string; onJoined: () => void }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
@@ -72,6 +66,316 @@ function WaitlistForm({
   );
 }
 
+function Shot({ url, children }: { url: string; children: ReactNode }) {
+  return (
+    <div className="shot" aria-hidden="true">
+      <div className="shot-bar">
+        <i />
+        <i />
+        <i />
+        <span>{url}</span>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+const MiniSide = ({ dest }: { dest: string }) => (
+  <aside className="mini-side">
+    <div className="lg">
+      Farol<i>.</i>
+    </div>
+    <div className="kv">
+      Origem <b>São Paulo · GRU</b>
+    </div>
+    <div className="kv">
+      Datas <b>10 – 17 mai</b>
+    </div>
+    <div className="kv">
+      {dest}
+    </div>
+    <div className="mini-step done">
+      <span className="dot" />
+      Perfil de gosto
+    </div>
+    <div className="mini-step done">
+      <span className="dot" />
+      Escolher destino
+    </div>
+    <div className="mini-step on">
+      <span className="dot" />
+      Roteiro
+    </div>
+    <div className="mini-step">
+      <span className="dot" />
+      Voo &amp; hotel
+    </div>
+  </aside>
+);
+
+function ShotOnboarding() {
+  return (
+    <Shot url="farol.app/onboarding">
+      <div className="ob">
+        <div className="prog">
+          <i />
+        </div>
+        <h4>O que te move numa viagem?</h4>
+        <p className="obsub">Escolha ao menos 3. Isso ajusta destino e roteiro.</p>
+        <div className="ob-grid">
+          <div className="ob-tile on">Praia</div>
+          <div className="ob-tile on">Gastronomia</div>
+          <div className="ob-tile">Cultura</div>
+          <div className="ob-tile on">Natureza</div>
+          <div className="ob-tile">Vida noturna</div>
+          <div className="ob-tile">Compras</div>
+        </div>
+        <div className="ob-field">Ritmo da viagem</div>
+        <div className="ob-seg">
+          <span>Relaxado</span>
+          <span className="on">Moderado</span>
+          <span>Intenso</span>
+        </div>
+        <div>
+          <span className="ob-cta">Continuar →</span>
+        </div>
+      </div>
+    </Shot>
+  );
+}
+
+function ShotDiscovery() {
+  return (
+    <Shot url="farol.app/viagem/descoberta">
+      <div className="mini">
+        <MiniSide dest="Gostos · Praia · gastronomia" />
+        <div className="mini-main">
+          <h4 className="mini-h">4 destinos pra você</h4>
+          <p className="mini-sub">Ordenados por aderência ao seu perfil. Custo para 2 pessoas.</p>
+          <div className="dgrid">
+            <div className="dcard top">
+              <div className="ph ph-a">
+                <span className="bdg">94%</span>
+              </div>
+              <div className="bd">
+                <div className="ct">Cartagena</div>
+                <div className="cy">Colômbia</div>
+                <div className="mb">
+                  <i style={{ width: "94%" }} />
+                </div>
+                <p className="rt">
+                  Praia e um centro histórico que já é um roteiro gastronômico. Maio é seco.
+                </p>
+                <div className="st">
+                  <span>
+                    <b>31°</b> seco
+                  </span>
+                  <span>
+                    <b>5h</b> direto
+                  </span>
+                  <span>
+                    <b>R$ 4,1k</b>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="dcard">
+              <div className="ph ph-b">
+                <span className="bdg">85%</span>
+              </div>
+              <div className="bd">
+                <div className="ct">Lisboa</div>
+                <div className="cy">Portugal</div>
+                <div className="mb">
+                  <i style={{ width: "85%" }} />
+                </div>
+                <p className="rt">
+                  Clima ameno, ladeiras históricas e praia a 30 minutos quando bater vontade.
+                </p>
+                <div className="st">
+                  <span>
+                    <b>21°</b> ameno
+                  </span>
+                  <span>
+                    <b>9h30</b> direto
+                  </span>
+                  <span>
+                    <b>R$ 5,6k</b>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside className="mini-rail">
+          <div className="rlbl">Assessor</div>
+          <span className="mb-bub a">Cartagena lidera: praia e gastronomia no mesmo lugar.</span>
+          <span className="mb-bub u">o de Lisboa cabe no orçamento?</span>
+          <span className="mb-bub a">No limite — uns R$ 600 acima. Dá pra fechar cortando 1 noite.</span>
+        </aside>
+      </div>
+    </Shot>
+  );
+}
+
+function ShotItinerary() {
+  return (
+    <Shot url="farol.app/viagem/roteiro">
+      <div className="mini">
+        <MiniSide dest="Destino · Cartagena, Colômbia" />
+        <div className="mini-main">
+          <h4 className="mini-h">Cartagena · 7 dias</h4>
+          <p className="mini-sub">10 – 17 de maio · ritmo moderado · praia e gastronomia</p>
+          <div className="daystrip-mini">
+            <span className="on">Dia 1</span>
+            <span>Dia 2</span>
+            <span>Dia 3</span>
+            <span>Dia 4</span>
+            <span>Dia 5</span>
+            <span>Dia 6</span>
+            <span>Dia 7</span>
+          </div>
+          <div className="day-h">
+            <h4>Dia 1 — Chegada e Cidade Amuralhada</h4>
+            <span className="chip">31° ensolarado</span>
+            <span className="chip">R$ 210 no dia</span>
+          </div>
+          <div className="tl-entry">
+            <span className="tm">09:00</span>
+            <div className="tl-card">
+              <span className="tl-thumb" />
+              <div>
+                <div className="nm">Cidade Amuralhada a pé</div>
+                <div className="mt">Centro histórico · comece cedo para evitar o calor.</div>
+                <div className="tgs">
+                  <span>Passeio</span>
+                  <span>~2h</span>
+                  <span>Grátis</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="tl-entry">
+            <span className="tm">12:30</span>
+            <div className="tl-card">
+              <span className="tl-thumb t2" />
+              <div>
+                <div className="nm">Almoço — La Cevichería</div>
+                <div className="mt">Frutos do mar · chegar antes das 13h.</div>
+                <div className="tgs">
+                  <span>Restaurante</span>
+                  <span>$$</span>
+                  <span>4.5 ★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="tl-entry">
+            <span className="tm">15:00</span>
+            <div className="tl-card">
+              <span className="tl-thumb t3" />
+              <div>
+                <div className="nm">Praia de Bocagrande</div>
+                <div className="mt">Tarde livre à beira-mar.</div>
+                <div className="tgs">
+                  <span>Praia</span>
+                  <span>Livre</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside className="mini-rail">
+          <div className="rlbl">Assessor</div>
+          <span className="mb-bub u">tira o dia de museu e põe mais praia</span>
+          <span className="mb-bub a">Feito — o Dia 4 virou praia com passeio de barco. Custo do dia caiu R$ 120.</span>
+        </aside>
+      </div>
+    </Shot>
+  );
+}
+
+function ShotFlights() {
+  return (
+    <Shot url="farol.app/viagem/voo-hotel">
+      <div className="mini">
+        <MiniSide dest="Roteiro · 7 dias montados" />
+        <div className="mini-main">
+          <h4 className="mini-h">Voo &amp; hotel</h4>
+          <p className="mini-sub">GRU → CTG · 10 – 17 mai. A reserva é concluída no site do parceiro.</p>
+          <div className="mini-tabs">
+            <span className="on">Voos</span>
+            <span>Hotéis</span>
+          </div>
+          <div className="offer-mini best">
+            <span className="al">AV</span>
+            <span className="rt2">
+              08:15 → 13:40
+              <small>GRU → CTG · direto · 5h25</small>
+            </span>
+            <span className="pr">
+              R$ 2.140
+              <small>ou ~92k milhas</small>
+            </span>
+          </div>
+          <div className="offer-mini">
+            <span className="al">LA</span>
+            <span className="rt2">
+              10:50 → 18:05
+              <small>GRU → CTG · 1 escala · BOG</small>
+            </span>
+            <span className="pr">
+              R$ 1.980
+              <small>ou ~78k milhas</small>
+            </span>
+          </div>
+          <p className="fresh-mini">Preços atualizados há 8 min · confirmados no site do parceiro.</p>
+          <div className="hgrid">
+            <div className="hcard-mini">
+              <div className="hph" />
+              <div className="hb">
+                <div className="hn">Casa del Arzobispado</div>
+                <div className="ha">Centro Histórico</div>
+                <div className="hr">
+                  <span className="rate">4.7 ★</span>
+                  <span>R$ 320</span>
+                </div>
+              </div>
+            </div>
+            <div className="hcard-mini">
+              <div className="hph h2" />
+              <div className="hb">
+                <div className="hn">Hotel Getsemaní 24</div>
+                <div className="ha">Perto da vida noturna</div>
+                <div className="hr">
+                  <span className="rate">4.5 ★</span>
+                  <span>R$ 240</span>
+                </div>
+              </div>
+            </div>
+            <div className="hcard-mini">
+              <div className="hph h3" />
+              <div className="hb">
+                <div className="hn">Bocagrande Mar</div>
+                <div className="ha">Pé na areia</div>
+                <div className="hr">
+                  <span className="rate">4.4 ★</span>
+                  <span>R$ 280</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside className="mini-rail">
+          <div className="rlbl">Assessor</div>
+          <span className="mb-bub a">O direto da Avianca chega a tempo do almoço do Dia 1.</span>
+          <span className="mb-bub u">tem algo mais barato saindo sábado?</span>
+        </aside>
+      </div>
+    </Shot>
+  );
+}
+
 export default function HomePage() {
   const [count, setCount] = useState<number | null>(null);
 
@@ -111,7 +415,9 @@ export default function HomePage() {
           </p>
           <WaitlistForm source="landing-hero" onJoined={bumpCount} />
           {count !== null ? (
-            <p className="count">{count} pessoa{count === 1 ? "" : "s"} já na lista.</p>
+            <p className="count">
+              {count} pessoa{count === 1 ? "" : "s"} já na lista.
+            </p>
           ) : null}
         </section>
 
@@ -124,51 +430,59 @@ export default function HomePage() {
         </section>
 
         <section className="wrap">
-          <p className="eyebrow">Como funciona</p>
-          <ol className="steps">
-            <li>
-              <h3>Conta o gosto</h3>
-              <p>Ritmo, companhia, orçamento e o que você curte. Sem formulário infinito.</p>
-            </li>
-            <li>
-              <h3>Recebe o destino</h3>
-              <p>
-                Uma lista curta com o porquê de cada um — clima, custo estimado, tempo de voo.
-              </p>
-            </li>
-            <li>
-              <h3>Vê o roteiro</h3>
-              <p>Dia a dia montado, com margem para respirar. Nada de agenda militar.</p>
-            </li>
-            <li>
-              <h3>Ajusta conversando</h3>
-              <p>“Menos museu, mais praia” e o plano se refaz na hora.</p>
-            </li>
-          </ol>
-        </section>
+          <p className="eyebrow">A experiência, tela por tela</p>
+          <p className="lead">
+            Do gosto ao roteiro pronto, sem sair de uma conversa. As telas abaixo são do
+            protótipo — nomes de lugares e preços são exemplos.
+          </p>
+          <div className="exp">
+            <figure>
+              <ShotOnboarding />
+              <figcaption>
+                <span className="step-n">01</span>
+                <h3>Conta o gosto</h3>
+                <p>
+                  Ritmo, companhia, orçamento e o que você curte. Sem formulário infinito — o
+                  resto o Farol infere.
+                </p>
+              </figcaption>
+            </figure>
 
-        <section className="wrap">
-          <p className="eyebrow">Ajuste por conversa</p>
-          <p className="lead">Você fala com o Farol como falaria com um amigo que viaja muito.</p>
-          <div className="adjust-grid">
-            <div className="chat">
-              <span className="bubble you">Tem algo mais tranquilo que Lisboa?</span>
-              <span className="bubble farol">
-                Porto encaixa melhor no seu ritmo: mesma comida e vinho, metade da agitação.
-                Troco o destino?
-              </span>
-              <span className="bubble you">Troca.</span>
-            </div>
-            <div className="card">
-              <h3>Porto</h3>
-              <p className="place">Portugal · voo ~10h de GRU</p>
-              <span className="match">82% de aderência ao seu gosto</span>
-              <ul>
-                <li>Ritmo tranquilo, caminhável</li>
-                <li>Gastronomia e vinho no centro do roteiro</li>
-                <li>Custo estimado 15% abaixo do seu teto</li>
-              </ul>
-            </div>
+            <figure>
+              <ShotDiscovery />
+              <figcaption>
+                <span className="step-n">02</span>
+                <h3>Recebe destinos com o porquê</h3>
+                <p>
+                  Uma lista curta, ordenada por aderência. Cada um vem com clima, tempo de voo
+                  e custo estimado — e o assessor no trilho lateral explica a escolha.
+                </p>
+              </figcaption>
+            </figure>
+
+            <figure>
+              <ShotItinerary />
+              <figcaption>
+                <span className="step-n">03</span>
+                <h3>Vê o roteiro dia a dia</h3>
+                <p>
+                  Manhã, tarde e noite montadas, com margem para respirar. “Menos museu, mais
+                  praia” no chat e o dia se refaz na hora.
+                </p>
+              </figcaption>
+            </figure>
+
+            <figure>
+              <ShotFlights />
+              <figcaption>
+                <span className="step-n">04</span>
+                <h3>Voo e hotel, com link pro parceiro</h3>
+                <p>
+                  As melhores opções para as suas datas, em dinheiro (e milhas, depois). A
+                  compra é concluída no site do parceiro — o Farol não fecha a reserva.
+                </p>
+              </figcaption>
+            </figure>
           </div>
         </section>
 
@@ -211,7 +525,9 @@ export default function HomePage() {
           </h1>
           <WaitlistForm source="landing-footer" onJoined={bumpCount} />
           {count !== null ? (
-            <p className="count">{count} pessoa{count === 1 ? "" : "s"} já na lista.</p>
+            <p className="count">
+              {count} pessoa{count === 1 ? "" : "s"} já na lista.
+            </p>
           ) : null}
         </section>
       </main>
