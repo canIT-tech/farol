@@ -46,6 +46,12 @@ export class ItineraryController {
     return this.itinerary.regenerateDay(user.id, tripId, Number(dayIndex));
   }
 
+  @Post("itinerary/enrich")
+  @HttpCode(202)
+  enrich(@CurrentUser() user: CurrentUserType, @Param("id") tripId: string): Promise<void> {
+    return this.itinerary.requestEnrich(user.id, tripId);
+  }
+
   @Post("itinerary/items/:itemId/swap-restaurant")
   swapRestaurant(
     @CurrentUser() user: CurrentUserType,

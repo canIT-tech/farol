@@ -4,15 +4,21 @@ import {
   JOB_QUEUE,
   ItineraryGenerateHandler,
   ItineraryRegenerateDayHandler,
+  PlacesEnrichHandler,
   type JobQueue
 } from "@farol/api";
-import type { ItineraryGenerateData, ItineraryRegenerateDayData } from "@farol/api";
+import type {
+  ItineraryGenerateData,
+  ItineraryRegenerateDayData,
+  PlacesEnrichData
+} from "@farol/api";
 
 // Liga cada nome de fila ao seu handler. Chamado uma vez no bootstrap do worker.
 export async function registerHandlers(app: INestApplicationContext): Promise<void> {
   const queue = app.get<JobQueue>(JOB_QUEUE);
   const generate = app.get(ItineraryGenerateHandler);
   const regenerateDay = app.get(ItineraryRegenerateDayHandler);
+  const placesEnrich = app.get(PlacesEnrichHandler);
 
   await queue.work<ItineraryGenerateData>(JOB_NAMES.itineraryGenerate, (data) =>
     generate.handle(data)
@@ -20,4 +26,5 @@ export async function registerHandlers(app: INestApplicationContext): Promise<vo
   await queue.work<ItineraryRegenerateDayData>(JOB_NAMES.itineraryRegenerateDay, (data) =>
     regenerateDay.handle(data)
   );
+  await queue.work<PlacesEnrichData>(JOB_NAMES.placesEnrich, (data) => placesEnrich.handle(data));
 }

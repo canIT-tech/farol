@@ -96,7 +96,8 @@ describe("parseEnv", () => {
   });
 
   it("lança quando GOOGLE_PLACES_KEY falta", () => {
-    const { GOOGLE_PLACES_KEY: _omitida, ...semChave } = valid;
+    const semChave: Record<string, string | undefined> = { ...valid };
+    delete semChave.GOOGLE_PLACES_KEY;
     expect(() => parseEnv(semChave)).toThrow(/GOOGLE_PLACES_KEY/);
   });
 

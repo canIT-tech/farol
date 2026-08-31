@@ -172,7 +172,7 @@ describe("ItineraryGenerateHandler.handle", () => {
 
   it("enriquece os itens usando cidade e país do destino escolhido", async () => {
     const { itineraryId } = await scenario();
-    const findFirst = vi.fn((_query: string) => Promise.resolve(null));
+    const findFirst = vi.fn<PlacesService["findFirst"]>(() => Promise.resolve(null));
     const enriching = new ItineraryGenerateHandler(repo, new FakeLlmService(), db, {
       findFirst
     } as unknown as PlacesService);

@@ -28,6 +28,13 @@ describe("ItineraryController", () => {
     expect(regenerateDay).toHaveBeenCalledWith("u-1", "t-1", 2);
   });
 
+  it("POST .../itinerary/enrich delega para requestEnrich", async () => {
+    const requestEnrich = vi.fn().mockResolvedValue(undefined);
+    const controller = new ItineraryController({ requestEnrich } as unknown as ItineraryService);
+    await controller.enrich(user, "t-1");
+    expect(requestEnrich).toHaveBeenCalledWith("u-1", "t-1");
+  });
+
   it("POST .../items/:itemId/swap-restaurant delega para swapRestaurant", async () => {
     const swapRestaurant = vi.fn().mockResolvedValue({ id: "i-1", title: "Tasca" });
     const controller = new ItineraryController({ swapRestaurant } as unknown as ItineraryService);

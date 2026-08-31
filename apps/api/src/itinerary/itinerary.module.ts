@@ -6,6 +6,7 @@ import { ItineraryService } from "./itinerary.service";
 import { ItineraryRepository } from "./itinerary.repository";
 import { ItineraryGenerateHandler } from "./itinerary-generate.handler";
 import { ItineraryRegenerateDayHandler } from "./itinerary-regenerate-day.handler";
+import { PlacesEnrichHandler } from "./places-enrich.handler";
 
 @Module({
   imports: [TripsModule, PlacesModule],
@@ -14,8 +15,14 @@ import { ItineraryRegenerateDayHandler } from "./itinerary-regenerate-day.handle
     ItineraryService,
     ItineraryRepository,
     ItineraryGenerateHandler,
-    ItineraryRegenerateDayHandler
+    ItineraryRegenerateDayHandler,
+    PlacesEnrichHandler
   ],
-  exports: [ItineraryRepository, ItineraryGenerateHandler, ItineraryRegenerateDayHandler]
+  exports: [
+    ItineraryRepository,
+    ItineraryGenerateHandler,
+    ItineraryRegenerateDayHandler,
+    PlacesEnrichHandler
+  ]
 })
 export class ItineraryModule {}

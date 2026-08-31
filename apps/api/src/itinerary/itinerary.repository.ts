@@ -284,6 +284,23 @@ export class ItineraryRepository {
     });
   }
 
+  // "Cidade, País" do destino escolhido — a dica de busca do enrich.
+  async destinationHint(itineraryId: string): Promise<string | null> {
+    const rows = await this.db
+      .select({ city: tripDestinations.city, country: tripDestinations.country })
+      .from(itineraries)
+      .innerJoin(
+        tripDestinations,
+        and(
+          eq(tripDestinations.tripId, itineraries.tripId),
+          eq(tripDestinations.chosen, true)
+        )
+      )
+      .where(eq(itineraries.id, itineraryId));
+    const row = rows[0];
+    return row === undefined ? null : `${row.city}, ${row.country}`;
+  }
+
   // Item do roteiro, restrito à viagem — evita mexer em item de outra trip.
   async itemOfTrip(tripId: string, itemId: string): Promise<ItemRow | null> {
     const rows = await this.db

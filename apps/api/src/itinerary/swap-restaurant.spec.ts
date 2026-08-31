@@ -139,7 +139,7 @@ describe("ItineraryService.swapRestaurant", () => {
 
   it("busca perto das coordenadas do item, filtrando por restaurante", async () => {
     const { userId, tripId, mealId } = await seed();
-    const findFirst = vi.fn((_query: string, _opts?: unknown) => Promise.resolve(TASCA));
+    const findFirst = vi.fn<PlacesService["findFirst"]>(() => Promise.resolve(TASCA));
     await serviceWith(findFirst as unknown as PlacesService["findFirst"]).swapRestaurant(
       userId,
       tripId,
@@ -154,7 +154,7 @@ describe("ItineraryService.swapRestaurant", () => {
 
   it("usa a cozinha pedida na busca", async () => {
     const { userId, tripId, mealId } = await seed();
-    const findFirst = vi.fn((_query: string, _opts?: unknown) => Promise.resolve(TASCA));
+    const findFirst = vi.fn<PlacesService["findFirst"]>(() => Promise.resolve(TASCA));
     await serviceWith(findFirst as unknown as PlacesService["findFirst"]).swapRestaurant(
       userId,
       tripId,
@@ -167,7 +167,7 @@ describe("ItineraryService.swapRestaurant", () => {
 
   it("item sem coordenadas busca só pela cozinha, sem near", async () => {
     const { userId, tripId, mealSemCoordId } = await seed();
-    const findFirst = vi.fn((_query: string, _opts?: unknown) => Promise.resolve(TASCA));
+    const findFirst = vi.fn<PlacesService["findFirst"]>(() => Promise.resolve(TASCA));
     await serviceWith(findFirst as unknown as PlacesService["findFirst"]).swapRestaurant(
       userId,
       tripId,

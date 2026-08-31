@@ -140,6 +140,25 @@ describe("roteiro", () => {
     expect(res.body.code).toBe("itinerary_not_ready");
   });
 
+  it("POST .../itinerary/enrich sem auth responde 401", async () => {
+    const res = await request(app.getHttpServer()).post("/trips/x/itinerary/enrich");
+    expect(res.status).toBe(401);
+  });
+
+  it("POST .../itinerary/enrich responde 202 com o roteiro criado", async () => {
+    const u = await newUser();
+    const tripId = await tripWithCandidate(u.auth);
+    await request(app.getHttpServer())
+      .post(`/trips/${tripId}/destination`)
+      .set("Authorization", u.auth)
+      .send({ iata: "LIS" });
+
+    const res = await request(app.getHttpServer())
+      .post(`/trips/${tripId}/itinerary/enrich`)
+      .set("Authorization", u.auth);
+    expect(res.status).toBe(202);
+  });
+
   it("POST .../items/:itemId/swap-restaurant sem auth responde 401", async () => {
     const res = await request(app.getHttpServer()).post("/trips/x/itinerary/items/y/swap-restaurant");
     expect(res.status).toBe(401);

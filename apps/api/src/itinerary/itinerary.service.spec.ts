@@ -200,3 +200,36 @@ describe("ItineraryService.regenerateDay", () => {
     });
   });
 });
+
+describe("ItineraryService.requestEnrich", () => {
+  it("enfileira places.enrich para a versão atual do roteiro", async () => {
+    const userId = await makeUser();
+    const tripId = await tripWithCandidate(userId);
+    const { itineraryId } = await service.chooseDestination(userId, tripId, "LIS");
+    publish.mockClear();
+
+    await service.requestEnrich(userId, tripId);
+
+    expect(publish).toHaveBeenCalledWith(JOB_NAMES.placesEnrich, { itineraryId });
+  });
+
+  it("sem roteiro ainda responde not_found e não enfileira", async () => {
+    const userId = await makeUser();
+    const tripId = await tripWithCandidate(userId);
+    publish.mockClear();
+
+    await expect(service.requestEnrich(userId, tripId)).rejects.toMatchObject({
+      code: "not_found"
+    });
+    expect(publish).not.toHaveBeenCalled();
+  });
+
+  it("propaga ForbiddenError de outro usuário", async () => {
+    const owner = await makeUser();
+    const intruder = await makeUser();
+    const tripId = await tripWithCandidate(owner);
+    await expect(service.requestEnrich(intruder, tripId)).rejects.toMatchObject({
+      code: "forbidden"
+    });
+  });
+});

@@ -59,6 +59,13 @@ export class ItineraryService {
     await this.queue.publish(JOB_NAMES.itineraryRegenerateDay, { itineraryId: latest.id, dayIndex });
   }
 
+  // Enfileira uma nova rodada de enrich para a versão atual do roteiro.
+  async requestEnrich(userId: string, tripId: string): Promise<void> {
+    await this.trips.get(userId, tripId);
+    const latest = await this.requireLatest(tripId);
+    await this.queue.publish(JOB_NAMES.placesEnrich, { itineraryId: latest.id });
+  }
+
   // Troca o restaurante de um item de refeição por outro perto dele (design §6.4).
   async swapRestaurant(
     userId: string,

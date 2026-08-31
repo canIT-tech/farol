@@ -8,14 +8,20 @@ import {
   PlacesModule,
   ItineraryRepository,
   ItineraryGenerateHandler,
-  ItineraryRegenerateDayHandler
+  ItineraryRegenerateDayHandler,
+  PlacesEnrichHandler
 } from "@farol/api";
 
 // Processo de jobs: só a infra + os handlers, sem HTTP (nada de controllers/guards).
 // ProvidersModule/PlacesModule entram porque o enrich do roteiro (Passo 6) roda aqui.
 @Module({
   imports: [ConfigModule, DbModule, LlmModule, JobsModule, ProvidersModule, PlacesModule],
-  providers: [ItineraryRepository, ItineraryGenerateHandler, ItineraryRegenerateDayHandler],
-  exports: [ItineraryGenerateHandler, ItineraryRegenerateDayHandler]
+  providers: [
+    ItineraryRepository,
+    ItineraryGenerateHandler,
+    ItineraryRegenerateDayHandler,
+    PlacesEnrichHandler
+  ],
+  exports: [ItineraryGenerateHandler, ItineraryRegenerateDayHandler, PlacesEnrichHandler]
 })
 export class WorkerModule {}
