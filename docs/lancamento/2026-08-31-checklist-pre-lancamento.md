@@ -15,7 +15,7 @@ Legenda: 🔴 não começou · 🟡 em andamento · ✅ feito · ⬜ opcional/de
 | # | Frente | Dono(s) | Status | Bloqueia |
 |---|---|---|---|---|
 | 1 | Terminar de codar e testar | rafinha | 🔴 | lançamento do produto |
-| 2 | Achar um domínio decente | rafinha · xandinho · felippe | 🔴 | tudo que é público (site, e-mail, DNS) |
+| 2 | Domínio — **`farolviagens.com`** definido, falta registrar + DNS | rafinha · xandinho · felippe | 🟡 | tudo que é público (site, e-mail, DNS) |
 | 3 | Cadastro na Stripe | felippe *(a confirmar)* | 🔴 | pagamento no código · abertura |
 | 4 | Termos de uso + Privacidade | felippe | 🔴 | captar e-mail com tranquilidade · pagamento |
 | 5 | LLM — setup da API | rafinha | 🔴 | descoberta, roteiro, chat |
@@ -34,9 +34,10 @@ Backlog de implementação (ver `CLAUDE.md` › "Próximos passos"). Ordem = dep
   `chat_messages`. Depende de 4 + 5 + 6. **Maior bloco de código restante.**
 - **Passo 8 — UI web + E2E**. Ligar as telas do `apps/web` ao `apps/api` + fluxo
   Playwright login → onboarding → descoberta → destino → roteiro. Depende do 7.
-- **Pagamento no código (novo — não está no backlog):** `PaymentModule` + webhook Stripe
-  (checkout da viagem R$ 39 / pacote R$ 89, evento de pagamento confirmado libera o
-  produto completo). Depende do item 3 (cadastro Stripe).
+- **Pagamento no código (novo — não está no backlog):** `PaymentModule` + webhook Stripe.
+  **Spec pronta:** `docs/negocio/2026-08-31-spec-pagamento.md` — modelo de crédito
+  (avulso = 1, pacote = 3, sem expiração), conta primeiro, gate no `itinerary.generate`,
+  reembolso CDC. Depende do item 3 (cadastro Stripe).
 - **Débito técnico** (`docs/superpowers/plans/2026-08-29-correcao-debito-tecnico.md`):
   pelo menos A2 (envs no CI) e C3 (warning de eslint) antes de abrir PRs de produção.
   Placeholders da pipeline fecham junto do Passo 6.
@@ -46,14 +47,17 @@ verdes (baseline de testes do projeto). PR que não bate os gates não entra.
 
 ---
 
-## 2. Achar um domínio decente — **rafinha · xandinho · felippe**
+## 2. Domínio — **rafinha · xandinho · felippe**
 
-- `farol.app` é o nome de trabalho, **ainda não confirmado** (pendência antiga no `CLAUDE.md`).
-- Checar disponibilidade e preço de `farol.app` e alternativas (`.com`, `.com.br`,
-  `usefarol.*`, `farol.travel`, `appfarol.*`). Ter **2ª e 3ª opção** antes de decidir.
-- Registrar assim que decidir — trava o nome, o e-mail (`@dominio`) e o DNS para hosting.
-- Depois: apontar DNS para o hosting (item 6) e configurar e-mail transacional
-  (SPF/DKIM/DMARC) para não cair em spam.
+- ✅ **Decidido: `farolviagens.com`** (2026-08-31). Escolhido sobre `faroltravel.com.br`:
+  "viagens" é o termo que o brasileiro busca (melhor CTR/recall), `.com` não tem teto
+  geográfico, e a marca fica coerente em português.
+- **Registrar** `farolviagens.com` + os defensivos `farolviagens.com.br` e `faroltravel.com.br`.
+- Apontar DNS para o hosting (item 6) e ligar HTTPS.
+- Como é gTLD (`.com`): configurar geo-targeting p/ Brasil no Search Console + `hreflang` pt-BR.
+- Configurar e-mail transacional em `@farolviagens.com` (SPF/DKIM/DMARC) para não cair em spam.
+- Trocar as URLs de trabalho (`NEXT_PUBLIC_API_URL` e refs no PRD) por `farolviagens.com`.
+  Telas de marca/B2B (`docs/design/**`) já atualizadas — falta reseed + republish dos canvases.
 
 ---
 
@@ -167,6 +171,6 @@ GTM (Sala do Farol, IG, Ads) ─────────────────
 ## Riscos
 
 - **Stripe onboarding BR** pode levar dias — não deixar para o fim.
-- **`farol.app`** pode estar tomado — ter alternativas antes de comunicar o nome.
+- **`farolviagens.com`** ainda não registrado — registrar antes de comunicar o nome publicamente.
 - **Passo 7 (chat)** é o maior bloco de código restante e depende de 5 + 6.
 - **Teto de custo de LLM** ainda indefinido — sem ele, a margem por viagem é chute.

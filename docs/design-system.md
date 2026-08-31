@@ -318,4 +318,4 @@ type AppShellProps = {
 | DS3 | Ícones | montar o set inicial (~24 ícones) como sprite React a partir do manual. |
 | DS4 | Bricolage no app | confirmar licença/entrega (self-host WOFF2 vs. Google Fonts CDN). |
 | DS5 | Motion | definir presets de entrada (fade+rise 8px, `--motion-base`, `--ease`) para cards e bolhas. |
-| DS6 | `farol.app` | confirmar domínio e locking do nome antes de aplicar em produção. |
+| DS6 | Domínio | ✅ `farolviagens.com` (2026-08-31). Telas de marca/B2B já atualizadas; falta registrar o domínio + reseed/republish dos canvases. |

@@ -531,9 +531,9 @@
             <td>lançamento do produto</td>
           </tr>
           <tr>
-            <td class="mono">2</td><td>Achar um domínio decente</td>
+            <td class="mono">2</td><td>Domínio — <span class="mono">farolviagens.com</span> definido, falta registrar + DNS</td>
             <td class="who">rafinha · xandinho · felippe</td>
-            <td><span class="status red">não começou</span></td>
+            <td><span class="status amber">em andamento</span></td>
             <td>tudo que é público (site, e-mail, DNS)</td>
           </tr>
           <tr>
@@ -579,7 +579,7 @@
       <li><strong>Passo 6 — Google Places + enrich.</strong> <span class="mono">GooglePlacesProvider</span>, <span class="mono">PlacesModule</span>, enrich no job do roteiro, <span class="mono">swap_restaurant</span>. Depende do Passo 4 (feito).</li>
       <li><strong>Passo 7 — Chat IA.</strong> <span class="mono">ChatModule</span>, loop de tool-calling, 9 tools → serviços, <span class="mono">chat_messages</span>. Depende de 4 + 5 + 6. <strong>Maior bloco de código restante.</strong></li>
       <li><strong>Passo 8 — UI web + E2E.</strong> Telas do <span class="mono">apps/web</span> ligadas ao <span class="mono">apps/api</span> + fluxo Playwright completo. Depende do 7.</li>
-      <li><strong>Pagamento no código</strong> <span class="tag new">novo</span> — <span class="mono">PaymentModule</span> + webhook Stripe (checkout R$ 39 / R$ 89; pagamento confirmado libera o produto completo). Depende do item 3.</li>
+      <li><strong>Pagamento no código</strong> <span class="tag new">novo</span> — <span class="mono">PaymentModule</span> + webhook Stripe. Spec pronta: <span class="mono">docs/negocio/2026-08-31-spec-pagamento.md</span> (modelo de crédito, gate no roteiro, reembolso CDC). Depende do item 3.</li>
       <li><strong>Débito técnico:</strong> pelo menos A2 (envs no CI) e C3 (warning de eslint) antes dos PRs de produção. Placeholders da pipeline fecham junto do Passo 6.</li>
     </ul>
     <div class="callout">
@@ -588,12 +588,14 @@
   </section>
 
   <section id="s2">
-    <h2><span class="num">02</span> Achar um domínio decente <span class="owner">rafinha · xandinho · felippe</span></h2>
+    <h2><span class="num">02</span> Domínio <span class="owner">rafinha · xandinho · felippe</span></h2>
     <ul>
-      <li><span class="mono">farol.app</span> é o nome de trabalho, <strong>ainda não confirmado</strong>.</li>
-      <li>Checar disponibilidade e preço de <span class="mono">farol.app</span> e alternativas (<span class="mono">.com</span>, <span class="mono">.com.br</span>, <span class="mono">usefarol.*</span>, <span class="mono">farol.travel</span>). Ter <strong>2ª e 3ª opção</strong> antes de decidir.</li>
-      <li>Registrar assim que decidir — trava o nome, o e-mail (<span class="mono">@dominio</span>) e o DNS para hosting.</li>
-      <li>Depois: apontar DNS para o hosting (item 6) e configurar e-mail transacional (SPF / DKIM / DMARC).</li>
+      <li>✅ <strong>Decidido: <span class="mono">farolviagens.com</span></strong> (2026-08-31) — sobre <span class="mono">faroltravel.com.br</span>: "viagens" é o que o brasileiro busca, <span class="mono">.com</span> sem teto geográfico, marca coerente em português.</li>
+      <li><strong>Registrar</strong> <span class="mono">farolviagens.com</span> + defensivos <span class="mono">farolviagens.com.br</span> e <span class="mono">faroltravel.com.br</span>.</li>
+      <li>Apontar DNS para o hosting (item 6) e ligar HTTPS.</li>
+      <li>gTLD: geo-targeting p/ Brasil no Search Console + <span class="mono">hreflang</span> pt-BR.</li>
+      <li>E-mail transacional em <span class="mono">@farolviagens.com</span> (SPF / DKIM / DMARC).</li>
+      <li>Trocar <span class="mono">NEXT_PUBLIC_API_URL</span> e refs do PRD por <span class="mono">farolviagens.com</span>. Telas de marca/B2B já atualizadas.</li>
     </ul>
   </section>
 
@@ -691,7 +693,7 @@ GTM (Sala do Farol, IG, Ads) ────────────► roda desde 
     <h2><span class="num">—</span> Riscos</h2>
     <ul>
       <li><strong>Stripe onboarding BR</strong> pode levar dias — não deixar para o fim.</li>
-      <li><strong><span class="mono">farol.app</span></strong> pode estar tomado — ter alternativas antes de comunicar o nome.</li>
+      <li><strong><span class="mono">farolviagens.com</span></strong> ainda não registrado — registrar antes de comunicar o nome publicamente.</li>
       <li><strong>Passo 7 (chat)</strong> é o maior bloco de código restante e depende de 5 + 6.</li>
       <li><strong>Teto de custo de LLM</strong> ainda indefinido — sem ele, a margem por viagem é chute.</li>
     </ul>

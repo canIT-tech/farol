@@ -4,7 +4,7 @@ Assessor de viagem que leva a pessoa do "não sei para onde ir" a um roteiro pro
 descobre o destino pelo gosto, acha a melhor forma de chegar (dinheiro ou milhas),
 monta o dia a dia e ajusta tudo por conversa.
 
-- **Nome:** Farol (nome de trabalho — domínio `farol.app` a confirmar)
+- **Nome:** Farol — marca pública **Farol Viagens**, domínio **`farolviagens.com`** (definido 2026-08-31; falta registrar)
 - **Codinome antigo:** trip
 - **Repo:** `git@github.com:canIT-tech/farol.git`
 - **Status:** fase de definição — PRD, design técnico e identidade prontos. Sem código de app ainda.
@@ -142,9 +142,9 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - Catálogo de destinos: CSV curado em `packages/db/data/destinations.csv` (23 cidades no Passo 3; `pnpm --filter @farol/db db:seed`). Expandir para ~200 é curadoria contínua.
 - Site parceiro para o deep-link de voo/hotel no MVP (template configurável via `FLIGHT_/HOTEL_DEEPLINK_TEMPLATE` desde o Passo 5).
 - Re-gravar as fixtures Amadeus **e Google Places** (`packages/providers/**/__fixtures__/*.json`) a partir das APIs reais — hoje são escritas à mão (Passos 5 e 6, sem credenciais).
-- Confirmar domínio `farol.app` e travar o nome antes de produção.
+- ~~Confirmar domínio~~ ✅ **`farolviagens.com`** (2026-08-31, sobre `faroltravel.com.br`). Falta: registrar (+ defensivos `farolviagens.com.br`, `faroltravel.com.br`), apontar DNS, geo-targeting BR no Search Console, e-mail transacional (SPF/DKIM/DMARC).
 - Escolher lib base de componentes (recomendação: Radix para overlays).
-- **Gateway de pagamento** para a viagem avulsa (R$ 39 / pacote R$ 89) — Stripe / Mercado Pago / Pagar.me. Não iniciado; é o que destrava a receita principal do modelo per-trip.
+- **Gateway de pagamento** para a viagem avulsa (R$ 39 / pacote R$ 89) — Stripe (fallback Mercado Pago / Pagar.me). Spec pronta: `docs/negocio/2026-08-31-spec-pagamento.md` (modelo de crédito, `PaymentModule`, webhook, gate no roteiro). Falta cadastro Stripe + implementação.
 
 ## Landing / waitlist (fora do backlog numerado)
 
