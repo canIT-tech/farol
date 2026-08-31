@@ -227,3 +227,24 @@ export const destinationCatalog = pgTable(
     iataIdx: index("destination_catalog_iata_idx").on(t.iata)
   })
 );
+
+// Histórico de mensagens do chat conversacional (design §6.4)
+export const chatMessages = pgTable(
+  "chat_messages",
+  {
+    id: uuid("id").primaryKey(),
+    tripId: uuid("trip_id")
+      .notNull()
+      .references(() => trips.id, { onDelete: "cascade" }),
+    role: text("role").notNull(),
+    content: text("content"),
+    toolCalls: jsonb("tool_calls").$type<unknown>(),
+    toolCallId: text("tool_call_id"),
+    name: text("name"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+  },
+  (t) => ({
+    tripIdx: index("chat_messages_trip_idx").on(t.tripId, t.createdAt)
+  })
+);
+

@@ -13,8 +13,10 @@ import {
   itineraries,
   itineraryDays,
   itineraryItems,
-  waitlist
+  waitlist,
+  chatMessages
 } from "./schema";
+
 
 type ColSpec = {
   name: string;
@@ -373,3 +375,32 @@ describe("schema.itineraryItems", () => {
     ]);
   });
 });
+
+describe("schema.chatMessages", () => {
+  checkColumns(chatMessages, "chat_messages", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    tripId: { name: "trip_id", sqlType: "uuid", notNull: true },
+    role: { name: "role", sqlType: "text", notNull: true },
+    content: { name: "content", sqlType: "text", notNull: false },
+    toolCalls: { name: "tool_calls", sqlType: "jsonb", notNull: false },
+    toolCallId: { name: "tool_call_id", sqlType: "text", notNull: false },
+    name: { name: "name", sqlType: "text", notNull: false },
+    createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true }
+  });
+
+  it("referencia trips.id com ON DELETE cascade", () => {
+    const fk = getTableConfig(chatMessages).foreignKeys[0]!;
+    const ref = fk.reference();
+    expect(ref.foreignTable).toBe(trips);
+    expect(ref.foreignColumns[0]!.name).toBe("id");
+    expect(fk.onDelete).toBe("cascade");
+  });
+
+  it("indexa (tripId, createdAt)", () => {
+    expect(indexColumnNames(chatMessages, "chat_messages_trip_idx")).toEqual([
+      "trip_id",
+      "created_at"
+    ]);
+  });
+});
+
