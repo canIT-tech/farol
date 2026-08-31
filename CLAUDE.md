@@ -163,7 +163,7 @@ Backlog de implementação. Ordem = dependência. Puxe pelo número.
 | 3 | Viagens + Descoberta de destino — `TripsModule`, catálogo seed (~200 cidades), `LlmModule`, `DiscoveryModule` (pré-filtro + ranking Claude) | ✅ concluído | felippebutland | — | 2 | (2026-08-29) |
 | 4 | Roteiro + Jobs — `JobsModule` (pg-boss), `apps/worker`, `ItineraryModule`, job `itinerary.generate`, polling no web | ✅ concluído | felippebutland | — | 3 | (2026-08-29) |
 | 5 | Providers Amadeus — `packages/providers`, auth OAuth2, `AmadeusFlightProvider` / `AmadeusHotelProvider`, `provider_cache`, resiliência, `FlightsModule` / `HotelsModule` | ✅ concluído | felippebutland | — | 3 | (2026-08-29) |
-| 6 | Google Places + enrich — `GooglePlacesProvider`, `PlacesModule`, passo de enrich no job do roteiro, `swap_restaurant` | 🟢 livre | — | — | 4 |
+| 6 | Google Places + enrich — `GooglePlacesProvider`, `PlacesModule`, passo de enrich no job do roteiro, `swap_restaurant` | 🟡 em andamento | rafaignaulin | `rafaignaulin/passo-6-places-enrich` | 4 | (2026-08-31) |
 | 7 | Chat IA — `ChatModule`, loop de tool-calling, as 9 tools mapeadas para serviços, `chat_messages` | 🟢 livre | — | — | 4, 5, 6 |
 | 8 | UI web + E2E — telas ligadas ao `apps/api`, fluxo Playwright login→onboarding→descoberta→destino→roteiro | 🟢 livre | — | — | 7 |
 | 9 | `packages/ui` — implementar tokens (`docs/design-system.md`) + componentes base (`Button`, `TextField`, `Chip`, `MatchBadge`, `DestinationCard`, `AppShell`, `StepNav`, `AdvisorChat`) | ✅ concluído | felippebutland | — | 1 | (2026-08-28) |
