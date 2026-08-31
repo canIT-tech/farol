@@ -10,7 +10,7 @@
     { "file": "Components.dc.html", "x": 4560, "y": 1580, "w": 1400, "h": 1600, "title": "08 · Componentes & tokens" }
   ],
   "annotations": [
-    { "id": "brand-intro", "x": 0, "y": -196, "w": 1400, "text": "Farol - manual de marca (v0.1).\nNome de trabalho aprovado: Farol. Dominio farol.app a confirmar.\nDirecao: assessor calmo e confiavel. Sistema visual herdado das telas hi-fi e formalizado aqui.\nOs tokens da prancha 08 sao a fonte da verdade; a versao em codigo fica em docs/design-system.md no repo." }
+    { "id": "brand-intro", "x": 0, "y": -196, "w": 1400, "text": "Farol - manual de marca (v0.1).\nNome de trabalho aprovado: Farol. Marca publica: Farol Viagens. Dominio farolviagens.com (a registrar).\nDirecao: assessor calmo e confiavel. Sistema visual herdado das telas hi-fi e formalizado aqui.\nOs tokens da prancha 08 sao a fonte da verdade; a versao em codigo fica em docs/design-system.md no repo." }
   ],
   "launch": { "view": "canvas" }
 }
