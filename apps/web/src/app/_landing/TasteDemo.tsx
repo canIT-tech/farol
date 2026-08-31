@@ -270,6 +270,162 @@ const DESTINATIONS: Destination[] = [
     flightLabel: "1 escala",
     cost: "R$ 6,2k",
     photo: SLATE
+  },
+  {
+    city: "Fernando de Noronha",
+    country: "Brasil · Pernambuco",
+    tags: ["praia", "natureza", "aventura", "sossego"],
+    bias: 5,
+    why: "Praias que entram em rankings mundiais e um limite diário de visitantes. Reserve com meses.",
+    tempValue: "28°",
+    tempLabel: "sol",
+    flightValue: "4h",
+    flightLabel: "1 escala",
+    cost: "R$ 6,4k",
+    photo: SEA
+  },
+  {
+    city: "Florianópolis",
+    country: "Brasil · Santa Catarina",
+    tags: ["praia", "natureza", "noturna"],
+    bias: 4,
+    why: "Quarenta praias de perfis diferentes na mesma ilha, do surf pesado ao mar liso de lagoa.",
+    tempValue: "26°",
+    tempLabel: "sol",
+    flightValue: "1h30",
+    flightLabel: "direto",
+    cost: "R$ 2,8k",
+    photo: SEA
+  },
+  {
+    city: "Porto",
+    country: "Portugal",
+    tags: ["cultura", "gastronomia", "sossego"],
+    bias: 4,
+    why: "A comida e o vinho de Lisboa com metade da agitação, em ladeiras debruçadas sobre o rio.",
+    tempValue: "19°",
+    tempLabel: "ameno",
+    flightValue: "10h",
+    flightLabel: "direto",
+    cost: "R$ 5,2k",
+    photo: ROSE
+  },
+  {
+    city: "San Sebastián",
+    country: "Espanha",
+    tags: ["gastronomia", "praia", "cultura"],
+    bias: 4,
+    why: "Uma das maiores densidades de estrelas Michelin do mundo, com uma praia urbana no meio.",
+    tempValue: "20°",
+    tempLabel: "ameno",
+    flightValue: "12h",
+    flightLabel: "1 escala",
+    cost: "R$ 6,9k",
+    photo: SEA
+  },
+  {
+    city: "Salvador",
+    country: "Brasil · Bahia",
+    tags: ["cultura", "praia", "noturna", "gastronomia"],
+    bias: 4,
+    why: "Centro histórico vivo, percussão na rua e dendê em tudo. Vale ir além do Pelourinho.",
+    tempValue: "30°",
+    tempLabel: "sol",
+    flightValue: "2h",
+    flightLabel: "direto",
+    cost: "R$ 2,5k",
+    photo: WARM
+  },
+  {
+    city: "Santiago e Valparaíso",
+    country: "Chile",
+    tags: ["cultura", "gastronomia", "natureza"],
+    bias: 3,
+    why: "Vinhedos a uma hora, arte de rua no porto e a cordilheira sempre no horizonte.",
+    tempValue: "19°",
+    tempLabel: "seco",
+    flightValue: "4h",
+    flightLabel: "direto",
+    cost: "R$ 3,7k",
+    photo: SLATE
+  },
+  {
+    city: "Ushuaia e Patagônia",
+    country: "Argentina",
+    tags: ["natureza", "aventura"],
+    bias: 4,
+    why: "Glaciares, o canal de Beagle e trilhas no fim do continente. Casaco em qualquer mês.",
+    tempValue: "6°",
+    tempLabel: "frio",
+    flightValue: "6h",
+    flightLabel: "1 escala",
+    cost: "R$ 5,4k",
+    photo: SLATE
+  },
+  {
+    city: "Bangkok",
+    country: "Tailândia",
+    tags: ["gastronomia", "noturna", "cultura", "compras"],
+    bias: 3,
+    why: "Comida de rua premiada, templos dourados e mercados que não fecham. Calor pesado.",
+    tempValue: "33°",
+    tempLabel: "úmido",
+    flightValue: "27h",
+    flightLabel: "1 escala",
+    cost: "R$ 6,8k",
+    photo: SAND
+  },
+  {
+    city: "Marrakech",
+    country: "Marrocos",
+    tags: ["cultura", "compras", "gastronomia"],
+    bias: 3,
+    why: "Labirinto de souks, riads escondidos e o deserto a um bate-volta de carro.",
+    tempValue: "27°",
+    tempLabel: "seco",
+    flightValue: "15h",
+    flightLabel: "1 escala",
+    cost: "R$ 6,1k",
+    photo: SAND
+  },
+  {
+    city: "Bonito",
+    country: "Brasil · Mato Grosso do Sul",
+    tags: ["natureza", "aventura", "sossego"],
+    bias: 4,
+    why: "Flutuação em rios transparentes, grutas e cachoeiras. Passeios com hora marcada.",
+    tempValue: "28°",
+    tempLabel: "seco",
+    flightValue: "4h",
+    flightLabel: "+ transfer",
+    cost: "R$ 3,3k",
+    photo: FERN
+  },
+  {
+    city: "Barcelona",
+    country: "Espanha",
+    tags: ["cultura", "gastronomia", "praia", "noturna", "compras"],
+    bias: 4,
+    why: "Gaudí, tapas, praia urbana e madrugada longa — quase tudo a pé.",
+    tempValue: "21°",
+    tempLabel: "ameno",
+    flightValue: "11h",
+    flightLabel: "direto",
+    cost: "R$ 6,3k",
+    photo: CLAY
+  },
+  {
+    city: "Cancún e Riviera Maya",
+    country: "México",
+    tags: ["praia", "noturna", "aventura"],
+    bias: 3,
+    why: "Mar azul-piscina, cenotes para mergulhar e ruínas maias na beira da praia.",
+    tempValue: "30°",
+    tempLabel: "úmido",
+    flightValue: "8h",
+    flightLabel: "1 escala",
+    cost: "R$ 5,1k",
+    photo: SEA
   }
 ];
 
@@ -323,7 +479,7 @@ export default function TasteDemo() {
         <p className="demo-hint">
           {selected.length === 0
             ? "Escolha ao menos um gosto para ver um destino."
-            : `${selected.length} ${selected.length === 1 ? "gosto" : "gostos"} — o Farol cruza isso com ${DESTINATIONS.length} destinos, clima, custo e época.`}
+            : `${selected.length} ${selected.length === 1 ? "gosto" : "gostos"} — o Farol cruza isso com clima, custo e época de cada lugar.`}
         </p>
       </div>
 

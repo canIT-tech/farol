@@ -12,9 +12,10 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("demo de gosto troca o destino ao selecionar um gosto", async ({ page }) => {
-  await expect(page.getByText("Cartagena").first()).toBeVisible();
+  const city = page.locator(".result .city");
+  await expect(city).toHaveText("Cartagena");
   await page.getByRole("button", { name: "Natureza" }).click();
-  await expect(page.getByText("Cidade do Cabo")).toBeVisible();
+  await expect(city).toHaveText("Cidade do Cabo");
 });
 
 test("demo de chat responde e altera o plano", async ({ page }) => {
