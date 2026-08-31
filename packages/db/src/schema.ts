@@ -141,7 +141,10 @@ export const itineraryItems = pgTable(
     durationMin: integer("duration_min"),
     estCost: numeric("est_cost"),
     sortOrder: integer("sort_order").notNull(),
-    pinned: boolean("pinned").notNull().default(false)
+    pinned: boolean("pinned").notNull().default(false),
+    // true quando o enrich do Places não achou lugar para o item (design §7.3).
+    // O job places.enrich reprocessa só esses.
+    needsReview: boolean("needs_review").notNull().default(false)
   },
   (t) => ({
     daySortIdx: index("itinerary_items_day_sort_idx").on(t.dayId, t.sortOrder)
