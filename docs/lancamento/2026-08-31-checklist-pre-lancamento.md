@@ -82,6 +82,12 @@ verdes (baseline de testes do projeto). PR que não bate os gates não entra.
 
 ## 4. Termos de uso + Política de privacidade — **felippe**
 
+> **Rascunhos prontos:** `docs/legal/termos-de-uso.md` e `docs/legal/politica-de-privacidade.md`
+> (+ `docs/legal/README.md` com a lista de placeholders a preencher). **Falta:** preencher
+> os dados do operador (razão social, CNPJ, endereço, e-mails, foro), definir provedor de
+> e-mail e analytics, e **revisão de um(a) advogado(a)** antes de publicar nas rotas
+> `/termos` e `/privacidade` do `apps/web`.
+
 ### 4.1 Termos de uso
 - **Escopo honesto** (casa com a voz da marca): o Farol **não reserva** voo/hotel, **não
   garante preço**, o roteiro é **sugestão** — o usuário confere antes de comprar.
