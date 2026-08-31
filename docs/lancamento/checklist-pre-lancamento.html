@@ -1,0 +1,733 @@
+<title>Pré-lançamento do Farol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+  rel="stylesheet"
+/>
+
+<style>
+  :root {
+    --bg: #fbfaf8;
+    --surface: #ffffff;
+    --surface-2: #f5f2ec;
+    --ink: #1c1b19;
+    --ink-soft: #6b6963;
+    --ink-faint: #9b9992;
+    --line: #ece9e2;
+    --line-soft: #f3f0ea;
+    --sun: #c25a38;
+    --sun-strong: #a5482c;
+    --sun-wash: #f9efe9;
+    --sea: #3d7a67;
+    --sea-strong: #2f6252;
+    --sea-wash: #edf3f0;
+    --amber: #9a6f28;
+    --amber-wash: #f6efe0;
+    --focus: #1c6feb;
+
+    --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
+    --font-body: "Instrument Sans", system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16120d;
+      --surface: #1f1a14;
+      --surface-2: #241e17;
+      --ink: #f2e9dd;
+      --ink-soft: #b7ab9c;
+      --ink-faint: #8a7e6f;
+      --line: #322a20;
+      --line-soft: #2b2419;
+      --sun: #e37f5b;
+      --sun-strong: #ef9575;
+      --sun-wash: #33231b;
+      --sea: #6cb49c;
+      --sea-strong: #8ecdb6;
+      --sea-wash: #21302a;
+      --amber: #d9a75a;
+      --amber-wash: #322611;
+      --focus: #6ea8ff;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #16120d;
+    --surface: #1f1a14;
+    --surface-2: #241e17;
+    --ink: #f2e9dd;
+    --ink-soft: #b7ab9c;
+    --ink-faint: #8a7e6f;
+    --line: #322a20;
+    --line-soft: #2b2419;
+    --sun: #e37f5b;
+    --sun-strong: #ef9575;
+    --sun-wash: #33231b;
+    --sea: #6cb49c;
+    --sea-strong: #8ecdb6;
+    --sea-wash: #21302a;
+    --amber: #d9a75a;
+    --amber-wash: #322611;
+    --focus: #6ea8ff;
+    color-scheme: dark;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 1.02rem;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--sun-wash);
+  }
+
+  a {
+    color: var(--sun);
+    text-underline-offset: 2px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  code,
+  .mono {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+  }
+
+  .layout {
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 0 clamp(1.1rem, 0.4rem + 3vw, 2.75rem) 5rem;
+  }
+
+  /* masthead */
+  .masthead {
+    border-bottom: 1px solid var(--line);
+    padding: clamp(2.5rem, 1.5rem + 4vw, 4.5rem) 0 2.25rem;
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--sun);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .kicker .dot {
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 50%;
+    background: var(--sun);
+  }
+
+  .masthead h1 {
+    font-size: clamp(2.1rem, 1.4rem + 3vw, 3.2rem);
+    margin: 1rem 0 0;
+    max-width: 20ch;
+  }
+
+  .masthead .sub {
+    margin: 1rem 0 0;
+    color: var(--ink-soft);
+    max-width: 58ch;
+    font-size: 1.08rem;
+  }
+
+  .meta-row {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.6rem;
+  }
+
+  .pill {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    padding: 0.32rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-soft);
+    background: var(--surface);
+  }
+
+  .pill b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .theme-toggle {
+    margin-top: 1.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    cursor: pointer;
+  }
+
+  .theme-toggle:hover {
+    color: var(--ink);
+  }
+
+  /* legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.9rem;
+    margin-top: 1.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    color: var(--ink-soft);
+  }
+
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .swatch {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 3px;
+  }
+
+  .s-red {
+    background: var(--sun);
+  }
+
+  .s-amber {
+    background: var(--amber);
+  }
+
+  .s-green {
+    background: var(--sea);
+  }
+
+  /* sections */
+  section {
+    padding-block: clamp(2rem, 1.4rem + 2vw, 2.9rem);
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  section:last-of-type {
+    border-bottom: 0;
+  }
+
+  section > h2 {
+    font-size: clamp(1.4rem, 1.15rem + 1vw, 1.8rem);
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    scroll-margin-top: 1.5rem;
+  }
+
+  section > h2 .num {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--sun);
+    flex: none;
+  }
+
+  .owner {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    padding: 0.1rem 0.45rem;
+    margin-left: 0.2rem;
+  }
+
+  section > p {
+    margin: 1rem 0 0;
+    color: var(--ink-soft);
+    max-width: 66ch;
+  }
+
+  section > p strong,
+  li strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  h3 {
+    font-size: 1.08rem;
+    margin: 1.7rem 0 0.3rem;
+  }
+
+  ul,
+  ol {
+    margin: 0.9rem 0 0;
+    padding-left: 1.3rem;
+    color: var(--ink-soft);
+    max-width: 66ch;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+
+  li::marker {
+    color: var(--ink-faint);
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 0.7em;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 0.05em 0.36em;
+    white-space: nowrap;
+  }
+
+  .tag.new {
+    color: var(--sun-strong);
+    background: var(--sun-wash);
+  }
+
+  .tag.opt {
+    color: var(--ink-faint);
+    background: var(--surface-2);
+  }
+
+  /* overview table */
+  .table-wrap {
+    overflow-x: auto;
+    margin-top: 1.4rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.92rem;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 0.75rem 0.9rem;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  thead th {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  td .who {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  .status::before {
+    content: "";
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    flex: none;
+  }
+
+  .status.red::before {
+    background: var(--sun);
+  }
+
+  .status.amber::before {
+    background: var(--amber);
+  }
+
+  .status.green::before {
+    background: var(--sea);
+  }
+
+  /* critical path */
+  .phases {
+    counter-reset: phase;
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1.5rem;
+    border-left: 2px solid var(--line);
+  }
+
+  .phases li {
+    counter-increment: phase;
+    position: relative;
+    padding: 0.15rem 0 1.3rem 1.6rem;
+    color: var(--ink);
+  }
+
+  .phases li::before {
+    content: counter(phase);
+    position: absolute;
+    left: -0.85rem;
+    top: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--sun);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .phases li:last-child {
+    padding-bottom: 0;
+  }
+
+  .phases b {
+    font-weight: 600;
+  }
+
+  .phases span {
+    color: var(--ink-soft);
+  }
+
+  pre {
+    margin-top: 1.4rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.75;
+    color: var(--ink-soft);
+  }
+
+  .callout {
+    margin-top: 1.5rem;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--sun);
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 1rem 1.1rem;
+    font-size: 0.95rem;
+  }
+
+  .callout p {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+
+  .callout strong {
+    color: var(--ink);
+  }
+
+  .footer-note {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+</style>
+
+<div class="layout">
+  <header class="masthead">
+    <p class="kicker"><span class="dot"></span> Farol · Pré-lançamento · living doc</p>
+    <h1>O que falta entre os planos e o produto no ar</h1>
+    <p class="sub">
+      Planos prontos: negócio, técnico, go-to-market. Aqui é a lista operacional para
+      chegar ao lançamento — donos, status, dependências e caminho crítico.
+    </p>
+    <div class="meta-row">
+      <span class="pill">Atualizado: <b>2026-08-31</b></span>
+      <span class="pill">Fonte: <b>docs/lancamento/2026-08-31-checklist-pre-lancamento.md</b></span>
+    </div>
+    <div class="legend">
+      <span><span class="swatch s-red"></span> não começou</span>
+      <span><span class="swatch s-amber"></span> em andamento</span>
+      <span><span class="swatch s-green"></span> feito</span>
+      <span><span class="tag new">novo</span> não estava na lista original</span>
+      <span><span class="tag opt">opcional</span> pode ficar para depois</span>
+    </div>
+    <button class="theme-toggle" type="button" data-theme-toggle>tema: auto</button>
+  </header>
+
+  <section id="overview">
+    <h2><span class="num">—</span> Visão geral</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Frente</th><th>Dono(s)</th><th>Status</th><th>Bloqueia</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">1</td><td>Terminar de codar e testar</td>
+            <td class="who">rafinha</td>
+            <td><span class="status red">não começou</span></td>
+            <td>lançamento do produto</td>
+          </tr>
+          <tr>
+            <td class="mono">2</td><td>Achar um domínio decente</td>
+            <td class="who">rafinha · xandinho · felippe</td>
+            <td><span class="status red">não começou</span></td>
+            <td>tudo que é público (site, e-mail, DNS)</td>
+          </tr>
+          <tr>
+            <td class="mono">3</td><td>Cadastro na Stripe</td>
+            <td class="who">felippe*</td>
+            <td><span class="status red">não começou</span></td>
+            <td>pagamento no código · abertura</td>
+          </tr>
+          <tr>
+            <td class="mono">4</td><td>Termos de uso + Privacidade</td>
+            <td class="who">felippe</td>
+            <td><span class="status red">não começou</span></td>
+            <td>captar e-mail com tranquilidade · pagamento</td>
+          </tr>
+          <tr>
+            <td class="mono">5</td><td>LLM — setup da API</td>
+            <td class="who">rafinha</td>
+            <td><span class="status red">não começou</span></td>
+            <td>descoberta, roteiro, chat</td>
+          </tr>
+          <tr>
+            <td class="mono">6</td><td>Infra de produção (hosting + DB)</td>
+            <td class="who">rafinha · felippe*</td>
+            <td><span class="status red">não começou</span></td>
+            <td>produto no ar</td>
+          </tr>
+          <tr>
+            <td class="mono">7</td><td>GTM operacional</td>
+            <td class="who">felippe</td>
+            <td><span class="status amber">em andamento</span></td>
+            <td>— (roda em paralelo)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="mono" style="font-size: 0.8rem">* dono a confirmar</p>
+  </section>
+
+  <section id="s1">
+    <h2><span class="num">01</span> Terminar de codar e testar <span class="owner">rafinha</span></h2>
+    <p>Backlog de implementação (ver <span class="mono">CLAUDE.md</span> › "Próximos passos"). Ordem = dependência.</p>
+    <ul>
+      <li><strong>Passo 6 — Google Places + enrich.</strong> <span class="mono">GooglePlacesProvider</span>, <span class="mono">PlacesModule</span>, enrich no job do roteiro, <span class="mono">swap_restaurant</span>. Depende do Passo 4 (feito).</li>
+      <li><strong>Passo 7 — Chat IA.</strong> <span class="mono">ChatModule</span>, loop de tool-calling, 9 tools → serviços, <span class="mono">chat_messages</span>. Depende de 4 + 5 + 6. <strong>Maior bloco de código restante.</strong></li>
+      <li><strong>Passo 8 — UI web + E2E.</strong> Telas do <span class="mono">apps/web</span> ligadas ao <span class="mono">apps/api</span> + fluxo Playwright completo. Depende do 7.</li>
+      <li><strong>Pagamento no código</strong> <span class="tag new">novo</span> — <span class="mono">PaymentModule</span> + webhook Stripe (checkout R$ 39 / R$ 89; pagamento confirmado libera o produto completo). Depende do item 3.</li>
+      <li><strong>Débito técnico:</strong> pelo menos A2 (envs no CI) e C3 (warning de eslint) antes dos PRs de produção. Placeholders da pipeline fecham junto do Passo 6.</li>
+    </ul>
+    <div class="callout">
+      <p><strong>Definition of Done de cada passo:</strong> cobertura 100% + unidade / integração / e2e / mutação verdes. PR que não bate os gates não entra.</p>
+    </div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="num">02</span> Achar um domínio decente <span class="owner">rafinha · xandinho · felippe</span></h2>
+    <ul>
+      <li><span class="mono">farol.app</span> é o nome de trabalho, <strong>ainda não confirmado</strong>.</li>
+      <li>Checar disponibilidade e preço de <span class="mono">farol.app</span> e alternativas (<span class="mono">.com</span>, <span class="mono">.com.br</span>, <span class="mono">usefarol.*</span>, <span class="mono">farol.travel</span>). Ter <strong>2ª e 3ª opção</strong> antes de decidir.</li>
+      <li>Registrar assim que decidir — trava o nome, o e-mail (<span class="mono">@dominio</span>) e o DNS para hosting.</li>
+      <li>Depois: apontar DNS para o hosting (item 6) e configurar e-mail transacional (SPF / DKIM / DMARC).</li>
+    </ul>
+  </section>
+
+  <section id="s3">
+    <h2><span class="num">03</span> Cadastro na Stripe <span class="owner">felippe (a confirmar)</span></h2>
+    <ul>
+      <li>Criar conta Stripe com dados da <strong>canIT</strong> (CNPJ, conta bancária, representante). Se o onboarding BR emperrar: <strong>Mercado Pago</strong> ou <strong>Pagar.me</strong>. Decidir por uma.</li>
+      <li><strong>Começar já</strong> — ativação/verificação pode levar dias.</li>
+      <li>Configurar: produtos e preços (<strong>Viagem R$ 39</strong> · <strong>Pacote 3 R$ 89</strong>); chaves <span class="mono">test</span> + <span class="mono">live</span> + <span class="mono">webhook secret</span>; <strong>Stripe Checkout hospedado</strong> para o MVP; recibo e política de reembolso (casar com os Termos).</li>
+      <li>Saída: chaves e IDs de preço vão para o <span class="mono">.env</span> de produção e destravam o <span class="mono">PaymentModule</span>.</li>
+    </ul>
+  </section>
+
+  <section id="s4">
+    <h2><span class="num">04</span> Termos de uso + Política de privacidade <span class="owner">felippe</span></h2>
+    <h3>Termos de uso</h3>
+    <ul>
+      <li><strong>Escopo honesto</strong> (casa com a voz da marca): o Farol <strong>não reserva</strong> voo/hotel, <strong>não garante preço</strong>, o roteiro é <strong>sugestão</strong> — o usuário confere antes de comprar.</li>
+      <li>Conteúdo gerado por IA pode conter erros; responsabilidade do usuário na conferência.</li>
+      <li>Pagamento por viagem, regras de reembolso / estorno / cancelamento.</li>
+      <li>Propriedade do conteúdo do roteiro; lei e foro (Brasil).</li>
+    </ul>
+    <h3>Política de privacidade / LGPD</h3>
+    <ul>
+      <li><strong>Já é necessária agora</strong> — a waitlist coleta e-mail.</li>
+      <li>Dados: e-mail, perfil de gosto, dados de viagem, pagamento (via Stripe).</li>
+      <li>Terceiros: <strong>Amadeus, Google Places, Anthropic, Stripe</strong>, provedor de e-mail, analytics.</li>
+      <li>Base legal, direitos do titular, opt-out, contato do encarregado. Consentimento explícito no formulário da waitlist + link para a política.</li>
+    </ul>
+    <h3>Cookies / consentimento <span class="tag opt">opcional</span></h3>
+    <ul>
+      <li>Com <strong>Plausible</strong> (sem cookie): aviso mínimo. Com <strong>GA4 / Meta Pixel</strong>: banner de consentimento obrigatório.</li>
+    </ul>
+  </section>
+
+  <section id="s5">
+    <h2><span class="num">05</span> LLM — setup da API <span class="owner">rafinha</span></h2>
+    <ul>
+      <li>Acesso à <strong>API da Anthropic</strong> (Claude): conta, créditos iniciais / tier de desenvolvimento, chave <span class="mono">ANTHROPIC_API_KEY</span> para <strong>dev</strong> e <strong>produção</strong> (chaves separadas).</li>
+      <li>Confirmar o roteamento de modelo no código: <span class="mono">LLM_MODEL_CAPABLE</span> (sonnet) / <span class="mono">LLM_MODEL_CHEAP</span> (haiku); revisar <span class="mono">MODEL_PRICING</span> (hoje aproximado — débito C1).</li>
+      <li><strong>Definir o teto de custo de LLM por roteiro</strong> (<span class="mono">LLM_ROUTE_BUDGET_USD</span>) — pendência do PRD; sem número, não dá para prever margem.</li>
+      <li>Em teste, LLM sempre via fake determinístico (regra do projeto). Chave real só em dev/prod.</li>
+    </ul>
+  </section>
+
+  <section id="s6">
+    <h2><span class="num">06</span> Infra de produção <span class="owner">rafinha · felippe (a definir)</span> <span class="tag new">novo</span></h2>
+    <ul>
+      <li><strong>Hosting:</strong> container para <span class="mono">apps/api</span> + <span class="mono">apps/worker</span>, deploy do <span class="mono">apps/web</span> (Next), Postgres gerenciado. Hospedagem agnóstica (container + Postgres + env).</li>
+      <li><strong>Supabase de produção:</strong> projeto <strong>separado do dev</strong> (Auth + Postgres + Storage).</li>
+      <li>Rodar <span class="mono">db:migrate</span> (0000–0005) + <span class="mono">db:seed</span> (catálogo) no banco de produção.</li>
+      <li>Preencher <strong>todas</strong> as envs de produção (base em <span class="mono">.env.example</span>): <span class="mono">DATABASE_URL</span>, <span class="mono">SUPABASE_*</span>, <span class="mono">ANTHROPIC_API_KEY</span>, <span class="mono">AMADEUS_*</span>, <span class="mono">JOBS_SCHEMA</span>, <span class="mono">*_DEEPLINK_TEMPLATE</span>, <span class="mono">NEXT_PUBLIC_API_URL</span>, chaves da Stripe.</li>
+      <li><strong>CI:</strong> fechar o débito A2 (envs novas no <span class="mono">ci.yml</span>) antes dos PRs de prod. DNS do domínio apontando para o hosting; HTTPS.</li>
+    </ul>
+  </section>
+
+  <section id="s7">
+    <h2><span class="num">07</span> GTM operacional <span class="owner">felippe</span></h2>
+    <p>Roda em paralelo, não espera o produto. Backlog do plano de go-to-market (§14):</p>
+    <ol>
+      <li>Criar a <strong>Sala do Farol</strong> (WhatsApp + Telegram) + regras; convidar a waitlist.</li>
+      <li>Montar <strong>perfil do Instagram</strong> (bio, destaques, 6 posts).</li>
+      <li>Instrumentar <strong>UTM + PostHog + Pixel</strong> na landing.</li>
+      <li><strong>9 criativos</strong> para o primeiro teste de Meta Ads.</li>
+      <li>Ligar <strong>Meta Ads pré-lançamento</strong> (R$ 40–80/dia).</li>
+      <li>Configurar a <strong>newsletter "Para onde ir em [mês]"</strong>.</li>
+      <li>Listar <strong>20 comunidades de terceiros</strong>.</li>
+      <li>Rascunhar <strong>10 páginas de roteiro</strong> para SEO.</li>
+      <li>Definir a mecânica de <strong>referral</strong> com produto.</li>
+      <li>Fechar as <strong>metas (H)</strong> do plano.</li>
+    </ol>
+  </section>
+
+  <section id="caminho">
+    <h2><span class="num">—</span> Caminho crítico</h2>
+    <ol class="phases">
+      <li><b>Domínio</b> + <b>Termos + Privacidade</b> — <span>começam hoje, destravam o resto.</span></li>
+      <li><b>Stripe</b> (cadastro) + <b>LLM API</b> (dev + prod) — <span>cadastros que demoram; abrir já.</span></li>
+      <li><b>Infra de produção</b> + <b>CI (débito A2)</b>.</li>
+      <li><b>Código:</b> Passo 6 → 7 → 8 + <span class="mono">PaymentModule</span>.</li>
+      <li><b>GTM</b> — <span>em paralelo o tempo todo.</span></li>
+    </ol>
+    <pre>Domínio ─┬─► DNS + e-mail transacional ─► Infra de produção ─► Produto no ar
+         │
+Termos + Privacidade ─────────────────────► libera captar e-mail e vender
+         │
+Stripe (cadastro) ─► PaymentModule ───────► checkout funcionando
+         │
+LLM API (dev+prod) ─► fecha Passos 6/7/8 ─► produto completo
+         │
+GTM (Sala do Farol, IG, Ads) ────────────► roda desde já, em paralelo</pre>
+  </section>
+
+  <section id="riscos">
+    <h2><span class="num">—</span> Riscos</h2>
+    <ul>
+      <li><strong>Stripe onboarding BR</strong> pode levar dias — não deixar para o fim.</li>
+      <li><strong><span class="mono">farol.app</span></strong> pode estar tomado — ter alternativas antes de comunicar o nome.</li>
+      <li><strong>Passo 7 (chat)</strong> é o maior bloco de código restante e depende de 5 + 6.</li>
+      <li><strong>Teto de custo de LLM</strong> ainda indefinido — sem ele, a margem por viagem é chute.</li>
+    </ul>
+  </section>
+
+  <p class="footer-note">
+    Fonte da verdade: <span class="mono">docs/lancamento/2026-08-31-checklist-pre-lancamento.md</span>.
+    Ligações: <span class="mono">PRD.md</span> · débito técnico
+    (<span class="mono">docs/superpowers/plans/2026-08-29-correcao-debito-tecnico.md</span>) ·
+    plano de go-to-market (<span class="mono">docs/marketing/2026-08-31-plano-go-to-market.md</span>).
+  </p>
+</div>
+
+<script>
+  (function () {
+    var btn = document.querySelector("[data-theme-toggle]");
+    var root = document.documentElement;
+    var order = ["auto", "light", "dark"];
+    function read() {
+      try {
+        return localStorage.getItem("farol-launch-theme") || "auto";
+      } catch (e) {
+        return "auto";
+      }
+    }
+    function apply(mode) {
+      if (mode === "auto") root.removeAttribute("data-theme");
+      else root.setAttribute("data-theme", mode);
+      if (btn) btn.textContent = "tema: " + mode;
+      try {
+        localStorage.setItem("farol-launch-theme", mode);
+      } catch (e) {}
+    }
+    apply(read());
+    if (btn) {
+      btn.addEventListener("click", function () {
+        apply(order[(order.indexOf(read()) + 1) % order.length]);
+      });
+    }
+  })();
+</script>
