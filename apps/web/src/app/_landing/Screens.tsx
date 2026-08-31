@@ -1,10 +1,36 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
+import { type Ranked, rankDestinations } from "./destinations";
 
-function Shot({ url, children }: { url: string; children: ReactNode }) {
+const STEP_LABELS = ["Perfil de gosto", "Escolher destino", "Roteiro", "Voo & hotel"];
+
+const ONB_TASTES: Array<{ id: string; label: string }> = [
+  { id: "praia", label: "Praia" },
+  { id: "gastronomia", label: "Gastronomia" },
+  { id: "cultura", label: "Cultura" },
+  { id: "natureza", label: "Natureza" },
+  { id: "noturna", label: "Vida noturna" },
+  { id: "compras", label: "Compras" }
+];
+
+const PACES: Array<{ id: string; label: string }> = [
+  { id: "relaxado", label: "Relaxado" },
+  { id: "moderado", label: "Moderado" },
+  { id: "intenso", label: "Intenso" }
+];
+
+function Shot({
+  url,
+  interactive,
+  children
+}: {
+  url: string;
+  interactive?: boolean;
+  children: ReactNode;
+}) {
   return (
-    <div className="shot" aria-hidden="true">
+    <div className="shot" aria-hidden={interactive ? undefined : true}>
       <div className="shot-bar">
         <i />
         <i />
@@ -16,7 +42,7 @@ function Shot({ url, children }: { url: string; children: ReactNode }) {
   );
 }
 
-function MiniSide({ dest }: { dest: string }) {
+function MiniSide({ dest, step }: { dest: string; step: number }) {
   return (
     <aside className="mini-side">
       <div className="lg">
@@ -29,139 +55,157 @@ function MiniSide({ dest }: { dest: string }) {
         Datas <b>10 – 17 mai</b>
       </div>
       <div className="kv">{dest}</div>
-      <div className="mini-step done">
-        <span className="dot" />
-        Perfil de gosto
-      </div>
-      <div className="mini-step done">
-        <span className="dot" />
-        Escolher destino
-      </div>
-      <div className="mini-step on">
-        <span className="dot" />
-        Roteiro
-      </div>
-      <div className="mini-step">
-        <span className="dot" />
-        Voo &amp; hotel
-      </div>
+      {STEP_LABELS.map((label, i) => (
+        <div
+          key={label}
+          className={`mini-step ${i < step ? "done" : ""} ${i === step ? "on" : ""}`}
+        >
+          <span className="dot" />
+          {label}
+        </div>
+      ))}
     </aside>
   );
 }
 
-function ShotOnboarding() {
+function StageOnboarding({
+  interests,
+  pace,
+  onToggle,
+  onPace
+}: {
+  interests: string[];
+  pace: string;
+  onToggle: (id: string) => void;
+  onPace: (id: string) => void;
+}) {
   return (
-    <Shot url="farol.app/onboarding">
+    <Shot url="farol.app/onboarding" interactive>
       <div className="ob">
         <div className="prog">
-          <i />
+          <i style={{ width: "25%" }} />
         </div>
         <h4>O que te move numa viagem?</h4>
-        <p className="obsub">Escolha ao menos 3. Isso ajusta destino e roteiro.</p>
+        <p className="obsub">Escolha o que curte e o ritmo. Isso ajusta destino e roteiro.</p>
         <div className="ob-grid">
-          <div className="ob-tile on">Praia</div>
-          <div className="ob-tile on">Gastronomia</div>
-          <div className="ob-tile">Cultura</div>
-          <div className="ob-tile on">Natureza</div>
-          <div className="ob-tile">Vida noturna</div>
-          <div className="ob-tile">Compras</div>
+          {ONB_TASTES.map((taste) => (
+            <button
+              key={taste.id}
+              type="button"
+              className={`ob-tile ${interests.includes(taste.id) ? "on" : ""}`}
+              aria-pressed={interests.includes(taste.id)}
+              onClick={() => onToggle(taste.id)}
+            >
+              {taste.label}
+            </button>
+          ))}
         </div>
         <div className="ob-field">Ritmo da viagem</div>
-        <div className="ob-seg">
-          <span>Relaxado</span>
-          <span className="on">Moderado</span>
-          <span>Intenso</span>
-        </div>
-        <div>
-          <span className="ob-cta">Continuar →</span>
+        <div className="ob-seg" role="radiogroup" aria-label="Ritmo da viagem">
+          {PACES.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              role="radio"
+              aria-checked={pace === option.id}
+              className={pace === option.id ? "on" : ""}
+              onClick={() => onPace(option.id)}
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
       </div>
     </Shot>
   );
 }
 
-function ShotDiscovery() {
+function StageDiscovery({
+  results,
+  pickIndex,
+  gostos,
+  onPick
+}: {
+  results: Ranked[];
+  pickIndex: number;
+  gostos: string;
+  onPick: (index: number) => void;
+}) {
+  const top = results.slice(0, 3);
+  const leader = top[0];
   return (
-    <Shot url="farol.app/viagem/descoberta">
+    <Shot url="farol.app/viagem/descoberta" interactive>
       <div className="mini">
-        <MiniSide dest="Gostos · Praia · gastronomia" />
+        <MiniSide dest={`Gostos · ${gostos}`} step={1} />
         <div className="mini-main">
-          <h4 className="mini-h">4 destinos pra você</h4>
-          <p className="mini-sub">Ordenados por aderência ao seu perfil. Custo para 2 pessoas.</p>
+          <h4 className="mini-h">Destinos pra você</h4>
+          <p className="mini-sub">Ordenados por aderência ao seu perfil. Toque para ver o roteiro.</p>
           <div className="dgrid">
-            <div className="dcard top">
-              <div className="ph ph-a">
-                <span className="bdg">94%</span>
-              </div>
-              <div className="bd">
-                <div className="ct">Cartagena</div>
-                <div className="cy">Colômbia</div>
-                <div className="mb">
-                  <i style={{ width: "94%" }} />
+            {top.map((row, i) => (
+              <button
+                key={row.dest.city}
+                type="button"
+                className={`dcard flow-pick ${i === 0 ? "top" : ""} ${i === pickIndex ? "picked" : ""}`}
+                onClick={() => onPick(i)}
+              >
+                <div className="ph" style={{ background: row.dest.photo }}>
+                  <span className="bdg">{row.score}%</span>
                 </div>
-                <p className="rt">
-                  Praia e um centro histórico que já é um roteiro gastronômico. Maio é seco.
-                </p>
-                <div className="st">
-                  <span>
-                    <b>31°</b> seco
-                  </span>
-                  <span>
-                    <b>5h</b> direto
-                  </span>
-                  <span>
-                    <b>R$ 4,1k</b>
-                  </span>
+                <div className="bd">
+                  <div className="ct">{row.dest.city}</div>
+                  <div className="cy">{row.dest.country}</div>
+                  <div className="mb">
+                    <i style={{ width: `${row.score}%` }} />
+                  </div>
+                  <p className="rt">{row.dest.why}</p>
+                  <div className="st">
+                    <span>
+                      <b>{row.dest.tempValue}</b> {row.dest.tempLabel}
+                    </span>
+                    <span>
+                      <b>{row.dest.flightValue}</b> {row.dest.flightLabel}
+                    </span>
+                    <span>
+                      <b>{row.dest.cost}</b>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="dcard">
-              <div className="ph ph-b">
-                <span className="bdg">85%</span>
-              </div>
-              <div className="bd">
-                <div className="ct">Lisboa</div>
-                <div className="cy">Portugal</div>
-                <div className="mb">
-                  <i style={{ width: "85%" }} />
-                </div>
-                <p className="rt">
-                  Clima ameno, ladeiras históricas e praia a 30 minutos quando bater vontade.
-                </p>
-                <div className="st">
-                  <span>
-                    <b>21°</b> ameno
-                  </span>
-                  <span>
-                    <b>9h30</b> direto
-                  </span>
-                  <span>
-                    <b>R$ 5,6k</b>
-                  </span>
-                </div>
-              </div>
-            </div>
+              </button>
+            ))}
           </div>
         </div>
         <aside className="mini-rail">
           <div className="rlbl">Assessor</div>
-          <span className="mb-bub a">Cartagena lidera: praia e gastronomia no mesmo lugar.</span>
-          <span className="mb-bub u">o de Lisboa cabe no orçamento?</span>
-          <span className="mb-bub a">No limite — uns R$ 600 acima. Dá pra fechar cortando 1 noite.</span>
+          <span className="mb-bub a">
+            {leader ? `${leader.dest.city} lidera pelo seu gosto.` : "Escolha um gosto para eu buscar."}
+          </span>
+          <span className="mb-bub a">Toque num card e eu monto o roteiro.</span>
         </aside>
       </div>
     </Shot>
   );
 }
 
-function ShotItinerary() {
+function StageItinerary({
+  city,
+  temp,
+  paceLabel,
+  gostos
+}: {
+  city: string;
+  temp: string;
+  paceLabel: string;
+  gostos: string;
+}) {
   return (
     <Shot url="farol.app/viagem/roteiro">
       <div className="mini">
-        <MiniSide dest="Destino · Cartagena, Colômbia" />
+        <MiniSide dest={`Destino · ${city}`} step={2} />
         <div className="mini-main">
-          <h4 className="mini-h">Cartagena · 7 dias</h4>
-          <p className="mini-sub">10 – 17 de maio · ritmo moderado · praia e gastronomia</p>
+          <h4 className="mini-h">{city} · 7 dias</h4>
+          <p className="mini-sub">
+            10 – 17 de maio · ritmo {paceLabel.toLowerCase()} · foco em {gostos.toLowerCase()}
+          </p>
           <div className="daystrip-mini">
             <span className="on">Dia 1</span>
             <span>Dia 2</span>
@@ -172,8 +216,8 @@ function ShotItinerary() {
             <span>Dia 7</span>
           </div>
           <div className="day-h">
-            <h4>Dia 1 — Chegada e Cidade Amuralhada</h4>
-            <span className="chip">31° ensolarado</span>
+            <h4>Dia 1 — Chegada e primeiro passeio</h4>
+            <span className="chip">{temp}</span>
             <span className="chip">R$ 210 no dia</span>
           </div>
           <div className="tl-entry">
@@ -181,12 +225,11 @@ function ShotItinerary() {
             <div className="tl-card">
               <span className="tl-thumb" />
               <div>
-                <div className="nm">Cidade Amuralhada a pé</div>
-                <div className="mt">Centro histórico · comece cedo para evitar o calor.</div>
+                <div className="nm">Caminhada pelo centro histórico</div>
+                <div className="mt">Comece cedo, antes do movimento e do calor.</div>
                 <div className="tgs">
                   <span>Passeio</span>
                   <span>~2h</span>
-                  <span>Grátis</span>
                 </div>
               </div>
             </div>
@@ -196,12 +239,11 @@ function ShotItinerary() {
             <div className="tl-card">
               <span className="tl-thumb t2" />
               <div>
-                <div className="nm">Almoço — La Cevichería</div>
-                <div className="mt">Frutos do mar · chegar antes das 13h.</div>
+                <div className="nm">Almoço recomendado pelo Farol</div>
+                <div className="mt">Cozinha local, bem avaliada e perto da caminhada.</div>
                 <div className="tgs">
                   <span>Restaurante</span>
                   <span>$$</span>
-                  <span>4.5 ★</span>
                 </div>
               </div>
             </div>
@@ -211,10 +253,9 @@ function ShotItinerary() {
             <div className="tl-card">
               <span className="tl-thumb t3" />
               <div>
-                <div className="nm">Praia de Bocagrande</div>
-                <div className="mt">Tarde livre à beira-mar.</div>
+                <div className="nm">Tarde livre no ponto alto da cidade</div>
+                <div className="mt">Espaço para descanso ou um passeio extra pelo chat.</div>
                 <div className="tgs">
-                  <span>Praia</span>
                   <span>Livre</span>
                 </div>
               </div>
@@ -223,25 +264,23 @@ function ShotItinerary() {
         </div>
         <aside className="mini-rail">
           <div className="rlbl">Assessor</div>
-          <span className="mb-bub u">tira o dia de museu e põe mais praia</span>
-          <span className="mb-bub a">
-            Feito — o Dia 4 virou praia com passeio de barco. Custo do dia caiu R$ 120.
-          </span>
+          <span className="mb-bub a">Montei 7 dias em {city}. Dia 1 mais leve para a chegada.</span>
+          <span className="mb-bub u">tira o museu do Dia 4</span>
         </aside>
       </div>
     </Shot>
   );
 }
 
-function ShotFlights() {
+function StageFlights({ city, cost }: { city: string; cost: string }) {
   return (
     <Shot url="farol.app/viagem/voo-hotel">
       <div className="mini">
-        <MiniSide dest="Roteiro · 7 dias montados" />
+        <MiniSide dest={`Roteiro · 7 dias montados`} step={3} />
         <div className="mini-main">
           <h4 className="mini-h">Voo &amp; hotel</h4>
           <p className="mini-sub">
-            GRU → CTG · 10 – 17 mai. A reserva é concluída no site do parceiro.
+            Voos para {city} · 10 – 17 mai. A reserva é concluída no site do parceiro.
           </p>
           <div className="mini-tabs">
             <span className="on">Voos</span>
@@ -251,7 +290,7 @@ function ShotFlights() {
             <span className="al">AV</span>
             <span className="rt2">
               08:15 → 13:40
-              <small>GRU → CTG · direto · 5h25</small>
+              <small>GRU → {city} · direto</small>
             </span>
             <span className="pr">
               R$ 2.140
@@ -262,7 +301,7 @@ function ShotFlights() {
             <span className="al">LA</span>
             <span className="rt2">
               10:50 → 18:05
-              <small>GRU → CTG · 1 escala · BOG</small>
+              <small>GRU → {city} · 1 escala</small>
             </span>
             <span className="pr">
               R$ 1.980
@@ -270,14 +309,14 @@ function ShotFlights() {
             </span>
           </div>
           <p className="fresh-mini">
-            Preços atualizados há 8 min · confirmados no site do parceiro.
+            Preços atualizados há 8 min · gasto total do roteiro estimado em {cost}.
           </p>
           <div className="hgrid">
             <div className="hcard-mini">
               <div className="hph" />
               <div className="hb">
-                <div className="hn">Casa del Arzobispado</div>
-                <div className="ha">Centro Histórico</div>
+                <div className="hn">Hotel bem posicionado</div>
+                <div className="ha">A pé das primeiras paradas</div>
                 <div className="hr">
                   <span className="rate">4.7 ★</span>
                   <span>R$ 320</span>
@@ -287,8 +326,8 @@ function ShotFlights() {
             <div className="hcard-mini">
               <div className="hph h2" />
               <div className="hb">
-                <div className="hn">Hotel Getsemaní 24</div>
-                <div className="ha">Perto da vida noturna</div>
+                <div className="hn">Opção econômica</div>
+                <div className="ha">Bairro central</div>
                 <div className="hr">
                   <span className="rate">4.5 ★</span>
                   <span>R$ 240</span>
@@ -298,8 +337,8 @@ function ShotFlights() {
             <div className="hcard-mini">
               <div className="hph h3" />
               <div className="hb">
-                <div className="hn">Bocagrande Mar</div>
-                <div className="ha">Pé na areia</div>
+                <div className="hn">Perto da orla</div>
+                <div className="ha">Para os dias de praia</div>
                 <div className="hr">
                   <span className="rate">4.4 ★</span>
                   <span>R$ 280</span>
@@ -310,7 +349,7 @@ function ShotFlights() {
         </div>
         <aside className="mini-rail">
           <div className="rlbl">Assessor</div>
-          <span className="mb-bub a">O direto da Avianca chega a tempo do almoço do Dia 1.</span>
+          <span className="mb-bub a">O direto chega a tempo do almoço do Dia 1.</span>
           <span className="mb-bub u">tem algo mais barato saindo sábado?</span>
         </aside>
       </div>
@@ -318,88 +357,142 @@ function ShotFlights() {
   );
 }
 
-const STEPS = [
-  {
-    n: "01",
-    title: "Conta o gosto",
-    copy: "Ritmo, companhia, orçamento e o que você curte. Sem formulário infinito — o resto o Farol infere.",
-    shot: <ShotOnboarding />
-  },
-  {
-    n: "02",
-    title: "Recebe destinos com o porquê",
-    copy: "Uma lista curta, ordenada por aderência. Cada um com clima, tempo de voo e custo estimado — e o assessor explica a escolha.",
-    shot: <ShotDiscovery />
-  },
-  {
-    n: "03",
-    title: "Vê o roteiro dia a dia",
-    copy: "Manhã, tarde e noite montadas, com margem para respirar. Um pedido no chat e o dia se refaz na hora.",
-    shot: <ShotItinerary />
-  },
-  {
-    n: "04",
-    title: "Voo e hotel, com link pro parceiro",
-    copy: "As melhores opções para as suas datas, em dinheiro — e milhas, depois. A compra fecha no site do parceiro.",
-    shot: <ShotFlights />
-  }
-];
-
 export default function Screens() {
-  const [active, setActive] = useState(0);
-  const refs = useRef<Array<HTMLElement | null>>([]);
+  const [step, setStep] = useState(0);
+  const [interests, setInterests] = useState<string[]>(["praia", "gastronomia"]);
+  const [pace, setPace] = useState("moderado");
+  const [pickIndex, setPickIndex] = useState(0);
 
-  useEffect(() => {
-    if (typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const idx = Number((entry.target as HTMLElement).dataset.idx);
-            setActive(idx);
-          }
-        }
-      },
-      { rootMargin: "-45% 0px -45% 0px" }
+  const results = useMemo(() => {
+    const ranked = rankDestinations(interests);
+    return ranked.length > 0 ? ranked : rankDestinations(["praia", "gastronomia"]);
+  }, [interests]);
+
+  const chosen = results[Math.min(pickIndex, results.length - 1)] ?? results[0];
+  const gostos = ONB_TASTES.filter((t) => interests.includes(t.id))
+    .map((t) => t.label)
+    .slice(0, 2)
+    .join(" · ");
+  const paceLabel = PACES.find((p) => p.id === pace)?.label ?? "Moderado";
+
+  function toggleInterest(id: string) {
+    setInterests((current) =>
+      current.includes(id) ? current.filter((t) => t !== id) : [...current, id]
     );
-    for (const el of refs.current) {
-      if (el) io.observe(el);
-    }
-    return () => io.disconnect();
-  }, []);
+  }
 
-  const current = STEPS[active] ?? STEPS[0]!;
+  function goTo(target: number) {
+    if (target <= step) setStep(target);
+  }
+
+  function next() {
+    setStep((current) => Math.min(current + 1, STEP_LABELS.length - 1));
+  }
+
+  function back() {
+    setStep((current) => Math.max(current - 1, 0));
+  }
+
+  const canContinue = interests.length >= 1;
+  const hint =
+    interests.length === 0
+      ? "Escolha ao menos um gosto para continuar."
+      : interests.length < 3
+        ? "Pode escolher mais — 3 ou mais afinam melhor o resultado."
+        : "Bom perfil. Vamos ver os destinos.";
 
   return (
-    <div className="walk">
-      <div className="walk-copy" aria-hidden="true">
-        <span className="step-n">{current.n}</span>
-        <h3>{current.title}</h3>
-        <p>{current.copy}</p>
-        <div className="dots">
-          {STEPS.map((step, i) => (
-            <i key={step.n} className={i === active ? "on" : undefined} />
-          ))}
-        </div>
+    <div className="flow">
+      <ol className="flow-steps">
+        {STEP_LABELS.map((label, i) => (
+          <li key={label}>
+            <button
+              type="button"
+              className={`flow-step ${i < step ? "done" : ""} ${i === step ? "active" : ""}`}
+              aria-current={i === step ? "step" : undefined}
+              disabled={i > step}
+              onClick={() => goTo(i)}
+            >
+              <span className="fs-num">{i < step ? "✓" : i + 1}</span>
+              <span className="fs-label">{label}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+
+      <div className="flow-progress">
+        <i style={{ width: `${((step + 1) / STEP_LABELS.length) * 100}%` }} />
       </div>
 
-      <div className="walk-shots">
-        {STEPS.map((step, i) => (
-          <figure
-            key={step.n}
-            data-idx={i}
-            ref={(el) => {
-              refs.current[i] = el;
+      <div className="flow-stage" key={step}>
+        {step === 0 ? (
+          <StageOnboarding
+            interests={interests}
+            pace={pace}
+            onToggle={toggleInterest}
+            onPace={setPace}
+          />
+        ) : null}
+        {step === 1 ? (
+          <StageDiscovery
+            results={results}
+            pickIndex={pickIndex}
+            gostos={gostos || "seu gosto"}
+            onPick={(index) => {
+              setPickIndex(index);
+              next();
             }}
-          >
-            <figcaption>
-              <span className="step-n">{step.n}</span>
-              <h3>{step.title}</h3>
-              <p>{step.copy}</p>
-            </figcaption>
-            {step.shot}
-          </figure>
-        ))}
+          />
+        ) : null}
+        {step === 2 && chosen ? (
+          <StageItinerary
+            city={chosen.dest.city}
+            temp={`${chosen.dest.tempValue} ${chosen.dest.tempLabel}`}
+            paceLabel={paceLabel}
+            gostos={gostos || "praia e gastronomia"}
+          />
+        ) : null}
+        {step === 3 && chosen ? (
+          <StageFlights city={chosen.dest.city} cost={chosen.dest.cost} />
+        ) : null}
+      </div>
+
+      <div className="flow-nav">
+        {step > 0 ? (
+          <button type="button" className="flow-back" onClick={back}>
+            ← Voltar
+          </button>
+        ) : (
+          <span />
+        )}
+
+        {step === 0 ? (
+          <div className="flow-next-wrap">
+            <button type="button" className="flow-next" disabled={!canContinue} onClick={next}>
+              Continuar<span aria-hidden="true"> →</span>
+            </button>
+            <p className="flow-hint">{hint}</p>
+          </div>
+        ) : null}
+
+        {step === 1 && chosen ? (
+          <button type="button" className="flow-next" onClick={next}>
+            Continuar com {chosen.dest.city}
+            <span aria-hidden="true"> →</span>
+          </button>
+        ) : null}
+
+        {step === 2 ? (
+          <button type="button" className="flow-next" onClick={next}>
+            Ver voo e hotel<span aria-hidden="true"> →</span>
+          </button>
+        ) : null}
+
+        {step === 3 ? (
+          <a className="flow-next" href="#lista">
+            É assim no app — entrar na lista
+          </a>
+        ) : null}
       </div>
     </div>
   );
