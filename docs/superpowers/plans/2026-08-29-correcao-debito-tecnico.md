@@ -4,6 +4,13 @@
 > nos Passos 2–5. Cada item é independente; ordem = risco. Pode virar 1 PR só
 > (`chore/debito-tecnico-passos-2-5`) ou vários pequenos.
 
+> **Nota 2026-08-31.** Onde este plano cita `AMADEUS_*`, `AmadeusFlightProvider`,
+> "sandbox Amadeus" ou "fixtures Amadeus" (itens A2, C2, e o placeholder de
+> `flightTimeHours`): a Amadeus descontinuou o Self-Service. O provider migra para
+> **Travelpayouts** — ver `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md`
+> (Passo 10). Fazer a migração antes ou junto de C2; as envs de CI usam
+> `TRAVELPAYOUTS_TOKEN` / `TRAVELPAYOUTS_MARKER`.
+
 **Regra:** todo item que toca código passa pelos mesmos gates (cobertura 100%,
 mutação ≥ break por pacote). Itens de config/CI validam com `pnpm build && pnpm
 typecheck && pnpm lint && pnpm test && pnpm test:e2e` verdes.

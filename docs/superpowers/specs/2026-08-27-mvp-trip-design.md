@@ -5,6 +5,14 @@
 - **Autor:** Felippe Butland
 - **Documento pai:** `PRD.md` (seções 4 e 5, fase MVP)
 
+> **Addendum 2026-08-31 — provider de voo/hotel.** A Amadeus descontinuou o portal
+> Self-Service (só Enterprise/contrato). O provider passou a ser **Travelpayouts**
+> (Aviasales + Hotellook, data + deep-link com afiliado). Onde este documento diz
+> "Amadeus" (D8, D10, §7.2, §7.3, HealthModule, `provider_cache`, envs `AMADEUS_*`),
+> vale a spec de migração `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md`.
+> Mudança que importa: **D10 deixa de valer** — há afiliado no MVP via `marker` do
+> Travelpayouts. Pagamento por viagem: `docs/negocio/2026-08-31-spec-pagamento.md`.
+
 ---
 
 ## 1. Objetivo e escopo

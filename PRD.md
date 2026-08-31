@@ -249,7 +249,7 @@ Notação: **[M]** MVP · **[1]** v1 · **[2]** v2.
 
 | Área | Candidatos | Observação |
 |---|---|---|
-| Voos (busca/preço) | Amadeus Self-Service, Skyscanner, Kiwi, Duffel | Confirmar termos de afiliado e limites de rate |
+| Voos (busca/preço) | **Travelpayouts / Aviasales** (escolhido — MVP; Amadeus Self-Service foi descontinuado). Graduação: Skyscanner Partners. Alternativas: Duffel, Kiwi (por convite) | Data + deep-link com `marker` de afiliado. Ver `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` |
 | Hospedagem | Booking.com Affiliate, Expedia EPS, Airbnb (afiliado limitado), Hotelbeds | Comissão varia por parceiro |
 | Restaurantes / POIs | Google Places, Foursquare, TripAdvisor Content API | Custo por chamada relevante — cachear |
 | Experiências / tours | GetYourGuide, Viator (v2) | Afiliado |

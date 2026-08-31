@@ -28,16 +28,19 @@ Legenda: 🔴 não começou · 🟡 em andamento · ✅ feito · ⬜ opcional/de
 
 Backlog de implementação (ver `CLAUDE.md` › "Próximos passos"). Ordem = dependência.
 
-- **Passo 6 — Google Places + enrich** 🟢 livre. `GooglePlacesProvider`, `PlacesModule`,
-  enrich no job do roteiro, `swap_restaurant`. Depende do Passo 4 ✅.
+- **Passo 6 — Google Places + enrich** ✅ concluído (rafinha, 2026-08-31).
+- **Passo 10 — Migração do provider voo/hotel: Amadeus → Travelpayouts** 🟢. Amadeus
+  descontinuou o Self-Service. Trocar `Amadeus*Provider` por `Travelpayouts*Provider`
+  (sem OAuth, `marker` de afiliado no deep-link), regravar fixtures, envs.
+  **Spec pronta:** `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md`. Depende do Passo 5.
 - **Passo 7 — Chat IA** 🟢. `ChatModule`, loop de tool-calling, as 9 tools → serviços,
   `chat_messages`. Depende de 4 + 5 + 6. **Maior bloco de código restante.**
 - **Passo 8 — UI web + E2E**. Ligar as telas do `apps/web` ao `apps/api` + fluxo
   Playwright login → onboarding → descoberta → destino → roteiro. Depende do 7.
-- **Pagamento no código (novo — não está no backlog):** `PaymentModule` + webhook Stripe.
-  **Spec pronta:** `docs/negocio/2026-08-31-spec-pagamento.md` — modelo de crédito
-  (avulso = 1, pacote = 3, sem expiração), conta primeiro, gate no `itinerary.generate`,
-  reembolso CDC. Depende do item 3 (cadastro Stripe).
+- **Passo 11 — Pagamento:** `PaymentModule` + webhook Stripe. **Spec pronta:**
+  `docs/negocio/2026-08-31-spec-pagamento.md` — modelo de crédito (avulso = 1, pacote = 3,
+  sem expiração), conta primeiro, gate no `itinerary.generate`, reembolso CDC.
+  Depende do item 3 (cadastro Stripe).
 - **Débito técnico** (`docs/superpowers/plans/2026-08-29-correcao-debito-tecnico.md`):
   pelo menos A2 (envs no CI) e C3 (warning de eslint) antes de abrir PRs de produção.
   Placeholders da pipeline fecham junto do Passo 6.
@@ -90,7 +93,7 @@ verdes (baseline de testes do projeto). PR que não bate os gates não entra.
 ### 4.2 Política de privacidade / LGPD
 - **Já é necessária agora** — a waitlist coleta e-mail.
 - Dados coletados: e-mail, perfil de gosto, dados de viagem, pagamento (via Stripe).
-- Terceiros com quem os dados trafegam: **Amadeus**, **Google Places**, **Anthropic
+- Terceiros com quem os dados trafegam: **Travelpayouts**, **Google Places**, **Anthropic
   (Claude)**, **Stripe**, provedor de e-mail, analytics.
 - Base legal, direitos do titular, opt-out, contato do encarregado.
 - Consentimento explícito no formulário da waitlist + link para a política.
@@ -121,10 +124,11 @@ verdes (baseline de testes do projeto). PR que não bate os gates não entra.
 - **Hosting:** container para `apps/api` + `apps/worker`, deploy do `apps/web` (Next),
   Postgres gerenciado. Hospedagem é agnóstica (container + Postgres + env).
 - **Supabase de produção:** projeto **separado do dev** (Auth + Postgres + Storage).
-- Rodar `db:migrate` (0000–0005) + `db:seed` (catálogo) no banco de produção.
+- Rodar `db:migrate` (0000–0006+) + `db:seed` (catálogo) no banco de produção.
 - Preencher **todas** as envs de produção (base em `.env.example`): `DATABASE_URL`,
-  `SUPABASE_*`, `ANTHROPIC_API_KEY`, `AMADEUS_*`, `JOBS_SCHEMA`, `*_DEEPLINK_TEMPLATE`,
-  `NEXT_PUBLIC_API_URL`, chaves da Stripe.
+  `SUPABASE_*`, `ANTHROPIC_API_KEY`, `TRAVELPAYOUTS_TOKEN` / `TRAVELPAYOUTS_MARKER`,
+  `GOOGLE_PLACES_KEY`, `JOBS_SCHEMA`, `*_DEEPLINK_TEMPLATE`, `NEXT_PUBLIC_API_URL`,
+  chaves da Stripe.
 - **CI:** fechar o débito A2 (adicionar as envs novas ao `ci.yml`) antes dos PRs de prod.
 - DNS do domínio (item 2) apontando para o hosting; HTTPS.
 
