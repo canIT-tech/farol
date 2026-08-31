@@ -29,3 +29,8 @@ test-results/
 
 # Stryker sandbox
 .stryker-tmp/
+
+# Worktrees
+.worktrees/
+.claude/worktrees/
+
