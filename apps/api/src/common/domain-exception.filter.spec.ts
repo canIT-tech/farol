@@ -59,6 +59,12 @@ describe("DomainExceptionFilter", () => {
     expect(status).toHaveBeenCalledWith(422);
   });
 
+  it("mapeia item_not_swappable para 422", () => {
+    const { host, status } = makeHost();
+    new DomainExceptionFilter().catch(new DomainError("item_not_swappable", "não é refeição"), host);
+    expect(status).toHaveBeenCalledWith(422);
+  });
+
   it("usa 400 para código de domínio sem mapeamento", () => {
     const { host, status, json } = makeHost();
     new DomainExceptionFilter().catch(new DomainError("outro", "estranho"), host);

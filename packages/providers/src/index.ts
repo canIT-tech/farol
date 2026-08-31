@@ -8,3 +8,6 @@ export * from "./amadeus/normalize-flight";
 export * from "./amadeus/amadeus-flight-provider";
 export * from "./amadeus/normalize-hotel";
 export * from "./amadeus/amadeus-hotel-provider";
+export * from "./places-provider";
+export * from "./google/normalize-place";
+export * from "./google/google-places-provider";

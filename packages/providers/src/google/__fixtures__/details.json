@@ -1,0 +1,20 @@
+{
+  "id": "ChIJZ3VqNbc0GQ0RRfCB8ZKQPqE",
+  "displayName": { "text": "Museu Nacional do Azulejo", "languageCode": "pt" },
+  "location": { "latitude": 38.7247, "longitude": -9.1146 },
+  "rating": 4.6,
+  "priceLevel": "PRICE_LEVEL_INEXPENSIVE",
+  "types": ["museum", "tourist_attraction", "point_of_interest"],
+  "formattedAddress": "R. Me. Deus 4, 1900-312 Lisboa, Portugal",
+  "regularOpeningHours": {
+    "weekdayDescriptions": [
+      "segunda-feira: Encerrado",
+      "terça-feira: 10:00 – 18:00",
+      "quarta-feira: 10:00 – 18:00",
+      "quinta-feira: 10:00 – 18:00",
+      "sexta-feira: 10:00 – 18:00",
+      "sábado: 10:00 – 18:00",
+      "domingo: 10:00 – 18:00"
+    ]
+  }
+}

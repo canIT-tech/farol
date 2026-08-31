@@ -1,0 +1,26 @@
+{
+  "places": [
+    {
+      "id": "ChIJZ3VqNbc0GQ0RRfCB8ZKQPqE",
+      "displayName": { "text": "Museu Nacional do Azulejo", "languageCode": "pt" },
+      "location": { "latitude": 38.7247, "longitude": -9.1146 },
+      "rating": 4.6,
+      "priceLevel": "PRICE_LEVEL_INEXPENSIVE",
+      "types": ["museum", "tourist_attraction", "point_of_interest"]
+    },
+    {
+      "id": "ChIJq0dQGrY0GQ0RSjNZ0-uNJ2s",
+      "displayName": { "text": "Time Out Market Lisboa", "languageCode": "pt" },
+      "location": { "latitude": 38.7071, "longitude": -9.1459 },
+      "rating": 4.4,
+      "priceLevel": "PRICE_LEVEL_MODERATE",
+      "types": ["restaurant", "food", "point_of_interest"]
+    },
+    {
+      "id": "ChIJnf6ZLLc0GQ0RE1zBxLQ0Yr0",
+      "displayName": { "text": "Miradouro da Senhora do Monte", "languageCode": "pt" },
+      "location": { "latitude": 38.7196, "longitude": -9.1327 },
+      "types": ["tourist_attraction", "point_of_interest"]
+    }
+  ]
+}

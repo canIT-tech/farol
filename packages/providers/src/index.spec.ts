@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isFlightProvider, isHotelProvider } from "./index";
+import { isFlightProvider, isHotelProvider, isPlacesProvider } from "./index";
 
 describe("isFlightProvider", () => {
   it("reconhece um objeto com search()", () => {
@@ -35,5 +35,24 @@ describe("isHotelProvider", () => {
     expect(isHotelProvider({})).toBe(false);
     expect(isHotelProvider({ search: 1 })).toBe(false);
     expect(isHotelProvider("x")).toBe(false);
+  });
+});
+
+describe("isPlacesProvider", () => {
+  const full = { textSearch: async () => [], details: async () => ({}) };
+
+  it("reconhece um objeto com textSearch() e details()", () => {
+    expect(isPlacesProvider(full)).toBe(true);
+  });
+
+  it("exige as duas funções", () => {
+    expect(isPlacesProvider({ textSearch: full.textSearch })).toBe(false);
+    expect(isPlacesProvider({ details: full.details })).toBe(false);
+    expect(isPlacesProvider({ ...full, details: 1 })).toBe(false);
+  });
+
+  it("rejeita null e primitivos", () => {
+    expect(isPlacesProvider(null)).toBe(false);
+    expect(isPlacesProvider("x")).toBe(false);
   });
 });

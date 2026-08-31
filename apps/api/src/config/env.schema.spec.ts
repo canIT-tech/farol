@@ -6,7 +6,8 @@ const valid = {
   SUPABASE_JWKS_URL: "https://proj.supabase.co/auth/v1/.well-known/jwks.json",
   ANTHROPIC_API_KEY: "sk-ant-test",
   AMADEUS_CLIENT_ID: "amadeus-id",
-  AMADEUS_CLIENT_SECRET: "amadeus-secret"
+  AMADEUS_CLIENT_SECRET: "amadeus-secret",
+  GOOGLE_PLACES_KEY: "google-places-key"
 };
 
 describe("parseEnv", () => {
@@ -94,9 +95,22 @@ describe("parseEnv", () => {
     expect(() => parseEnv({ ...valid, API_PORT: "-1" })).toThrow(/API_PORT/);
   });
 
+  it("lança quando GOOGLE_PLACES_KEY falta", () => {
+    const semChave: Record<string, string | undefined> = { ...valid };
+    delete semChave.GOOGLE_PLACES_KEY;
+    expect(() => parseEnv(semChave)).toThrow(/GOOGLE_PLACES_KEY/);
+  });
+
+  it("aplica o default de 24h do cache de Places e respeita o valor informado", () => {
+    expect(parseEnv({ ...valid }).PLACES_CACHE_TTL_SECONDS).toBe(86_400);
+    expect(parseEnv({ ...valid, PLACES_CACHE_TTL_SECONDS: "600" }).PLACES_CACHE_TTL_SECONDS).toBe(
+      600
+    );
+  });
+
   it("lista os campos inválidos separados por vírgula", () => {
     expect(() => parseEnv({ API_PORT: "-1" })).toThrow(
-      "Env inválida: DATABASE_URL, API_PORT, SUPABASE_JWKS_URL, ANTHROPIC_API_KEY, AMADEUS_CLIENT_ID, AMADEUS_CLIENT_SECRET"
+      "Env inválida: DATABASE_URL, API_PORT, SUPABASE_JWKS_URL, ANTHROPIC_API_KEY, AMADEUS_CLIENT_ID, AMADEUS_CLIENT_SECRET, GOOGLE_PLACES_KEY"
     );
   });
 });

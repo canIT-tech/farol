@@ -119,14 +119,14 @@ O **Passo 1** monta esse harness (Vitest, Playwright, Stryker) e liga os gates n
 Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correcao-debito-tecnico.md`.
 
 **Bloqueiam / arriscam o CI**
-- **`.github/workflows/ci.yml` sem as envs novas.** Só define `DATABASE_URL` e `NEXT_PUBLIC_API_URL`. Os e2e trazem defaults via `setup-e2e.ts` e o worker seta as suas no topo do spec, então *hoje passa por sorte*. Adicionar `SUPABASE_JWKS_URL`, `ANTHROPIC_API_KEY`, `AMADEUS_CLIENT_ID/SECRET`, `JOBS_SCHEMA` no bloco `env:`.
-- **CI roda `db:migrate` mas não `db:seed`.** Os specs que precisam do catálogo semeiam sozinhos no `beforeAll`; ainda assim vale um `db:seed` explícito no CI pra deixar o banco em estado conhecido.
+- ~~**`.github/workflows/ci.yml` sem as envs novas.**~~ Resolvido no Passo 6: o bloco `env:` agora declara `SUPABASE_JWKS_URL`, `ANTHROPIC_API_KEY`, `AMADEUS_CLIENT_ID/SECRET`, `GOOGLE_PLACES_KEY` e `JOBS_SCHEMA`.
+- ~~**CI roda `db:migrate` mas não `db:seed`.**~~ Resolvido no Passo 6: `db:seed` entrou como step explícito.
 - **`pnpm test:mutation` no CI roda tudo** (api grande + worker + db + pg-boss real dentro da mutação). Lento e potencialmente instável. Avaliar rodar mutação só nos pacotes tocados no PR, ou mover pra job separado/nightly.
 - **Testes de integração e o Postgres único.** A serialização no `turbo.json` resolve o CI (Postgres novo a cada run), mas localmente exige banco limpo. Opção definitiva: `DATABASE_URL_TEST` apontando pra um banco `farol_test` dedicado (docker-compose cria; specs já preferem `DATABASE_URL_TEST`).
 
-**Placeholders da pipeline (fecham no Passo 6)**
-- `discovery`: `climate.expectedC = 22` fixo e `flightTimeHours = null` (sem fonte de clima/tempo de voo no MVP).
-- `itinerary_items.placeId/lat/lng/rating = null` — enrich do Google Places é o Passo 6.
+**Placeholders da pipeline**
+- `discovery`: `climate.expectedC = 22` fixo e `flightTimeHours = null` (sem fonte de clima/tempo de voo no MVP). **Segue aberto** — o Passo 6 não trouxe fonte de clima.
+- ~~`itinerary_items.placeId/lat/lng/rating = null`~~ — preenchidos pelo enrich do Passo 6; item sem match fica `needsReview = true` e é reprocessado pelo job `places.enrich`.
 - `prefilterDestinations({ excludeIata })` existe mas não é usado (não há conceito de "destino rejeitado" no schema).
 
 **Qualidade / precisão**
@@ -141,7 +141,7 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - Teto de custo de LLM por roteiro (definir número).
 - Catálogo de destinos: CSV curado em `packages/db/data/destinations.csv` (23 cidades no Passo 3; `pnpm --filter @farol/db db:seed`). Expandir para ~200 é curadoria contínua.
 - Site parceiro para o deep-link de voo/hotel no MVP (template configurável via `FLIGHT_/HOTEL_DEEPLINK_TEMPLATE` desde o Passo 5).
-- Re-gravar as fixtures Amadeus (`packages/providers/**/__fixtures__/*.json`) a partir do sandbox real — hoje são escritas à mão (Passo 5, sem credenciais).
+- Re-gravar as fixtures Amadeus **e Google Places** (`packages/providers/**/__fixtures__/*.json`) a partir das APIs reais — hoje são escritas à mão (Passos 5 e 6, sem credenciais).
 - Confirmar domínio `farol.app` e travar o nome antes de produção.
 - Escolher lib base de componentes (recomendação: Radix para overlays).
 - **Gateway de pagamento** para a viagem avulsa (R$ 39 / pacote R$ 89) — Stripe / Mercado Pago / Pagar.me. Não iniciado; é o que destrava a receita principal do modelo per-trip.
@@ -164,7 +164,7 @@ Backlog de implementação. Ordem = dependência. Puxe pelo número.
 | 3 | Viagens + Descoberta de destino — `TripsModule`, catálogo seed (~200 cidades), `LlmModule`, `DiscoveryModule` (pré-filtro + ranking Claude) | ✅ concluído | felippebutland | — | 2 | (2026-08-29) |
 | 4 | Roteiro + Jobs — `JobsModule` (pg-boss), `apps/worker`, `ItineraryModule`, job `itinerary.generate`, polling no web | ✅ concluído | felippebutland | — | 3 | (2026-08-29) |
 | 5 | Providers Amadeus — `packages/providers`, auth OAuth2, `AmadeusFlightProvider` / `AmadeusHotelProvider`, `provider_cache`, resiliência, `FlightsModule` / `HotelsModule` | ✅ concluído | felippebutland | — | 3 | (2026-08-29) |
-| 6 | Google Places + enrich — `GooglePlacesProvider`, `PlacesModule`, passo de enrich no job do roteiro, `swap_restaurant` | 🟢 livre | — | — | 4 |
+| 6 | Google Places + enrich — `GooglePlacesProvider`, `PlacesModule`, passo de enrich no job do roteiro, `swap_restaurant` | ✅ concluído | rafaignaulin | `rafaignaulin/passo-6-places-enrich` | 4 | (2026-08-31) |
 | 7 | Chat IA — `ChatModule`, loop de tool-calling, as 9 tools mapeadas para serviços, `chat_messages` | 🟢 livre | — | — | 4, 5, 6 |
 | 8 | UI web + E2E — telas ligadas ao `apps/api`, fluxo Playwright login→onboarding→descoberta→destino→roteiro | 🟢 livre | — | — | 7 |
 | 9 | `packages/ui` — implementar tokens (`docs/design-system.md`) + componentes base (`Button`, `TextField`, `Chip`, `MatchBadge`, `DestinationCard`, `AppShell`, `StepNav`, `AdvisorChat`) | ✅ concluído | felippebutland | — | 1 | (2026-08-28) |

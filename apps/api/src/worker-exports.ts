@@ -3,6 +3,11 @@ export { ConfigModule } from "./config/config.module";
 export { DbModule } from "./db/db.module";
 export { LlmModule } from "./llm/llm.module";
 export { JobsModule } from "./jobs/jobs.module";
+// O worker precisa do Places para o enrich do roteiro (Passo 6). ProvidersModule
+// é @Global mas ainda tem que ser importado uma vez pelo módulo raiz do processo.
+export { ProvidersModule, PLACES_PROVIDER } from "./providers/providers.module";
+export { PlacesModule } from "./places/places.module";
+export { PlacesService } from "./places/places.service";
 export { ItineraryRepository } from "./itinerary/itinerary.repository";
 export { JOB_QUEUE, type JobQueue } from "./jobs/job-queue";
 export { JOB_NAMES } from "./jobs/job-names";
@@ -16,3 +21,4 @@ export {
   ItineraryRegenerateDayHandler,
   type ItineraryRegenerateDayData
 } from "./itinerary/itinerary-regenerate-day.handler";
+export { PlacesEnrichHandler, type PlacesEnrichData } from "./itinerary/places-enrich.handler";

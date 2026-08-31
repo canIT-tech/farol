@@ -70,3 +70,10 @@ export type BuildItineraryOutput = z.infer<typeof buildItineraryOutputSchema>;
 // Body de POST /trips/:id/destination.
 export const chooseDestinationSchema = z.object({ iata: z.string().length(3) });
 export type ChooseDestinationInput = z.infer<typeof chooseDestinationSchema>;
+
+// Body de POST /trips/:id/itinerary/items/:itemId/swap-restaurant.
+// Sem cuisine, o swap busca só "restaurante" perto do item (design §6.4).
+export const swapRestaurantSchema = z.object({
+  cuisine: z.string().min(2).max(60).optional()
+});
+export type SwapRestaurantInput = z.infer<typeof swapRestaurantSchema>;

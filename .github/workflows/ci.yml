@@ -24,6 +24,14 @@ jobs:
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/farol
       NEXT_PUBLIC_API_URL: http://localhost:3333
+      # Envs de app: os specs trazem defaults próprios, mas o CI declara aqui
+      # para o banco/config ficarem em estado conhecido (débito do Passo 5).
+      SUPABASE_JWKS_URL: https://example.com/auth/v1/.well-known/jwks.json
+      ANTHROPIC_API_KEY: sk-ant-ci
+      AMADEUS_CLIENT_ID: amadeus-ci-id
+      AMADEUS_CLIENT_SECRET: amadeus-ci-secret
+      GOOGLE_PLACES_KEY: google-places-ci
+      JOBS_SCHEMA: pgboss_ci
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -35,6 +43,7 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm --filter @farol/db run db:migrate
+      - run: pnpm --filter @farol/db run db:seed
       - run: pnpm test
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:e2e

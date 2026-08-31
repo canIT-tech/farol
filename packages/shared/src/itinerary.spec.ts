@@ -7,7 +7,8 @@ import {
   itineraryDaySchema,
   itinerarySchema,
   buildItinerarySlotSchema,
-  buildItineraryOutputSchema
+  buildItineraryOutputSchema,
+  swapRestaurantSchema
 } from "./itinerary";
 
 const UUID = "11111111-1111-1111-1111-111111111111";
@@ -275,5 +276,20 @@ describe("buildItineraryOutputSchema", () => {
     expect(
       buildItineraryOutputSchema.parse({ days: [{ dayIndex: 1, slots: [] }] }).days[0]!.slots
     ).toEqual([]);
+  });
+});
+
+describe("swapRestaurantSchema", () => {
+  it("aceita body vazio (sem cozinha preferida)", () => {
+    expect(swapRestaurantSchema.parse({})).toEqual({});
+  });
+
+  it("aceita uma cozinha", () => {
+    expect(swapRestaurantSchema.parse({ cuisine: "japonesa" }).cuisine).toBe("japonesa");
+  });
+
+  it("rejeita cozinha curta demais ou longa demais", () => {
+    expect(() => swapRestaurantSchema.parse({ cuisine: "a" })).toThrow();
+    expect(() => swapRestaurantSchema.parse({ cuisine: "a".repeat(61) })).toThrow();
   });
 });

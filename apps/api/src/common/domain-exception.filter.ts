@@ -10,7 +10,8 @@ const STATUS_BY_CODE: Record<string, number> = {
   no_destinations_in_budget: HttpStatus.UNPROCESSABLE_ENTITY,
   no_destination_chosen: HttpStatus.UNPROCESSABLE_ENTITY,
   llm_invalid_output: HttpStatus.BAD_GATEWAY,
-  itinerary_not_ready: HttpStatus.CONFLICT
+  itinerary_not_ready: HttpStatus.CONFLICT,
+  item_not_swappable: HttpStatus.UNPROCESSABLE_ENTITY
 };
 
 interface ResponseLike {

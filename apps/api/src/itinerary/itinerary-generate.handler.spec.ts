@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from "vitest";
 import { eq, inArray } from "drizzle-orm";
 import {
   createDbClient,
@@ -16,6 +16,7 @@ import { ItineraryRepository } from "./itinerary.repository";
 import { TripsService } from "../trips/trips.service";
 import { FakeLlmService } from "../llm/fake-llm.service";
 import type { LlmPort } from "../llm/llm.types";
+import type { PlacesService } from "../places/places.service";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/api");
@@ -23,7 +24,11 @@ if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/api");
 const { db, close } = createDbClient(url);
 const repo = new ItineraryRepository(db);
 const tripsService = new TripsService(db);
-const handler = new ItineraryGenerateHandler(repo, new FakeLlmService());
+
+// O enrich do Places é exercido em enrich-itinerary.spec.ts; aqui um fake que
+// nunca acha lugar mantém o foco do spec na geração em si.
+const places = { findFirst: () => Promise.resolve(null) } as unknown as PlacesService;
+const handler = new ItineraryGenerateHandler(repo, new FakeLlmService(), db, places);
 
 const userIds: string[] = [];
 
@@ -140,7 +145,7 @@ describe("ItineraryGenerateHandler.handle", () => {
       rankDestinations: () => Promise.reject(new Error("x")),
       buildItinerary: () => Promise.reject(new Error("modelo fora do ar"))
     } as unknown as LlmPort;
-    const failing = new ItineraryGenerateHandler(repo, boom);
+    const failing = new ItineraryGenerateHandler(repo, boom, db, places);
 
     await expect(failing.handle({ itineraryId })).rejects.toThrow("modelo fora do ar");
     const [it] = await db.select().from(itineraries).where(eq(itineraries.id, itineraryId));
@@ -154,7 +159,7 @@ describe("ItineraryGenerateHandler.handle", () => {
       rankDestinations: () => Promise.reject(new Error("x")),
       buildItinerary: () => Promise.reject("string crua")
     } as unknown as LlmPort;
-    const failing = new ItineraryGenerateHandler(repo, boom);
+    const failing = new ItineraryGenerateHandler(repo, boom, db, places);
     await expect(failing.handle({ itineraryId })).rejects.toBe("string crua");
     const [it] = await db.select().from(itineraries).where(eq(itineraries.id, itineraryId));
     expect(it!.status).toBe("failed");
@@ -163,6 +168,45 @@ describe("ItineraryGenerateHandler.handle", () => {
 
   it("lança quando o itineraryId não existe", async () => {
     await expect(handler.handle({ itineraryId: crypto.randomUUID() })).rejects.toThrow(/não existe/);
+  });
+
+  it("enriquece os itens usando cidade e país do destino escolhido", async () => {
+    const { itineraryId } = await scenario();
+    const findFirst = vi.fn<PlacesService["findFirst"]>(() => Promise.resolve(null));
+    const enriching = new ItineraryGenerateHandler(repo, new FakeLlmService(), db, {
+      findFirst
+    } as unknown as PlacesService);
+
+    await enriching.handle({ itineraryId });
+
+    expect(findFirst).toHaveBeenCalled();
+    expect(findFirst.mock.calls.every(([query]) => String(query).endsWith("Lisboa, Portugal"))).toBe(
+      true
+    );
+    const items = await itemsOf(itineraryId);
+    expect(items.every((row) => row.itinerary_items.needsReview)).toBe(true);
+  });
+
+  it("falha do enrich não derruba a geração: fica ready e loga o evento", async () => {
+    const { itineraryId } = await scenario();
+    // db quebrado só para o enrich; o repo continua usando o db real.
+    const brokenDb = {
+      select: () => {
+        throw new Error("db fora do ar");
+      }
+    } as never;
+    const resilient = new ItineraryGenerateHandler(repo, new FakeLlmService(), brokenDb, places);
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    try {
+      await resilient.handle({ itineraryId });
+      expect(errSpy.mock.calls[0]![0]).toContain("itinerary_enrich_failed");
+    } finally {
+      errSpy.mockRestore();
+    }
+
+    const [it] = await db.select().from(itineraries).where(eq(itineraries.id, itineraryId));
+    expect(it!.status).toBe("ready");
   });
 });
 

@@ -347,7 +347,15 @@ describe("schema.itineraryItems", () => {
     durationMin: { name: "duration_min", sqlType: "integer", notNull: false },
     estCost: { name: "est_cost", sqlType: "numeric", notNull: false },
     sortOrder: { name: "sort_order", sqlType: "integer", notNull: true },
-    pinned: { name: "pinned", sqlType: "boolean", notNull: true, hasDefault: true, default: false }
+    pinned: { name: "pinned", sqlType: "boolean", notNull: true, hasDefault: true, default: false },
+    // Marca de falha do enrich do Google Places (design §7.3, Passo 6).
+    needsReview: {
+      name: "needs_review",
+      sqlType: "boolean",
+      notNull: true,
+      hasDefault: true,
+      default: false
+    }
   });
 
   it("referencia itinerary_days.id com ON DELETE cascade", () => {

@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 
 process.env.SUPABASE_JWKS_URL ??= "https://example.com/jwks.json";
-process.env.ANTHROPIC_API_KEY ??= "sk-ant-worker-e2e";
+process.env.ANTHROPIC_API_KEY ??= "sk-ant-worker-enrich";
 process.env.AMADEUS_CLIENT_ID ??= "amadeus-worker-id";
 process.env.AMADEUS_CLIENT_SECRET ??= "amadeus-worker-secret";
 process.env.GOOGLE_PLACES_KEY ??= "google-places-worker";
-process.env.JOBS_SCHEMA = `pgboss_worker_${Math.random().toString(36).slice(2, 8)}`;
+process.env.JOBS_SCHEMA = `pgboss_enrich_${Math.random().toString(36).slice(2, 8)}`;
 
 import { Test, type TestingModule } from "@nestjs/testing";
 import postgres from "postgres";
@@ -16,17 +16,34 @@ import {
   users,
   trips,
   tripDestinations,
-  tasteProfiles,
   itineraries,
-  itineraryDays
+  itineraryDays,
+  itineraryItems
 } from "@farol/db";
-import { LLM, FakeLlmService } from "@farol/api";
+import { PLACES_PROVIDER } from "@farol/api";
+import type { Place } from "@farol/shared";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para o e2e do worker");
 
 const { db, close } = createDbClient(url);
 let app: TestingModule;
+
+const ACHADO: Place = {
+  placeId: "place-achado",
+  name: "Lugar Achado",
+  lat: 38.72,
+  lng: -9.14,
+  rating: 4.5,
+  priceLevel: 2,
+  types: ["tourist_attraction"]
+};
+
+// Provider que agora acha tudo — é o cenário do reprocessamento.
+const provider = {
+  textSearch: () => Promise.resolve([ACHADO]),
+  details: () => Promise.resolve({ ...ACHADO, address: null, openingHours: null })
+};
 
 async function waitFor(predicate: () => Promise<boolean>, timeoutMs: number): Promise<void> {
   const start = Date.now();
@@ -44,8 +61,8 @@ beforeAll(async () => {
   const { WorkerModule } = await import("../src/worker.module");
   const { registerHandlers } = await import("../src/register-handlers");
   app = await Test.createTestingModule({ imports: [WorkerModule] })
-    .overrideProvider(LLM)
-    .useClass(FakeLlmService)
+    .overrideProvider(PLACES_PROVIDER)
+    .useValue(provider)
     .compile();
   await app.init();
   await registerHandlers(app);
@@ -62,25 +79,17 @@ afterAll(async () => {
   await close();
 });
 
-describe("worker — itinerary.generate ponta a ponta", () => {
-  it("processa o job publicado e deixa o itinerary ready com dias", async () => {
+describe("worker — places.enrich ponta a ponta", () => {
+  it("reprocessa os itens needsReview e preenche o lugar", async () => {
     const userId = crypto.randomUUID();
     await db.insert(users).values({ id: userId, email: `${userId}@farol.test` });
-    await db.insert(tasteProfiles).values({
-      id: crypto.randomUUID(),
-      userId,
-      interests: ["praia", "gastronomia", "cultura e museus"],
-      pace: "moderado",
-      partyType: "casal",
-      budgetBand: "medio"
-    });
     const tripId = crypto.randomUUID();
     await db.insert(trips).values({
       id: tripId,
       userId,
-      status: "draft",
+      status: "planned",
       originIata: "GRU",
-      durationDays: 2,
+      durationDays: 1,
       targetMonth: "2026-09",
       party: { adults: 2, children: 0 },
       budgetTotal: "30000",
@@ -99,56 +108,46 @@ describe("worker — itinerary.generate ponta a ponta", () => {
       flightTimeHours: null,
       chosen: true
     });
+
     const itineraryId = crypto.randomUUID();
-    await db.insert(itineraries).values({ id: itineraryId, tripId, version: 1, status: "pending" });
+    await db.insert(itineraries).values({ id: itineraryId, tripId, version: 1, status: "ready" });
+    const dayId = crypto.randomUUID();
+    await db.insert(itineraryDays).values({ id: dayId, itineraryId, dayIndex: 1 });
+    const first = crypto.randomUUID();
+    const second = crypto.randomUUID();
+    await db.insert(itineraryItems).values([
+      {
+        id: first,
+        dayId,
+        slot: "morning",
+        type: "activity",
+        title: "Museu do Azulejo",
+        sortOrder: 0,
+        needsReview: true
+      },
+      {
+        id: second,
+        dayId,
+        slot: "afternoon",
+        type: "meal",
+        title: "Almoço no bairro",
+        sortOrder: 1,
+        needsReview: true
+      }
+    ]);
 
     const { JOB_NAMES, JOB_QUEUE } = await import("@farol/api");
     const queue = app.get(JOB_QUEUE);
-    await queue.publish(JOB_NAMES.itineraryGenerate, { itineraryId });
+    await queue.publish(JOB_NAMES.placesEnrich, { itineraryId });
 
     await waitFor(async () => {
-      const [row] = await db.select().from(itineraries).where(eq(itineraries.id, itineraryId));
-      return row?.status === "ready";
+      const rows = await db.select().from(itineraryItems).where(eq(itineraryItems.dayId, dayId));
+      return rows.length >= 2 && rows.every((row) => !row.needsReview && row.placeId !== null);
     }, 20_000);
 
-    const days = await db
-      .select()
-      .from(itineraryDays)
-      .where(eq(itineraryDays.itineraryId, itineraryId));
-    expect(days).toHaveLength(2);
-
-    // ---- regenerate-day ponta a ponta ----
-    const { itineraryItems } = await import("@farol/db");
-    const [day1] = await db
-      .select()
-      .from(itineraryDays)
-      .where(eq(itineraryDays.itineraryId, itineraryId))
-      .orderBy(itineraryDays.dayIndex)
-      .limit(1);
-    const day1Items = await db
-      .select()
-      .from(itineraryItems)
-      .where(eq(itineraryItems.dayId, day1!.id));
-    const pinnedItem = day1Items[0]!;
-    const swappable = day1Items[1]!;
-    await db.update(itineraryItems).set({ pinned: true }).where(eq(itineraryItems.id, pinnedItem.id));
-    await db
-      .update(itineraryItems)
-      .set({ title: "TITULO ANTIGO PARA TROCAR" })
-      .where(eq(itineraryItems.id, swappable.id));
-
-    await queue.publish(JOB_NAMES.itineraryRegenerateDay, { itineraryId, dayIndex: day1!.dayIndex });
-
-    await waitFor(async () => {
-      const now = await db
-        .select()
-        .from(itineraryItems)
-        .where(eq(itineraryItems.dayId, day1!.id));
-      return (
-        now.some((i) => i.pinned && i.title === pinnedItem.title) &&
-        !now.some((i) => i.title === "TITULO ANTIGO PARA TROCAR")
-      );
-    }, 20_000);
+    const rows = await db.select().from(itineraryItems).where(eq(itineraryItems.id, first));
+    expect(rows[0]!.placeId).toBe("place-achado");
+    expect(Number(rows[0]!.lat)).toBeCloseTo(38.72);
 
     await db.delete(users).where(eq(users.id, userId));
   });
