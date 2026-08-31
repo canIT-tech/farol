@@ -1,0 +1,1077 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Custo do Farol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+/>
+
+<style>
+  :root {
+    --ground: #faf6f0;
+    --surface: #f2ebdf;
+    --surface-2: #ede4d4;
+    --ink: #2a2320;
+    --ink-soft: #6d6259;
+    --ink-faint: #948a7e;
+    --accent: #c25a38;
+    --accent-ink: #a8462a;
+    --accent-wash: #f0ddd3;
+    --good: #3d7a67;
+    --good-wash: #dbe8e2;
+    --warn: #a96a1e;
+    --warn-wash: #f0e2cd;
+    --rule: #e0d5c4;
+    --rule-strong: #cdbfa9;
+    --shadow: 0 1px 2px rgba(60, 42, 30, 0.06), 0 8px 24px rgba(60, 42, 30, 0.05);
+    --maxw: 46rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #171310;
+      --surface: #201a15;
+      --surface-2: #26201a;
+      --ink: #efe6da;
+      --ink-soft: #a89d8f;
+      --ink-faint: #7c7264;
+      --accent: #e07a56;
+      --accent-ink: #ef9576;
+      --accent-wash: #37241b;
+      --good: #6bb39b;
+      --good-wash: #1f2f29;
+      --warn: #d29a4e;
+      --warn-wash: #33281a;
+      --rule: #322a22;
+      --rule-strong: #453a2f;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #171310;
+    --surface: #201a15;
+    --surface-2: #26201a;
+    --ink: #efe6da;
+    --ink-soft: #a89d8f;
+    --ink-faint: #7c7264;
+    --accent: #e07a56;
+    --accent-ink: #ef9576;
+    --accent-wash: #37241b;
+    --good: #6bb39b;
+    --good-wash: #1f2f29;
+    --warn: #d29a4e;
+    --warn-wash: #33281a;
+    --rule: #322a22;
+    --rule-strong: #453a2f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .wrap {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: clamp(2.5rem, 6vw, 5rem) clamp(1.15rem, 5vw, 2rem) 5rem;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: "Bricolage Grotesque", "Instrument Sans", sans-serif;
+    line-height: 1.12;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(2.05rem, 6vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: clamp(1.4rem, 3.5vw, 1.7rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: var(--accent-ink);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  code {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.86em;
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 0.08em 0.36em;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+  }
+
+  /* ---------- header ---------- */
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    padding-bottom: 2.25rem;
+    border-bottom: 2px solid var(--rule-strong);
+  }
+
+  .lede {
+    font-size: 1.16rem;
+    color: var(--ink-soft);
+    max-width: 38rem;
+  }
+
+  .meta {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.76rem;
+    letter-spacing: 0.03em;
+    color: var(--ink-faint);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+  }
+
+  /* ---------- tl;dr ---------- */
+  .tldr {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 2.25rem 0 0;
+  }
+
+  .tldr div {
+    background: var(--surface);
+    padding: 1.15rem 1.1rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .tldr .k {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .tldr .v {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-size: clamp(1.35rem, 4.4vw, 1.7rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tldr .n {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--ink-soft);
+  }
+
+  @media (max-width: 34rem) {
+    .tldr {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ---------- callout ---------- */
+  .callout {
+    display: flex;
+    gap: 0.8rem;
+    background: var(--warn-wash);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--warn);
+    border-radius: 8px;
+    padding: 0.95rem 1.1rem;
+    font-size: 0.94rem;
+    color: var(--ink-soft);
+    margin-top: 1.75rem;
+  }
+
+  .callout strong {
+    color: var(--ink);
+  }
+
+  .callout .mark {
+    color: var(--warn);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ---------- sections ---------- */
+  section {
+    padding-top: 3rem;
+  }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.85rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .sec-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .sec-note {
+    color: var(--ink-soft);
+    margin: 0.55rem 0 1.4rem;
+    font-size: 0.98rem;
+  }
+
+  .sec-note + .sec-note {
+    margin-top: -0.9rem;
+  }
+
+  /* ---------- tables ---------- */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+    min-width: 30rem;
+  }
+
+  caption {
+    text-align: left;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 0.85rem 1rem 0.55rem;
+  }
+
+  th,
+  td {
+    padding: 0.62rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  thead th {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--rule-strong);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  td.num,
+  th.num {
+    text-align: right;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.86rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  tr.total td {
+    border-top: 1px solid var(--rule-strong);
+    background: var(--accent-wash);
+    font-weight: 600;
+  }
+
+  tr.total td.num {
+    color: var(--accent-ink);
+    font-weight: 500;
+  }
+
+  tbody th {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* ---------- composition bars ---------- */
+  .bars {
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    margin: 1.6rem 0 0.5rem;
+  }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .bar-row .label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.78rem;
+    line-height: 1.3;
+    color: var(--ink-soft);
+  }
+
+  .bar-row .label b {
+    display: block;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .track {
+    display: flex;
+    height: 1.6rem;
+    border-radius: 5px;
+    overflow: hidden;
+    background: var(--surface-2);
+    border: 1px solid var(--rule);
+  }
+
+  .seg {
+    height: 100%;
+  }
+
+  .seg.infra {
+    background: var(--good);
+  }
+  .seg.ia {
+    background: var(--accent);
+  }
+  .seg.svc {
+    background: var(--warn);
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.2rem;
+    margin-top: 1rem;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.74rem;
+    color: var(--ink-soft);
+  }
+
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .swatch {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .swatch.infra {
+    background: var(--good);
+  }
+  .swatch.ia {
+    background: var(--accent);
+  }
+  .swatch.svc {
+    background: var(--warn);
+  }
+
+  /* ---------- takeaways ---------- */
+  .reads {
+    list-style: none;
+    margin: 1.3rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .reads li {
+    display: grid;
+    grid-template-columns: 1.6rem 1fr;
+    gap: 0.7rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .reads li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .reads .idx {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 700;
+    color: var(--accent);
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+
+  .reads b {
+    color: var(--ink);
+  }
+
+  .risks {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 1.25rem 1.35rem;
+    margin-top: 1.6rem;
+  }
+
+  .risks h3 {
+    margin-bottom: 0.7rem;
+  }
+
+  .risks ul {
+    margin: 0;
+    padding-left: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.94rem;
+    color: var(--ink-soft);
+  }
+
+  .risks li::marker {
+    color: var(--warn);
+  }
+
+  .risks b {
+    color: var(--ink);
+  }
+
+  footer {
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .prose p + p {
+    margin-top: 0.9rem;
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Farol · modelo de custo</span>
+    <h1>Quanto custa rodar o Farol</h1>
+    <p class="lede">
+      Custo mensal para operar o produto — infraestrutura fixa, IA (Claude) e
+      serviços de terceiros (Amadeus, Google Places) — em três volumes de uso,
+      e o modelo de pricing que decorre dele: grátis para provar, pagamento
+      por viagem, afiliado por baixo.
+    </p>
+    <div class="meta">
+      <span>29 ago 2026</span>
+      <span>base: arquitetura MVP + v1</span>
+      <span>preços de LLM do código (<code>MODEL_PRICING</code>)</span>
+    </div>
+  </header>
+
+  <div class="tldr">
+    <div>
+      <span class="k">Infra do MVP</span>
+      <span class="v">US$ 45–75<span style="font-size: 0.6em">/mês</span></span>
+      <span class="n">Supabase Pro + 1 host de container + tiers grátis. Independe de volume.</span>
+    </div>
+    <div>
+      <span class="k">Custo marginal</span>
+      <span class="v">US$ 0,15–0,50</span>
+      <span class="n">por usuário ativo/mês (IA + APIs de viagem, já com cache).</span>
+    </div>
+    <div>
+      <span class="k">Margem por viagem paga</span>
+      <span class="v">~85%</span>
+      <span class="n">R$ 39 avulso + afiliado, contra ~US$ 1–1,65 de custo marginal + taxa.</span>
+    </div>
+  </div>
+
+  <div class="callout">
+    <span class="mark">⚠</span>
+    <p>
+      <strong>Amadeus e Google Places têm faixas de preço por volume e cotas
+      grátis mensais.</strong> Os valores de serviços abaixo são estimativa de
+      ordem de grandeza — confirmar nas contas antes de fechar preço de venda.
+      IA e infra são firmes.
+    </p>
+  </div>
+
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2>Custo de IA — Claude</h2>
+    </div>
+    <p class="sec-note">
+      Roteamento de modelo por tarefa. Preços do código:
+      <strong>Sonnet 5</strong> US$ 3 / US$ 15 por 1M de tokens (entrada /
+      saída); <strong>Haiku 4.5</strong> US$ 0,80 / US$ 4. As tarefas do MVP
+      usam Sonnet 5.
+    </p>
+
+    <div class="table-wrap prose">
+      <table>
+        <caption>Custo por operação</caption>
+        <thead>
+          <tr>
+            <th scope="col">Operação</th>
+            <th scope="col" class="num">tok in / out</th>
+            <th scope="col" class="num">Custo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Descoberta — shortlist de ~20 destinos → 3–5 escolhidos</th>
+            <td class="num">1.650 / 440</td>
+            <td class="num">US$ 0,012</td>
+          </tr>
+          <tr>
+            <th scope="row">Roteiro — 5 noites × 3 slots/dia</th>
+            <td class="num">450 / 900</td>
+            <td class="num">US$ 0,015</td>
+          </tr>
+          <tr>
+            <th scope="row">Regenerar 1 dia</th>
+            <td class="num">400 / 200</td>
+            <td class="num">US$ 0,004</td>
+          </tr>
+          <tr>
+            <th scope="row">Chat (v1) — ~8 turnos, histórico + schema de tools</th>
+            <td class="num">24.000 / 3.200</td>
+            <td class="num">US$ 0,12 <span style="color: var(--ink-faint)">→ 0,05*</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sec-note" style="margin-top: 0.75rem; font-size: 0.88rem">
+      * com prompt caching (system e schema de tools repetidos custam 10% no
+      cache-hit).
+    </p>
+
+    <p class="sec-note" style="margin-top: 1.1rem">
+      <strong>Por viagem engajada (MVP, sem chat):</strong> descoberta + roteiro
+      + ~2 regenerações ≈ <strong>US$ 0,03–0,05</strong> — folga larga contra o
+      teto <code>LLM_ROUTE_BUDGET_USD = 0,15</code>.
+    </p>
+
+    <div class="table-wrap prose" style="margin-top: 1.2rem">
+      <table>
+        <caption>Claude por mês, por volume</caption>
+        <thead>
+          <tr>
+            <th scope="col">Usuários ativos/mês</th>
+            <th scope="col" class="num">MVP (sem chat)</th>
+            <th scope="col" class="num">v1 (com chat)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">100</th><td class="num">US$ 4</td><td class="num">US$ 11</td></tr>
+          <tr><th scope="row">1.000</th><td class="num">US$ 40</td><td class="num">US$ 110</td></tr>
+          <tr><th scope="row">10.000</th><td class="num">US$ 400</td><td class="num">US$ 1.100</td></tr>
+          <tr><th scope="row">100.000</th><td class="num">US$ 4.000</td><td class="num">US$ 11.000</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2>Serviços de terceiros</h2>
+    </div>
+    <p class="sec-note">
+      O <code>provider_cache</code> (voo 10&nbsp;min, hotel 1&nbsp;h) e um cache
+      global de lugares reduzem chamadas repetidas. É aqui que mora o custo
+      variável — 3 a 10× a IA.
+    </p>
+
+    <div class="table-wrap prose">
+      <table>
+        <caption>Custo por viagem</caption>
+        <thead>
+          <tr>
+            <th scope="col">API</th>
+            <th scope="col">Uso por viagem</th>
+            <th scope="col" class="num">~US$/viagem</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Amadeus — Flight Offers + Hotel Search</th>
+            <td>~2 buscas de voo + ~2 de hotel após cache</td>
+            <td class="num">~0,08</td>
+          </tr>
+          <tr>
+            <th scope="row">Google Places — enrich de POI / restaurante</th>
+            <td>~8 lugares × (search + details), 1ª vez</td>
+            <td class="num">~0,15 → 0,03</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sec-note" style="margin-top: 0.75rem; font-size: 0.88rem">
+      Amadeus Self-Service tem cota grátis mensal — no MVP pode custar US$ 0.
+      Places cai para ~US$ 0,03/viagem conforme o cache global de lugares
+      enche.
+    </p>
+
+    <div class="table-wrap prose" style="margin-top: 1.2rem">
+      <table>
+        <caption>Serviços por mês, por volume de viagens</caption>
+        <thead>
+          <tr>
+            <th scope="col">Viagens/mês</th>
+            <th scope="col" class="num">Amadeus</th>
+            <th scope="col" class="num">Google Places</th>
+            <th scope="col" class="num">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">1.500</th>
+            <td class="num">0 – 120</td>
+            <td class="num">25 – 225</td>
+            <td class="num">30 – 350</td>
+          </tr>
+          <tr>
+            <th scope="row">15.000</th>
+            <td class="num">300 – 1.200</td>
+            <td class="num">100 – 450</td>
+            <td class="num">450 – 1.750</td>
+          </tr>
+          <tr>
+            <th scope="row">150.000</th>
+            <td class="num">3k – 12k</td>
+            <td class="num">1k – 4,5k</td>
+            <td class="num">4,4k – 17,6k</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2>Infraestrutura fixa</h2>
+    </div>
+    <p class="sec-note">
+      Recorrente, não escala com uso no MVP. <code>apps/api</code> +
+      <code>apps/worker</code> são dois processos Node sempre de pé; o pg-boss
+      vive no próprio Postgres do Supabase.
+    </p>
+
+    <div class="table-wrap prose">
+      <table>
+        <caption>US$ / mês</caption>
+        <thead>
+          <tr>
+            <th scope="col">Item</th>
+            <th scope="col" class="num">MVP<br />~0,1–1k users</th>
+            <th scope="col" class="num">Crescimento<br />~10k</th>
+            <th scope="col" class="num">Escala<br />~100k</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Supabase — Postgres + Auth + Storage</th>
+            <td class="num">25</td>
+            <td class="num">85</td>
+            <td class="num">250 – 400</td>
+          </tr>
+          <tr>
+            <th scope="row">Host de container — api + worker</th>
+            <td class="num">15 – 25</td>
+            <td class="num">50 – 80</td>
+            <td class="num">200 – 400</td>
+          </tr>
+          <tr>
+            <th scope="row">Frontend — Cloudflare Pages / Vercel</th>
+            <td class="num">0 – 20</td>
+            <td class="num">20 – 40</td>
+            <td class="num">100 – 200</td>
+          </tr>
+          <tr>
+            <th scope="row">Sentry + PostHog + Resend</th>
+            <td class="num">0</td>
+            <td class="num">~50</td>
+            <td class="num">~150</td>
+          </tr>
+          <tr>
+            <th scope="row">Domínio <code>farol.app</code> (amortizado)</th>
+            <td class="num">~2</td>
+            <td class="num">~2</td>
+            <td class="num">~2</td>
+          </tr>
+          <tr class="total">
+            <td>Infra / mês</td>
+            <td class="num">45 – 75</td>
+            <td class="num">210 – 260</td>
+            <td class="num">700 – 1.150</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2>Total consolidado</h2>
+    </div>
+    <p class="sec-note">
+      Soma de infra + IA + serviços. A composição vira de barato-e-fixo para
+      dominado-pelo-uso conforme o volume cresce.
+    </p>
+
+    <div class="table-wrap prose">
+      <table>
+        <caption>US$ / mês</caption>
+        <thead>
+          <tr>
+            <th scope="col">Cenário</th>
+            <th scope="col" class="num">Infra</th>
+            <th scope="col" class="num">IA</th>
+            <th scope="col" class="num">Serviços</th>
+            <th scope="col" class="num">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">MVP — 1k users · 1,5k viagens · sem chat</th>
+            <td class="num">60</td>
+            <td class="num">40</td>
+            <td class="num">30 – 350</td>
+            <td class="num">130 – 450</td>
+          </tr>
+          <tr>
+            <th scope="row">Crescimento — 10k users · 15k viagens · com chat</th>
+            <td class="num">235</td>
+            <td class="num">110</td>
+            <td class="num">450 – 1.750</td>
+            <td class="num">800 – 2.100</td>
+          </tr>
+          <tr>
+            <th scope="row">Escala — 100k users · 150k viagens</th>
+            <td class="num">925</td>
+            <td class="num">11.000</td>
+            <td class="num">4,4k – 17,6k</td>
+            <td class="num">16k – 29k</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bars" role="img" aria-label="Composição de custo por cenário: no MVP a infra pesa; na escala IA e serviços dominam e a infra vira ruído.">
+      <div class="bar-row">
+        <span class="label"><b>MVP</b>~US$ 260/mês</span>
+        <span class="track">
+          <span class="seg infra" style="width: 23%"></span>
+          <span class="seg ia" style="width: 15%"></span>
+          <span class="seg svc" style="width: 62%"></span>
+        </span>
+      </div>
+      <div class="bar-row">
+        <span class="label"><b>Crescimento</b>~US$ 1.450/mês</span>
+        <span class="track">
+          <span class="seg infra" style="width: 16%"></span>
+          <span class="seg ia" style="width: 8%"></span>
+          <span class="seg svc" style="width: 76%"></span>
+        </span>
+      </div>
+      <div class="bar-row">
+        <span class="label"><b>Escala</b>~US$ 22.900/mês</span>
+        <span class="track">
+          <span class="seg infra" style="width: 4%"></span>
+          <span class="seg ia" style="width: 48%"></span>
+          <span class="seg svc" style="width: 48%"></span>
+        </span>
+      </div>
+    </div>
+    <div class="legend">
+      <span><span class="swatch infra"></span> Infra fixa</span>
+      <span><span class="swatch ia"></span> IA (Claude)</span>
+      <span><span class="swatch svc"></span> Serviços (Amadeus + Places)</span>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <h2>Modelo de pricing</h2>
+    </div>
+    <p class="sec-note">
+      <strong>Não é SaaS para o consumidor.</strong> Grátis para provar o
+      produto; paga <strong>por viagem</strong>, uma vez, quando quer a coisa
+      inteira (destino + roteiro + chat + voo/hotel). O afiliado roda por baixo
+      em todos os planos. A assinatura fica só no B2B (v2).
+    </p>
+
+    <div class="table-wrap prose">
+      <table>
+        <caption>Planos</caption>
+        <thead>
+          <tr>
+            <th scope="col">Plano</th>
+            <th scope="col">Inclui</th>
+            <th scope="col" class="num">Preço</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Grátis</th>
+            <td>
+              <b>1 viagem, 1 destino</b> (modo autônomo: datas + origem +
+              orçamento + até 3 gostos → um plano fechado). Sem seletor de
+              destino, sem chat. Deep-links de voo/hotel ativos.
+            </td>
+            <td class="num">R$ 0</td>
+          </tr>
+          <tr>
+            <th scope="row">Viagem</th>
+            <td>
+              Descoberta completa (escolhe entre 3–5 destinos), roteiro dia a
+              dia, <b>chat do assessor</b>, comparação de voo + hotel
+              (dinheiro e milhas na v1), regenerar dias, trocar restaurante.
+              Edições liberadas por ~90 dias.
+            </td>
+            <td class="num">R$ 39 <span style="color: var(--ink-faint)">≈ US$ 7,5</span></td>
+          </tr>
+          <tr>
+            <th scope="row">Pacote 3 viagens</th>
+            <td>Três compras de "Viagem", para quem já sabe que vai planejar mais de uma.</td>
+            <td class="num">R$ 89 <span style="color: var(--ink-faint)">≈ US$ 17</span></td>
+          </tr>
+          <tr>
+            <th scope="row">B2B — consultor (v2)</th>
+            <td>
+              Console do consultor: carteira de clientes, roteiro com markup +
+              alternativa em milhas, proposta com a marca da agência.
+            </td>
+            <td class="num">assinatura / proposta — a definir</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-wrap prose" style="margin-top: 1.2rem">
+      <table>
+        <caption>Economia por viagem (US$)</caption>
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col" class="num">Grátis</th>
+            <th scope="col" class="num">Paga (R$ 39)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Preço</th><td class="num">0</td><td class="num">7,50</td></tr>
+          <tr>
+            <th scope="row">Afiliado esperado <span style="color: var(--ink-faint)">(book × comissão)</span></th>
+            <td class="num">~1,00–1,50</td>
+            <td class="num">~4,00–8,00</td>
+          </tr>
+          <tr>
+            <th scope="row">Custo marginal (IA + APIs, com cache)</th>
+            <td class="num">−0,15–0,30</td>
+            <td class="num">−0,40–1,00</td>
+          </tr>
+          <tr>
+            <th scope="row">Taxa de pagamento (Pix / cartão)</th>
+            <td class="num">0</td>
+            <td class="num">−0,40–0,65</td>
+          </tr>
+          <tr class="total">
+            <td>Contribuição / viagem</td>
+            <td class="num">~+0,85–1,20</td>
+            <td class="num">~+10–14</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sec-note" style="margin-top: 0.75rem; font-size: 0.88rem">
+      O grátis <b>não é isca de prejuízo</b> — se paga com o afiliado e serve de
+      funil. Afiliado depende do <b>site parceiro para o deep-link</b>
+      (pendência do MVP); sem ele, a receita de afiliado do grátis vai a zero.
+    </p>
+
+    <div class="table-wrap prose" style="margin-top: 1.2rem">
+      <table>
+        <caption>P&amp;L mensal projetado (US$) — 12–15% grátis → paga</caption>
+        <thead>
+          <tr>
+            <th scope="col">Cenário</th>
+            <th scope="col" class="num">Receita viagem</th>
+            <th scope="col" class="num">Receita afiliado</th>
+            <th scope="col" class="num">Custo total</th>
+            <th scope="col" class="num">Resultado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">MVP — 1,5k viagens (12% pagam)</th>
+            <td class="num">~1.350</td>
+            <td class="num">~2.700</td>
+            <td class="num">~500</td>
+            <td class="num">~+3.500</td>
+          </tr>
+          <tr>
+            <th scope="row">Crescimento — 15k viagens (15% pagam)</th>
+            <td class="num">~16.900</td>
+            <td class="num">~28.800</td>
+            <td class="num">~3.100</td>
+            <td class="num">~+42.000</td>
+          </tr>
+          <tr>
+            <th scope="row">Escala — 150k viagens (15% pagam)</th>
+            <td class="num">~169k</td>
+            <td class="num">~288k</td>
+            <td class="num">~24k</td>
+            <td class="num">~+430k</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sec-note" style="margin-top: 0.75rem; font-size: 0.88rem">
+      Premissas frágeis, na ordem de impacto: <b>conversão grátis → paga</b>
+      (usei 12–15%), <b>conversão de clique → reserva no afiliado</b> (30% na
+      viagem paga, ~10% no grátis), <b>ticket médio de comissão</b> (~US$ 15) e
+      o <b>volume de viagens</b>.
+    </p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <h2>Leitura para o produto</h2>
+    </div>
+
+    <ol class="reads">
+      <li>
+        <span class="idx">1</span>
+        <p>
+          <b>IA não é o gargalo de custo.</b> Claude por viagem ≈ US$ 0,03–0,05;
+          com chat, ~US$ 0,10–0,15 por usuário engajado/mês. O teto de
+          <code>0,15</code> por roteiro é generoso.
+        </p>
+      </li>
+      <li>
+        <span class="idx">2</span>
+        <p>
+          <b>Amadeus + Places são o custo variável real</b> — 3 a 10× a IA. O
+          lever é cache. O design já tem <code>provider_cache</code>; priorizar
+          um <b>cache global de lugares</b> (não por viagem) no Passo 6 corta o
+          custo de Places em ~5×.
+        </p>
+      </li>
+      <li>
+        <span class="idx">3</span>
+        <p>
+          <b>MVP roda por US$ 45–75/mês de infra</b> — preço de duas assinaturas
+          SaaS. Dá para operar o MVP inteiro por menos de US$ 100/mês fixos.
+        </p>
+      </li>
+      <li>
+        <span class="idx">4</span>
+        <p>
+          <b>Pagar por viagem, não SaaS.</b> Contribuição de ~US$ 10–14 por
+          viagem paga (margem ~85%) e ~US$ 1 por viagem grátis. Com 12–15%
+          convertendo, o MVP fica no positivo já a ~1,5k viagens/mês. A receita
+          é dividida quase meio a meio entre a taxa da viagem e o afiliado —
+          por isso o <b>site parceiro do deep-link</b> deixa de ser detalhe e
+          vira metade do modelo.
+        </p>
+      </li>
+      <li>
+        <span class="idx">5</span>
+        <p>
+          <b>Antes de abrir o chat (Passo 7):</b> teto
+          <code>LLM_ROUTE_BUDGET_USD</code> + rate limiting por usuário + prompt
+          caching. Sem isso, uma sessão de chat descontrolada é o único jeito de
+          o custo por usuário explodir.
+        </p>
+      </li>
+    </ol>
+
+    <div class="risks">
+      <h3>Onde o custo escala mal</h3>
+      <ul>
+        <li><b>Chat sem limite de sessão</b> — histórico cresce, cada turno recarrega tudo.</li>
+        <li><b>Google Places sem cache persistente</b> — pode 5–10× o custo por viagem.</li>
+        <li><b>Compute do Supabase sob carga</b> — se o pool de conexão + polling do pg-boss não forem afinados.</li>
+        <li><b>Cliff da cota grátis do Amadeus</b> — mapear o volume em que a cobrança começa.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span>Farol — assessor de viagem. Modelo de custo e pricing, revisão de 29 ago 2026.</span>
+    <span>Preços de IA firmes (código). Amadeus, Google Places e as premissas de conversão do pricing são estimativa a validar.</span>
+  </footer>
+</div>

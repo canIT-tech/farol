@@ -1,11 +1,15 @@
-<title>Documentação do Farol</title>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Farol · Backoffice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
 <link
   href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
   rel="stylesheet"
 />
-
 <style>
   :root {
     --bg: #fbfaf8;
@@ -20,13 +24,11 @@
     --sun-strong: #a5482c;
     --sun-wash: #f9efe9;
     --sea: #3d7a67;
-    --sea-strong: #2f6252;
-    --amber: #9a6f28;
     --focus: #1c6feb;
-
     --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
     --font-body: "Instrument Sans", system-ui, -apple-system, sans-serif;
     --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --side-w: 16rem;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -43,8 +45,6 @@
       --sun-strong: #ef9575;
       --sun-wash: #33231b;
       --sea: #6cb49c;
-      --sea-strong: #8ecdb6;
-      --amber: #d9a75a;
       --focus: #6ea8ff;
       color-scheme: dark;
     }
@@ -63,8 +63,6 @@
     --sun-strong: #ef9575;
     --sun-wash: #33231b;
     --sea: #6cb49c;
-    --sea-strong: #8ecdb6;
-    --amber: #d9a75a;
     --focus: #6ea8ff;
     color-scheme: dark;
   }
@@ -73,97 +71,177 @@
     box-sizing: border-box;
   }
 
+  html,
+  body {
+    height: 100%;
+  }
+
   body {
     margin: 0;
     background: var(--bg);
     color: var(--ink);
     font-family: var(--font-body);
-    font-size: 1.02rem;
-    line-height: 1.6;
+    font-size: 0.98rem;
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
   }
 
-  ::selection {
-    background: var(--sun-wash);
-  }
-
   a {
-    color: var(--sun);
+    color: inherit;
+    text-decoration: none;
   }
 
   :focus-visible {
     outline: 2px solid var(--focus);
-    outline-offset: 3px;
+    outline-offset: 2px;
     border-radius: 4px;
   }
 
-  h1,
-  h2,
-  h3 {
+  .shell {
+    display: grid;
+    grid-template-columns: var(--side-w) 1fr;
+    min-height: 100vh;
+  }
+
+  /* ---------- sidebar ---------- */
+  .side {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--surface-2);
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    padding: 1.1rem 0.85rem 1rem;
+  }
+
+  .brand {
     font-family: var(--font-display);
-    font-weight: 600;
-    line-height: 1.1;
-    letter-spacing: -0.022em;
-    text-wrap: balance;
-    margin: 0;
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: -0.02em;
+    padding: 0 0.55rem;
   }
 
-  .mono {
+  .brand span {
+    color: var(--sun);
+  }
+
+  .brand-sub {
     font-family: var(--font-mono);
-  }
-
-  .layout {
-    max-width: 64rem;
-    margin: 0 auto;
-    padding: 0 clamp(1.1rem, 0.4rem + 3vw, 2.5rem) 5rem;
-  }
-
-  /* masthead */
-  .masthead {
-    padding: clamp(2.75rem, 1.5rem + 5vw, 5rem) 0 2rem;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .kicker {
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
-    font-weight: 500;
+    font-size: 0.68rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--sun);
+    color: var(--ink-faint);
+    padding: 0.15rem 0.55rem 0;
+  }
+
+  nav {
+    margin-top: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    flex-grow: 1;
+  }
+
+  .nav-group {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 1.1rem 0 0.35rem;
+    padding: 0 0.55rem;
+  }
+
+  .nav-group:first-child {
+    margin-top: 0;
+  }
+
+  .nav-item {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-  }
-
-  .kicker .dot {
-    width: 0.42rem;
-    height: 0.42rem;
-    border-radius: 50%;
-    background: var(--sun);
-  }
-
-  .masthead h1 {
-    font-size: clamp(2.2rem, 1.4rem + 3.4vw, 3.4rem);
-    margin: 1rem 0 0;
-  }
-
-  .masthead p {
-    margin: 0.9rem 0 0;
+    gap: 0.55rem;
+    padding: 0.5rem 0.55rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
     color: var(--ink-soft);
-    max-width: 56ch;
-    font-size: 1.06rem;
+    cursor: pointer;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    text-align: left;
+    width: 100%;
+    line-height: 1.3;
+  }
+
+  .nav-item:hover {
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  .nav-item.active {
+    background: var(--surface);
+    color: var(--ink);
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 var(--sun);
+  }
+
+  .nav-item .ico {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+    color: var(--ink-faint);
+  }
+
+  .nav-item.active .ico {
+    color: var(--sun);
+  }
+
+  .nav-item.ext .tail {
+    margin-left: auto;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+  }
+
+  .nav-item.disabled {
+    color: var(--ink-faint);
+    cursor: not-allowed;
+  }
+
+  .nav-item.disabled:hover {
+    background: none;
+    color: var(--ink-faint);
+  }
+
+  .nav-item .soon {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.05rem 0.4rem;
+  }
+
+  .side-foot {
+    margin-top: 1rem;
+    padding: 0.75rem 0.55rem 0;
+    border-top: 1px solid var(--line);
   }
 
   .theme-toggle {
-    margin-top: 1.4rem;
     font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     background: var(--surface);
     border: 1px solid var(--line);
     color: var(--ink-soft);
     border-radius: 999px;
-    padding: 0.35rem 0.8rem;
+    padding: 0.3rem 0.75rem;
     cursor: pointer;
   }
 
@@ -171,320 +249,393 @@
     color: var(--ink);
   }
 
-  /* group */
-  .group {
-    margin-top: clamp(2.25rem, 1.5rem + 2vw, 3.25rem);
-  }
-
-  .group > h2 {
-    font-size: 1.15rem;
+  /* ---------- main ---------- */
+  .main {
     display: flex;
-    align-items: baseline;
-    gap: 0.7rem;
+    flex-direction: column;
+    min-width: 0;
   }
 
-  .group > h2 .idx {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+    min-height: 3.25rem;
+  }
+
+  .menu-btn {
+    display: none;
+    font-size: 1.1rem;
+    line-height: 1;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--ink-soft);
+    padding: 0.35rem 0.55rem;
+    cursor: pointer;
+  }
+
+  .crumb {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: -0.01em;
+  }
+
+  .open-new {
+    margin-left: auto;
+    font-size: 0.82rem;
+    font-weight: 600;
     color: var(--sun);
   }
 
-  .group > .note {
-    margin: 0.4rem 0 0;
-    color: var(--ink-faint);
-    font-size: 0.9rem;
+  .frame {
+    flex: 1;
+    width: 100%;
+    border: 0;
+    background: var(--bg);
   }
 
-  /* card grid */
-  .grid {
-    margin-top: 1.2rem;
+  /* ---------- home ---------- */
+  .home {
+    flex: 1;
+    overflow-y: auto;
+    padding: clamp(1.5rem, 1rem + 3vw, 3rem);
+  }
+
+  .home h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    font-size: clamp(1.6rem, 1.2rem + 2vw, 2.4rem);
+    margin: 0;
+    max-width: 22ch;
+  }
+
+  .home .lede {
+    margin: 0.9rem 0 0;
+    color: var(--ink-soft);
+    max-width: 56ch;
+  }
+
+  .cards {
+    margin-top: 2rem;
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    max-width: 52rem;
   }
 
-  .card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
+  .doc-card {
+    text-align: left;
+    font-family: inherit;
     border: 1px solid var(--line);
     border-radius: 14px;
     background: var(--surface);
-    padding: 1.15rem 1.2rem 1.1rem;
+    padding: 1.1rem 1.15rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
     transition:
-      border-color 140ms ease,
-      transform 140ms ease,
-      box-shadow 140ms ease;
+      border-color 130ms ease,
+      transform 130ms ease;
   }
 
-  .card:hover {
+  .doc-card:hover {
     border-color: var(--sun);
     transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(28, 27, 25, 0.08);
   }
 
-  .card .cat {
+  .doc-card .cat {
     font-family: var(--font-mono);
-    font-size: 0.68rem;
+    font-size: 0.66rem;
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--ink-faint);
   }
 
-  .card h3 {
-    font-size: 1.12rem;
-    margin: 0.45rem 0 0;
-  }
-
-  .card p {
-    margin: 0.5rem 0 0;
-    color: var(--ink-soft);
-    font-size: 0.92rem;
-    line-height: 1.5;
-    flex-grow: 1;
-  }
-
-  .card .foot {
-    margin-top: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
-  }
-
-  .card .path {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    color: var(--ink-faint);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .card .open {
-    font-size: 0.82rem;
+  .doc-card h3 {
+    font-family: var(--font-display);
     font-weight: 600;
-    color: var(--sun);
-    flex: none;
+    font-size: 1.05rem;
+    margin: 0.4rem 0 0;
   }
 
-  .card a.stretch {
-    position: absolute;
-    inset: 0;
-    border-radius: 14px;
-    text-indent: -9999px;
-    overflow: hidden;
-  }
-
-  .card a.stretch:focus-visible {
-    outline: 2px solid var(--focus);
-    outline-offset: 2px;
-  }
-
-  /* repo list */
-  .repo {
-    margin-top: 1.2rem;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    overflow: hidden;
-  }
-
-  .repo .row {
-    display: grid;
-    grid-template-columns: minmax(0, 20rem) 1fr;
-    gap: 0.6rem 1rem;
-    padding: 0.8rem 1.1rem;
-    border-bottom: 1px solid var(--line-soft);
-    font-size: 0.9rem;
-  }
-
-  .repo .row:last-child {
-    border-bottom: 0;
-  }
-
-  .repo .row .p {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--ink);
-    word-break: break-all;
-  }
-
-  .repo .row .d {
+  .doc-card p {
+    margin: 0.45rem 0 0;
+    font-size: 0.88rem;
     color: var(--ink-soft);
+    line-height: 1.45;
   }
 
-  @media (max-width: 620px) {
-    .repo .row {
+  .home .soon-note {
+    margin-top: 2.25rem;
+    padding: 1rem 1.15rem;
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    background: var(--surface-2);
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    max-width: 52rem;
+  }
+
+  .home .soon-note strong {
+    color: var(--ink);
+  }
+
+  /* ---------- backdrop (mobile) ---------- */
+  .backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 8;
+  }
+
+  @media (max-width: 860px) {
+    .shell {
       grid-template-columns: 1fr;
-      gap: 0.2rem;
+    }
+
+    .side {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--side-w);
+      z-index: 10;
+      transform: translateX(-100%);
+      transition: transform 180ms ease;
+    }
+
+    .shell.side-open .side {
+      transform: none;
+    }
+
+    .shell.side-open .backdrop {
+      display: block;
+    }
+
+    .menu-btn {
+      display: inline-flex;
     }
   }
 
-  .footer-note {
-    margin-top: 3rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--line);
-    font-size: 0.85rem;
-    color: var(--ink-faint);
+  [hidden] {
+    display: none !important;
   }
 </style>
+</head>
+<body>
+<div class="shell" data-shell>
+  <aside class="side" data-side>
+    <div class="brand">Farol<span>.</span></div>
+    <div class="brand-sub">Backoffice</div>
 
-<div class="layout">
-  <header class="masthead">
-    <p class="kicker"><span class="dot"></span> Farol · Documentação</p>
-    <h1>Tudo do Farol num lugar só</h1>
-    <p>
-      Estratégia, produto e o que falta para o lançamento. As páginas abrem em nova aba;
-      os arquivos-fonte ficam no repositório <span class="mono">canIT-tech/farol</span>.
-    </p>
-    <button class="theme-toggle" type="button" data-theme-toggle>tema: auto</button>
-  </header>
+    <nav>
+      <p class="nav-group">Documentação</p>
+      <button class="nav-item" type="button" data-doc="./negocio/custo-e-pricing.html" data-label="Custo &amp; pricing">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19V5M4 19h16M8 16v-5M13 16V8M18 16v-8" stroke-linecap="round" /></svg>
+        Custo &amp; pricing
+      </button>
+      <button class="nav-item" type="button" data-doc="./marketing/plano-go-to-market.html" data-label="Go-to-Market">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 11l16-6-5 16-3-6-8-4z" stroke-linejoin="round" /></svg>
+        Go-to-Market
+      </button>
+      <button class="nav-item" type="button" data-doc="./lancamento/checklist-pre-lancamento.html" data-label="Pré-lançamento">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 12l4 4L19 6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Pré-lançamento
+      </button>
 
-  <div class="group">
-    <h2><span class="idx">01</span> Estratégia &amp; negócio</h2>
-    <p class="note">Páginas navegáveis, com a fonte em markdown no repositório.</p>
-    <div class="grid">
-      <article class="card">
-        <span class="cat">Custo &amp; pricing</span>
-        <h3>Custo do Farol</h3>
-        <p>Custo mensal de infra, API de IA e serviços de terceiros; modelo de pricing por viagem; economia por viagem e P&amp;L mensal projetado.</p>
-        <div class="foot">
-          <span class="path">scratchpad/farol-cost-model.html</span>
-          <span class="open">abrir →</span>
-        </div>
-        <a class="stretch" href="https://claude.ai/code/artifact/a93aaa41-decb-4557-85bc-079195ade808" target="_blank" rel="noopener">Abrir Custo do Farol</a>
-      </article>
+      <p class="nav-group">Design</p>
+      <a class="nav-item ext" href="https://claude.ai/code/artifact/0086b95c-831f-40d6-8310-a54b0a5974cd" target="_blank" rel="noopener">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="4" width="18" height="14" rx="2" /><path d="M3 9h18" /></svg>
+        App — telas hi-fi <span class="tail">↗</span>
+      </a>
+      <a class="nav-item ext" href="https://claude.ai/code/artifact/c677b6a3-2ac6-47c8-aadd-c561eb8bc41b" target="_blank" rel="noopener">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="8" /><path d="M12 8v8M8 12h8" stroke-linecap="round" /></svg>
+        Manual de marca <span class="tail">↗</span>
+      </a>
 
-      <article class="card">
-        <span class="cat">Marketing</span>
-        <h3>Go-to-Market do Farol</h3>
-        <p>Aquisição por fase: comunidade própria e de terceiros, Instagram, mídia paga (Meta, Google, TikTok), orçamento, métricas e backlog de 2–4 semanas.</p>
-        <div class="foot">
-          <span class="path">docs/marketing/plano-go-to-market.html</span>
-          <span class="open">abrir →</span>
-        </div>
-        <a class="stretch" href="https://claude.ai/code/artifact/92c920b6-8057-4db5-acf4-de58b5df8579" target="_blank" rel="noopener">Abrir Go-to-Market do Farol</a>
-      </article>
+      <p class="nav-group">Operação</p>
+      <span class="nav-item disabled">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 7h16v12H4zM4 7l4-4h8l4 4" stroke-linejoin="round" /></svg>
+        Assinaturas <span class="soon">em breve</span>
+      </span>
+      <span class="nav-item disabled">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke-linecap="round" /></svg>
+        Clientes <span class="soon">em breve</span>
+      </span>
+      <span class="nav-item disabled">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V4M4 20h16M8 16l3-4 3 2 4-6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Métricas <span class="soon">em breve</span>
+      </span>
+    </nav>
 
-      <article class="card">
-        <span class="cat">Lançamento</span>
-        <h3>Pré-lançamento do Farol</h3>
-        <p>O que falta entre os planos e o produto no ar: código, domínio, Stripe, termos de uso, LLM, infra e GTM — com donos, status e caminho crítico.</p>
-        <div class="foot">
-          <span class="path">docs/lancamento/checklist-pre-lancamento.html</span>
-          <span class="open">abrir →</span>
-        </div>
-        <a class="stretch" href="https://claude.ai/code/artifact/f03a529a-c17a-4aba-8a01-3a6f7fca3687" target="_blank" rel="noopener">Abrir Pré-lançamento do Farol</a>
-      </article>
+    <div class="side-foot">
+      <button class="theme-toggle" type="button" data-theme-toggle>tema: auto</button>
     </div>
-  </div>
+  </aside>
 
-  <div class="group">
-    <h2><span class="idx">02</span> Produto &amp; design</h2>
-    <p class="note">Canvases de design (Claude Artifacts). Fontes em <span class="mono">docs/design/</span> (<span class="mono">.dc.html</span> + <span class="mono">canvas.json</span>).</p>
-    <div class="grid">
-      <article class="card">
-        <span class="cat">Landing</span>
-        <h3>Landing / waitlist</h3>
-        <p>Versão artifact da landing de captação de e-mail. A landing de produção vive em <span class="mono">apps/web</span> (rota <span class="mono">/</span>), com demo interativa e fluxo navegável.</p>
-        <div class="foot">
-          <span class="path">apps/web/src/app/page.tsx</span>
-          <span class="open">abrir →</span>
-        </div>
-        <a class="stretch" href="https://claude.ai/code/artifact/964064c6-e187-4e78-a316-e48f0d730e61" target="_blank" rel="noopener">Abrir Landing / waitlist</a>
-      </article>
+  <div class="backdrop" data-backdrop></div>
 
-      <article class="card">
-        <span class="cat">Telas hi-fi</span>
-        <h3>App — fluxo do produto</h3>
-        <p>Canvas com as telas: onboarding de gosto → descoberta → roteiro dia a dia → voo &amp; hotel; mais o modo autônomo e o console B2B (v2).</p>
-        <div class="foot">
-          <span class="path">docs/design/app/</span>
-          <span class="open">abrir →</span>
-        </div>
-        <a class="stretch" href="https://claude.ai/code/artifact/0086b95c-831f-40d6-8310-a54b0a5974cd" target="_blank" rel="noopener">Abrir App — fluxo do produto</a>
-      </article>
+  <main class="main">
+    <header class="topbar">
+      <button class="menu-btn" type="button" data-menu aria-label="Abrir menu">☰</button>
+      <span class="crumb" data-crumb>Início</span>
+      <a class="open-new" data-open-new href="#" target="_blank" rel="noopener" hidden>abrir em nova aba ↗</a>
+    </header>
 
-      <article class="card">
-        <span class="cat">Marca</span>
-        <h3>Manual de marca Farol</h3>
-        <p>Tipografia (Bricolage Grotesque + Instrument Sans), cor (neutro quente, terracota, verde só no match), personalidade e voz do assessor.</p>
-        <div class="foot">
-          <span class="path">docs/design/brand/ · docs/design-system.md</span>
-          <span class="open">abrir →</span>
-        </div>
-        <a class="stretch" href="https://claude.ai/code/artifact/c677b6a3-2ac6-47c8-aadd-c561eb8bc41b" target="_blank" rel="noopener">Abrir Manual de marca Farol</a>
-      </article>
-    </div>
-  </div>
+    <section class="home" data-home>
+      <h1>Backoffice do Farol</h1>
+      <p class="lede">
+        Central da operação. Por enquanto reúne a documentação viva do projeto; vai
+        crescer para mostrar assinaturas, clientes e métricas.
+      </p>
 
-  <div class="group">
-    <h2><span class="idx">03</span> No repositório</h2>
-    <p class="note">Markdown, sem página publicada. Caminhos relativos à raiz do repo.</p>
-    <div class="repo">
-      <div class="row">
-        <span class="p">PRD.md</span>
-        <span class="d">Visão, escopo faseado (MVP → v1 → v2), personas, monetização.</span>
+      <div class="cards">
+        <button class="doc-card" type="button" data-doc="./negocio/custo-e-pricing.html" data-label="Custo &amp; pricing">
+          <span class="cat">Negócio</span>
+          <h3>Custo &amp; pricing</h3>
+          <p>Custo mensal de infra, IA e serviços; modelo de pricing por viagem; P&amp;L projetado.</p>
+        </button>
+        <button class="doc-card" type="button" data-doc="./marketing/plano-go-to-market.html" data-label="Go-to-Market">
+          <span class="cat">Marketing</span>
+          <h3>Go-to-Market</h3>
+          <p>Aquisição por fase: comunidade, Instagram, mídia paga, orçamento e métricas.</p>
+        </button>
+        <button class="doc-card" type="button" data-doc="./lancamento/checklist-pre-lancamento.html" data-label="Pré-lançamento">
+          <span class="cat">Lançamento</span>
+          <h3>Pré-lançamento</h3>
+          <p>O que falta entre os planos e o produto no ar, com donos e caminho crítico.</p>
+        </button>
       </div>
-      <div class="row">
-        <span class="p">docs/superpowers/specs/2026-08-27-mvp-trip-design.md</span>
-        <span class="d">Design técnico do MVP — arquitetura, módulos, modelo de dados.</span>
-      </div>
-      <div class="row">
-        <span class="p">docs/superpowers/plans/2026-08-29-correcao-debito-tecnico.md</span>
-        <span class="d">Débito técnico dos Passos 2–5 e plano de correção (blocos A/B/C).</span>
-      </div>
-      <div class="row">
-        <span class="p">docs/marketing/2026-08-31-plano-go-to-market.md</span>
-        <span class="d">Fonte da verdade do artifact de Go-to-Market.</span>
-      </div>
-      <div class="row">
-        <span class="p">docs/lancamento/2026-08-31-checklist-pre-lancamento.md</span>
-        <span class="d">Fonte da verdade do artifact de Pré-lançamento.</span>
-      </div>
-      <div class="row">
-        <span class="p">docs/design-system.md</span>
-        <span class="d">Tokens e specs de componentes (fonte para <span class="mono">packages/ui</span>).</span>
-      </div>
-      <div class="row">
-        <span class="p">CLAUDE.md</span>
-        <span class="d">Contexto do projeto, decisões travadas, baseline de testes, backlog de passos.</span>
-      </div>
-    </div>
-  </div>
 
-  <p class="footer-note">
-    Fonte desta página: <span class="mono">docs/index.html</span>. Ao publicar uma versão
-    nova de qualquer artifact, o link acima continua o mesmo — atualizar só o conteúdo.
-  </p>
+      <p class="soon-note">
+        <strong>Em breve:</strong> painel de assinaturas (receita, viagens pagas,
+        recompra), lista de clientes e métricas do funil — puxados da base do produto.
+      </p>
+    </section>
+
+    <iframe class="frame" data-frame title="Documento" hidden></iframe>
+  </main>
 </div>
 
 <script>
   (function () {
+    var shell = document.querySelector("[data-shell]");
+    var frame = document.querySelector("[data-frame]");
+    var home = document.querySelector("[data-home]");
+    var crumb = document.querySelector("[data-crumb]");
+    var openNew = document.querySelector("[data-open-new]");
+    var items = Array.prototype.slice.call(document.querySelectorAll("[data-doc]"));
+
+    function decode(el) {
+      // resolve entidades (&amp;) do data-label
+      var t = document.createElement("textarea");
+      t.innerHTML = el.getAttribute("data-label") || "";
+      return t.value;
+    }
+
+    function showHome() {
+      frame.hidden = true;
+      frame.removeAttribute("src");
+      home.hidden = false;
+      crumb.textContent = "Início";
+      openNew.hidden = true;
+      items.forEach(function (i) {
+        i.classList.remove("active");
+      });
+      if (location.hash) history.replaceState(null, "", location.pathname);
+    }
+
+    function openDoc(src, label, push) {
+      home.hidden = true;
+      frame.src = src;
+      frame.hidden = false;
+      crumb.textContent = label;
+      openNew.href = src;
+      openNew.hidden = false;
+      items.forEach(function (i) {
+        i.classList.toggle("active", i.getAttribute("data-doc") === src);
+      });
+      closeSide();
+      if (push !== false) {
+        var h = "#" + encodeURIComponent(src);
+        if (location.hash !== h) history.pushState(null, "", h);
+      }
+    }
+
+    items.forEach(function (item) {
+      item.addEventListener("click", function () {
+        openDoc(item.getAttribute("data-doc"), decode(item));
+      });
+    });
+
+    crumb.addEventListener("click", function () {
+      if (!frame.hidden) showHome();
+    });
+
+    function fromHash() {
+      var raw = location.hash.replace(/^#/, "");
+      if (!raw) {
+        showHome();
+        return;
+      }
+      var src = decodeURIComponent(raw);
+      var match = items.filter(function (i) {
+        return i.getAttribute("data-doc") === src;
+      })[0];
+      if (match) openDoc(src, decode(match), false);
+      else showHome();
+    }
+
+    window.addEventListener("popstate", fromHash);
+    fromHash();
+
+    /* ---- mobile drawer ---- */
+    var menuBtn = document.querySelector("[data-menu]");
+    var backdrop = document.querySelector("[data-backdrop]");
+    function closeSide() {
+      shell.classList.remove("side-open");
+    }
+    if (menuBtn) {
+      menuBtn.addEventListener("click", function () {
+        shell.classList.toggle("side-open");
+      });
+    }
+    if (backdrop) backdrop.addEventListener("click", closeSide);
+
+    /* ---- tema ---- */
     var btn = document.querySelector("[data-theme-toggle]");
     var root = document.documentElement;
     var order = ["auto", "light", "dark"];
-    function read() {
+    function readTheme() {
       try {
-        return localStorage.getItem("farol-docs-theme") || "auto";
+        return localStorage.getItem("farol-bo-theme") || "auto";
       } catch (e) {
         return "auto";
       }
     }
-    function apply(mode) {
+    function applyTheme(mode) {
       if (mode === "auto") root.removeAttribute("data-theme");
       else root.setAttribute("data-theme", mode);
       if (btn) btn.textContent = "tema: " + mode;
       try {
-        localStorage.setItem("farol-docs-theme", mode);
+        localStorage.setItem("farol-bo-theme", mode);
       } catch (e) {}
     }
-    apply(read());
+    applyTheme(readTheme());
     if (btn) {
       btn.addEventListener("click", function () {
-        apply(order[(order.indexOf(read()) + 1) % order.length]);
+        applyTheme(order[(order.indexOf(readTheme()) + 1) % order.length]);
       });
     }
   })();
 </script>
+</body>
+</html>

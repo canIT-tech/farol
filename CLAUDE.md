@@ -20,7 +20,7 @@ monta o dia a dia e ajusta tudo por conversa.
 | Design system (tokens + specs de componentes) | `docs/design-system.md` |
 | Manual de marca (fontes) | `docs/design/brand/*.dc.html` + `docs/design/brand/canvas.json` |
 | Telas do app (fontes) | `docs/design/app/*.dc.html` + `docs/design/app/canvas.json` |
-| Hub da documentação | `docs/index.html` |
+| Backoffice / hub da documentação | `docs/index.html` (shell local: sidebar + iframe; aponta para os `.html` de `docs/`. Vai virar backoffice com dados de assinatura) |
 
 Canvases publicados (Claude Artifacts):
 - App / telas hi-fi: https://claude.ai/code/artifact/0086b95c-831f-40d6-8310-a54b0a5974cd
