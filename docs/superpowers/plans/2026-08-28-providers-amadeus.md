@@ -1,5 +1,13 @@
 # Providers Amadeus (voo + hotel) — Implementation Plan
 
+> **⚠️ Parcialmente superado (2026-08-31).** A estrutura (`packages/providers`,
+> interfaces `FlightProvider`/`HotelProvider`, `provider_cache`, resiliência,
+> `FlightsModule`/`HotelsModule`) foi entregue e **continua válida**. Mas a Amadeus
+> descontinuou o Self-Service — o provider concreto migra para **Travelpayouts**.
+> A partir daqui, seguir `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md`
+> (Passo 10 do backlog). Tudo que menciona `AmadeusAuth`/OAuth2/`AMADEUS_*`/
+> endpoints `test.api.amadeus.com` está obsoleto.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Buscar voos e hotéis reais para uma viagem via Amadeus Self-Service, com token OAuth2 em cache, retry, circuit breaker e cache de resposta com TTL; normalizar para DTOs, guardar o snapshot cru na seleção e devolver deep link para o parceiro de reserva. Falha de provider degrada a seção sem derrubar o resto.

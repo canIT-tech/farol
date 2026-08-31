@@ -576,10 +576,11 @@
     <h2><span class="num">01</span> Terminar de codar e testar <span class="owner">rafinha</span></h2>
     <p>Backlog de implementação (ver <span class="mono">CLAUDE.md</span> › "Próximos passos"). Ordem = dependência.</p>
     <ul>
-      <li><strong>Passo 6 — Google Places + enrich.</strong> <span class="mono">GooglePlacesProvider</span>, <span class="mono">PlacesModule</span>, enrich no job do roteiro, <span class="mono">swap_restaurant</span>. Depende do Passo 4 (feito).</li>
+      <li><strong>Passo 6 — Google Places + enrich.</strong> ✅ concluído (rafinha, 2026-08-31).</li>
+      <li><strong>Passo 10 — Migração do provider voo/hotel: Amadeus → Travelpayouts.</strong> <span class="tag new">novo</span> Amadeus descontinuou o Self-Service. Trocar <span class="mono">Amadeus*Provider</span> por <span class="mono">Travelpayouts*Provider</span> (sem OAuth, <span class="mono">marker</span> de afiliado no deep-link), regravar fixtures, envs. Spec: <span class="mono">docs/negocio/2026-08-31-spec-migracao-travelpayouts.md</span>. Depende do Passo 5.</li>
       <li><strong>Passo 7 — Chat IA.</strong> <span class="mono">ChatModule</span>, loop de tool-calling, 9 tools → serviços, <span class="mono">chat_messages</span>. Depende de 4 + 5 + 6. <strong>Maior bloco de código restante.</strong></li>
       <li><strong>Passo 8 — UI web + E2E.</strong> Telas do <span class="mono">apps/web</span> ligadas ao <span class="mono">apps/api</span> + fluxo Playwright completo. Depende do 7.</li>
-      <li><strong>Pagamento no código</strong> <span class="tag new">novo</span> — <span class="mono">PaymentModule</span> + webhook Stripe. Spec pronta: <span class="mono">docs/negocio/2026-08-31-spec-pagamento.md</span> (modelo de crédito, gate no roteiro, reembolso CDC). Depende do item 3.</li>
+      <li><strong>Passo 11 — Pagamento.</strong> <span class="tag new">novo</span> <span class="mono">PaymentModule</span> + webhook Stripe. Spec: <span class="mono">docs/negocio/2026-08-31-spec-pagamento.md</span> (modelo de crédito, gate no roteiro, reembolso CDC). Depende do item 3.</li>
       <li><strong>Débito técnico:</strong> pelo menos A2 (envs no CI) e C3 (warning de eslint) antes dos PRs de produção. Placeholders da pipeline fecham junto do Passo 6.</li>
     </ul>
     <div class="callout">
@@ -622,7 +623,7 @@
     <ul>
       <li><strong>Já é necessária agora</strong> — a waitlist coleta e-mail.</li>
       <li>Dados: e-mail, perfil de gosto, dados de viagem, pagamento (via Stripe).</li>
-      <li>Terceiros: <strong>Amadeus, Google Places, Anthropic, Stripe</strong>, provedor de e-mail, analytics.</li>
+      <li>Terceiros: <strong>Travelpayouts, Google Places, Anthropic, Stripe</strong>, provedor de e-mail, analytics.</li>
       <li>Base legal, direitos do titular, opt-out, contato do encarregado. Consentimento explícito no formulário da waitlist + link para a política.</li>
     </ul>
     <h3>Cookies / consentimento <span class="tag opt">opcional</span></h3>
@@ -647,7 +648,7 @@
       <li><strong>Hosting:</strong> container para <span class="mono">apps/api</span> + <span class="mono">apps/worker</span>, deploy do <span class="mono">apps/web</span> (Next), Postgres gerenciado. Hospedagem agnóstica (container + Postgres + env).</li>
       <li><strong>Supabase de produção:</strong> projeto <strong>separado do dev</strong> (Auth + Postgres + Storage).</li>
       <li>Rodar <span class="mono">db:migrate</span> (0000–0005) + <span class="mono">db:seed</span> (catálogo) no banco de produção.</li>
-      <li>Preencher <strong>todas</strong> as envs de produção (base em <span class="mono">.env.example</span>): <span class="mono">DATABASE_URL</span>, <span class="mono">SUPABASE_*</span>, <span class="mono">ANTHROPIC_API_KEY</span>, <span class="mono">AMADEUS_*</span>, <span class="mono">JOBS_SCHEMA</span>, <span class="mono">*_DEEPLINK_TEMPLATE</span>, <span class="mono">NEXT_PUBLIC_API_URL</span>, chaves da Stripe.</li>
+      <li>Preencher <strong>todas</strong> as envs de produção (base em <span class="mono">.env.example</span>): <span class="mono">DATABASE_URL</span>, <span class="mono">SUPABASE_*</span>, <span class="mono">ANTHROPIC_API_KEY</span>, <span class="mono">TRAVELPAYOUTS_TOKEN</span> / <span class="mono">TRAVELPAYOUTS_MARKER</span>, <span class="mono">GOOGLE_PLACES_KEY</span>, <span class="mono">JOBS_SCHEMA</span>, <span class="mono">*_DEEPLINK_TEMPLATE</span>, <span class="mono">NEXT_PUBLIC_API_URL</span>, chaves da Stripe.</li>
       <li><strong>CI:</strong> fechar o débito A2 (envs novas no <span class="mono">ci.yml</span>) antes dos PRs de prod. DNS do domínio apontando para o hosting; HTTPS.</li>
     </ul>
   </section>
@@ -675,7 +676,7 @@
       <li><b>Domínio</b> + <b>Termos + Privacidade</b> — <span>começam hoje, destravam o resto.</span></li>
       <li><b>Stripe</b> (cadastro) + <b>LLM API</b> (dev + prod) — <span>cadastros que demoram; abrir já.</span></li>
       <li><b>Infra de produção</b> + <b>CI (débito A2)</b>.</li>
-      <li><b>Código:</b> Passo 6 → 7 → 8 + <span class="mono">PaymentModule</span>.</li>
+      <li><b>Código:</b> Passo 10 (Travelpayouts) → 7 → 8 + Passo 11 (pagamento). Passo 6 feito.</li>
       <li><b>GTM</b> — <span>em paralelo o tempo todo.</span></li>
     </ol>
     <pre>Domínio ─┬─► DNS + e-mail transacional ─► Infra de produção ─► Produto no ar
