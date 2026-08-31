@@ -53,6 +53,7 @@ export class ItineraryController {
   }
 
   @Post("itinerary/items/:itemId/swap-restaurant")
+  @HttpCode(200)
   swapRestaurant(
     @CurrentUser() user: CurrentUserType,
     @Param("id") tripId: string,

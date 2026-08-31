@@ -190,7 +190,7 @@ describe("roteiro", () => {
       .set("Authorization", u.auth)
       .send({ cuisine: "portuguesa" });
 
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(200);
     expect(res.body.id).toBe(mealId);
     expect(res.body.placeId).toBe("place-museu");
   });
