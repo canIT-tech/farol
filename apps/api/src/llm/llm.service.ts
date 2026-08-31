@@ -21,15 +21,17 @@ export interface AnthropicLike {
     create(args: {
       model: string;
       max_tokens: number;
-      system: string;
-      messages: { role: "user"; content: string }[];
+      system?: string;
+      tools?: any[];
+      messages: any[];
     }): Promise<{
       model: string;
-      content: { type: string; text?: string }[];
+      content: any[];
       usage: { input_tokens: number; output_tokens: number };
     }>;
   };
 }
+
 
 const MAX_ATTEMPTS = 2;
 const MAX_TOKENS = 2048;
@@ -129,6 +131,37 @@ export class LlmService implements LlmPort {
       invalidMessage: "o modelo não devolveu um roteiro válido"
     });
   }
+
+  async chat(params: {
+    system: string;
+    messages: { role: string; content: any }[];
+    tools?: any[];
+  }): Promise<{ content: any[]; usage: { input_tokens: number; output_tokens: number } }> {
+    const startedAt = Date.now();
+    const response = await this.client.messages.create({
+      model: this.capableModel,
+      max_tokens: MAX_TOKENS,
+      system: params.system,
+      messages: params.messages,
+      tools: params.tools
+    });
+
+    this.logger.info({
+      model: response.model,
+      inputTokens: response.usage.input_tokens,
+      outputTokens: response.usage.output_tokens,
+      estimatedUsd: estimateUsd(
+        response.model,
+        response.usage.input_tokens,
+        response.usage.output_tokens
+      ),
+      kind: "chat",
+      latencyMs: Date.now() - startedAt
+    });
+
+    return response;
+  }
+
 
   private async runWithRetry<T>(task: RetryTask<T>): Promise<T> {
     let previousError: string | undefined;

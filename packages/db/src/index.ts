@@ -14,5 +14,7 @@ export {
   providerCache,
   flightSelections,
   hotelSelections,
-  waitlist
+  waitlist,
+  chatMessages
 } from "./schema";
+
