@@ -1,0 +1,1073 @@
+<title>Go-to-Market do Farol</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+  rel="stylesheet"
+/>
+
+<style>
+  :root {
+    --bg: #fbfaf8;
+    --surface: #ffffff;
+    --surface-2: #f5f2ec;
+    --ink: #1c1b19;
+    --ink-soft: #6b6963;
+    --ink-faint: #9b9992;
+    --line: #ece9e2;
+    --line-soft: #f3f0ea;
+    --sun: #c25a38;
+    --sun-strong: #a5482c;
+    --sun-wash: #f9efe9;
+    --sea: #3d7a67;
+    --sea-strong: #2f6252;
+    --sea-wash: #edf3f0;
+    --focus: #1c6feb;
+
+    --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
+    --font-body: "Instrument Sans", system-ui, -apple-system, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  :root:not([data-theme="light"]) {
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16120d;
+      --surface: #1f1a14;
+      --surface-2: #241e17;
+      --ink: #f2e9dd;
+      --ink-soft: #b7ab9c;
+      --ink-faint: #8a7e6f;
+      --line: #322a20;
+      --line-soft: #2b2419;
+      --sun: #e37f5b;
+      --sun-strong: #ef9575;
+      --sun-wash: #33231b;
+      --sea: #6cb49c;
+      --sea-strong: #8ecdb6;
+      --sea-wash: #21302a;
+      --focus: #6ea8ff;
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #16120d;
+    --surface: #1f1a14;
+    --surface-2: #241e17;
+    --ink: #f2e9dd;
+    --ink-soft: #b7ab9c;
+    --ink-faint: #8a7e6f;
+    --line: #322a20;
+    --line-soft: #2b2419;
+    --sun: #e37f5b;
+    --sun-strong: #ef9575;
+    --sun-wash: #33231b;
+    --sea: #6cb49c;
+    --sea-strong: #8ecdb6;
+    --sea-wash: #21302a;
+    --focus: #6ea8ff;
+    color-scheme: dark;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 1.02rem;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--sun-wash);
+  }
+
+  a {
+    color: var(--sun);
+    text-underline-offset: 2px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  code,
+  .mono {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+  }
+
+  /* ---------- layout ---------- */
+  .layout {
+    max-width: 74rem;
+    margin: 0 auto;
+    padding: 0 clamp(1.1rem, 0.4rem + 3vw, 2.75rem) 5rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  @media (min-width: 1080px) {
+    .layout {
+      grid-template-columns: 15rem 1fr;
+      gap: 3.5rem;
+    }
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid var(--line);
+    padding: clamp(2.5rem, 1.5rem + 4vw, 4.5rem) 0 2.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--sun);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .kicker .dot {
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 50%;
+    background: var(--sun);
+  }
+
+  .masthead h1 {
+    font-size: clamp(2.1rem, 1.4rem + 3vw, 3.4rem);
+    margin: 1rem 0 0;
+    max-width: 20ch;
+  }
+
+  .masthead .sub {
+    margin: 1rem 0 0;
+    color: var(--ink-soft);
+    max-width: 60ch;
+    font-size: 1.08rem;
+  }
+
+  .meta-row {
+    margin-top: 1.6rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.6rem;
+  }
+
+  .pill {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    padding: 0.32rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink-soft);
+    background: var(--surface);
+  }
+
+  .pill b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .legend {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+  }
+
+  /* ---------- toc ---------- */
+  .toc {
+    display: none;
+  }
+
+  @media (min-width: 1080px) {
+    .toc {
+      display: block;
+      align-self: start;
+      position: sticky;
+      top: 1.5rem;
+      font-size: 0.86rem;
+    }
+
+    .toc ol {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      border-left: 1px solid var(--line);
+    }
+
+    .toc a {
+      display: flex;
+      gap: 0.6rem;
+      padding: 0.3rem 0 0.3rem 0.9rem;
+      margin-left: -1px;
+      border-left: 2px solid transparent;
+      color: var(--ink-soft);
+      text-decoration: none;
+      line-height: 1.35;
+    }
+
+    .toc a:hover {
+      color: var(--ink);
+    }
+
+    .toc a.active {
+      color: var(--ink);
+      border-left-color: var(--sun);
+      font-weight: 600;
+    }
+
+    .toc a .n {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--ink-faint);
+      flex: none;
+    }
+  }
+
+  .theme-toggle {
+    margin-top: 1.4rem;
+    font: inherit;
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    border-radius: 999px;
+    padding: 0.35rem 0.8rem;
+    cursor: pointer;
+  }
+
+  .theme-toggle:hover {
+    color: var(--ink);
+  }
+
+  /* ---------- article ---------- */
+  .content {
+    min-width: 0;
+  }
+
+  section {
+    padding-block: clamp(2rem, 1.4rem + 2vw, 3rem);
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  section:last-child {
+    border-bottom: 0;
+  }
+
+  section > h2 {
+    font-size: clamp(1.45rem, 1.2rem + 1vw, 1.9rem);
+    display: flex;
+    align-items: baseline;
+    gap: 0.8rem;
+    scroll-margin-top: 1.5rem;
+  }
+
+  section > h2 .num {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--sun);
+    flex: none;
+  }
+
+  section > p,
+  section > ul,
+  section > ol {
+    max-width: 68ch;
+  }
+
+  section > p {
+    margin: 1rem 0 0;
+    color: var(--ink-soft);
+  }
+
+  section > p strong,
+  li strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  h3 {
+    font-size: 1.12rem;
+    margin: 2rem 0 0.3rem;
+  }
+
+  h3 + p {
+    margin-top: 0.4rem;
+  }
+
+  ul,
+  ol {
+    margin: 0.9rem 0 0;
+    padding-left: 1.3rem;
+    color: var(--ink-soft);
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+
+  li::marker {
+    color: var(--ink-faint);
+  }
+
+  /* hypothesis tag */
+  .h {
+    font-family: var(--font-mono);
+    font-size: 0.72em;
+    font-weight: 600;
+    color: var(--sun-strong);
+    background: var(--sun-wash);
+    border-radius: 4px;
+    padding: 0.05em 0.34em;
+    white-space: nowrap;
+    vertical-align: 0.05em;
+  }
+
+  /* ---------- tables ---------- */
+  .table-wrap {
+    overflow-x: auto;
+    margin-top: 1.3rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.92rem;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+
+  thead th {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    font-weight: 600;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--line);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  td.num,
+  th.num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  td b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ---------- funnel ---------- */
+  .funnel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-top: 1.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .funnel .stage {
+    flex: 1 1 8rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0.7rem 0.8rem;
+    position: relative;
+  }
+
+  .funnel .stage b {
+    display: block;
+    font-family: var(--font-body);
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.15rem;
+  }
+
+  .funnel .stage span {
+    color: var(--ink-faint);
+  }
+
+  .funnel .stage:not(:last-child)::after {
+    content: "→";
+    position: absolute;
+    right: -0.55rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-faint);
+    z-index: 1;
+  }
+
+  /* ---------- callouts ---------- */
+  .callout {
+    margin-top: 1.5rem;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--sun);
+    background: var(--surface);
+    border-radius: 8px;
+    padding: 1rem 1.1rem;
+    font-size: 0.95rem;
+  }
+
+  .callout.warn {
+    border-left-color: var(--sea);
+  }
+
+  .callout p {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+
+  .callout strong {
+    color: var(--ink);
+  }
+
+  pre {
+    margin-top: 1.3rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.7;
+    color: var(--ink-soft);
+  }
+
+  .backlog {
+    counter-reset: task;
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1.4rem;
+  }
+
+  .backlog li {
+    counter-increment: task;
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.7rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--line-soft);
+    color: var(--ink);
+  }
+
+  .backlog li:last-child {
+    border-bottom: 0;
+  }
+
+  .backlog li::before {
+    content: counter(task, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--sun);
+    padding-top: 0.15rem;
+  }
+
+  .footer-note {
+    grid-column: 1 / -1;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+</style>
+
+<div class="layout">
+  <header class="masthead">
+    <p class="kicker"><span class="dot"></span> Farol · Go-to-Market · rascunho de trabalho</p>
+    <h1>Aquisição do Farol: comunidade, conteúdo e mídia paga</h1>
+    <p class="sub">
+      Como levar o Farol do "waitlist no ar" a viagens pagas recorrentes — por fase,
+      com orçamento e métricas. Documento vivo: revisar a cada fase.
+    </p>
+    <div class="meta-row">
+      <span class="pill">Dono: <b>felippebutland / canIT</b></span>
+      <span class="pill">Fase atual: <b>pré-lançamento</b></span>
+      <span class="pill">Fonte: <b>docs/marketing/2026-08-31-plano-go-to-market.md</b></span>
+    </div>
+    <p class="legend">
+      Todo número aqui é <span class="h">(H)</span> — <strong>hipótese a validar</strong>.
+      Ajustar conforme os primeiros dados reais entrarem.
+    </p>
+  </header>
+
+  <nav class="toc" aria-label="Índice">
+    <ol>
+      <li><a href="#s1"><span class="n">01</span> Contexto</a></li>
+      <li><a href="#s2"><span class="n">02</span> Objetivos e métricas</a></li>
+      <li><a href="#s3"><span class="n">03</span> Público-alvo</a></li>
+      <li><a href="#s4"><span class="n">04</span> Posicionamento</a></li>
+      <li><a href="#s5"><span class="n">05</span> Comunidade</a></li>
+      <li><a href="#s6"><span class="n">06</span> Canais orgânicos</a></li>
+      <li><a href="#s7"><span class="n">07</span> Mídia paga (ADS)</a></li>
+      <li><a href="#s8"><span class="n">08</span> Influenciadores</a></li>
+      <li><a href="#s9"><span class="n">09</span> Lançamento</a></li>
+      <li><a href="#s10"><span class="n">10</span> Retenção e recompra</a></li>
+      <li><a href="#s11"><span class="n">11</span> Orçamento</a></li>
+      <li><a href="#s12"><span class="n">12</span> Stack e UTM</a></li>
+      <li><a href="#s13"><span class="n">13</span> Riscos</a></li>
+      <li><a href="#s14"><span class="n">14</span> Backlog</a></li>
+    </ol>
+    <button class="theme-toggle" type="button" data-theme-toggle>tema: auto</button>
+  </nav>
+
+  <article class="content">
+    <section id="s1">
+      <h2><span class="num">01</span> Contexto e o que muda no marketing</h2>
+      <p>
+        Farol é <strong>pagamento por viagem</strong>, não assinatura (R$ 39 a viagem ·
+        R$ 89 o pacote de 3 · grátis com 1 destino e sem chat). Isso muda o funil:
+      </p>
+      <ul>
+        <li>
+          <strong>Não existe</strong> "trial de 14 dias → converte pra assinatura". O
+          <strong>plano grátis é o topo do funil</strong>: a pessoa sente o produto com
+          uma viagem simples.
+        </li>
+        <li>O jogo é: <strong>atrair → cadastro no grátis → primeira viagem paga → recompra</strong>.</li>
+        <li>
+          Hoje não há produto aberto. A fase atual é <strong>construir audiência e lista
+          de espera</strong> com comunidade + conteúdo, para ter demanda no dia da abertura.
+        </li>
+      </ul>
+      <div class="callout">
+        <p>
+          <strong>Cunha de posicionamento:</strong> "não sei para onde ir" + "odeio
+          planejar". O gatilho emocional é as <em>trinta abas abertas</em>. O diferencial
+          de marca é a <strong>honestidade</strong> (o Farol não reserva por você, o
+          roteiro é ponto de partida) num mercado de influencer eufórico e de
+          "planejadores de IA" genéricos.
+        </p>
+      </div>
+      <p>
+        <strong>Voz em todo material:</strong> assessor calmo e confiável — específico,
+        honesto sobre incerteza, assume o trabalho, sem euforia, sem ponto de exclamação.
+      </p>
+    </section>
+
+    <section id="s2">
+      <h2><span class="num">02</span> Objetivos e métricas</h2>
+      <h3>North Star</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Fase</th><th>North Star</th><th>Meta <span class="h">(H)</span></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Pré-lançamento (M0–M2)</td>
+              <td>Cadastros qualificados na waitlist</td>
+              <td class="num">1.000 e-mails · 150 na comunidade</td>
+            </tr>
+            <tr>
+              <td>Lançamento (M2–M4)</td>
+              <td>Viagens <b>pagas</b> concluídas / mês</td>
+              <td class="num">60/mês ao fim do M4</td>
+            </tr>
+            <tr>
+              <td>Crescimento (M4+)</td>
+              <td>Viagens pagas / mês + recompra 90d</td>
+              <td class="num">300/mês · recompra ≥ 20%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Funil</h3>
+      <div class="funnel">
+        <span class="stage"><b>Impressão</b><span>orgânico + pago</span></span>
+        <span class="stage"><b>Clique</b><span>CTR ≥ 1,2% <span class="h">(H)</span></span></span>
+        <span class="stage"><b>Cadastro grátis</b><span>CPL ≤ R$ 4 <span class="h">(H)</span></span></span>
+        <span class="stage"><b>Viagem paga</b><span>≥ 8% em 30d <span class="h">(H)</span></span></span>
+        <span class="stage"><b>Recompra</b><span>≥ 20% em 90d <span class="h">(H)</span></span></span>
+      </div>
+
+      <h3>KPIs de apoio <span class="h">(H)</span></h3>
+      <ul>
+        <li><strong>CTR</strong> ≥ 1,2% (Meta) · ≥ 4% (Search)</li>
+        <li><strong>Custo por cadastro (CPL)</strong> ≤ R$ 4 no pré-lançamento</li>
+        <li><strong>Cadastro → viagem paga</strong> ≥ 8% nos primeiros 30 dias</li>
+        <li><strong>CAC de viagem paga</strong> ≤ R$ 25 → payback na 1ª compra (ticket R$ 39)</li>
+        <li><strong>LTV</strong> ≈ R$ 47 com recompra 20% (R$ 39 × 1,2)</li>
+        <li><strong>Ativação</strong> — % de cadastros que geram ≥ 1 roteiro na 1ª semana ≥ 40%</li>
+      </ul>
+      <p>Instrumentar tudo com UTM padronizado (seção 12) e eventos de funil no PostHog.</p>
+    </section>
+
+    <section id="s3">
+      <h2><span class="num">03</span> Público-alvo</h2>
+      <h3>Primário — "o indeciso sobrecarregado"</h3>
+      <p>
+        25–45 anos, classe média urbana BR, viaja 1–3× por ano, tem verba mas não tempo
+        nem paciência para pesquisar. Já usa Skyscanner / Booking / Google Flights. Sente
+        culpa das abas abertas. Compra conveniência.
+      </p>
+      <h3>Secundário — "o casal / família planejando as férias"</h3>
+      <p>
+        Decisão conjunta, orçamento mais firme, quer um roteiro pronto para ajustar. Alta
+        sazonalidade (jan, jul, feriados longos).
+      </p>
+      <h3>Terciário (v1+) — "o caçador de milhas"</h3>
+      <p>Espera o motor de milhas. Não é foco de aquisição agora; é lista de espera segmentada.</p>
+      <div class="callout warn">
+        <p>
+          <strong>Não é público agora:</strong> mochileiro hardcore (quer planejar),
+          viajante de luxo com agência, corporativo.
+        </p>
+      </div>
+      <p>
+        <strong>Onde essa gente está:</strong> Instagram e YouTube salvos de viagem,
+        grupos de Facebook e WhatsApp de viagem, Reddit (r/turismo, r/viagem), buscas do
+        Google em alta intenção, newsletters de passagem barata (Melhores Destinos,
+        Passagens Imperdíveis).
+      </p>
+    </section>
+
+    <section id="s4">
+      <h2><span class="num">04</span> Posicionamento e mensagens</h2>
+      <p><strong>Frase-âncora:</strong> <em>Você não precisa saber para onde ir.</em></p>
+      <p>
+        <strong>Promessa:</strong> do "não sei" a um roteiro pronto, ajustável por
+        conversa — em minutos, não em trinta abas.
+      </p>
+      <p>
+        <strong>Provas:</strong> a demo interativa da landing (gosto → destino), o roteiro
+        dia a dia, o "por quê" de cada destino (clima, custo, tempo de voo).
+      </p>
+
+      <h3>Ângulos para criativos e conteúdo</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Ângulo</th><th>Gancho</th><th>Para quem</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Dor do planejamento</td><td>"31 abas, 3 planilhas, e a viagem continua no 'quem sabe'."</td><td>Primário</td></tr>
+            <tr><td>Descoberta por gosto</td><td>"Diz 3 coisas que você curte. Recebe um destino com o porquê."</td><td>Primário</td></tr>
+            <tr><td>Honestidade</td><td>"Não reserva por você. Leva até a página de compra e explica a escolha."</td><td>Todos (diferencial)</td></tr>
+            <tr><td>Ajuste por conversa</td><td>"'Menos museu, mais praia' e o roteiro se refaz na hora."</td><td>Secundário</td></tr>
+            <tr><td>Preço</td><td>"Sem assinatura. Você paga a viagem que montar — R$ 39."</td><td>Todos</td></tr>
+            <tr><td>Autônomo</td><td>"Sem tempo? Datas + orçamento + 3 gostos → um plano fechado."</td><td>Secundário</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warn">
+        <p>
+          <strong>O que NÃO dizer:</strong> "a IA que planeja tudo por você", "viagem
+          perfeita", "melhores destinos de 2026", nada com "revolucionário". Não prometer
+          reserva, não prometer preço garantido.
+        </p>
+      </div>
+    </section>
+
+    <section id="s5">
+      <h2><span class="num">05</span> Comunidade</h2>
+      <p>
+        Duas frentes: <strong>comunidade própria</strong> (controlável, vira loop de
+        feedback e base de beta) e <strong>comunidades de terceiros</strong> (alcance,
+        com regras).
+      </p>
+
+      <h3>5.1 Comunidade própria — "Sala do Farol"</h3>
+      <p>
+        <strong>Plataforma:</strong> Comunidade do WhatsApp (padrão BR, abertura alta) +
+        espelho no Telegram. Discord só se o público early puxar pra lá.
+      </p>
+      <p><strong>Propósito:</strong></p>
+      <ol>
+        <li>Loop de feedback com quem entrou na waitlist (o que falta, o que confunde).</li>
+        <li>Recrutar e organizar <strong>beta testers</strong>.</li>
+        <li>Conteúdo com troca real: "para onde ir em [mês]", "alguém já foi pra [destino]?", revisão de roteiros.</li>
+        <li>Primeiros defensores da marca → sementes de indicação.</li>
+      </ol>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ritual</th><th class="num">Frequência</th><th>Formato</th></tr></thead>
+          <tbody>
+            <tr><td>"Para onde ir em [mês]"</td><td class="num">Mensal</td><td>Post com 3 destinos + enquete</td></tr>
+            <tr><td>Bastidores do produto</td><td class="num">Quinzenal</td><td>Print / vídeo curto do que mudou</td></tr>
+            <tr><td>Roteiro em revisão</td><td class="num">Semanal</td><td>Farol monta um roteiro real, comunidade critica</td></tr>
+            <tr><td>Pergunta aberta</td><td class="num">Semanal</td><td>1 pergunta de descoberta</td></tr>
+            <tr><td>Chamada de beta</td><td class="num">Por onda</td><td>Convite + vagas limitadas</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        <strong>Regras da sala:</strong> sem spam de agência, sem link de afiliado de
+        terceiros, feedback direto é bem-vindo. Moderação: 1 pessoa do time + 2
+        voluntários early. <strong>Meta <span class="h">(H)</span>:</strong> 150 membros
+        no fim do M2, 30% ativos/semana.
+      </p>
+
+      <h3>5.2 Comunidades de terceiros</h3>
+      <p>
+        <strong>Onde:</strong> r/turismo, r/viagem, r/brasil (com parcimônia), grupos de
+        Facebook ("Mochileiros", "Viajantes pelo Mundo", "Mulheres que Viajam Sozinhas",
+        regionais), grupos de WhatsApp de viagem, Quora BR.
+      </p>
+      <p><strong>Como — contribuir, não spammar:</strong></p>
+      <ul>
+        <li>Responder perguntas reais de "para onde ir" com resposta útil de verdade; mencionar o Farol só quando fizer sentido e com transparência.</li>
+        <li>Ratio <strong>9:1</strong> — nove contribuições sem link para cada uma com link.</li>
+        <li>Ler as regras de cada grupo. Vários proíbem autopromoção; nesses, só valor + perfil bem montado.</li>
+        <li>AMA / post de bastidores quando a comunidade permitir.</li>
+      </ul>
+      <p><strong>Meta <span class="h">(H)</span>:</strong> 300 cliques/mês de comunidade orgânica no M2.</p>
+    </section>
+
+    <section id="s6">
+      <h2><span class="num">06</span> Canais orgânicos</h2>
+      <h3>6.1 Instagram — canal principal</h3>
+      <p>
+        <strong>Bio:</strong> o que é + para quem + link (waitlist agora, produto depois).
+        Destaques: "Como funciona", "Para onde ir", "Bastidores".
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Pilar</th><th class="num">%</th><th>Exemplos</th></tr></thead>
+          <tbody>
+            <tr><td>Descoberta / "para onde ir"</td><td class="num">35%</td><td>"3 destinos para quem curte X e tem R$ Y" · carrossel com o porquê</td></tr>
+            <tr><td>Dor do planejamento</td><td class="num">20%</td><td>Reels "POV: 30 abas abertas" · "o roteiro que a planilha não dá"</td></tr>
+            <tr><td>Produto em ação</td><td class="num">20%</td><td>Screen-recording da demo · antes/depois de um ajuste no chat</td></tr>
+            <tr><td>Bastidores / honestidade</td><td class="num">15%</td><td>"o que o Farol ainda NÃO faz" · decisões de produto</td></tr>
+            <tr><td>Prova social / comunidade</td><td class="num">10%</td><td>roteiros da Sala do Farol · depoimentos de beta</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        <strong>Formatos:</strong> Reels (alcance), carrossel (salvamento = sinal de
+        intenção), Stories (comunidade + enquetes de descoberta que alimentam o produto).
+        <strong>Cadência inicial <span class="h">(H)</span>:</strong> 3 Reels + 2
+        carrosséis + Stories diários por semana. Reavaliar em 4 semanas pelo
+        alcance/salvamento, não por likes.
+      </p>
+
+      <h3>Calendário das 4 primeiras semanas</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th class="num">Sem.</th><th>Reels</th><th>Carrossel</th><th>Stories</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td>"30 abas" · "diz 3 gostos"</td><td>"Para onde ir em [mês+1]"</td><td>Enquete: praia calma vs agitada</td></tr>
+            <tr><td class="num">2</td><td>Demo gosto→destino · "o que NÃO faz"</td><td>"Roteiro de 7 dias em [destino]"</td><td>Bastidor: por que sem assinatura</td></tr>
+            <tr><td class="num">3</td><td>Ajuste no chat (antes/depois) · POV planejamento</td><td>"Quanto custa 7 dias em 4 destinos"</td><td>Caixinha: "sua maior dúvida ao planejar"</td></tr>
+            <tr><td class="num">4</td><td>Depoimento beta · "como o Farol escolhe"</td><td>"Melhor época para 5 destinos BR"</td><td>Chamada de beta</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>6.2 Outros orgânicos</h3>
+      <ul>
+        <li><strong>TikTok / Reels cross-post:</strong> mesmo material. Ângulo "escolhi 3 gostos e o app me mandou pra [destino]".</li>
+        <li><strong>YouTube (médio prazo):</strong> roteiros em vídeo. Evergreen, casa com SEO.</li>
+        <li><strong>SEO / blog (jogo longo):</strong> páginas de roteiro e de "melhor época para [destino]". Começar com 10 destinos do catálogo. Tráfego de cauda longa a partir do M4.</li>
+        <li><strong>Pinterest:</strong> destinos + roteiros como pins. Baixo esforço, público de planejamento.</li>
+        <li><strong>Newsletter própria:</strong> "Para onde ir em [mês]", 1×/mês, começa com a waitlist.</li>
+        <li><strong>Parcerias com newsletters de viagem:</strong> patrocínio pontual quando houver produto e verba.</li>
+      </ul>
+    </section>
+
+    <section id="s7">
+      <h2><span class="num">07</span> Mídia paga (ADS)</h2>
+      <h3>Princípios</h3>
+      <ul>
+        <li>Não escalar antes de o CAC fechar. Pré-lançamento = <strong>aprender</strong>, não crescer.</li>
+        <li>1 variável por teste. Nomear tudo com UTM (seção 12).</li>
+        <li>Orçamento em <strong>faixas</strong>, subindo só quando CPL/CAC validar.</li>
+      </ul>
+
+      <h3>Meta Ads (Instagram + Facebook) — canal principal</h3>
+      <p><strong>Fase pré-lançamento</strong> — objetivo: cadastro na waitlist.</p>
+      <ul>
+        <li>Campanha: <em>Leads</em> (formulário nativo) <strong>e</strong> <em>Tráfego</em> para a landing — testar as duas.</li>
+        <li>Públicos: interesses (viagem, Skyscanner, Booking, Airbnb, Hotéis.com, 123milhas, Lonely Planet × "compras online"); retarget de visitantes; lookalike 1–3% dos cadastros (≥ 100).</li>
+        <li>Criativos (3–5 por conjunto, 1 ângulo cada): Reel da demo · estático "30 abas" · vídeo "o que o Farol NÃO faz".</li>
+        <li>Orçamento <span class="h">(H)</span>: <strong>R$ 40–80/dia</strong>, 2 conjuntos, 2 semanas de aprendizado. Meta: CPL ≤ R$ 4 · CTR ≥ 1,2%.</li>
+      </ul>
+      <p><strong>Fase lançamento</strong> — objetivo: cadastro grátis → primeira viagem paga.</p>
+      <ul>
+        <li>Campanha de <em>Conversão</em> otimizada para o evento "cadastro grátis".</li>
+        <li>Retarget por etapa: visitou → cadastrou sem gerar roteiro → gerou roteiro sem comprar. Criativo específico por etapa.</li>
+        <li>Orçamento <span class="h">(H)</span>: <strong>R$ 100–200/dia</strong>, escala 20%/semana enquanto CAC ≤ R$ 25.</li>
+      </ul>
+
+      <h3>Google Ads</h3>
+      <p><strong>Search (alta intenção — ligar no lançamento):</strong></p>
+      <ul>
+        <li>"para onde viajar" / "não sei para onde viajar" / "destino de viagem [mês]"</li>
+        <li>"roteiro [cidade] [n] dias" / "o que fazer em [cidade]"</li>
+        <li>"planejador de viagem" / "montar roteiro de viagem" / "assistente de viagem"</li>
+        <li>"melhor época para [destino]"</li>
+        <li>Negativar: "emprego", "curso", "agência", "trabalhar com". CPC alvo ≤ R$ 1,50. Orçamento <span class="h">(H)</span> R$ 30–60/dia.</li>
+      </ul>
+      <p><strong>Performance Max / Demand Gen:</strong> só depois de ter dados de conversão e criativos já validados. Não abrir no dia 1.</p>
+
+      <h3>TikTok Ads</h3>
+      <p>
+        Testar depois do Meta validar. Mesmo criativo de Reels, público amplo, orçamento
+        pequeno (<strong>R$ 20–40/dia <span class="h">(H)</span></strong>).
+      </p>
+
+      <h3>Criativos — pipeline</h3>
+      <ul>
+        <li>Produzir em lote: 6–8 peças por sprint quinzenal, 1 ângulo cada.</li>
+        <li>Sempre 1 versão "feia/nativa" (celular, sem produção) e 1 "caprichada".</li>
+        <li>Legenda na voz do Farol, sem euforia.</li>
+        <li>Matar criativo com CTR &lt; 0,8% após R$ 50 gastos <span class="h">(H)</span>.</li>
+      </ul>
+    </section>
+
+    <section id="s8">
+      <h2><span class="num">08</span> Influenciadores e parcerias</h2>
+      <ul>
+        <li><strong>Alvo:</strong> micro creators de viagem BR (10k–100k), nicho "viagem real / sem luxo", casais, viagem-sozinha, bate-volta, road trip.</li>
+        <li><strong>Modelo:</strong> permuta + cupom/afiliado. Pagamento fixo só para quem já converteu bem.</li>
+        <li><strong>Formato:</strong> o creator usa o Farol de verdade para a própria viagem e mostra o processo. Autenticidade &gt; roteiro publicitário.</li>
+        <li><strong>Meta <span class="h">(H)</span>:</strong> 5 parcerias no trimestre de lançamento, medir por cupom.</li>
+        <li><strong>Não-influencer:</strong> newsletters de passagem barata, podcasts de viagem, comunidades de nômade digital, guest posts que casam com SEO.</li>
+      </ul>
+    </section>
+
+    <section id="s9">
+      <h2><span class="num">09</span> Lançamento — sequência</h2>
+      <ol>
+        <li><strong>Waitlist (agora):</strong> landing no ar. Foco: encher a lista e a Sala do Farol.</li>
+        <li><strong>Beta fechado (M2):</strong> ondas de 50–100 pessoas da waitlist, priorizando quem está ativo na comunidade. Objetivo: consertar ativação, não vender.</li>
+        <li><strong>Early access (M3):</strong> abre para toda a waitlist. Liga o <strong>referral</strong> — "convide e ganhe 1 viagem" (o convidado também ganha). Link único.</li>
+        <li><strong>Abertura pública (M4):</strong> liga Search + escala Meta. PR leve (Product Hunt BR, comunidades de produto, newsletters de tech BR).</li>
+        <li><strong>Pós-abertura:</strong> ciclo mensal "Para onde ir em [mês]" alimentando orgânico + pago + newsletter.</li>
+      </ol>
+      <div class="callout warn">
+        <p>
+          <strong>Gatilho de cada fase:</strong> só avança quando a métrica da fase
+          anterior bate a meta <span class="h">(H)</span> (ex.: não abre público antes de
+          ativação ≥ 40% no early access).
+        </p>
+      </div>
+    </section>
+
+    <section id="s10">
+      <h2><span class="num">10</span> Retenção e recompra</h2>
+      <p>O modelo por viagem vive de <strong>recompra</strong> e <strong>sazonalidade</strong>.</p>
+      <ul>
+        <li><strong>Fim do roteiro:</strong> CTA "planeje a próxima" + salvar como rascunho.</li>
+        <li><strong>E-mail pós-viagem (D+3 da volta estimada):</strong> "como foi [destino]?" + avaliar + gancho para a próxima.</li>
+        <li><strong>Sazonalidade:</strong> disparo 6–8 semanas antes de feriados longos e alta temporada (jan, jul, carnaval, semana santa, nov).</li>
+        <li><strong>Newsletter mensal "Para onde ir em [mês]":</strong> principal canal de recompra barata.</li>
+        <li><strong>Indicação permanente:</strong> 1 viagem grátis por indicação que compra.</li>
+        <li><strong>Reativação:</strong> gerou roteiro e não comprou em 30d → 3 e-mails (lembrete do roteiro salvo → destino novo pelo gosto dele → oferta do pacote).</li>
+      </ul>
+    </section>
+
+    <section id="s11">
+      <h2><span class="num">11</span> Orçamento e cronograma</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fase</th><th class="num">Período <span class="h">(H)</span></th><th>Foco</th>
+              <th class="num">ADS/mês <span class="h">(H)</span></th><th class="num">Produção+ferramentas <span class="h">(H)</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Pré-lançamento</td><td class="num">M0–M2</td><td>Waitlist + comunidade + orgânico</td><td class="num">R$ 1.500–2.500</td><td class="num">R$ 300–600</td></tr>
+            <tr><td>Lançamento</td><td class="num">M2–M4</td><td>Beta → early access → abertura</td><td class="num">R$ 3.000–6.000</td><td class="num">R$ 500–900</td></tr>
+            <tr><td>Crescimento</td><td class="num">M4+</td><td>Escala do que validou</td><td class="num">R$ 6.000+ (se CAC ≤ R$ 25)</td><td class="num">R$ 800+</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout warn">
+        <p>
+          <strong>Regra de corte:</strong> se no fim do M4 o CAC de viagem paga estiver
+          acima de R$ 39 (o ticket), <strong>parar de escalar</strong> e voltar para
+          orgânico + comunidade até o produto melhorar a conversão.
+        </p>
+      </div>
+    </section>
+
+    <section id="s12">
+      <h2><span class="num">12</span> Stack e convenção de UTM</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Função</th><th>Ferramenta sugerida <span class="h">(H)</span></th><th>Observação</th></tr></thead>
+          <tbody>
+            <tr><td>Analytics de produto / funil</td><td>PostHog</td><td>eventos: cadastro, roteiro gerado, viagem paga, recompra</td></tr>
+            <tr><td>Analytics de site</td><td>Plausible ou GA4</td><td>Plausible = leve, sem banner de cookie</td></tr>
+            <tr><td>E-mail + automação</td><td>Resend (transacional) + Loops ou Brevo (marketing)</td><td>waitlist, newsletter, sequências</td></tr>
+            <tr><td>Agendador social</td><td>Metricool ou Buffer</td><td>calendário + relatórios IG/TikTok</td></tr>
+            <tr><td>Pixel / conversões</td><td>Meta Pixel + CAPI · Google Tag</td><td>conversões server-side quando der</td></tr>
+            <tr><td>UTM / links</td><td>Planilha padrão + encurtador próprio</td><td>convenção abaixo</td></tr>
+            <tr><td>Comunidade</td><td>Comunidade do WhatsApp + Telegram</td><td>1 do time + 2 voluntários</td></tr>
+            <tr><td>Referral</td><td>link único por usuário (feature de produto)</td><td>rastrear no PostHog</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <pre>utm_source   = instagram | meta_ads | google_ads | tiktok | newsletter | comunidade | creator
+utm_medium   = organic | cpc | email | referral | bio
+utm_campaign = prelancamento | beta | early_access | abertura | sazonal_&lt;mes&gt;
+utm_content  = &lt;slug-do-criativo-ou-post&gt;</pre>
+    </section>
+
+    <section id="s13">
+      <h2><span class="num">13</span> Riscos e o que não fazer</h2>
+      <ul>
+        <li><strong>Prometer o que o produto não faz</strong> (reserva, preço garantido, milhas antes da v1). Todo criativo passa pelo filtro da voz.</li>
+        <li><strong>Comprar seguidores / engajamento.</strong> Envenena o lookalike e a métrica.</li>
+        <li><strong>Escalar ADS antes do CAC fechar.</strong> Queima caixa de bootstrap.</li>
+        <li><strong>Spam em comunidade.</strong> Ban + reputação. Ratio 9:1, ler regras.</li>
+        <li><strong>LGPD:</strong> consentimento explícito no cadastro, opt-out em todo e-mail, não vender base, não usar e-mail para fim diferente do informado.</li>
+        <li><strong>Depender de um canal só.</strong> Se 80% vier de Meta, um bloqueio de conta trava tudo — manter orgânico + comunidade + Search como base.</li>
+        <li><strong>Clickbait de destino</strong> ("melhores lugares 2026"). Traz audiência errada e fere a voz.</li>
+      </ul>
+    </section>
+
+    <section id="s14">
+      <h2><span class="num">14</span> Backlog — próximas 2–4 semanas</h2>
+      <ol class="backlog">
+        <li>Criar a <strong>Sala do Farol</strong> (WhatsApp + Telegram) e as regras. Convidar a waitlist atual.</li>
+        <li>Montar <strong>perfil do Instagram</strong> (bio, 3 destaques, primeiros 6 posts prontos).</li>
+        <li>Instrumentar <strong>UTM + PostHog + Pixel</strong> na landing (eventos de funil).</li>
+        <li>Escrever <strong>9 criativos</strong> (3 ângulos × 3 formatos) para o primeiro teste de Meta Ads.</li>
+        <li>Ligar <strong>Meta Ads pré-lançamento</strong> (R$ 40–80/dia, 2 conjuntos, 2 semanas).</li>
+        <li>Definir e configurar a <strong>newsletter "Para onde ir em [mês]"</strong> (ferramenta + template).</li>
+        <li>Listar <strong>20 comunidades de terceiros</strong> (Reddit, Facebook, WhatsApp) + regras de cada.</li>
+        <li>Rascunhar as <strong>10 primeiras páginas de roteiro</strong> para SEO (a partir do catálogo).</li>
+        <li>Definir a mecânica de <strong>referral</strong> com o time de produto (link único, recompensa).</li>
+        <li>Fechar as <strong>metas <span class="h">(H)</span></strong> desta doc com números que o time topa perseguir.</li>
+      </ol>
+    </section>
+  </article>
+
+  <p class="footer-note">
+    Fonte da verdade: <span class="mono">docs/marketing/2026-08-31-plano-go-to-market.md</span>.
+    Ligações: modelo de custo e pricing (artifact "Custo do Farol"), landing em
+    <span class="mono">apps/web</span> rota <span class="mono">/</span>, voz em
+    <span class="mono">brand/Voice.dc.html</span>, PRD em <span class="mono">PRD.md</span>.
+  </p>
+</div>
+
+<script>
+  (function () {
+    var btn = document.querySelector("[data-theme-toggle]");
+    var root = document.documentElement;
+    var order = ["auto", "light", "dark"];
+
+    function read() {
+      try {
+        return localStorage.getItem("farol-gtm-theme") || "auto";
+      } catch (e) {
+        return "auto";
+      }
+    }
+
+    function apply(mode) {
+      if (mode === "auto") root.removeAttribute("data-theme");
+      else root.setAttribute("data-theme", mode);
+      if (btn) btn.textContent = "tema: " + mode;
+      try {
+        localStorage.setItem("farol-gtm-theme", mode);
+      } catch (e) {}
+    }
+
+    apply(read());
+
+    if (btn) {
+      btn.addEventListener("click", function () {
+        var current = read();
+        var next = order[(order.indexOf(current) + 1) % order.length];
+        apply(next);
+      });
+    }
+
+    // realce do índice conforme a seção visível
+    var links = Array.prototype.slice.call(document.querySelectorAll(".toc a"));
+    if (links.length && "IntersectionObserver" in window) {
+      var byId = {};
+      links.forEach(function (a) {
+        byId[a.getAttribute("href").slice(1)] = a;
+      });
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              links.forEach(function (a) {
+                a.classList.remove("active");
+              });
+              var active = byId[entry.target.id];
+              if (active) active.classList.add("active");
+            }
+          });
+        },
+        { rootMargin: "-20% 0px -70% 0px" }
+      );
+      document.querySelectorAll("section[id]").forEach(function (s) {
+        io.observe(s);
+      });
+    }
+  })();
+</script>
