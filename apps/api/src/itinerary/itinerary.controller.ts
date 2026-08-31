@@ -1,9 +1,12 @@
 import { Body, Controller, Get, HttpCode, Param, Post, UseGuards } from "@nestjs/common";
 import {
   chooseDestinationSchema,
+  swapRestaurantSchema,
   type ChooseDestinationInput,
   type CurrentUser as CurrentUserType,
-  type Itinerary
+  type Itinerary,
+  type ItineraryItem,
+  type SwapRestaurantInput
 } from "@farol/shared";
 import { AuthGuard } from "../auth/auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
@@ -41,5 +44,15 @@ export class ItineraryController {
     @Param("dayIndex") dayIndex: string
   ): Promise<void> {
     return this.itinerary.regenerateDay(user.id, tripId, Number(dayIndex));
+  }
+
+  @Post("itinerary/items/:itemId/swap-restaurant")
+  swapRestaurant(
+    @CurrentUser() user: CurrentUserType,
+    @Param("id") tripId: string,
+    @Param("itemId") itemId: string,
+    @Body(new ZodValidationPipe(swapRestaurantSchema)) body: SwapRestaurantInput
+  ): Promise<ItineraryItem> {
+    return this.itinerary.swapRestaurant(user.id, tripId, itemId, body);
   }
 }

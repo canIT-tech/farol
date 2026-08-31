@@ -3,8 +3,17 @@ import { Test } from "@nestjs/testing";
 import type { INestApplication } from "@nestjs/common";
 import request from "supertest";
 import { inArray } from "drizzle-orm";
-import { createDbClient, users, tripDestinations } from "@farol/db";
+import {
+  createDbClient,
+  users,
+  tripDestinations,
+  itineraries,
+  itineraryDays,
+  itineraryItems
+} from "@farol/db";
 import { startFakeJwks, type FakeJwks } from "./support/test-jwt";
+import { PLACES_PROVIDER } from "../src/providers/providers.module";
+import { FakePlacesProvider } from "./support/fake-providers";
 
 const dbUrl = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!dbUrl) throw new Error("DATABASE_URL ausente para o e2e de itinerary");
@@ -51,7 +60,10 @@ beforeAll(async () => {
   jwks = await startFakeJwks();
   process.env.SUPABASE_JWKS_URL = jwks.jwksUrl;
   const { AppModule } = await import("../src/app.module");
-  const mod = await Test.createTestingModule({ imports: [AppModule] }).compile();
+  const mod = await Test.createTestingModule({ imports: [AppModule] })
+    .overrideProvider(PLACES_PROVIDER)
+    .useValue(new FakePlacesProvider())
+    .compile();
   app = mod.createNestApplication();
   await app.init();
 });
@@ -126,5 +138,68 @@ describe("roteiro", () => {
       .set("Authorization", u.auth);
     expect(res.status).toBe(409);
     expect(res.body.code).toBe("itinerary_not_ready");
+  });
+
+  it("POST .../items/:itemId/swap-restaurant sem auth responde 401", async () => {
+    const res = await request(app.getHttpServer()).post("/trips/x/itinerary/items/y/swap-restaurant");
+    expect(res.status).toBe(401);
+  });
+
+  it("POST .../items/:itemId/swap-restaurant troca o restaurante e responde 200", async () => {
+    const u = await newUser();
+    const tripId = await tripWithCandidate(u.auth);
+
+    // Roteiro pronto com um item de refeição, direto no banco.
+    const itineraryId = crypto.randomUUID();
+    await db.insert(itineraries).values({ id: itineraryId, tripId, version: 1, status: "ready" });
+    const dayId = crypto.randomUUID();
+    await db.insert(itineraryDays).values({ id: dayId, itineraryId, dayIndex: 1 });
+    const mealId = crypto.randomUUID();
+    await db.insert(itineraryItems).values({
+      id: mealId,
+      dayId,
+      slot: "evening",
+      type: "meal",
+      title: "Jantar genérico",
+      lat: "38.70",
+      lng: "-9.10",
+      sortOrder: 0
+    });
+
+    const res = await request(app.getHttpServer())
+      .post(`/trips/${tripId}/itinerary/items/${mealId}/swap-restaurant`)
+      .set("Authorization", u.auth)
+      .send({ cuisine: "portuguesa" });
+
+    expect(res.status).toBe(201);
+    expect(res.body.id).toBe(mealId);
+    expect(res.body.placeId).toBe("place-museu");
+  });
+
+  it("POST .../items/:itemId/swap-restaurant em item que não é refeição responde 422", async () => {
+    const u = await newUser();
+    const tripId = await tripWithCandidate(u.auth);
+
+    const itineraryId = crypto.randomUUID();
+    await db.insert(itineraries).values({ id: itineraryId, tripId, version: 1, status: "ready" });
+    const dayId = crypto.randomUUID();
+    await db.insert(itineraryDays).values({ id: dayId, itineraryId, dayIndex: 1 });
+    const activityId = crypto.randomUUID();
+    await db.insert(itineraryItems).values({
+      id: activityId,
+      dayId,
+      slot: "morning",
+      type: "activity",
+      title: "Museu",
+      sortOrder: 0
+    });
+
+    const res = await request(app.getHttpServer())
+      .post(`/trips/${tripId}/itinerary/items/${activityId}/swap-restaurant`)
+      .set("Authorization", u.auth)
+      .send({});
+
+    expect(res.status).toBe(422);
+    expect(res.body.code).toBe("item_not_swappable");
   });
 });

@@ -12,16 +12,38 @@ import {
 import { nightsOf } from "@farol/domain";
 import {
   itinerarySchema,
+  itineraryItemSchema,
   type BuildItineraryOutput,
-  type Itinerary
+  type Itinerary,
+  type ItineraryItem
 } from "@farol/shared";
 import type { BuildItineraryInput, PinnedItem } from "../llm/llm.types";
 import { DB } from "../db/db.module";
 
 type ItineraryRow = typeof itineraries.$inferSelect;
+type ItemRow = typeof itineraryItems.$inferSelect;
 
 function num(value: string | null): number | null {
   return value === null ? null : Number(value);
+}
+
+// Linha do banco → DTO que a api devolve. Compartilhado por latest() e swapRestaurant().
+export function toItineraryItem(item: ItemRow): ItineraryItem {
+  return itineraryItemSchema.parse({
+    id: item.id,
+    slot: item.slot,
+    type: item.type,
+    title: item.title,
+    description: item.description,
+    placeId: item.placeId,
+    lat: num(item.lat),
+    lng: num(item.lng),
+    rating: num(item.rating),
+    durationMin: item.durationMin,
+    estCost: num(item.estCost),
+    sortOrder: item.sortOrder,
+    pinned: item.pinned
+  });
 }
 
 @Injectable()
@@ -99,23 +121,7 @@ export class ItineraryRepository {
         dayIndex: day.dayIndex,
         date: day.date,
         notes: day.notes,
-        items: itemRows
-          .filter((item) => item.dayId === day.id)
-          .map((item) => ({
-            id: item.id,
-            slot: item.slot,
-            type: item.type,
-            title: item.title,
-            description: item.description,
-            placeId: item.placeId,
-            lat: num(item.lat),
-            lng: num(item.lng),
-            rating: num(item.rating),
-            durationMin: item.durationMin,
-            estCost: num(item.estCost),
-            sortOrder: item.sortOrder,
-            pinned: item.pinned
-          }))
+        items: itemRows.filter((item) => item.dayId === day.id).map(toItineraryItem)
       }))
     });
   }
@@ -276,6 +282,37 @@ export class ItineraryRepository {
         );
       }
     });
+  }
+
+  // Item do roteiro, restrito à viagem — evita mexer em item de outra trip.
+  async itemOfTrip(tripId: string, itemId: string): Promise<ItemRow | null> {
+    const rows = await this.db
+      .select({ item: itineraryItems })
+      .from(itineraryItems)
+      .innerJoin(itineraryDays, eq(itineraryItems.dayId, itineraryDays.id))
+      .innerJoin(itineraries, eq(itineraryDays.itineraryId, itineraries.id))
+      .where(and(eq(itineraryItems.id, itemId), eq(itineraries.tripId, tripId)));
+    return rows[0]?.item ?? null;
+  }
+
+  // Troca o lugar de um item já existente (swap_restaurant, design §6.4).
+  async applyPlaceToItem(
+    itemId: string,
+    place: { name: string; placeId: string; lat: number; lng: number; rating: number | null }
+  ): Promise<ItemRow> {
+    const rows = await this.db
+      .update(itineraryItems)
+      .set({
+        title: place.name,
+        placeId: place.placeId,
+        lat: String(place.lat),
+        lng: String(place.lng),
+        rating: place.rating === null ? null : String(place.rating),
+        needsReview: false
+      })
+      .where(eq(itineraryItems.id, itemId))
+      .returning();
+    return rows[0]!;
   }
 
   async markReady(itineraryId: string): Promise<void> {

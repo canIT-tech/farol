@@ -15,6 +15,7 @@ import { ItineraryRepository } from "./itinerary.repository";
 import { TripsService } from "../trips/trips.service";
 import { JOB_NAMES } from "../jobs/job-names";
 import type { JobQueue } from "../jobs/job-queue";
+import type { PlacesService } from "../places/places.service";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/api");
@@ -24,7 +25,9 @@ const tripsService = new TripsService(db);
 const repo = new ItineraryRepository(db);
 const publish = vi.fn((): Promise<string> => Promise.resolve("job-1"));
 const queue = { publish, work: vi.fn() } as unknown as JobQueue;
-const service = new ItineraryService(repo, queue, tripsService);
+// swapRestaurant tem spec próprio (swap-restaurant.spec.ts); aqui o Places não é usado.
+const places = { findFirst: () => Promise.resolve(null) } as unknown as PlacesService;
+const service = new ItineraryService(repo, queue, tripsService, places);
 
 const userIds: string[] = [];
 

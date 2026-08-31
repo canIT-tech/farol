@@ -1,16 +1,26 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { DomainError, NotFoundError, type Itinerary } from "@farol/shared";
+import {
+  DomainError,
+  NotFoundError,
+  type Itinerary,
+  type ItineraryItem,
+  type SwapRestaurantInput
+} from "@farol/shared";
 import { JOB_NAMES } from "../jobs/job-names";
 import { JOB_QUEUE, type JobQueue } from "../jobs/job-queue";
+import { PlacesService } from "../places/places.service";
 import { TripsService } from "../trips/trips.service";
-import { ItineraryRepository } from "./itinerary.repository";
+import { ItineraryRepository, toItineraryItem } from "./itinerary.repository";
+
+const DEFAULT_CUISINE = "restaurante";
 
 @Injectable()
 export class ItineraryService {
   constructor(
     private readonly repo: ItineraryRepository,
     @Inject(JOB_QUEUE) private readonly queue: JobQueue,
-    private readonly trips: TripsService
+    private readonly trips: TripsService,
+    private readonly places: PlacesService
   ) {}
 
   // Escolhe o destino, cria a próxima versão pendente e enfileira a geração.
@@ -47,6 +57,41 @@ export class ItineraryService {
       throw new NotFoundError("esse dia não existe no roteiro");
     }
     await this.queue.publish(JOB_NAMES.itineraryRegenerateDay, { itineraryId: latest.id, dayIndex });
+  }
+
+  // Troca o restaurante de um item de refeição por outro perto dele (design §6.4).
+  async swapRestaurant(
+    userId: string,
+    tripId: string,
+    itemId: string,
+    opts: SwapRestaurantInput = {}
+  ): Promise<ItineraryItem> {
+    await this.trips.get(userId, tripId);
+
+    const item = await this.repo.itemOfTrip(tripId, itemId);
+    if (item === null) {
+      throw new NotFoundError("item não encontrado neste roteiro");
+    }
+    if (item.type !== "meal") {
+      throw new DomainError("item_not_swappable", "só dá para trocar um item de refeição");
+    }
+
+    const near =
+      item.lat === null || item.lng === null
+        ? undefined
+        : { lat: Number(item.lat), lng: Number(item.lng) };
+    const cuisine = opts.cuisine ?? DEFAULT_CUISINE;
+    const query = near === undefined ? cuisine : `${cuisine} perto de ${near.lat},${near.lng}`;
+
+    const place = await this.places.findFirst(query, {
+      ...(near === undefined ? {} : { near }),
+      type: "restaurant"
+    });
+    if (place === null) {
+      throw new NotFoundError("nenhum restaurante encontrado para essa troca");
+    }
+
+    return toItineraryItem(await this.repo.applyPlaceToItem(itemId, place));
   }
 
   private async requireLatest(tripId: string): Promise<Itinerary> {
