@@ -7,3 +7,4 @@ export * from "./discovery";
 export * from "./itinerary";
 export * from "./flights";
 export * from "./hotels";
+export * from "./waitlist";

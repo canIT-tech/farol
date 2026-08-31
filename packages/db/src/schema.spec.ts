@@ -12,7 +12,8 @@ import {
   hotelSelections,
   itineraries,
   itineraryDays,
-  itineraryItems
+  itineraryItems,
+  waitlist
 } from "./schema";
 
 type ColSpec = {
@@ -169,6 +170,23 @@ describe("schema.tripDestinations", () => {
 
   it("indexa tripId", () => {
     expect(indexColumnNames(tripDestinations, "trip_destinations_trip_idx")).toEqual(["trip_id"]);
+  });
+});
+
+describe("schema.waitlist", () => {
+  checkColumns(waitlist, "waitlist", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    email: { name: "email", sqlType: "text", notNull: true },
+    source: { name: "source", sqlType: "text", notNull: false },
+    createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true }
+  });
+
+  it("id é primary key", () => {
+    expect(getTableColumns(waitlist).id.primary).toBe(true);
+  });
+
+  it("email é unique", () => {
+    expect(getTableColumns(waitlist).email.isUnique).toBe(true);
   });
 });
 

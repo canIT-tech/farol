@@ -196,6 +196,14 @@ export const hotelSelections = pgTable("hotel_selections", {
   selectedAt: timestamp("selected_at", { withTimezone: true }).notNull().defaultNow()
 });
 
+// Lista de espera da landing pública (sem login). email único, source = origem do cadastro.
+export const waitlist = pgTable("waitlist", {
+  id: uuid("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  source: text("source"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+});
+
 // Catálogo curado de destinos (design §6.1). Base determinística da descoberta.
 export const destinationCatalog = pgTable(
   "destination_catalog",
