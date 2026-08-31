@@ -345,4 +345,21 @@ export class ItineraryRepository {
       .set({ status: "failed", error })
       .where(eq(itineraries.id, itineraryId));
   }
+
+  async removeItem(tripId: string, itemId: string): Promise<void> {
+    const item = await this.itemOfTrip(tripId, itemId);
+    if (!item) {
+      throw new Error("item não encontrado neste roteiro");
+    }
+    await this.db.delete(itineraryItems).where(eq(itineraryItems.id, itemId));
+  }
+
+  async setPinned(tripId: string, itemId: string, pinned: boolean): Promise<void> {
+    const item = await this.itemOfTrip(tripId, itemId);
+    if (!item) {
+      throw new Error("item não encontrado neste roteiro");
+    }
+    await this.db.update(itineraryItems).set({ pinned }).where(eq(itineraryItems.id, itemId));
+  }
 }
+

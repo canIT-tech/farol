@@ -54,4 +54,30 @@ export class TripsService {
       .where(eq(tripDestinations.tripId, tripId));
     return buildTripState(tripRow, destinationRows);
   }
+
+  async updateDates(
+    userId: string,
+    tripId: string,
+    opts: { dateStart?: string | null; dateEnd?: string | null; durationDays?: number | null }
+  ): Promise<void> {
+    await this.get(userId, tripId);
+    await this.db
+      .update(trips)
+      .set({
+        dateStart: opts.dateStart === undefined ? undefined : opts.dateStart,
+        dateEnd: opts.dateEnd === undefined ? undefined : opts.dateEnd,
+        durationDays: opts.durationDays === undefined ? undefined : opts.durationDays,
+        updatedAt: new Date()
+      })
+      .where(eq(trips.id, tripId));
+  }
+
+  async updateBudget(userId: string, tripId: string, budgetTotal: number): Promise<void> {
+    await this.get(userId, tripId);
+    await this.db
+      .update(trips)
+      .set({ budgetTotal: String(budgetTotal), updatedAt: new Date() })
+      .where(eq(trips.id, tripId));
+  }
 }
+

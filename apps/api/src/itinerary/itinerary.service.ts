@@ -101,7 +101,26 @@ export class ItineraryService {
     return toItineraryItem(await this.repo.applyPlaceToItem(itemId, place));
   }
 
+  async removeItem(userId: string, tripId: string, itemId: string): Promise<void> {
+    await this.trips.get(userId, tripId);
+    try {
+      await this.repo.removeItem(tripId, itemId);
+    } catch {
+      throw new NotFoundError("item não encontrado neste roteiro");
+    }
+  }
+
+  async pinItem(userId: string, tripId: string, itemId: string, pinned: boolean): Promise<void> {
+    await this.trips.get(userId, tripId);
+    try {
+      await this.repo.setPinned(tripId, itemId, pinned);
+    } catch {
+      throw new NotFoundError("item não encontrado neste roteiro");
+    }
+  }
+
   private async requireLatest(tripId: string): Promise<Itinerary> {
+
     const itinerary = await this.repo.latest(tripId);
     if (!itinerary) {
       throw new NotFoundError("roteiro ainda não foi iniciado para esta viagem");

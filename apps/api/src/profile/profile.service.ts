@@ -53,4 +53,32 @@ export class ProfileService {
       .returning();
     return toDto(rows[0] as Row);
   }
+
+  async addInterest(userId: string, tag: string): Promise<TasteProfile> {
+    const current = await this.get(userId);
+    const existing = current.interests;
+    if (existing.includes(tag)) {
+      return current;
+    }
+    return this.upsert(userId, {
+      interests: [...existing, tag],
+      pace: current.pace,
+      partyType: current.partyType,
+      budgetBand: current.budgetBand,
+      constraints: current.constraints
+    });
+  }
+
+  async removeInterest(userId: string, tag: string): Promise<TasteProfile> {
+    const current = await this.get(userId);
+    const updated = current.interests.filter((t) => t !== tag);
+    return this.upsert(userId, {
+      interests: updated,
+      pace: current.pace,
+      partyType: current.partyType,
+      budgetBand: current.budgetBand,
+      constraints: current.constraints
+    });
+  }
 }
+

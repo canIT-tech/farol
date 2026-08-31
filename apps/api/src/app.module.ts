@@ -14,6 +14,7 @@ import { ProvidersModule } from "./providers/providers.module";
 import { FlightsModule } from "./flights/flights.module";
 import { HotelsModule } from "./hotels/hotels.module";
 import { WaitlistModule } from "./waitlist/waitlist.module";
+import { ChatModule } from "./chat/chat.module";
 
 @Module({
   imports: [
@@ -31,7 +32,9 @@ import { WaitlistModule } from "./waitlist/waitlist.module";
     ProvidersModule,
     FlightsModule,
     HotelsModule,
-    WaitlistModule
+    WaitlistModule,
+    ChatModule
   ]
 })
 export class AppModule {}
+

@@ -9,3 +9,5 @@ export * from "./flights";
 export * from "./hotels";
 export * from "./places";
 export * from "./waitlist";
+export * from "./chat";
+

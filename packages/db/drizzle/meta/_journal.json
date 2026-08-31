@@ -50,6 +50,13 @@
       "when": 1788201974031,
       "tag": "0006_lumpy_scorpion",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788216959816,
+      "tag": "0007_odd_weapon_omega",
+      "breakpoints": true
     }
   ]
 }
