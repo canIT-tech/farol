@@ -126,7 +126,7 @@ export default function HomePage() {
           <p className="trust">Sem spam. Um único e-mail quando abrir o acesso.</p>
         </section>
 
-        <section className="band-dark">
+        <section className="band-dark" id="experimente">
           <div className="wrap reveal">
             <p className="eyebrow">Experimente agora</p>
             <h2 className="h2">Escolha o que você curte. O Farol devolve um destino com o porquê.</h2>
@@ -140,7 +140,11 @@ export default function HomePage() {
 
         <section className="wrap reveal" id="experiencia">
           <p className="eyebrow">A experiência, tela por tela</p>
-          <h2 className="h2">Do gosto ao roteiro pronto, sem sair de uma conversa.</h2>
+          <h2 className="h2">Percorra o fluxo como quem já está usando.</h2>
+          <p className="lead">
+            Escolha o que te move e o ritmo, siga para os destinos, abra um roteiro. É o
+            caminho real do app, aqui na página.
+          </p>
           <Screens />
         </section>
 
