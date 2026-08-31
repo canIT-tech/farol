@@ -20,7 +20,10 @@ export const envSchema = z.object({
     .min(1)
     .default("https://www.google.com/travel/hotels/{cityCode}?checkin={checkIn}&checkout={checkOut}"),
   FLIGHT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(600),
-  HOTEL_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(3600)
+  HOTEL_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(3600),
+  // Google Places (Passo 6). Cache de 24 h: lugar não muda de lugar.
+  GOOGLE_PLACES_KEY: z.string().min(1),
+  PLACES_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(86_400)
 });
 
 export type Env = z.infer<typeof envSchema>;

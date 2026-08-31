@@ -4,6 +4,7 @@ process.env.SUPABASE_JWKS_URL ??= "https://example.com/jwks.json";
 process.env.ANTHROPIC_API_KEY ??= "sk-ant-worker-e2e";
 process.env.AMADEUS_CLIENT_ID ??= "amadeus-worker-id";
 process.env.AMADEUS_CLIENT_SECRET ??= "amadeus-worker-secret";
+process.env.GOOGLE_PLACES_KEY ??= "google-places-worker";
 process.env.JOBS_SCHEMA = `pgboss_worker_${Math.random().toString(36).slice(2, 8)}`;
 
 import { Test, type TestingModule } from "@nestjs/testing";

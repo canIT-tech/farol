@@ -5,3 +5,4 @@ process.env.ANTHROPIC_API_KEY ??= "sk-ant-e2e";
 process.env.JOBS_SCHEMA ??= "pgboss_e2e";
 process.env.AMADEUS_CLIENT_ID ??= "amadeus-e2e-id";
 process.env.AMADEUS_CLIENT_SECRET ??= "amadeus-e2e-secret";
+process.env.GOOGLE_PLACES_KEY ??= "google-places-e2e";

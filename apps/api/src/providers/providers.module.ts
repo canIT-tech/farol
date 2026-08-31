@@ -1,11 +1,16 @@
 import { Global, Module } from "@nestjs/common";
-import { AmadeusFlightProvider, AmadeusHotelProvider } from "@farol/providers";
+import {
+  AmadeusFlightProvider,
+  AmadeusHotelProvider,
+  GooglePlacesProvider
+} from "@farol/providers";
 import { ENV } from "../config/config.module";
 import type { Env } from "../config/env.schema";
 import { ProviderCacheRepository } from "./provider-cache.repository";
 
 export const FLIGHT_PROVIDER = Symbol("FLIGHT_PROVIDER");
 export const HOTEL_PROVIDER = Symbol("HOTEL_PROVIDER");
+export const PLACES_PROVIDER = Symbol("PLACES_PROVIDER");
 
 @Global()
 @Module({
@@ -32,8 +37,13 @@ export const HOTEL_PROVIDER = Symbol("HOTEL_PROVIDER");
           clientSecret: env.AMADEUS_CLIENT_SECRET,
           deepLinkTemplate: env.HOTEL_DEEPLINK_TEMPLATE
         })
+    },
+    {
+      provide: PLACES_PROVIDER,
+      inject: [ENV],
+      useFactory: (env: Env) => new GooglePlacesProvider({ apiKey: env.GOOGLE_PLACES_KEY })
     }
   ],
-  exports: [ProviderCacheRepository, FLIGHT_PROVIDER, HOTEL_PROVIDER]
+  exports: [ProviderCacheRepository, FLIGHT_PROVIDER, HOTEL_PROVIDER, PLACES_PROVIDER]
 })
 export class ProvidersModule {}
