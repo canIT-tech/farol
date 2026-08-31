@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { PlacesModule } from "../places/places.module";
 import { TripsModule } from "../trips/trips.module";
 import { ItineraryController } from "./itinerary.controller";
 import { ItineraryService } from "./itinerary.service";
@@ -7,7 +8,7 @@ import { ItineraryGenerateHandler } from "./itinerary-generate.handler";
 import { ItineraryRegenerateDayHandler } from "./itinerary-regenerate-day.handler";
 
 @Module({
-  imports: [TripsModule],
+  imports: [TripsModule, PlacesModule],
   controllers: [ItineraryController],
   providers: [
     ItineraryService,
