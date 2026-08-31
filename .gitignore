@@ -7,9 +7,9 @@ node_modules/
 npm-debug.log*
 pnpm-debug.log*
 
-# Canvas de design — arquivos gerados pelo seed (as fontes .dc.html + canvas.json reproduzem)
-/trip-app-design.html
-/brand/farol-brand.html
+# Canvas de design — .html gerados pelo seed (as fontes .dc.html + canvas.json reproduzem)
+docs/design/**/*.html
+!docs/design/**/*.dc.html
 
 # Env
 .env
