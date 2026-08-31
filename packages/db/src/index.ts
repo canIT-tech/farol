@@ -13,5 +13,6 @@ export {
   itineraryItems,
   providerCache,
   flightSelections,
-  hotelSelections
+  hotelSelections,
+  waitlist
 } from "./schema";

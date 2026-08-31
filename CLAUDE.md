@@ -143,6 +143,14 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - Re-gravar as fixtures Amadeus (`packages/providers/**/__fixtures__/*.json`) a partir do sandbox real — hoje são escritas à mão (Passo 5, sem credenciais).
 - Confirmar domínio `farol.app` e travar o nome antes de produção.
 - Escolher lib base de componentes (recomendação: Radix para overlays).
+- **Gateway de pagamento** para a viagem avulsa (R$ 39 / pacote R$ 89) — Stripe / Mercado Pago / Pagar.me. Não iniciado; é o que destrava a receita principal do modelo per-trip.
+
+## Landing / waitlist (fora do backlog numerado)
+
+- Rota `/` do `apps/web` **é a landing pública** (captura de e-mail pré-lançamento). O fluxo do app começa em `/login`.
+- `POST /waitlist` (público, sem `AuthGuard`) + `GET /waitlist/count` no `WaitlistModule`. Tabela `waitlist` (migration `0005`). `app.enableCors()` ligado no `main.ts` por causa disso.
+- Deploy exige `NEXT_PUBLIC_API_URL` do `apps/web` apontando para a API pública e a `0005` aplicada no banco.
+- Débito: sem rate-limit no `POST /waitlist` (guard por IP depois).
 
 ## Próximos passos
 

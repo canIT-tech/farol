@@ -13,6 +13,7 @@ import { ItineraryModule } from "./itinerary/itinerary.module";
 import { ProvidersModule } from "./providers/providers.module";
 import { FlightsModule } from "./flights/flights.module";
 import { HotelsModule } from "./hotels/hotels.module";
+import { WaitlistModule } from "./waitlist/waitlist.module";
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { HotelsModule } from "./hotels/hotels.module";
     ItineraryModule,
     ProvidersModule,
     FlightsModule,
-    HotelsModule
+    HotelsModule,
+    WaitlistModule
   ]
 })
 export class AppModule {}
