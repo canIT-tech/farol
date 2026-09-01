@@ -1,14 +1,19 @@
 # Plano de métricas de produto — Farol
 
-- **Status:** rascunho para alinhar com o time (produto + GTM + tech)
+- **Status:** definições travadas (2026-08-31). **A instrumentação NÃO é MVP.**
 - **Data:** 2026-08-31
 - **Dono (produto):** felippe · **Consome:** Xandinho (GTM), Rafinha (instrumentação)
 - **Relacionado:** `docs/marketing/2026-08-31-plano-go-to-market.md` (funil e KPIs de canal) ·
   `docs/negocio/2026-08-31-custo-llm-por-roteiro.md` (margem por roteiro) ·
   specs de pagamento e plano gratuito
 
-Toda meta numérica está marcada **(H)** — hipótese a validar com dado real. O objetivo
-deste doc é **cravar as definições** (o que conta como o quê) antes de instrumentar.
+> **Escopo (decisão 2026-08-31).** A montagem completa deste plano — PostHog, tabela de
+> eventos, CSAT, dashboards, cadência semanal — fica para **uma fase depois do programa
+> de milhas** (v1+). **O MVP não precisa disso.** No MVP mede-se só o mínimo que já
+> existe de graça (ver §9). Este doc segue como a referência de quando a hora chegar; as
+> definições da §4 valem desde já para não haver retrabalho.
+
+Toda meta numérica está marcada **(H)** — hipótese a validar com dado real.
 
 ---
 
@@ -111,6 +116,11 @@ Recompra
 
 ## 5. Tabela de eventos a instrumentar
 
+> **Pós-milhas (v1+), não MVP.** Esta tabela é o alvo de quando a instrumentação for
+> priorizada. `csat_submitted` dispara no **`trigger: "deeplink_exit"`** — a pergunta
+> aparece na aba do Farol depois que o usuário clica para sair ao parceiro (não bloqueia
+> a compra), uma vez por viagem.
+
 `distinct_id` = id do usuário Supabase. Todo evento com escopo de viagem carrega
 `trip_id`. **Eventos de `api`/`worker` são a fonte da verdade** para funil e receita;
 os de `web` servem para UX e CTA.
@@ -135,13 +145,12 @@ os de `web` servem para UX e CTA.
 | `credit_consumed` | `CreditsService.consume` | api | `trip_id` |
 | `flight_deeplink_clicked` | clique no link de voo | web | `trip_id` |
 | `hotel_deeplink_clicked` | clique no link de hotel | web | `trip_id` |
-| `csat_submitted` | pergunta pós-roteiro respondida | web | `trip_id`, `score` |
+| `csat_submitted` | 1 pergunta (score 1–5) na aba do Farol após o clique de saída ao parceiro | web | `trip_id`, `score`, `trigger` = `deeplink_exit` |
 
-**Ferramenta:** recomendação **PostHog** (funis, coortes e retenção prontos, tier grátis
-generoso, opção de hospedagem na UE para LGPD). Alternativas: GA4 (grátis, funil mais
-pobre), Plausible (sem cookie, mas sem funil de produto). Entra como operador na
-Política de Privacidade e **só carrega após o opt-in** no banner de cookies (analytics =
-não essencial).
+**Ferramenta:** **PostHog** (fechado — funis, coortes e retenção prontos, tier grátis
+generoso, hospedagem na UE para LGPD). Entra como operador na Política de Privacidade e
+**só carrega após o opt-in** no banner de cookies (analytics = não essencial). Quando
+entrar (pós-milhas), a categoria "analytics" volta ao banner — no MVP ela não existe.
 
 ---
 
@@ -155,7 +164,7 @@ não essencial).
 
 ---
 
-## 7. Cadência
+## 7. Cadência *(pós-milhas)*
 
 - **Semanal:** NSM + funil + as 5 taxas principais + guardrails. 30 min com produto + GTM.
 - **Mensal:** receita (pagamento + afiliado), margem por roteiro, coortes de recompra.
@@ -164,11 +173,38 @@ não essencial).
 
 ---
 
-## 8. Decisões a fechar
+## 8. Decisões (travadas 2026-08-31)
 
-1. **NSM:** "roteiros pagos concluídos / mês" — confirmar. Alternativa: incluir os grátis
-   ("roteiros entregues"), o que mede valor mas não saúde do negócio.
-2. **Ferramenta de analytics:** PostHog *(proposto)* · GA4 · Plausible.
-3. **CSAT no fluxo:** 1 pergunta pós-roteiro (score 1–5) — topa? Onde exatamente?
-4. **Janela de conversão grátis → pago:** 30 dias *(proposto)*.
-5. **Double opt-in na waitlist:** sim/não (afeta a métrica de confirmação e a base legal).
+1. **NSM:** **roteiros pagos concluídos / mês** — não inclui os grátis (grátis é *entrada*,
+   não NSM). Até o lançamento público, o número de manchete é **ativados / mês**; vira
+   pago no lançamento (como o plano de GTM já faz por fase).
+2. **Analytics:** **PostHog**.
+3. **CSAT:** 1 pergunta (1–5) na aba do Farol **após o clique de saída ao parceiro**
+   (`trigger: deeplink_exit`), sem bloquear a compra, 1× por viagem. Cobertura = CTR de
+   deep-link (~40% H); 2º gatilho (24h após o roteiro) fica como ampliação futura.
+4. **Janela de conversão grátis → pago:** **30 dias**.
+5. **Waitlist:** **single opt-in** — a pessoa entra na lista ao enviar o e-mail (checkbox
+   + link da política cobrem a base LGPD). **Virar para double opt-in antes do 1º e-mail
+   de marketing.** Sem double, não há a métrica "taxa de confirmação" nesta fase.
+
+---
+
+## 9. O que medir no MVP (mínimo, sem instrumentação)
+
+Nada de PostHog, evento client-side, CSAT ou banner de analytics no MVP. Mede-se com o
+que já existe, por consulta manual / no backoffice:
+
+| Métrica | De onde | Frequência |
+|---|---|---|
+| Inscritos na waitlist | `GET /waitlist/count` (tabela `waitlist`) | semanal |
+| Contas criadas | `SELECT count(*) FROM users` | semanal |
+| Roteiros gerados (grátis + pago) | `itinerary` com status concluído | semanal |
+| Roteiros pagos | `credit_ledger` (linhas `reason='consumption'`) / `orders` `paid` | semanal |
+| Conversão grátis → pago | cruzar `users.free_autonomous_used_at` com `orders` `paid` (30d) | mensal |
+| Receita de pagamento | `orders` `paid` − `refunded` | mensal |
+| Comissão de afiliado | painel do Travelpayouts | mensal |
+| Reembolsos | `orders` `refunded` / `partially_refunded` | mensal |
+| Custo de LLM por roteiro | log `event: "llm_call"` agregado por `tripId` | mensal |
+
+Isso responde "está funcionando?" sem custo de engenharia. A instrumentação completa
+(§1–§7) entra numa fase **depois do programa de milhas** (v1+).

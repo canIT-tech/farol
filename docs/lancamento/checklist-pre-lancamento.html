@@ -612,7 +612,7 @@
 
   <section id="s4">
     <h2><span class="num">04</span> Termos de uso + Política de privacidade <span class="owner">felippe</span></h2>
-    <p><strong>Rascunhos prontos</strong> em <span class="mono">docs/legal/</span> (<span class="mono">termos-de-uso.md</span>, <span class="mono">politica-de-privacidade.md</span>, <span class="mono">README.md</span> com os placeholders). Falta: dados do operador (razão social, CNPJ, endereço, e-mails, foro), definir provedor de e-mail e analytics, e <strong>revisão jurídica</strong> antes de publicar em <span class="mono">/termos</span> e <span class="mono">/privacidade</span>.</p>
+    <p><strong>Rascunhos prontos</strong> em <span class="mono">docs/legal/</span> (<span class="mono">termos-de-uso.md</span>, <span class="mono">politica-de-privacidade.md</span>, <span class="mono">README.md</span> com os placeholders). Falta: dados do operador (razão social, CNPJ, endereço, e-mails, foro), definir provedor de e-mail, e <strong>revisão jurídica</strong> antes de publicar em <span class="mono">/termos</span> e <span class="mono">/privacidade</span>. Sem analytics no MVP (pós-milhas). Waitlist: single opt-in.</p>
     <h3>Termos de uso</h3>
     <ul>
       <li><strong>Escopo honesto</strong> (casa com a voz da marca): o Farol <strong>não reserva</strong> voo/hotel, <strong>não garante preço</strong>, o roteiro é <strong>sugestão</strong> — o usuário confere antes de comprar.</li>
@@ -624,12 +624,12 @@
     <ul>
       <li><strong>Já é necessária agora</strong> — a waitlist coleta e-mail.</li>
       <li>Dados: e-mail, perfil de gosto, dados de viagem, pagamento (via Stripe).</li>
-      <li>Terceiros: <strong>Travelpayouts, Google Places, Anthropic, Stripe</strong>, provedor de e-mail, analytics.</li>
+      <li>Terceiros: <strong>Travelpayouts, Google Places, Anthropic, Stripe</strong>, provedor de e-mail. Sem analytics no MVP (pós-milhas).</li>
       <li>Base legal, direitos do titular, opt-out, contato do encarregado. Consentimento explícito no formulário da waitlist + link para a política.</li>
     </ul>
     <h3>Cookies / consentimento <span class="tag opt">opcional</span></h3>
     <ul>
-      <li>Com <strong>Plausible</strong> (sem cookie): aviso mínimo. Com <strong>GA4 / Meta Pixel</strong>: banner de consentimento obrigatório.</li>
+      <li>MVP: duas categorias — <strong>essenciais</strong> + <strong>afiliado/monetização</strong> (script do Travelpayouts, só após opt-in). Analytics (PostHog) entra só pós-milhas.</li>
     </ul>
   </section>
 

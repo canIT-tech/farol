@@ -24,7 +24,7 @@ Todo `[ENTRE COLCHETES]` nos dois documentos é fato que só o time tem. Lista:
 - **E-mail de contato / suporte** — ex.: `contato@farolviagens.com`.
 - **Comarca do foro** (cidade/UF da sede).
 - **Provedor de e-mail transacional** (Resend / SendGrid / Amazon SES / …) — entra na lista de operadores.
-- **Ferramenta de analytics** (Plausible / GA4 / PostHog / …) — entra na lista de operadores e na seção de cookies.
+- ~~Ferramenta de analytics~~ — **fora do MVP** (decisão 2026-08-31: instrumentação de produto é pós-milhas). Quando entrar, será **PostHog** e volta à lista de operadores + seção de cookies.
 - **Data de vigência** de cada documento (data da publicação).
 - **Gateway de pagamento** — os textos assumem **Stripe**; se cair pra Mercado Pago / Pagar.me, trocar o nome.
 

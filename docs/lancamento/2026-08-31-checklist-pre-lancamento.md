@@ -100,13 +100,16 @@ verdes (baseline de testes do projeto). PR que não bate os gates não entra.
 - **Já é necessária agora** — a waitlist coleta e-mail.
 - Dados coletados: e-mail, perfil de gosto, dados de viagem, pagamento (via Stripe).
 - Terceiros com quem os dados trafegam: **Travelpayouts**, **Google Places**, **Anthropic
-  (Claude)**, **Stripe**, provedor de e-mail, analytics.
+  (Claude)**, **Stripe**, provedor de e-mail. **Sem analytics no MVP** (instrumentação de
+  produto é pós-milhas — `docs/negocio/2026-08-31-plano-de-metricas.md`).
 - Base legal, direitos do titular, opt-out, contato do encarregado.
-- Consentimento explícito no formulário da waitlist + link para a política.
+- Waitlist: **single opt-in** + checkbox de consentimento + link para a política.
+  (Virar para double opt-in antes do 1º e-mail de marketing.)
 
 ### 4.3 Cookies / consentimento ⬜
-- Com **Plausible** (sem cookie): aviso mínimo.
-- Com **GA4 / Meta Pixel**: banner de consentimento obrigatório.
+- MVP tem só duas categorias: **essenciais** + **afiliado/monetização** (script do
+  Travelpayouts). Banner: essenciais sempre; o de afiliado só após opt-in.
+- Analytics (PostHog) entra só na fase pós-milhas — aí vira uma 3ª categoria no banner.
 
 ---
 
