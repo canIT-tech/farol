@@ -45,6 +45,7 @@ jobs:
       - run: pnpm --filter @farol/db run db:migrate
       - run: pnpm --filter @farol/db run db:seed
       - run: pnpm --filter @farol/api smoke
+      - run: pnpm --filter @farol/worker smoke
       - run: pnpm test
       # No workspace do web: o playwright é devDependency de apps/web e o pnpm
       # não faz hoisting, então `pnpm exec` na raiz não acha o binário.

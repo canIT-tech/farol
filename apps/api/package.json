@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    ".": "./src/worker-exports.ts"
+    ".": {
+      "types": "./dist/worker-exports.d.ts",
+      "default": "./dist/worker-exports.js"
+    }
   },
   "scripts": {
     "build": "nest build",

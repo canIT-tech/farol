@@ -179,8 +179,14 @@ Corrigido em `apps/api/test/boot-smoke.mjs` mais `pnpm build` e o smoke no CI.
 Qualquer novo processo executável (o `apps/worker` inclusive, hoje sem smoke próprio)
 precisa de uma verificação no Node cru.
 
-- **Fazer:** smoke equivalente para o `apps/worker` — subir e esperar
-  `{"event":"worker_ready"}`.
+**FEITO (2026-09-01).** `apps/worker/test/boot-smoke.mjs` sobe `node dist/main.worker.js`
+e espera `{"event":"worker_ready"}`; entrou no CI ao lado do smoke da api.
+
+Pegou bug na primeira execução: `apps/api/package.json` exportava
+`{ ".": "./src/worker-exports.ts" }` — TypeScript com import sem extensão, mesma classe
+do fix de boot. **O `apps/worker` nunca subiu.** Passava por 2 testes verdes e pelo e2e
+porque tudo roda sob Vitest. `exports` agora aponta para `dist/worker-exports.js`, com
+`types` separado.
 
 ---
 
