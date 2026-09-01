@@ -17,7 +17,7 @@ monta o dia a dia e ajusta tudo por conversa.
 |---|---|
 | PRD (visão, escopo faseado, personas, monetização) | `PRD.md` |
 | Design técnico do MVP (arquitetura, módulos, dados) | `docs/superpowers/specs/2026-08-27-mvp-trip-design.md` |
-| Specs de produto (pagamento, plano grátis, migração de provider) | `docs/negocio/2026-08-31-spec-pagamento.md` · `docs/negocio/2026-08-31-spec-plano-gratuito.md` · `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` |
+| Specs de produto (pagamento, plano grátis, migração de provider, custo de LLM) | `docs/negocio/2026-08-31-spec-pagamento.md` · `docs/negocio/2026-08-31-spec-plano-gratuito.md` · `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` · `docs/negocio/2026-08-31-custo-llm-por-roteiro.md` |
 | Legal (Termos + Privacidade/LGPD — rascunhos, pré-jurídico) | `docs/legal/` |
 | Design system (tokens + specs de componentes) | `docs/design-system.md` |
 | Manual de marca (fontes) | `docs/design/brand/*.dc.html` + `docs/design/brand/canvas.json` |
@@ -140,7 +140,7 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 
 ## Pendências abertas (do PRD / design técnico)
 
-- Teto de custo de LLM por roteiro (definir número).
+- Teto de custo de LLM por roteiro (`LLM_ROUTE_BUDGET_USD`) — planilha em `docs/negocio/2026-08-31-custo-llm-por-roteiro.md` (proposta: 0,60 pago / 0,15 grátis, chat no tier barato). Falta felippe cravar.
 - Catálogo de destinos: CSV curado em `packages/db/data/destinations.csv` (23 cidades no Passo 3; `pnpm --filter @farol/db db:seed`). Expandir para ~200 é curadoria contínua.
 - ~~Site parceiro para o deep-link de voo/hotel~~ — resolvido pela migração para Travelpayouts: o parceiro é Aviasales / Hotellook, o `marker` no deep-link já rende comissão.
 - Re-gravar as fixtures **Travelpayouts e Google Places** (`packages/providers/**/__fixtures__/*.json`) a partir das APIs reais — hoje são escritas à mão (sem credenciais). Travelpayouts entra junto da migração do provider.
