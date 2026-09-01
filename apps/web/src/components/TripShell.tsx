@@ -2,10 +2,23 @@
 
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { AppShell } from "@farol/ui";
+import { AdvisorChat, AppShell } from "@farol/ui";
 import { AuthGate } from "./AuthGate";
 import { TripSidebar } from "./TripSidebar";
 import { TripProvider, useTrip } from "../providers/TripProvider";
+import { useChat } from "../hooks/useChat";
+
+function Rail({ tripId }: { tripId: string }) {
+  const { token, refetch } = useTrip();
+  const { messages, pending, error, send } = useChat(token, tripId, refetch);
+
+  return (
+    <>
+      <AdvisorChat messages={messages} pending={pending} onSend={(text) => void send(text)} />
+      {error !== null ? <p role="alert">{error}</p> : null}
+    </>
+  );
+}
 
 export function TripFrame({ tripId, children }: { tripId: string; children: ReactNode }) {
   const { trip, error, refetch } = useTrip();
@@ -22,14 +35,12 @@ export function TripFrame({ tripId, children }: { tripId: string; children: Reac
     );
   }
 
-  // O AppShell já monta o <aside aria-label="Assessor"> do trilho; o conteúdo
-  // dele entra na Task 6.
   return (
     <AppShell
       sidebar={
         <TripSidebar trip={trip} onNavigate={(step) => router.push(`/trips/${tripId}/${step}`)} />
       }
-      rail={null}
+      rail={<Rail tripId={tripId} />}
     >
       {children}
     </AppShell>

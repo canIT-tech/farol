@@ -121,6 +121,61 @@ describe("TripShell", () => {
     expect(await screen.findByText("miolo")).toBeInTheDocument();
   });
 
+  it("o trilho manda a mensagem e mostra a resposta do assessor", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string, init?: RequestInit) => {
+        if (init?.method === "POST") {
+          return new Response(
+            JSON.stringify({
+              message: { role: "assistant", content: "Tirei o museu." },
+              tripState: {}
+            }),
+            { status: 200, headers: { "content-type": "application/json" } }
+          );
+        }
+        return new Response(JSON.stringify(state), {
+          status: 200,
+          headers: { "content-type": "application/json" }
+        });
+      })
+    );
+    render(
+      <TripShell tripId={TRIP_ID}>
+        <p>miolo</p>
+      </TripShell>
+    );
+    await screen.findByText("miolo");
+    await userEvent.type(screen.getByRole("textbox"), "tira o museu");
+    await userEvent.click(screen.getByRole("button", { name: /[Ee]nviar/ }));
+    expect(await screen.findByText("Tirei o museu.")).toBeInTheDocument();
+  });
+
+  it("erro do chat aparece no trilho sem derrubar a tela", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string, init?: RequestInit) => {
+        if (init?.method === "POST") {
+          return new Response(null, { status: 503 });
+        }
+        return new Response(JSON.stringify(state), {
+          status: 200,
+          headers: { "content-type": "application/json" }
+        });
+      })
+    );
+    render(
+      <TripShell tripId={TRIP_ID}>
+        <p>miolo</p>
+      </TripShell>
+    );
+    await screen.findByText("miolo");
+    await userEvent.type(screen.getByRole("textbox"), "oi");
+    await userEvent.click(screen.getByRole("button", { name: /[Ee]nviar/ }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("503");
+    expect(screen.getByText("miolo")).toBeInTheDocument();
+  });
+
   it("sem sessão, manda para o login", async () => {
     sessionResult = SESSION_NONE;
     render(
