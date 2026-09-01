@@ -14,7 +14,9 @@ export const destinationCandidateSchema = z.object({
     currency: z.string().min(1)
   }),
   climate: z.object({
-    expectedC: z.number(),
+    // null quando nao ha fonte de clima. Nunca inventar numero: a marca se
+    // define como honesta sobre incerteza.
+    expectedC: z.number().nullable(),
     summary: z.string().min(1),
     bestMonths: z.array(z.number().int().min(1).max(12))
   }),

@@ -21,6 +21,11 @@ describe("destinationCandidateSchema", () => {
     expect(destinationCandidateSchema.parse(candidate).iata).toBe("LIS");
   });
 
+  it("aceita clima sem temperatura — não há fonte no MVP", () => {
+    const semTemp = { ...candidate, climate: { ...candidate.climate, expectedC: null } };
+    expect(destinationCandidateSchema.parse(semTemp).climate.expectedC).toBeNull();
+  });
+
   it("aceita flightTimeHours nulo", () => {
     expect(destinationCandidateSchema.parse({ ...candidate, flightTimeHours: null }).flightTimeHours).toBeNull();
   });

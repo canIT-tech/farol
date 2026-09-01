@@ -17,7 +17,7 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
 
 ## Bloco D — Decidir antes do Passo 8
 
-### D1. Descoberta devolve clima e tempo de voo falsos
+### D1. Descoberta devolve clima e tempo de voo falsos — FEITO (2026-09-01)
 
 - **Evidência:** `apps/api/src/discovery/discovery.service.ts:130` — `expectedC:
   DEFAULT_EXPECTED_C`, 22 °C fixo para qualquer destino em qualquer mês. Linhas 91 e
@@ -25,11 +25,14 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
 - **Por que agora:** a tela de resultados do Passo 8 exibe esses campos. Publicar
   "22 °C" para Oslo em janeiro é pior do que não mostrar nada, e a marca se define como
   "honesto sobre incerteza" (`docs/design/brand/Voice.dc.html`).
-- **Decisão necessária:** (a) achar fonte de clima e de tempo de voo, (b) manter o campo
-  no schema mas a UI omite quando não houver dado real, ou (c) tirar do schema.
-- **Recomendação:** (b) agora, (a) depois. Tirar do schema custa migration e volta.
-- **Pronto quando:** ou o valor é real, ou nenhuma tela renderiza número inventado, e
-  existe teste cobrindo o caso "sem dado".
+- **Feito pela opção (b).** `climate.expectedC` virou `z.number().nullable()` e a
+  descoberta passa `null` em vez de 22 — `DEFAULT_EXPECTED_C` foi removido. O que sai do
+  catálogo e é real (`summary`, `bestMonths`) continua. `flightTimeHours` já era
+  `null` e já era nullable no schema.
+- A UI não renderiza nenhum dos dois: `DestinationResults.stats()` mostra só custo, com
+  teste garantindo que 22 °C e tempo de voo não aparecem.
+- Falta (a), a fonte de verdade. Quando existir, é só preencher — nenhuma migration:
+  `trip_destinations.climate` é jsonb.
 
 ### D2. Catálogo com 23 destinos
 

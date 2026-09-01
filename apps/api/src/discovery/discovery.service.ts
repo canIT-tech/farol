@@ -19,7 +19,6 @@ import type { TripState } from "../trips/trip-state";
 import { CatalogRepository } from "./catalog.repository";
 
 const MIN_SHORTLIST = 3;
-const DEFAULT_EXPECTED_C = 22; // sem fonte de clima no MVP
 
 function tripCriteria(trip: TripState): TripCriteria {
   return {
@@ -127,7 +126,8 @@ function toCandidate(
       currency
     },
     climate: {
-      expectedC: DEFAULT_EXPECTED_C,
+      // sem fonte de clima no MVP; bestMonths e summary saem do catalogo
+      expectedC: null,
       summary: `melhor época nos meses ${entry.bestMonths.join(", ")}`,
       bestMonths: entry.bestMonths
     },
