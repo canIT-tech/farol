@@ -86,7 +86,7 @@ describe("AiSdkLlmProvider.complete", () => {
     ]);
   });
 
-  it("usage ausente vira zero em vez de NaN no custo", async () => {
+  it("usage ausente vira zero em vez de NaN", async () => {
     const { provider, calls } = providerWith(
       modelReturning([{ type: "text", text: "x" }], {
         inputTokens: undefined,
@@ -97,7 +97,8 @@ describe("AiSdkLlmProvider.complete", () => {
     const result = await provider.complete({ ...baseRequest, tripId: null });
 
     expect(result.usage).toEqual({ inputTokens: 0, outputTokens: 0 });
-    expect(calls[0]!.estimatedUsd).toBe(0);
+    // O modelo do fake nao esta no MODEL_PRICING, entao o custo e desconhecido.
+    expect(calls[0]!.estimatedUsd).toBeNull();
   });
 
   it("loga métricas com tripId, kind e a chave provider:model", async () => {

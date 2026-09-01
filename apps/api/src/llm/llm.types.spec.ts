@@ -12,21 +12,18 @@ describe("estimateUsd", () => {
   });
 
   it("escala linearmente com os tokens", () => {
-    expect(estimateUsd("anthropic:claude-sonnet-5", 500_000, 0)).toBeCloseTo(1.5);
-    expect(estimateUsd("anthropic:claude-sonnet-5", 0, 200_000)).toBeCloseTo(3);
+    expect(estimateUsd("anthropic:claude-sonnet-5", 500_000, 0)).toBeCloseTo(1);
+    expect(estimateUsd("anthropic:claude-sonnet-5", 0, 200_000)).toBeCloseTo(2);
   });
 
-  it("modelo gratuito do Groq custa zero em vez de cair no fallback", () => {
-    expect(estimateUsd("groq:llama-3.3-70b-versatile", 1_000_000, 1_000_000)).toBe(0);
-  });
-
-  it("cai no preço de fallback para chave desconhecida", () => {
-    expect(estimateUsd("marte:modelo-x", 1_000_000, 0)).toBeCloseTo(3);
+  it("devolve null para modelo sem preço conhecido, em vez de inventar", () => {
+    expect(estimateUsd("marte:modelo-x", 1_000_000, 0)).toBeNull();
+    expect(estimateUsd("groq:llama-3.3-70b-versatile", 1_000_000, 1_000_000)).toBeNull();
   });
 
   it("o mesmo modelo sob outro provider é outra chave", () => {
     // Sem o prefixo do provider não dá para distinguir preço por fornecedor.
-    expect(estimateUsd("claude-sonnet-5", 1_000_000, 0)).toBeCloseTo(3); // fallback
+    expect(estimateUsd("claude-sonnet-5", 1_000_000, 0)).toBeNull();
   });
 
   it("é zero quando não há tokens", () => {

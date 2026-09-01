@@ -73,15 +73,21 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
   segue 100% com 24 testes. Quando existir "rejeitar destino", vira feature com coluna,
   não flag órfã.
 
-### E3. `MODEL_PRICING` é chute
+### E3. `MODEL_PRICING` é chute — FEITO (2026-09-01)
 
 - **Evidência:** `apps/api/src/llm/llm.types.ts:134` diz "Preços aproximados […]
   revisar". As linhas 141–142 dão custo **zero** para os dois modelos Groq.
 - **Consequência:** todo cálculo de custo por roteiro sai errado, e com Groq sai zero —
   o que torna qualquer teto de orçamento inoperante nesse provider.
-- **Fazer:** conferir os quatro preços na tabela oficial de cada fornecedor e anotar a
-  data da consulta ao lado.
-- **Pronto quando:** os valores batem com a fonte e o comentário diz de quando são.
+- Os dois preços da Anthropic estavam **errados**, não só aproximados: Sonnet 5 é
+  $2/$10 por MTok (estava $3/$15) e Haiku 4.5 é $1/$5 (estava $0,80/$4). Corrigidos
+  contra a tabela oficial, com a data da consulta no comentário.
+- Os dois modelos Groq **saíram do mapa**: aparecem como "Enterprise / Contact Sales",
+  sem preço público. Não há número honesto a colocar.
+- `estimateUsd` agora devolve `null` para modelo sem preço conhecido, e
+  `LlmCallMetrics.estimatedUsd` é `number | null`. Antes havia um `FALLBACK_PRICE` de
+  $3/$15 que inventava custo para qualquer modelo desconhecido — mesma classe do 22 °C
+  do D1. E o zero do Groq era pior: tornaria o teto do E5 inoperante sem avisar.
 
 ### E4. Nenhum modelo Groq foi medido (item L1 da spec de LLM)
 
