@@ -167,13 +167,21 @@ Backlog de implementação. Ordem = dependência. Puxe pelo número.
 | 4 | Roteiro + Jobs — `JobsModule` (pg-boss), `apps/worker`, `ItineraryModule`, job `itinerary.generate`, polling no web | ✅ concluído | felippebutland | — | 3 | (2026-08-29) |
 | 5 | Providers voo/hotel — `packages/providers`, `provider_cache`, resiliência, `FlightsModule` / `HotelsModule` | ✅ estrutura concluída · ⚠️ provider a trocar (ver Passo 10) | felippebutland | — | 3 | (2026-08-29) |
 | 6 | Google Places + enrich — `GooglePlacesProvider`, `PlacesModule`, passo de enrich no job do roteiro, `swap_restaurant` | ✅ concluído | rafaignaulin | `rafaignaulin/passo-6-places-enrich` | 4 | (2026-08-31) |
-| 7 | Chat IA — `ChatModule`, loop de tool-calling, as 9 tools mapeadas para serviços, `chat_messages` | 🟢 livre | — | — | 4, 5, 6 |
-| 8 | UI web + E2E — telas ligadas ao `apps/api`, fluxo Playwright login→onboarding→descoberta→destino→roteiro | 🟢 livre | — | — | 7 |
+| 7 | Chat IA — `ChatModule`, loop de tool-calling, as 11 tools mapeadas para serviços, `chat_messages` | ✅ concluído | felippebutland | — | 4, 5, 6 | (2026-08-31) |
+| 8 | UI web + E2E — telas ligadas ao `apps/api`, fluxo Playwright login→onboarding→descoberta→destino→roteiro | 🟡 em andamento | rafaignaulin | `rafaignaulin/passo-8-ui-web-e2e` | 7 | (2026-09-01) |
 | 9 | `packages/ui` — implementar tokens (`docs/design-system.md`) + componentes base (`Button`, `TextField`, `Chip`, `MatchBadge`, `DestinationCard`, `AppShell`, `StepNav`, `AdvisorChat`) | ✅ concluído | felippebutland | — | 1 | (2026-08-28) |
 | 10 | Migração do provider voo/hotel — Amadeus (descontinuado) → **Travelpayouts**. Trocar `Amadeus*Provider` por `Travelpayouts*Provider`, sem OAuth, `marker` de afiliado no deep-link, regravar fixtures, envs. Spec: `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` | 🟢 livre | — | — | 5 |
 | 11 | Pagamento — `PaymentModule` + webhook Stripe, ledger de crédito, gate no `itinerary.generate`. Spec: `docs/negocio/2026-08-31-spec-pagamento.md` | 🟢 livre | — | — | 4 · cadastro Stripe |
 
 Legenda de status: 🟢 livre · 🟡 em andamento · ✅ concluído · 🔴 bloqueado.
+
+Fora da numeração, já na `main`: **refactor de LLM provider-agnóstico** (2026-08-31,
+rafaignaulin — porta neutra + Vercel AI SDK, IA opcional no boot, troca de provider e de
+modelo só por env; spec `docs/superpowers/specs/2026-08-31-llm-provider-agnostico-design.md`)
+e o **fix de boot** (2026-09-01, rafaignaulin — os `packages/*` publicavam TypeScript com
+import sem extensão e a aplicação não subia; `apps/api/test/boot-smoke.mjs` + `pnpm build`
+no CI). Débito consolidado dos Passos 1–9 em
+`docs/superpowers/plans/2026-09-01-consolidacao-passos-1-9.md`.
 
 Detalhe de cada passo vem do design técnico (`docs/superpowers/specs/2026-08-27-mvp-trip-design.md`).
 Passos 4 e 5 podem rodar em paralelo depois do 3. Passo 9 pode começar em paralelo a partir do 1.
