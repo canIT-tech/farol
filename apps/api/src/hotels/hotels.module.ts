@@ -6,6 +6,8 @@ import { HotelsService } from "./hotels.service";
 @Module({
   imports: [TripsModule],
   controllers: [HotelsController],
-  providers: [HotelsService]
+  providers: [HotelsService],
+  // ChatToolService injeta este serviço nas tools do chat (Passo 7).
+  exports: [HotelsService]
 })
 export class HotelsModule {}

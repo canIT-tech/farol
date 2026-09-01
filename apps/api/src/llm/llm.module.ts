@@ -17,8 +17,11 @@ import { LlmService, type AnthropicLike } from "./llm.service";
           env.LLM_MODEL_CAPABLE,
           consoleLlmLogger
         )
-    }
+    },
+    // ChatService injeta a classe concreta em vez do token LLM (Passo 7).
+    // Alias para a mesma instância; o refactor da porta neutra remove isto.
+    { provide: LlmService, useExisting: LLM }
   ],
-  exports: [LLM]
+  exports: [LLM, LlmService]
 })
 export class LlmModule {}

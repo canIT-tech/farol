@@ -6,6 +6,8 @@ import { FlightsService } from "./flights.service";
 @Module({
   imports: [TripsModule],
   controllers: [FlightsController],
-  providers: [FlightsService]
+  providers: [FlightsService],
+  // ChatToolService injeta este serviço nas tools do chat (Passo 7).
+  exports: [FlightsService]
 })
 export class FlightsModule {}

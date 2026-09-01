@@ -1,1 +1,1 @@
-ALTER TABLE "itinerary_items" ADD COLUMN "needs_review" boolean DEFAULT false NOT NULL;
+ALTER TABLE "itinerary_items" ADD COLUMN IF NOT EXISTS "needs_review" boolean DEFAULT false NOT NULL;
