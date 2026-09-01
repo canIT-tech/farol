@@ -46,6 +46,8 @@ jobs:
       - run: pnpm --filter @farol/db run db:seed
       - run: pnpm --filter @farol/api smoke
       - run: pnpm test
-      - run: pnpm exec playwright install --with-deps chromium
+      # No workspace do web: o playwright é devDependency de apps/web e o pnpm
+      # não faz hoisting, então `pnpm exec` na raiz não acha o binário.
+      - run: pnpm --filter @farol/web exec playwright install --with-deps chromium
       - run: pnpm test:e2e
       - run: pnpm test:mutation

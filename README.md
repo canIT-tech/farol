@@ -79,7 +79,8 @@ pnpm test:mutation   # StrykerJS por pacote (falha abaixo do threshold.break)
 ```
 
 Os testes de banco e os e2e da api usam o Postgres do `docker-compose.yml`.
-Playwright precisa dos browsers: `pnpm exec playwright install chromium`.
+Playwright precisa dos browsers: `pnpm --filter @farol/web exec playwright install chromium`
+(na raiz o `pnpm exec` não acha o binário — o playwright é devDependency do `apps/web`).
 
 ## CI
 
