@@ -79,7 +79,10 @@ indicado:
 | **Travelpayouts / Aviasales / Hotellook** | parâmetros de busca (origem, destino, datas) ao montar os links; identificador de afiliado (`marker`) no clique | indicações de voo e hospedagem e mensuração de comissão — **controlador independente** quanto à navegação no site do parceiro |
 | **[Stripe]** (pagamento) | dados que você insere no checkout; e-mail; valor | processar o pagamento — **controlador independente** dos dados do cartão |
 | **[PROVEDOR DE E-MAIL]** | seu e-mail e o conteúdo da mensagem transacional | entregar os e-mails do serviço |
-| **[FERRAMENTA DE ANALYTICS]** | eventos de uso, dados de dispositivo, identificador anônimo | métricas de produto |
+
+> **Analytics não faz parte do MVP** (decisão 2026-08-31: instrumentação de produto
+> fica para uma fase posterior). Quando uma ferramenta de analytics (PostHog) for
+> adotada, ela entra nesta tabela e na seção de cookies, e passa a exigir opt-in.
 
 Também podemos compartilhar dados com **autoridades** quando exigido por lei ou ordem
 judicial, e com **assessores** (contábil, jurídico) sob dever de sigilo. Em caso de
@@ -138,14 +141,15 @@ seguintes categorias:
 | Categoria | Exemplos | Precisa de consentimento? |
 |---|---|---|
 | **Essenciais** | sessão, autenticação, segurança, preferência de tema, o próprio registro da sua escolha de cookies | Não — necessários para o serviço funcionar |
-| **Analytics** | `[FERRAMENTA DE ANALYTICS]` — medir uso e melhorar o produto | Sim |
 | **Afiliado / monetização** | script do **Travelpayouts** (`tp-em.com`) — atribuição de comissão dos links de voo e hospedagem | Sim |
 
+*(Analytics não está em uso no MVP — quando entrar, vira uma terceira categoria aqui,
+também sujeita a opt-in.)*
+
 **Banner de consentimento:** ao acessar o site, apenas os cookies **essenciais** são
-carregados. Os cookies de **analytics** e de **afiliado/monetização** só são ativados
-**depois que você aceita** no banner. Você pode **recusar os não essenciais** e mudar a
-escolha depois em "Preferências de cookies" no rodapé. Recusar não impede o uso do
-serviço.
+carregados. Os cookies de **afiliado/monetização** só são ativados **depois que você
+aceita** no banner. Você pode **recusar os não essenciais** e mudar a escolha depois em
+"Preferências de cookies" no rodapé. Recusar não impede o uso do serviço.
 
 > **Nota de implementação (a remover na publicação):** enquanto o banner não estiver no
 > ar, o script do Travelpayouts pode carregar sem gate. Alinhar com o jurídico se isso
