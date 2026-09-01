@@ -122,12 +122,22 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
 - **É o item de maior retorno do plano inteiro.** Todo o resto desta lista existe
   porque este não existia.
 
-### F2. Mutação no CI roda tudo
+### F2. Mutação no CI roda tudo — FEITO (2026-09-01)
 
-- `pnpm test:mutation` roda Stryker em todos os pacotes, incluindo `apps/api` (grande) e
-  o worker com pg-boss real. Lento e instável.
-- **Fazer:** mover pra job separado, nightly, ou restringir aos pacotes tocados no PR.
-- **Não remover o gate** — só tirar do caminho crítico do PR.
+- Era `pnpm test:mutation` dentro do job `check`, em série depois de tudo. Na primeira
+  vez que o CI chegou lá, o dry run do Stryker em `apps/api` estourou o timeout default
+  de 5 min.
+- Agora: job `mutation` separado e **em paralelo** ao `check` (a espera do PR é o maior
+  dos dois, não a soma), rodando `turbo run test:mutation --filter='...[origin/main]'` —
+  só os pacotes tocados e quem depende deles. Mutação completa em
+  `.github/workflows/nightly-mutation.yml` (cron 05:00 UTC, `timeout-minutes: 90`,
+  relatório HTML como artifact).
+- O gate não foi removido: o job `mutation` reprova o PR igual.
+- **Limite conhecido:** PR que toca `packages/shared` arrasta todo mundo, porque todos
+  dependem dele. Aí a mutação volta a ser completa — só em paralelo.
+- `apps/api/stryker.config.json` ganhou `dryRunTimeoutMinutes: 15`, e o CI re-migra o
+  banco antes da mutação (o `client.spec` de `@farol/db` dropa o schema durante
+  `pnpm test` e nada recriava antes).
 
 ### F3. Banco de teste dedicado
 
@@ -180,7 +190,7 @@ precisa de uma verificação no Node cru.
 3. Passo 8.
 4. **E6**, **E2** — as duas linhas fáceis, junto de qualquer PR.
 5. **E1**, **E3** → **E4** → **E5**.
-6. **F3**, **F2**, **G**.
+6. **F3**, **G**. (F2 feito)
 7. **E7** — reavaliar só depois do Passo 8.
 
 ## Definition of Done
