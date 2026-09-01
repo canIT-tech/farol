@@ -143,13 +143,23 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
   banco antes da mutação (o `client.spec` de `@farol/db` dropa o schema durante
   `pnpm test` e nada recriava antes).
 
-### F3. Banco de teste dedicado
+### F3. Banco de teste dedicado — FEITO (2026-09-01)
 
 - **Evidência:** hoje `DATABASE_URL_TEST` aponta pro mesmo banco de desenvolvimento.
   `packages/db/src/client.spec.ts` derruba tabelas, então `pnpm test` zera o banco local
   e exige `db:migrate` + `db:seed` de novo.
-- **Fazer:** `docker-compose.yml` cria um `farol_test`; `DATABASE_URL_TEST` aponta pra
-  ele; `.env.example` documenta.
+- `docker/init-test-db.sql` cria o `farol_test`, montado em
+  `/docker-entrypoint-initdb.d/` pelo `docker-compose.yml`. `.env.example` já vem
+  apontando pra ele. No CI o service não monta volume, então um step cria o banco.
+- Dois bugs apareceram no caminho, os dois mascarados por dev e teste serem o mesmo
+  banco: os CLIs de migração apontam para `DATABASE_URL`, então o `farol_test` ficava
+  sem schema nem catálogo (resolvido com steps próprios no CI); e o `AppModule` e o
+  `WorkerModule` leem `DATABASE_URL` enquanto os specs abrem `DATABASE_URL_TEST` — a
+  api escrevia num banco e o teste conferia no outro. `setup-e2e.ts` e os dois specs do
+  worker agora alinham as duas variáveis.
+- **A serialização do `turbo.json` fica.** `db#test` continua derrubando tabelas do
+  `farol_test`, que api e worker também usam. Um banco por pacote resolveria; não vale
+  a complexidade agora.
 - **Armadilha a manter documentada:** os specs fazem `DATABASE_URL_TEST ??
   DATABASE_URL`, e `??` **não** cai no fallback com string vazia. Variável definida e
   vazia quebra os testes com mensagem enganosa. Ou preenchida, ou comentada.

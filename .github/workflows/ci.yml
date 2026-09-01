@@ -23,6 +23,8 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/farol
+      # Banco separado: o client.spec de @farol/db derruba tabelas.
+      DATABASE_URL_TEST: postgres://postgres:postgres@localhost:5432/farol_test
       NEXT_PUBLIC_API_URL: http://localhost:3333
       # Envs de app: os specs trazem defaults próprios, mas o CI declara aqui
       # para o banco/config ficarem em estado conhecido (débito do Passo 5).
@@ -39,11 +41,22 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # O service do Postgres nao monta docker/init-test-db.sql, entao aqui o
+      # banco de teste e criado a mao.
+      - run: PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE farol_test"
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm build
       - run: pnpm --filter @farol/db run db:migrate
       - run: pnpm --filter @farol/db run db:seed
+      # O farol_test tambem precisa de schema e catalogo: os CLIs de migracao
+      # apontam para DATABASE_URL, e os specs usam DATABASE_URL_TEST.
+      - run: pnpm --filter @farol/db run db:migrate
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/farol_test
+      - run: pnpm --filter @farol/db run db:seed
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/farol_test
       - run: pnpm --filter @farol/api smoke
       - run: pnpm --filter @farol/worker smoke
       - run: pnpm test
@@ -73,6 +86,8 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/farol
+      # Banco separado: o client.spec de @farol/db derruba tabelas.
+      DATABASE_URL_TEST: postgres://postgres:postgres@localhost:5432/farol_test
       NEXT_PUBLIC_API_URL: http://localhost:3333
       SUPABASE_JWKS_URL: https://example.com/auth/v1/.well-known/jwks.json
       AMADEUS_CLIENT_ID: amadeus-ci-id
@@ -90,7 +105,18 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # O service do Postgres nao monta docker/init-test-db.sql, entao aqui o
+      # banco de teste e criado a mao.
+      - run: PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE farol_test"
       - run: pnpm build
       - run: pnpm --filter @farol/db run db:migrate
       - run: pnpm --filter @farol/db run db:seed
+      # O farol_test tambem precisa de schema e catalogo: os CLIs de migracao
+      # apontam para DATABASE_URL, e os specs usam DATABASE_URL_TEST.
+      - run: pnpm --filter @farol/db run db:migrate
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/farol_test
+      - run: pnpm --filter @farol/db run db:seed
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/farol_test
       - run: pnpm exec turbo run test:mutation --filter='...[origin/main]'
