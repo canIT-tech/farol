@@ -9,8 +9,7 @@ export const BUILD_ITINERARY_SYSTEM =
   "Um dayIndex por dia, começando em 1.";
 
 export function buildItineraryUserPrompt(
-  input: BuildItineraryInput,
-  previousError?: string
+  input: BuildItineraryInput
 ): string {
   const { destination, nights, pace, interests, party, pinned } = input;
   const lines = [
@@ -23,9 +22,6 @@ export function buildItineraryUserPrompt(
     for (const item of pinned) {
       lines.push(`- dia ${item.dayIndex}, ${item.slot}, ${item.type}: ${item.title}`);
     }
-  }
-  if (previousError !== undefined) {
-    lines.push(`Sua resposta anterior foi rejeitada: ${previousError}. Responda de novo, só o JSON válido.`);
   }
   return lines.join("\n");
 }

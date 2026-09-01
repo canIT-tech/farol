@@ -69,4 +69,62 @@ describe("ChatRepository", () => {
     expect(saved.role).toBe("user");
   });
 
+
+  it("campos ausentes viram null nas values do insert", async () => {
+    const mockRow = {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      tripId: "550e8400-e29b-41d4-a716-446655440001",
+      role: "assistant",
+      content: null,
+      toolCalls: null,
+      toolCallId: null,
+      name: null,
+      createdAt: new Date("2026-08-31T10:00:00Z")
+    };
+    const chain = {
+      values: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockResolvedValue([mockRow])
+    };
+    mockDb.insert.mockReturnValue(chain);
+
+    await repository.saveMessage("t1", { role: "assistant" });
+
+    const values = chain.values.mock.calls[0]![0] as Record<string, unknown>;
+    expect(values.content).toBeNull();
+    expect(values.toolCalls).toBeNull();
+    expect(values.toolCallId).toBeNull();
+    expect(values.name).toBeNull();
+  });
+
+  it("campos presentes chegam nas values", async () => {
+    const chain = {
+      values: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockResolvedValue([
+        {
+          id: "550e8400-e29b-41d4-a716-446655440000",
+          tripId: "550e8400-e29b-41d4-a716-446655440001",
+          role: "tool",
+          content: "{}",
+          toolCalls: null,
+          toolCallId: "c-1",
+          name: "set_budget",
+          createdAt: new Date("2026-08-31T10:00:00Z")
+        }
+      ])
+    };
+    mockDb.insert.mockReturnValue(chain);
+
+    await repository.saveMessage("t1", {
+      role: "tool",
+      content: "{}",
+      toolCallId: "c-1",
+      name: "set_budget",
+      toolCalls: [{ id: "c-1", name: "set_budget", args: {} }]
+    });
+
+    const values = chain.values.mock.calls[0]![0] as Record<string, unknown>;
+    expect(values.toolCallId).toBe("c-1");
+    expect(values.name).toBe("set_budget");
+    expect(values.toolCalls).toHaveLength(1);
+  });
 });

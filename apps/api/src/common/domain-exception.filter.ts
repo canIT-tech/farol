@@ -11,7 +11,9 @@ const STATUS_BY_CODE: Record<string, number> = {
   no_destination_chosen: HttpStatus.UNPROCESSABLE_ENTITY,
   llm_invalid_output: HttpStatus.BAD_GATEWAY,
   itinerary_not_ready: HttpStatus.CONFLICT,
-  item_not_swappable: HttpStatus.UNPROCESSABLE_ENTITY
+  item_not_swappable: HttpStatus.UNPROCESSABLE_ENTITY,
+  // Indisponibilidade de configuração, não erro do cliente (design §D4.1).
+  llm_not_configured: HttpStatus.SERVICE_UNAVAILABLE
 };
 
 interface ResponseLike {

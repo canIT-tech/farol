@@ -49,9 +49,19 @@ export interface BuildItineraryInput {
   pinned?: PinnedItem[];
 }
 
+// Entrada de um turno de chat. tripId é obrigatório: o chat sempre acontece
+// dentro de uma viagem, e é o que permite somar custo por roteiro.
+export interface LlmChatInput {
+  system: string;
+  messages: LlmMessage[];
+  tools: LlmToolSpec[];
+  tripId: string;
+}
+
 export interface LlmPort {
   rankDestinations(input: RankDestinationsInput): Promise<LlmRanking>;
   buildItinerary(input: BuildItineraryInput): Promise<BuildItineraryOutput>;
+  chat(input: LlmChatInput): Promise<LlmCompletion>;
 }
 
 // ---------------------------------------------------------------------------

@@ -6,7 +6,22 @@ import {
   type Slot,
   type LlmRanking
 } from "@farol/shared";
-import type { BuildItineraryInput, LlmPort, PinnedItem, RankDestinationsInput } from "./llm.types";
+import type {
+  BuildItineraryInput,
+  LlmChatInput,
+  LlmCompletion,
+  LlmPort,
+  LlmToolCall,
+  PinnedItem,
+  RankDestinationsInput
+} from "./llm.types";
+
+export interface FakeLlmOptions {
+  // Quando informado, a PRIMEIRA chamada de chat devolve esta tool call e as
+  // seguintes devolvem texto — o suficiente para exercitar o loop sem travá-lo
+  // em MAX_TURNS.
+  nextToolCall?: LlmToolCall;
+}
 
 const PICKS = 3;
 
@@ -24,6 +39,23 @@ export function fakeSlotTitle(type: ItemType, city: string, dayIndex: number): s
 
 // Usado nos testes no lugar do LlmService. Nenhuma chamada de rede.
 export class FakeLlmService implements LlmPort {
+  private chatCalls = 0;
+
+  constructor(private readonly options: FakeLlmOptions = {}) {}
+
+  chat(input: LlmChatInput): Promise<LlmCompletion> {
+    this.chatCalls += 1;
+    const pending = this.options.nextToolCall;
+    const shouldCallTool = pending !== undefined && this.chatCalls === 1;
+
+    return Promise.resolve({
+      text: shouldCallTool ? "" : `Resposta determinística de teste para ${input.tripId}.`,
+      toolCalls: shouldCallTool ? [pending] : [],
+      model: "fake-model",
+      usage: { inputTokens: 0, outputTokens: 0 }
+    });
+  }
+
   rankDestinations(input: RankDestinationsInput): Promise<LlmRanking> {
     const picks = input.shortlist.slice(0, PICKS).map((seed, index) => ({
       iata: seed.iata,

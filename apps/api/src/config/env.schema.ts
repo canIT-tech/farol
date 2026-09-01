@@ -1,12 +1,17 @@
 import { z } from "zod";
 
-export const envSchema = z.object({
+const baseEnvSchema = z.object({
   DATABASE_URL: z.string().min(1),
   API_PORT: z.coerce.number().int().positive().default(3333),
   SUPABASE_JWKS_URL: z.string().url(),
-  ANTHROPIC_API_KEY: z.string().min(1),
-  LLM_MODEL_CAPABLE: z.string().min(1).default("claude-sonnet-5"),
-  LLM_MODEL_CHEAP: z.string().min(1).default("claude-haiku-4-5-20251001"),
+  // LLM (design 2026-08-31, §D4.1). Todas opcionais: a aplicação sobe sem IA
+  // configurada, e só os fluxos de IA recusam (llm_not_configured, 503).
+  // Se LLM_PROVIDER vier, as outras três passam a ser obrigatórias — meia
+  // configuração é erro de boot, não falha no meio de um job.
+  LLM_PROVIDER: z.enum(["anthropic", "groq", "openai"]).optional(),
+  LLM_API_KEY: z.string().min(1).optional(),
+  LLM_MODEL_CAPABLE: z.string().min(1).optional(),
+  LLM_MODEL_CHEAP: z.string().min(1).optional(),
   JOBS_SCHEMA: z.string().min(1).default("pgboss"),
   AMADEUS_BASE_URL: z.string().url().default("https://test.api.amadeus.com"),
   AMADEUS_CLIENT_ID: z.string().min(1),
@@ -24,6 +29,21 @@ export const envSchema = z.object({
   // Google Places (Passo 6). Cache de 24 h: lugar não muda de lugar.
   GOOGLE_PLACES_KEY: z.string().min(1),
   PLACES_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(86_400)
+});
+
+export const envSchema = baseEnvSchema.superRefine((env, ctx) => {
+  if (env.LLM_PROVIDER === undefined) {
+    return;
+  }
+  for (const field of ["LLM_API_KEY", "LLM_MODEL_CAPABLE", "LLM_MODEL_CHEAP"] as const) {
+    if (env[field] === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [field],
+        message: `${field} é obrigatória quando LLM_PROVIDER está definida`
+      });
+    }
+  }
 });
 
 export type Env = z.infer<typeof envSchema>;
