@@ -50,4 +50,10 @@ jobs:
       # não faz hoisting, então `pnpm exec` na raiz não acha o binário.
       - run: pnpm --filter @farol/web exec playwright install --with-deps chromium
       - run: pnpm test:e2e
+      # O client.spec de @farol/db dropa o schema durante `pnpm test`, e nada
+      # re-migra antes da mutação — que roda os mesmos specs de novo. Sem isto,
+      # spec de DB sem tabela estala no retry do pg-boss e o dry run do Stryker
+      # estoura por timeout.
+      - run: pnpm --filter @farol/db run db:migrate
+      - run: pnpm --filter @farol/db run db:seed
       - run: pnpm test:mutation
