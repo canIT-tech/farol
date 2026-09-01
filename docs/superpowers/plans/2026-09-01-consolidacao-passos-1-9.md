@@ -163,6 +163,11 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
   `WorkerModule` leem `DATABASE_URL` enquanto os specs abrem `DATABASE_URL_TEST` — a
   api escrevia num banco e o teste conferia no outro. `setup-e2e.ts` e os dois specs do
   worker agora alinham as duas variáveis.
+- Junto veio um bug de estado: o `beforeAll` do `client.spec` dropava só `users` e
+  `taste_profiles` de 13 tabelas, e o `runMigrations` seguinte falhava ao re-adicionar a
+  FK de `trips` contra linhas órfãs deixadas pela suíte da api — 17 testes viravam
+  `skipped` num segundo run. Agora dropa o schema `public` inteiro, o que só é seguro
+  porque o banco de teste é separado. Dois runs seguidos passam.
 - **A serialização do `turbo.json` fica.** `db#test` continua derrubando tabelas do
   `farol_test`, que api e worker também usam. Um banco por pacote resolveria; não vale
   a complexidade agora.
