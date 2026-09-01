@@ -168,6 +168,9 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
   FK de `trips` contra linhas órfãs deixadas pela suíte da api — 17 testes viravam
   `skipped` num segundo run. Agora dropa o schema `public` inteiro, o que só é seguro
   porque o banco de teste é separado. Dois runs seguidos passam.
+- `test:mutation` também precisou da mesma serialização que `test` já tinha: as
+  tarefas rodavam em paralelo no mesmo `farol_test`, e o Stryker do `db` derrubava as
+  tabelas embaixo do `worker` (`relation "itineraries" does not exist` no dry run).
 - **A serialização do `turbo.json` fica.** `db#test` continua derrubando tabelas do
   `farol_test`, que api e worker também usam. Um banco por pacote resolveria; não vale
   a complexidade agora.

@@ -14,6 +14,16 @@
       "outputs": ["coverage/**"]
     },
     "test:e2e": { "dependsOn": ["^build"], "cache": false },
-    "test:mutation": { "dependsOn": ["^build"], "cache": false, "outputs": ["reports/mutation/**"] }
+    "test:mutation": { "dependsOn": ["^build"], "cache": false, "outputs": ["reports/mutation/**"] },
+    "@farol/api#test:mutation": {
+      "dependsOn": ["^build", "@farol/db#test:mutation"],
+      "cache": false,
+      "outputs": ["reports/mutation/**"]
+    },
+    "@farol/worker#test:mutation": {
+      "dependsOn": ["^build", "@farol/db#test:mutation", "@farol/api#test:mutation"],
+      "cache": false,
+      "outputs": ["reports/mutation/**"]
+    }
   }
 }
