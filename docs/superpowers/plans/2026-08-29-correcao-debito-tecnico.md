@@ -1,5 +1,8 @@
 # Plano de Correção — Débito Técnico dos Passos 2–5
 
+> **SUPERADO (2026-09-01)** por `2026-09-01-consolidacao-passos-1-9.md`, que cobre os
+> Passos 1–9 e absorve o que ficou aberto aqui. Mantido como histórico.
+
 > Não é feature. São correções pontuais de CI, configuração e placeholders acumulados
 > nos Passos 2–5. Cada item é independente; ordem = risco. Pode virar 1 PR só
 > (`chore/debito-tecnico-passos-2-5`) ou vários pequenos.
