@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ChatController } from "./chat.controller";
 import type { ChatService } from "./chat.service";
-import type { User } from "@farol/shared";
+import type { CurrentUser } from "@farol/shared";
 
 describe("ChatController", () => {
   let controller: ChatController;
   let mockChatService: any;
-  const user: User = { id: "u1", email: "user@example.com" };
+  const user: CurrentUser = { id: "u1", email: "user@example.com" };
 
   beforeEach(() => {
     mockChatService = {

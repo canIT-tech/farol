@@ -16,19 +16,36 @@ import { RANK_SYSTEM, buildRankUserPrompt } from "./prompts/rank-destinations";
 import { BUILD_ITINERARY_SYSTEM, buildItineraryUserPrompt } from "./prompts/build-itinerary";
 
 // Superfície mínima do SDK Anthropic que o serviço usa (facilita o fake nos testes).
+// Bloco de conteúdo do formato de fio da Anthropic. Os campos são opcionais
+// porque o tipo do bloco (text | tool_use) decide quais vêm preenchidos.
+export interface AnthropicContentBlock {
+  type?: string;
+  text?: string;
+  id?: string;
+  name?: string;
+  input?: Record<string, unknown>;
+}
+
+export interface AnthropicMessageParam {
+  role: string;
+  content: unknown;
+}
+
+export interface AnthropicResponse {
+  model: string;
+  content: AnthropicContentBlock[];
+  usage: { input_tokens: number; output_tokens: number };
+}
+
 export interface AnthropicLike {
   messages: {
     create(args: {
       model: string;
       max_tokens: number;
       system?: string;
-      tools?: any[];
-      messages: any[];
-    }): Promise<{
-      model: string;
-      content: any[];
-      usage: { input_tokens: number; output_tokens: number };
-    }>;
+      tools?: unknown[];
+      messages: AnthropicMessageParam[];
+    }): Promise<AnthropicResponse>;
   };
 }
 
@@ -134,9 +151,9 @@ export class LlmService implements LlmPort {
 
   async chat(params: {
     system: string;
-    messages: { role: string; content: any }[];
-    tools?: any[];
-  }): Promise<{ content: any[]; usage: { input_tokens: number; output_tokens: number } }> {
+    messages: AnthropicMessageParam[];
+    tools?: unknown[];
+  }): Promise<AnthropicResponse> {
     const startedAt = Date.now();
     const response = await this.client.messages.create({
       model: this.capableModel,

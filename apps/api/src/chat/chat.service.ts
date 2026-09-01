@@ -3,7 +3,11 @@ import type { ChatMessageDto, ChatResponseDto } from "@farol/shared";
 import { TripsService } from "../trips/trips.service";
 import { ChatRepository } from "./chat.repository";
 import { ChatToolService } from "./chat-tools.service";
-import { LlmService } from "../llm/llm.service";
+import {
+  LlmService,
+  type AnthropicContentBlock,
+  type AnthropicMessageParam
+} from "../llm/llm.service";
 
 const MAX_TURNS = 5;
 
@@ -42,7 +46,7 @@ export class ChatService {
 
     const toolDefs = this.toolsService.getToolDefinitions();
 
-    const apiMessages: any[] = history.map((msg) => {
+    const apiMessages: AnthropicMessageParam[] = history.map((msg) => {
       if (msg.role === "tool") {
         return {
           role: "user",
@@ -85,7 +89,12 @@ export class ChatService {
       });
 
       const contentBlocks = completion.content;
-      const toolUseBlock = contentBlocks.find((b) => b.type === "tool_use");
+      // Bloco tool_use sempre traz id e name; o predicado estreita o tipo para
+      // que não seja preciso asserção mais abaixo.
+      const toolUseBlock = contentBlocks.find(
+        (b): b is AnthropicContentBlock & { id: string; name: string } =>
+          b.type === "tool_use" && typeof b.id === "string" && typeof b.name === "string"
+      );
       const textBlock = contentBlocks.find((b) => b.type === "text");
 
       if (toolUseBlock) {
@@ -155,7 +164,7 @@ export class ChatService {
     const updatedState = await this.trips.get(userId, tripId);
     return {
       message: finalAssistantMsg,
-      tripState: updatedState
+      tripState: { ...updatedState }
     };
   }
 }
