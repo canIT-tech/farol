@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isoDateSchema } from "./trip";
+import { isoDateSchema } from "./trip.js";
 
 const iata = z.string().length(3);
 

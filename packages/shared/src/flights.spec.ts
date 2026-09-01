@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { flightSearchParamsSchema, flightOfferSchema } from "./flights";
+import { flightSearchParamsSchema, flightOfferSchema } from "./flights.js";
 
 const baseParams = {
   originIata: "GRU",

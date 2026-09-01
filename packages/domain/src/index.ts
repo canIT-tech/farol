@@ -1,3 +1,3 @@
-export * from "./budget";
-export * from "./discovery/types";
-export * from "./discovery/prefilter";
+export * from "./budget.js";
+export * from "./discovery/types.js";
+export * from "./discovery/prefilter.js";

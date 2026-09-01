@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
 import type { TasteProfileInput, TripInput } from "@farol/shared";
-import type { CatalogEntry } from "./types";
+import type { CatalogEntry } from "./types.js";
 import {
   prefilterDestinations,
   nightsOf,
   targetMonthOf,
   affinityScore
-} from "./prefilter";
+} from "./prefilter.js";
 
 function entry(over: Partial<CatalogEntry> = {}): CatalogEntry {
   return {

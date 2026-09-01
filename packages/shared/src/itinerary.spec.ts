@@ -9,7 +9,7 @@ import {
   buildItinerarySlotSchema,
   buildItineraryOutputSchema,
   swapRestaurantSchema
-} from "./itinerary";
+} from "./itinerary.js";
 
 const UUID = "11111111-1111-1111-1111-111111111111";
 

@@ -4,8 +4,8 @@ import {
   type PlaceDetails,
   type PlacesTextSearchParams
 } from "@farol/shared";
-import type { PlacesProvider } from "../places-provider";
-import { normalizePlaceDetails, normalizePlaceList, toPriceLevelEnum } from "./normalize-place";
+import type { PlacesProvider } from "../places-provider.js";
+import { normalizePlaceDetails, normalizePlaceList, toPriceLevelEnum } from "./normalize-place.js";
 
 export interface GooglePlacesProviderConfig {
   apiKey: string;

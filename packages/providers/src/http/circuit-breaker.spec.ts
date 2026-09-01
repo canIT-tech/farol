@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { CircuitBreaker, CircuitOpenError } from "./circuit-breaker";
+import { CircuitBreaker, CircuitOpenError } from "./circuit-breaker.js";
 
 const ok = () => Promise.resolve("ok");
 const fail = () => Promise.reject(new Error("boom"));

@@ -1,5 +1,5 @@
 import { fileURLToPath } from "node:url";
-import { seedCatalog, DEFAULT_CATALOG_CSV } from "./seed-catalog";
+import { seedCatalog, DEFAULT_CATALOG_CSV } from "./seed-catalog.js";
 
 const url = process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente");

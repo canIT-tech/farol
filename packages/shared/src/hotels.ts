@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { isoDateSchema } from "./trip";
+import { isoDateSchema } from "./trip.js";
 
 // Parâmetros de busca de hotel.
 export const hotelSearchParamsSchema = z.object({

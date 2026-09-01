@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { DomainError, NotFoundError, ForbiddenError, ValidationError, isDomainError } from "./errors";
+import { DomainError, NotFoundError, ForbiddenError, ValidationError, isDomainError } from "./errors.js";
 
 describe("erros de domínio", () => {
   it("DomainError carrega code e message", () => {

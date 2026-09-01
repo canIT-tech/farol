@@ -5,7 +5,7 @@ import {
   ChatMessageDtoSchema,
   ChatRequestDtoSchema,
   ChatResponseDtoSchema
-} from "./chat";
+} from "./chat.js";
 
 describe("Chat DTO Schemas", () => {
   it("validates valid roles", () => {

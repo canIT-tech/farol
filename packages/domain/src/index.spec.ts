@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { withinBudget } from "./index";
+import { withinBudget } from "./index.js";
 
 describe("withinBudget", () => {
   it("true quando o custo estimado cabe no orçamento", () => {

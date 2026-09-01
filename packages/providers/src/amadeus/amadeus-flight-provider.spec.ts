@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { AmadeusFlightProvider } from "./amadeus-flight-provider";
-import type { AmadeusHttp } from "./http";
+import { AmadeusFlightProvider } from "./amadeus-flight-provider.js";
+import type { AmadeusHttp } from "./http.js";
 
 const fixture = JSON.parse(
   readFileSync(fileURLToPath(new URL("./__fixtures__/flight-offers.json", import.meta.url)), "utf8")

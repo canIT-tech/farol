@@ -1,6 +1,6 @@
 import pRetry from "p-retry";
-import { AmadeusAuth } from "./amadeus-auth";
-import { CircuitBreaker } from "../http/circuit-breaker";
+import { AmadeusAuth } from "./amadeus-auth.js";
+import { CircuitBreaker } from "../http/circuit-breaker.js";
 
 export interface AmadeusHttpConfig {
   baseUrl: string;

@@ -7,7 +7,7 @@ import {
   normalizePlaceList,
   toPriceLevel,
   toPriceLevelEnum
-} from "./normalize-place";
+} from "./normalize-place.js";
 
 function loadFixture(name: string): never {
   return JSON.parse(

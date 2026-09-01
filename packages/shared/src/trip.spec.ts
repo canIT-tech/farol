@@ -5,7 +5,7 @@ import {
   tripPartySchema,
   isoDateSchema,
   yearMonthSchema
-} from "./trip";
+} from "./trip.js";
 
 const withDates = {
   originIata: "GRU",

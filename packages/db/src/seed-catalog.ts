@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
-import { createDbClient } from "./client";
-import { destinationCatalog } from "./schema";
+import { createDbClient } from "./client.js";
+import { destinationCatalog } from "./schema.js";
 
 export interface CatalogRow {
   city: string;

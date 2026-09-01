@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { hotelOfferSchema } from "@farol/shared";
-import { nightsBetween, normalizeHotel, toRating } from "./normalize-hotel";
+import { nightsBetween, normalizeHotel, toRating } from "./normalize-hotel.js";
 
 function loadFixture(name: string): unknown {
   return JSON.parse(

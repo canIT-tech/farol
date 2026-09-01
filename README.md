@@ -16,9 +16,15 @@ pnpm install
 docker compose up -d db
 cp .env.example .env          # ajuste o que precisar
 source .env
+pnpm build                    # os packages/* publicam dist/; api e worker leem de lá
 pnpm --filter @farol/db run db:migrate
 pnpm --filter @farol/db run db:seed   # catálogo de destinos; sem ele a descoberta não acha nada
 ```
+
+O `pnpm build` é obrigatório antes do primeiro `dev`: cada `packages/*` expõe
+`./dist/index.js`, e `pnpm --filter <app> dev` chama o script do pacote direto,
+sem passar pelo Turbo — então ninguém constrói as dependências por você.
+`pnpm dev` (via Turbo) já resolve isso sozinho.
 
 **Não há `dotenv` no projeto.** `apps/api` e `apps/worker` leem `process.env`
 direto, então as envs precisam estar no shell — daí o `source .env`. O
@@ -38,6 +44,9 @@ Sem o `worker` de pé, o roteiro fica `pending` para sempre — a geração roda
 
 A rota `/` do web é a **landing pública**; o fluxo do app começa em `/login`.
 Verificação rápida da API: `curl localhost:3333/health`.
+
+Para checar que a API sobe de verdade (Node cru, sem Vitest no caminho):
+`source .env && pnpm --filter @farol/api smoke`.
 
 ### IA é opcional
 

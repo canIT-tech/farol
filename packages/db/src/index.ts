@@ -1,7 +1,7 @@
-export * from "./client";
-export * from "./migrate";
-export * from "./seed-catalog";
-export * as schema from "./schema";
+export * from "./client.js";
+export * from "./migrate.js";
+export * from "./seed-catalog.js";
+export * as schema from "./schema.js";
 export {
   users,
   tasteProfiles,
@@ -16,5 +16,5 @@ export {
   hotelSelections,
   waitlist,
   chatMessages
-} from "./schema";
+} from "./schema.js";
 
