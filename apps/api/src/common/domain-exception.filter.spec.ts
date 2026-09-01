@@ -65,6 +65,12 @@ describe("DomainExceptionFilter", () => {
     expect(status).toHaveBeenCalledWith(422);
   });
 
+  it("mapeia llm_not_configured para 503", () => {
+    const { host, status } = makeHost();
+    new DomainExceptionFilter().catch(new DomainError("llm_not_configured", "sem LLM"), host);
+    expect(status).toHaveBeenCalledWith(503);
+  });
+
   it("usa 400 para código de domínio sem mapeamento", () => {
     const { host, status, json } = makeHost();
     new DomainExceptionFilter().catch(new DomainError("outro", "estranho"), host);

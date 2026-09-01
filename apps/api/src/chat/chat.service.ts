@@ -1,13 +1,9 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import type { ChatMessageDto, ChatResponseDto } from "@farol/shared";
 import { TripsService } from "../trips/trips.service";
 import { ChatRepository } from "./chat.repository";
 import { ChatToolService } from "./chat-tools.service";
-import {
-  LlmService,
-  type AnthropicContentBlock,
-  type AnthropicMessageParam
-} from "../llm/llm.service";
+import { LLM, type LlmMessage, type LlmPort } from "../llm/llm.types";
 
 const MAX_TURNS = 5;
 
@@ -23,7 +19,7 @@ export class ChatService {
     private readonly trips: TripsService,
     private readonly repo: ChatRepository,
     private readonly toolsService: ChatToolService,
-    private readonly llm: LlmService
+    @Inject(LLM) private readonly llm: LlmPort
   ) {}
 
   async sendMessage(
@@ -34,47 +30,24 @@ export class ChatService {
     const initialState = await this.trips.get(userId, tripId);
 
     // 1. Salva mensagem do usuário
-    const userMsg: ChatMessageDto = {
-      role: "user",
-      content: userMessageText
-    };
+    const userMsg: ChatMessageDto = { role: "user", content: userMessageText };
     await this.repo.saveMessage(tripId, userMsg);
 
-    // 2. Carrega histórico e constrói mensagens para o Claude
+    // 2. Carrega histórico. A porta neutra tem a mesma forma do que está
+    // persistido, então a tradução é campo a campo — sem montar blocos de
+    // fornecedor à mão.
     const history = await this.repo.listHistory(tripId);
     const system = `${CHAT_SYSTEM_PROMPT}\n\nEstado atual da viagem:\n${JSON.stringify(initialState, null, 2)}`;
-
     const toolDefs = this.toolsService.getToolDefinitions();
 
-    const apiMessages: AnthropicMessageParam[] = history.map((msg) => {
-      if (msg.role === "tool") {
-        return {
-          role: "user",
-          content: [
-            {
-              type: "tool_result",
-              tool_use_id: msg.toolCallId,
-              content: msg.content ?? ""
-            }
-          ]
-        };
-      }
-      if (msg.role === "assistant" && msg.toolCalls && msg.toolCalls.length > 0) {
-        return {
-          role: "assistant",
-          content: msg.toolCalls.map((tc) => ({
-            type: "tool_use",
-            id: tc.id,
-            name: tc.name,
-            input: tc.args
-          }))
-        };
-      }
-      return {
-        role: msg.role,
-        content: msg.content ?? ""
-      };
-    });
+    const messages: LlmMessage[] = history.map((msg) => ({
+      // O papel "system" não existe na porta: o system vai em campo próprio.
+      role: msg.role === "system" ? "user" : msg.role,
+      content: msg.content ?? null,
+      toolCalls: msg.toolCalls ?? undefined,
+      toolCallId: msg.toolCallId ?? undefined,
+      name: msg.name ?? undefined
+    }));
 
     let turns = 0;
     let finalAssistantMsg: ChatMessageDto = { role: "assistant", content: "" };
@@ -82,83 +55,42 @@ export class ChatService {
     while (turns < MAX_TURNS) {
       turns++;
 
-      const completion = await this.llm.chat({
-        system,
-        messages: apiMessages,
-        tools: toolDefs
-      });
+      const completion = await this.llm.chat({ system, messages, tools: toolDefs, tripId });
+      const call = completion.toolCalls[0];
 
-      const contentBlocks = completion.content;
-      // Bloco tool_use sempre traz id e name; o predicado estreita o tipo para
-      // que não seja preciso asserção mais abaixo.
-      const toolUseBlock = contentBlocks.find(
-        (b): b is AnthropicContentBlock & { id: string; name: string } =>
-          b.type === "tool_use" && typeof b.id === "string" && typeof b.name === "string"
-      );
-      const textBlock = contentBlocks.find((b) => b.type === "text");
-
-      if (toolUseBlock) {
-        // Salva turno do assistente chamando a tool
-        const assistantToolMsg: ChatMessageDto = {
-          role: "assistant",
-          content: textBlock?.text ?? null,
-          toolCalls: [
-            {
-              id: toolUseBlock.id,
-              name: toolUseBlock.name,
-              args: toolUseBlock.input ?? {}
-            }
-          ]
-        };
-        await this.repo.saveMessage(tripId, assistantToolMsg);
-
-        // Executa a tool
-        const toolResult = await this.toolsService.executeTool(userId, tripId, {
-          name: toolUseBlock.name,
-          args: toolUseBlock.input ?? {}
-        });
-
-        // Salva resultado da tool
-        const toolResultMsg: ChatMessageDto = {
-          role: "tool",
-          toolCallId: toolUseBlock.id,
-          name: toolUseBlock.name,
-          content: JSON.stringify(toolResult)
-        };
-        await this.repo.saveMessage(tripId, toolResultMsg);
-
-        // Atualiza apiMessages para a próxima iteração
-        apiMessages.push({
-          role: "assistant",
-          content: [
-            {
-              type: "tool_use",
-              id: toolUseBlock.id,
-              name: toolUseBlock.name,
-              input: toolUseBlock.input ?? {}
-            }
-          ]
-        });
-        apiMessages.push({
-          role: "user",
-          content: [
-            {
-              type: "tool_result",
-              tool_use_id: toolUseBlock.id,
-              content: JSON.stringify(toolResult)
-            }
-          ]
-        });
-      } else {
-        // Resposta final em texto
-        const textContent = textBlock?.text ?? "Ação concluída.";
-        finalAssistantMsg = {
-          role: "assistant",
-          content: textContent
-        };
+      if (call === undefined) {
+        const textContent = completion.text.length > 0 ? completion.text : "Ação concluída.";
+        finalAssistantMsg = { role: "assistant", content: textContent };
         await this.repo.saveMessage(tripId, finalAssistantMsg);
         break;
       }
+
+      await this.repo.saveMessage(tripId, {
+        role: "assistant",
+        content: completion.text.length > 0 ? completion.text : null,
+        toolCalls: [call]
+      });
+
+      const toolResult = await this.toolsService.executeTool(userId, tripId, {
+        name: call.name,
+        args: call.args
+      });
+      const toolResultText = JSON.stringify(toolResult);
+
+      await this.repo.saveMessage(tripId, {
+        role: "tool",
+        toolCallId: call.id,
+        name: call.name,
+        content: toolResultText
+      });
+
+      messages.push({ role: "assistant", content: null, toolCalls: [call] });
+      messages.push({
+        role: "tool",
+        content: toolResultText,
+        toolCallId: call.id,
+        name: call.name
+      });
     }
 
     const updatedState = await this.trips.get(userId, tripId);

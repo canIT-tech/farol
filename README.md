@@ -14,8 +14,50 @@ O assessor que guia a viagem inteira. Ver `CLAUDE.md` para o contexto do projeto
 ```bash
 pnpm install
 docker compose up -d db
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/farol pnpm --filter @farol/db run db:migrate
+cp .env.example .env          # ajuste o que precisar
+source .env
+pnpm --filter @farol/db run db:migrate
+pnpm --filter @farol/db run db:seed   # catálogo de destinos; sem ele a descoberta não acha nada
 ```
+
+**Não há `dotenv` no projeto.** `apps/api` e `apps/worker` leem `process.env`
+direto, então as envs precisam estar no shell — daí o `source .env`. O
+`apps/web` é a exceção: o Next lê `apps/web/.env.local` sozinho.
+
+## Rodando em desenvolvimento
+
+Três processos, cada um no seu terminal:
+
+```bash
+source .env && pnpm --filter @farol/api dev      # NestJS  :3333
+source .env && pnpm --filter @farol/worker dev   # jobs (pg-boss)
+pnpm --filter @farol/web dev                     # Next    :3000
+```
+
+Sem o `worker` de pé, o roteiro fica `pending` para sempre — a geração roda em job.
+
+A rota `/` do web é a **landing pública**; o fluxo do app começa em `/login`.
+Verificação rápida da API: `curl localhost:3333/health`.
+
+### IA é opcional
+
+A aplicação sobe **sem nenhuma env de LLM**. Nesse modo, descoberta de destino,
+geração de roteiro e chat respondem `503 llm_not_configured`; todo o resto
+(landing, waitlist, login, onboarding, viagens, Places, enrich) funciona.
+
+Para ligar, defina as quatro juntas — `LLM_PROVIDER` presente torna as outras
+três obrigatórias, e a falta de qualquer uma barra no boot:
+
+```
+LLM_PROVIDER=anthropic|groq|openai
+LLM_API_KEY=...
+LLM_MODEL_CAPABLE=...
+LLM_MODEL_CHEAP=...
+```
+
+Trocar de provider, ou de modelo dentro do mesmo provider, é só mudar env:
+nenhum código conhece fornecedor. Ver
+`docs/superpowers/specs/2026-08-31-llm-provider-agnostico-design.md`.
 
 ## Rodando os testes
 

@@ -27,7 +27,6 @@ jobs:
       # Envs de app: os specs trazem defaults próprios, mas o CI declara aqui
       # para o banco/config ficarem em estado conhecido (débito do Passo 5).
       SUPABASE_JWKS_URL: https://example.com/auth/v1/.well-known/jwks.json
-      ANTHROPIC_API_KEY: sk-ant-ci
       AMADEUS_CLIENT_ID: amadeus-ci-id
       AMADEUS_CLIENT_SECRET: amadeus-ci-secret
       GOOGLE_PLACES_KEY: google-places-ci

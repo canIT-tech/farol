@@ -4,7 +4,6 @@ import { parseEnv } from "./env.schema";
 const valid = {
   DATABASE_URL: "postgres://x",
   SUPABASE_JWKS_URL: "https://proj.supabase.co/auth/v1/.well-known/jwks.json",
-  ANTHROPIC_API_KEY: "sk-ant-test",
   AMADEUS_CLIENT_ID: "amadeus-id",
   AMADEUS_CLIENT_SECRET: "amadeus-secret",
   GOOGLE_PLACES_KEY: "google-places-key"
@@ -19,16 +18,8 @@ describe("parseEnv", () => {
     expect(parseEnv({ ...valid, API_PORT: "4000" }).API_PORT).toBe(4000);
   });
 
-  it("mantém SUPABASE_JWKS_URL e ANTHROPIC_API_KEY", () => {
-    const env = parseEnv({ ...valid });
-    expect(env.SUPABASE_JWKS_URL).toBe(valid.SUPABASE_JWKS_URL);
-    expect(env.ANTHROPIC_API_KEY).toBe("sk-ant-test");
-  });
-
-  it("aplica defaults de roteamento de modelo", () => {
-    const env = parseEnv({ ...valid });
-    expect(env.LLM_MODEL_CAPABLE).toBe("claude-sonnet-5");
-    expect(env.LLM_MODEL_CHEAP).toBe("claude-haiku-4-5-20251001");
+  it("mantém SUPABASE_JWKS_URL", () => {
+    expect(parseEnv({ ...valid }).SUPABASE_JWKS_URL).toBe(valid.SUPABASE_JWKS_URL);
   });
 
   it("aplica default de JOBS_SCHEMA e respeita o valor informado", () => {
@@ -36,22 +27,10 @@ describe("parseEnv", () => {
     expect(parseEnv({ ...valid, JOBS_SCHEMA: "pgboss_test" }).JOBS_SCHEMA).toBe("pgboss_test");
   });
 
-  it("respeita os modelos informados por env", () => {
-    const env = parseEnv({ ...valid, LLM_MODEL_CAPABLE: "x-capable", LLM_MODEL_CHEAP: "x-cheap" });
-    expect(env.LLM_MODEL_CAPABLE).toBe("x-capable");
-    expect(env.LLM_MODEL_CHEAP).toBe("x-cheap");
-  });
-
   it("lança quando DATABASE_URL falta", () => {
-    expect(() =>
-      parseEnv({ SUPABASE_JWKS_URL: valid.SUPABASE_JWKS_URL, ANTHROPIC_API_KEY: "k" })
-    ).toThrow(/DATABASE_URL/);
-  });
-
-  it("lança quando ANTHROPIC_API_KEY falta", () => {
-    expect(() =>
-      parseEnv({ DATABASE_URL: "postgres://x", SUPABASE_JWKS_URL: valid.SUPABASE_JWKS_URL })
-    ).toThrow(/ANTHROPIC_API_KEY/);
+    expect(() => parseEnv({ SUPABASE_JWKS_URL: valid.SUPABASE_JWKS_URL })).toThrow(
+      /DATABASE_URL/
+    );
   });
 
   it("lança quando as credenciais do Amadeus faltam", () => {
@@ -59,7 +38,6 @@ describe("parseEnv", () => {
       parseEnv({
         DATABASE_URL: "postgres://x",
         SUPABASE_JWKS_URL: valid.SUPABASE_JWKS_URL,
-        ANTHROPIC_API_KEY: "k"
       })
     ).toThrow(/AMADEUS_CLIENT_ID/);
   });
@@ -87,7 +65,7 @@ describe("parseEnv", () => {
 
   it("lança quando SUPABASE_JWKS_URL não é uma URL", () => {
     expect(() =>
-      parseEnv({ DATABASE_URL: "postgres://x", SUPABASE_JWKS_URL: "nao-e-url", ANTHROPIC_API_KEY: "k" })
+      parseEnv({ DATABASE_URL: "postgres://x", SUPABASE_JWKS_URL: "nao-e-url" })
     ).toThrow(/SUPABASE_JWKS_URL/);
   });
 
@@ -110,7 +88,55 @@ describe("parseEnv", () => {
 
   it("lista os campos inválidos separados por vírgula", () => {
     expect(() => parseEnv({ API_PORT: "-1" })).toThrow(
-      "Env inválida: DATABASE_URL, API_PORT, SUPABASE_JWKS_URL, ANTHROPIC_API_KEY, AMADEUS_CLIENT_ID, AMADEUS_CLIENT_SECRET, GOOGLE_PLACES_KEY"
+      "Env inválida: DATABASE_URL, API_PORT, SUPABASE_JWKS_URL, AMADEUS_CLIENT_ID, AMADEUS_CLIENT_SECRET, GOOGLE_PLACES_KEY"
     );
+  });
+});
+
+const comLlm = {
+  ...valid,
+  LLM_PROVIDER: "groq",
+  LLM_API_KEY: "chave-de-teste",
+  LLM_MODEL_CAPABLE: "llama-3.3-70b-versatile",
+  LLM_MODEL_CHEAP: "llama-3.1-8b-instant"
+};
+
+describe("env de LLM", () => {
+  it("é válida sem nenhuma env de LLM (IA desligada)", () => {
+    const env = parseEnv({ ...valid });
+    expect(env.LLM_PROVIDER).toBeUndefined();
+    expect(env.LLM_API_KEY).toBeUndefined();
+  });
+
+  it("aceita os três providers quando tudo está preenchido", () => {
+    for (const provider of ["anthropic", "groq", "openai"]) {
+      expect(parseEnv({ ...comLlm, LLM_PROVIDER: provider }).LLM_PROVIDER).toBe(provider);
+    }
+  });
+
+  it("rejeita provider desconhecido", () => {
+    expect(() => parseEnv({ ...comLlm, LLM_PROVIDER: "marte" })).toThrow(/LLM_PROVIDER/);
+  });
+
+  it("provider sem chave é erro de boot", () => {
+    const semChave: Record<string, string | undefined> = { ...comLlm };
+    delete semChave.LLM_API_KEY;
+    expect(() => parseEnv(semChave)).toThrow(/LLM_API_KEY/);
+  });
+
+  it("provider sem modelo capable é erro de boot", () => {
+    const sem: Record<string, string | undefined> = { ...comLlm };
+    delete sem.LLM_MODEL_CAPABLE;
+    expect(() => parseEnv(sem)).toThrow(/LLM_MODEL_CAPABLE/);
+  });
+
+  it("provider sem modelo cheap é erro de boot", () => {
+    const sem: Record<string, string | undefined> = { ...comLlm };
+    delete sem.LLM_MODEL_CHEAP;
+    expect(() => parseEnv(sem)).toThrow(/LLM_MODEL_CHEAP/);
+  });
+
+  it("chave sem provider é ignorada (IA segue desligada)", () => {
+    expect(parseEnv({ ...valid, LLM_API_KEY: "solta" }).LLM_PROVIDER).toBeUndefined();
   });
 });
