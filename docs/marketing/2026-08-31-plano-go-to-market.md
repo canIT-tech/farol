@@ -31,6 +31,10 @@ incerteza, assume o trabalho, sem euforia, sem ponto de exclamação. Ver
 
 ## 2. Objetivos e métricas
 
+> Definições operacionais, funil de servidor e tabela de eventos a instrumentar:
+> `docs/negocio/2026-08-31-plano-de-metricas.md`. As metas aqui são a leitura de GTM;
+> as definições de "ativado", "roteiro pago", "recompra" moram naquele doc.
+
 ### North Star
 
 | Fase | North Star | Meta `(H)` |
