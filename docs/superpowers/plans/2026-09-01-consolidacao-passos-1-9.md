@@ -59,15 +59,16 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
 - **Pronto quando:** as fixtures vêm de resposta real e os testes passam sem alterar a
   intenção das asserções.
 
-### E2. `prefilterDestinations({ excludeIata })` sem chamador
+### E2. `prefilterDestinations({ excludeIata })` sem chamador — FEITO (2026-09-01)
 
 - **Evidência:** `packages/domain/src/discovery/prefilter.ts:46` declara o campo e a
   linha 54 o usa; nenhum código de produção passa o argumento. Não existe conceito de
   "destino rejeitado" no schema.
 - **Fazer:** apagar o parâmetro e os testes dele. Se o produto quiser "não me mostre
   mais esse destino", isso vira feature com tabela, não flag órfã.
-- **Pronto quando:** o campo saiu, a cobertura segue 100% e nenhum teste foi só
-  deletado pra fechar a conta.
+- Removido o campo, o `Set` de exclusão, o `filter` e o teste dele. `@farol/domain`
+  segue 100% com 24 testes. Quando existir "rejeitar destino", vira feature com coluna,
+  não flag órfã.
 
 ### E3. `MODEL_PRICING` é chute
 
