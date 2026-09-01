@@ -23,7 +23,6 @@ export function AdvisorChat({
 
   useEffect(() => {
     // O container sempre renderiza, então a ref existe após o mount.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const el = listRef.current!;
     el.scrollTop = el.scrollHeight;
   }, [messages.length, pending]);

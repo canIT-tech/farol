@@ -16,7 +16,8 @@
       }
     ],
     "types": [
-      "node"
+      "node",
+      "@testing-library/jest-dom"
     ],
     "allowJs": true,
     "incremental": true,

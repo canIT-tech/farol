@@ -21,7 +21,9 @@ export const itineraryItemSchema = z.object({
   durationMin: z.number().int().nullable(),
   estCost: z.number().nullable(),
   sortOrder: z.number().int(),
-  pinned: z.boolean()
+  pinned: z.boolean(),
+  // Passo 6: o enrich do Places não achou correspondência para este item.
+  needsReview: z.boolean()
 });
 export type ItineraryItem = z.infer<typeof itineraryItemSchema>;
 

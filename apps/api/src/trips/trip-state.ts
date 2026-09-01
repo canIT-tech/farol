@@ -1,31 +1,18 @@
-import { destinationCandidateSchema, type DestinationCandidate, type TripStatus } from "@farol/shared";
+import {
+  destinationCandidateSchema,
+  type DestinationCandidate,
+  type Trip,
+  type TripState,
+  type TripStatus
+} from "@farol/shared";
 import type { trips, tripDestinations } from "@farol/db";
 
 type TripRow = typeof trips.$inferSelect;
 type TripDestinationRow = typeof tripDestinations.$inferSelect;
 
-export interface Trip {
-  id: string;
-  userId: string;
-  status: TripStatus;
-  title: string | null;
-  originIata: string;
-  dateStart: string | null;
-  dateEnd: string | null;
-  durationDays: number | null;
-  targetMonth: string | null;
-  party: { adults: number; children: number };
-  budgetTotal: number | null;
-  currency: string;
-  chosenDestinationId: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface TripState extends Trip {
-  destinations: DestinationCandidate[];
-  chosenDestination: DestinationCandidate | null;
-}
+// Trip e TripState são de @farol/shared: o apps/web valida a resposta com os
+// mesmos schemas, então o contrato tem que ter um dono só.
+export type { Trip, TripState };
 
 export function toTrip(row: TripRow): Trip {
   return {

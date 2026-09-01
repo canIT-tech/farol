@@ -42,7 +42,8 @@ export function toItineraryItem(item: ItemRow): ItineraryItem {
     durationMin: item.durationMin,
     estCost: num(item.estCost),
     sortOrder: item.sortOrder,
-    pinned: item.pinned
+    pinned: item.pinned,
+    needsReview: item.needsReview
   });
 }
 

@@ -4,16 +4,26 @@ import { createGroq } from "@ai-sdk/groq";
 import { createOpenAI } from "@ai-sdk/openai";
 import { ENV } from "../config/config.module";
 import type { Env } from "../config/env.schema";
-import { LLM, consoleLlmLogger, type LlmProvider, type LlmTier } from "./llm.types";
+import { LLM, consoleLlmLogger, type LlmPort, type LlmProvider, type LlmTier } from "./llm.types";
 import { LlmService } from "./llm.service";
+import { FakeLlmService } from "./fake-llm.service";
 import { AiSdkLlmProvider, type ModelResolver } from "./providers/ai-sdk.provider";
 import { DisabledLlmProvider } from "./providers/disabled.provider";
 
 // Único lugar que conhece os três fornecedores. Trocar de provider, ou trocar
 // de modelo dentro do mesmo provider, é mudança de env.
 // Sem LLM_PROVIDER a IA fica desligada e a aplicação sobe igual (§D4.1).
+// LLM_PROVIDER=fake devolve o FakeLlmService direto, sem passar pelo LlmService:
+// o E2E sobe a api como processo externo, onde overrideProvider não alcança.
+export function buildLlm(env: Env): LlmPort {
+  if (env.LLM_PROVIDER === "fake") {
+    return new FakeLlmService();
+  }
+  return new LlmService(buildLlmProvider(env));
+}
+
 export function buildLlmProvider(env: Env): LlmProvider {
-  if (env.LLM_PROVIDER === undefined) {
+  if (env.LLM_PROVIDER === undefined || env.LLM_PROVIDER === "fake") {
     return new DisabledLlmProvider();
   }
 
@@ -41,7 +51,7 @@ export function buildLlmProvider(env: Env): LlmProvider {
     {
       provide: LLM,
       inject: [ENV],
-      useFactory: (env: Env) => new LlmService(buildLlmProvider(env))
+      useFactory: (env: Env) => buildLlm(env)
     }
   ],
   exports: [LLM]

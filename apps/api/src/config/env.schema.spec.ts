@@ -139,4 +139,16 @@ describe("env de LLM", () => {
   it("chave sem provider é ignorada (IA segue desligada)", () => {
     expect(parseEnv({ ...valid, LLM_API_KEY: "solta" }).LLM_PROVIDER).toBeUndefined();
   });
+
+  // O E2E sobe a api como processo externo, onde overrideProvider do Vitest não
+  // alcança. "fake" é como o teste desliga a chamada real sem env nova.
+  it("aceita o provider fake sem chave nem modelos", () => {
+    expect(parseEnv({ ...valid, LLM_PROVIDER: "fake" }).LLM_PROVIDER).toBe("fake");
+  });
+
+  it("aceita o provider fake mesmo com os modelos informados", () => {
+    const env = parseEnv({ ...comLlm, LLM_PROVIDER: "fake" });
+    expect(env.LLM_PROVIDER).toBe("fake");
+    expect(env.LLM_MODEL_CAPABLE).toBe("llama-3.3-70b-versatile");
+  });
 });

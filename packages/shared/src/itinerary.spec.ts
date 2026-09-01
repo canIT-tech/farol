@@ -26,7 +26,8 @@ const item = {
   durationMin: null,
   estCost: null,
   sortOrder: 0,
-  pinned: false
+  pinned: false,
+  needsReview: false
 };
 
 describe("enums", () => {
@@ -56,7 +57,8 @@ describe("itineraryItemSchema", () => {
       rating: 4.6,
       durationMin: 120,
       estCost: 80,
-      pinned: true
+      pinned: true,
+      needsReview: true
     };
     expect(itineraryItemSchema.parse(enriched)).toEqual(enriched);
   });
