@@ -19,6 +19,8 @@ import { PlacesEnrichHandler } from "./places-enrich.handler";
     PlacesEnrichHandler
   ],
   exports: [
+    // ChatModule injeta ItineraryService no ChatToolService (tools do Passo 7).
+    ItineraryService,
     ItineraryRepository,
     ItineraryGenerateHandler,
     ItineraryRegenerateDayHandler,

@@ -8,7 +8,7 @@ import { CHAT_TOOLS, type ChatToolDefinition } from "./chat-tools.types";
 
 export interface ToolCallExecution {
   name: string;
-  args: Record<string, any>;
+  args: Record<string, unknown>;
 }
 
 export interface ToolExecutionResult {

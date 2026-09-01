@@ -81,7 +81,9 @@ describe("chat e2e", () => {
         originIata: "GRU",
         party: { adults: 1, children: 0 },
         budgetTotal: 5000,
-        durationDays: 5
+        durationDays: 5,
+        // tripInputSchema exige datas OU durationDays + targetMonth.
+        targetMonth: "2026-09"
       });
     expect(trip.status).toBe(201);
 

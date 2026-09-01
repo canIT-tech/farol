@@ -217,8 +217,10 @@ describe("enrichItinerary — refeição faltando", () => {
 
     await enrichItinerary({ db, places: fakePlaces(findFirst) }, itineraryId, "Lisboa, Portugal");
 
+    // O centroide é média de floats: (38.72 + 38.74) / 2 dá 38.730000000000004
+    // em IEEE 754. Comparar com igualdade exata quebra sem que a lógica esteja errada.
     expect(findFirst).toHaveBeenCalledWith("restaurante", {
-      near: { lat: 38.73, lng: -9.15 },
+      near: { lat: expect.closeTo(38.73, 6), lng: expect.closeTo(-9.15, 6) },
       type: "restaurant",
       minPrice: 1,
       maxPrice: 3
