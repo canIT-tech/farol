@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { sql } from "drizzle-orm";
-import { createDbClient } from "./client";
-import { runMigrations } from "./migrate";
-import { users, tasteProfiles } from "./schema";
+import { createDbClient } from "./client.js";
+import { runMigrations } from "./migrate.js";
+import { users, tasteProfiles } from "./schema.js";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/db");

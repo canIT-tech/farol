@@ -13,7 +13,8 @@
     "lint": "eslint src test",
     "test": "vitest run --coverage",
     "test:e2e": "vitest run --config vitest.config.e2e.ts",
-    "test:mutation": "stryker run"
+    "test:mutation": "stryker run",
+    "smoke": "node test/boot-smoke.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.46",

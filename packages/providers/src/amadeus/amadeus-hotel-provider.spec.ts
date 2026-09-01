@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { AmadeusHotelProvider } from "./amadeus-hotel-provider";
-import type { AmadeusHttp } from "./http";
+import { AmadeusHotelProvider } from "./amadeus-hotel-provider.js";
+import type { AmadeusHttp } from "./http.js";
 
 function loadFixture(name: string): unknown {
   return JSON.parse(

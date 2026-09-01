@@ -3,7 +3,7 @@ import {
   waitlistSignupSchema,
   waitlistSignupResultSchema,
   waitlistCountSchema
-} from "./waitlist";
+} from "./waitlist.js";
 
 describe("waitlistSignupSchema", () => {
   it("aceita um e-mail válido sem source", () => {

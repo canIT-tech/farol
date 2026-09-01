@@ -3,9 +3,9 @@ import {
   type FlightOffer,
   type FlightSearchParams
 } from "@farol/shared";
-import type { FlightProvider } from "../flight-provider";
-import { createAmadeusHttp, type AmadeusHttp, type AmadeusHttpConfig } from "./http";
-import { normalizeFlight } from "./normalize-flight";
+import type { FlightProvider } from "../flight-provider.js";
+import { createAmadeusHttp, type AmadeusHttp, type AmadeusHttpConfig } from "./http.js";
+import { normalizeFlight } from "./normalize-flight.js";
 
 export interface AmadeusFlightProviderConfig extends AmadeusHttpConfig {
   deepLinkTemplate: string;

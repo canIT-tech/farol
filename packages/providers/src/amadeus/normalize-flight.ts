@@ -1,5 +1,5 @@
 import { flightOfferSchema, type FlightOffer } from "@farol/shared";
-import { fillTemplate } from "./deep-link";
+import { fillTemplate } from "./deep-link.js";
 
 // ISO-8601 de duração (ex.: "PT12H30M", "P1DT2H") → minutos.
 export function parseIsoDurationMinutes(iso: string): number {

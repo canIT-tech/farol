@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { placesTextSearchParamsSchema, placeSchema, placeDetailsSchema } from "./places";
+import { placesTextSearchParamsSchema, placeSchema, placeDetailsSchema } from "./places.js";
 
 const baseParams = { query: "museu do azulejo Lisboa" };
 

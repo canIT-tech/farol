@@ -3,7 +3,7 @@ import {
   destinationCandidateSchema,
   llmRankingItemSchema,
   llmRankingSchema
-} from "./discovery";
+} from "./discovery.js";
 
 const candidate = {
   iata: "LIS",

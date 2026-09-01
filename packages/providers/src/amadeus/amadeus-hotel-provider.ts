@@ -3,9 +3,9 @@ import {
   type HotelOffer,
   type HotelSearchParams
 } from "@farol/shared";
-import type { HotelProvider } from "../hotel-provider";
-import { createAmadeusHttp, type AmadeusHttp, type AmadeusHttpConfig } from "./http";
-import { normalizeHotel } from "./normalize-hotel";
+import type { HotelProvider } from "../hotel-provider.js";
+import { createAmadeusHttp, type AmadeusHttp, type AmadeusHttpConfig } from "./http.js";
+import { normalizeHotel } from "./normalize-hotel.js";
 
 export interface AmadeusHotelProviderConfig extends AmadeusHttpConfig {
   deepLinkTemplate: string;

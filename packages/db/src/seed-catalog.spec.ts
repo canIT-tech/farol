@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { fileURLToPath } from "node:url";
 import { sql } from "drizzle-orm";
-import { createDbClient } from "./client";
-import { runMigrations } from "./migrate";
-import { parseCatalogCsv, seedCatalog, DEFAULT_CATALOG_CSV } from "./seed-catalog";
-import { destinationCatalog } from "./schema";
+import { createDbClient } from "./client.js";
+import { runMigrations } from "./migrate.js";
+import { parseCatalogCsv, seedCatalog, DEFAULT_CATALOG_CSV } from "./seed-catalog.js";
+import { destinationCatalog } from "./schema.js";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/db");

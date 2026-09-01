@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { healthResponseSchema } from "./health";
+import { healthResponseSchema } from "./health.js";
 
 describe("healthResponseSchema", () => {
   it("aceita um payload válido", () => {

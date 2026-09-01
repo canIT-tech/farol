@@ -5,7 +5,7 @@ import {
   GooglePlacesProvider,
   GooglePlacesHttpError,
   priceLevelsBetween
-} from "./google-places-provider";
+} from "./google-places-provider.js";
 
 function loadFixture(name: string): unknown {
   return JSON.parse(

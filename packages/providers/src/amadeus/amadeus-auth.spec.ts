@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { AmadeusAuth, type AmadeusAuthConfig } from "./amadeus-auth";
+import { AmadeusAuth, type AmadeusAuthConfig } from "./amadeus-auth.js";
 
 function tokenResponse(token: string, expiresIn = 1800): Response {
   return new Response(JSON.stringify({ access_token: token, expires_in: expiresIn }), {

@@ -4,7 +4,7 @@ import {
   hotelSearchParamsSchema,
   hotelOfferSchema,
   providerSectionSchema
-} from "./hotels";
+} from "./hotels.js";
 
 const baseParams = {
   cityCode: "LIS",

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isFlightProvider, isHotelProvider, isPlacesProvider } from "./index";
+import { isFlightProvider, isHotelProvider, isPlacesProvider } from "./index.js";
 
 describe("isFlightProvider", () => {
   it("reconhece um objeto com search()", () => {

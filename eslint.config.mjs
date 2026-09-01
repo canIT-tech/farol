@@ -16,6 +16,17 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    files: ["**/*.mjs"],
+    languageOptions: {
+      globals: {
+        process: "readonly",
+        console: "readonly",
+        fetch: "readonly",
+        URL: "readonly"
+      }
+    }
+  },
+  {
     files: ["**/*.spec.ts", "**/*.spec.tsx", "**/*.e2e-spec.ts", "**/test/**"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",

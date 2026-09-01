@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createAmadeusHttp, AmadeusHttpError, isRetryableStatus } from "./http";
+import { createAmadeusHttp, AmadeusHttpError, isRetryableStatus } from "./http.js";
 
 function jsonRes(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {

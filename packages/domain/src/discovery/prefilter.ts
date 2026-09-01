@@ -1,5 +1,5 @@
 import type { TasteProfileInput } from "@farol/shared";
-import { BRAZIL_REGION, type CatalogEntry } from "./types";
+import { BRAZIL_REGION, type CatalogEntry } from "./types.js";
 
 const MS_PER_DAY = 86_400_000;
 const DEFAULT_LIMIT = 20;

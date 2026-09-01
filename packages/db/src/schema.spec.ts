@@ -15,7 +15,7 @@ import {
   itineraryItems,
   waitlist,
   chatMessages
-} from "./schema";
+} from "./schema.js";
 
 
 type ColSpec = {

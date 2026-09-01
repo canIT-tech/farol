@@ -5,7 +5,7 @@ import {
   paceEnum,
   partyEnum,
   budgetEnum
-} from "./taste-profile";
+} from "./taste-profile.js";
 
 const base = {
   interests: ["praia", "gastronomia", "sossego"],
