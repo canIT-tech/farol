@@ -168,12 +168,13 @@ export class LlmService implements LlmPort {
       inputTokens: response.usage.input_tokens,
       outputTokens: response.usage.output_tokens,
       estimatedUsd: estimateUsd(
-        response.model,
+        `anthropic:${response.model}`,
         response.usage.input_tokens,
         response.usage.output_tokens
       ),
       kind: "chat",
-      latencyMs: Date.now() - startedAt
+      latencyMs: Date.now() - startedAt,
+      tripId: null
     });
 
     return response;
@@ -198,12 +199,13 @@ export class LlmService implements LlmPort {
         inputTokens: response.usage.input_tokens,
         outputTokens: response.usage.output_tokens,
         estimatedUsd: estimateUsd(
-          response.model,
+          `anthropic:${response.model}`,
           response.usage.input_tokens,
           response.usage.output_tokens
         ),
         kind: task.kind,
-        latencyMs: Date.now() - startedAt
+        latencyMs: Date.now() - startedAt,
+        tripId: null
       });
 
       const parsed = task.parse(text);
