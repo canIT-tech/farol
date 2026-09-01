@@ -45,9 +45,4 @@ describe("buildItineraryUserPrompt", () => {
     expect(prompt).toContain("- dia 2, morning, activity: Mosteiro dos Jerónimos");
   });
 
-  it("acrescenta o erro anterior quando informado", () => {
-    expect(buildItineraryUserPrompt(input, "faltou o dia 3")).toContain(
-      "rejeitada: faltou o dia 3"
-    );
-  });
 });

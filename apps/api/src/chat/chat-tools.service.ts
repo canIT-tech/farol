@@ -4,7 +4,8 @@ import { ItineraryService } from "../itinerary/itinerary.service";
 import { ProfileService } from "../profile/profile.service";
 import { HotelsService } from "../hotels/hotels.service";
 import { FlightsService } from "../flights/flights.service";
-import { CHAT_TOOLS, type ChatToolDefinition } from "./chat-tools.types";
+import { CHAT_TOOLS } from "./chat-tools.types";
+import type { LlmToolSpec } from "../llm/llm.types";
 
 export interface ToolCallExecution {
   name: string;
@@ -27,7 +28,7 @@ export class ChatToolService {
     private readonly flights: FlightsService
   ) {}
 
-  getToolDefinitions(): ChatToolDefinition[] {
+  getToolDefinitions(): LlmToolSpec[] {
     return CHAT_TOOLS;
   }
 

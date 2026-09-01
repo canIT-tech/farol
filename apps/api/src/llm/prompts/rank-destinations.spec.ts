@@ -36,15 +36,6 @@ describe("buildRankUserPrompt", () => {
     expect(prompt).toContain("OPO Porto/Portugal [vinhos]");
   });
 
-  it("não menciona erro anterior quando não há", () => {
-    expect(buildRankUserPrompt(input)).not.toContain("rejeitada");
-  });
-
-  it("acrescenta o erro anterior quando informado", () => {
-    const prompt = buildRankUserPrompt(input, "iata fora da shortlist: XXX");
-    expect(prompt).toContain("rejeitada: iata fora da shortlist: XXX");
-  });
-
   it("mostra 'não informado' quando o orçamento é nulo", () => {
     const prompt = buildRankUserPrompt({ ...input, trip: { ...input.trip, budgetTotal: null } });
     expect(prompt).toContain("Orçamento total: não informado BRL");

@@ -1,132 +1,93 @@
-export interface ChatToolDefinition {
-  name: string;
-  description: string;
-  input_schema: {
-    type: "object";
-    properties: Record<string, unknown>;
-    required?: string[];
-  };
-}
+import { z } from "zod";
+import type { LlmToolSpec } from "../llm/llm.types";
 
-export const CHAT_TOOLS: ChatToolDefinition[] = [
+// As 11 tools do chat (design §6.4 da spec do MVP, que ainda fala em 9).
+// parameters em zod: a mesma definição descreve a tool para o modelo e valida
+// o args que volta. Antes era JSON Schema escrito à mão, duplicando o zod e
+// sem validar nada de fato.
+export const CHAT_TOOLS: LlmToolSpec[] = [
   {
     name: "set_destination",
     description: "Escolhe ou altera o destino final da viagem pelo código IATA (ex: 'FOR', 'REC').",
-    input_schema: {
-      type: "object",
-      properties: {
-        iata: { type: "string", description: "Código IATA do destino candidato" }
-      },
-      required: ["iata"]
-    }
+    parameters: z.object({
+      iata: z.string().describe("Código IATA do destino candidato")
+    })
   },
   {
     name: "shift_dates",
     description: "Altera as datas da viagem ou a duração em dias.",
-    input_schema: {
-      type: "object",
-      properties: {
-        dateStart: { type: "string", description: "Data de início em YYYY-MM-DD" },
-        dateEnd: { type: "string", description: "Data de término em YYYY-MM-DD" },
-        durationDays: { type: "number", description: "Duração em dias" }
-      }
-    }
+    parameters: z.object({
+      dateStart: z.string().optional().describe("Data de início em YYYY-MM-DD"),
+      dateEnd: z.string().optional().describe("Data de término em YYYY-MM-DD"),
+      durationDays: z.number().optional().describe("Duração em dias")
+    })
   },
   {
     name: "set_budget",
     description: "Define ou atualiza o orçamento total em R$ (BRL).",
-    input_schema: {
-      type: "object",
-      properties: {
-        budgetTotal: { type: "number", description: "Valor do orçamento em reais" }
-      },
-      required: ["budgetTotal"]
-    }
+    parameters: z.object({
+      budgetTotal: z.number().describe("Valor do orçamento em reais")
+    })
   },
   {
     name: "add_interest",
     description: "Adiciona uma nova tag de interesse/gosto ao perfil do usuário.",
-    input_schema: {
-      type: "object",
-      properties: {
-        tag: { type: "string", description: "Nome da tag de interesse (ex: 'gastronomia', 'praia')" }
-      },
-      required: ["tag"]
-    }
+    parameters: z.object({
+      tag: z.string().describe("Nome da tag de interesse (ex: 'gastronomia', 'praia')")
+    })
   },
   {
     name: "remove_interest",
     description: "Remove uma tag de interesse do perfil do usuário.",
-    input_schema: {
-      type: "object",
-      properties: {
-        tag: { type: "string", description: "Nome da tag a remover" }
-      },
-      required: ["tag"]
-    }
+    parameters: z.object({
+      tag: z.string().describe("Nome da tag a remover")
+    })
   },
   {
     name: "regenerate_day",
-    description: "Enfileira a regeneração completa dos itens de um determinado dia do roteiro (preserva os itens marcados como 'pinned').",
-    input_schema: {
-      type: "object",
-      properties: {
-        dayIndex: { type: "number", description: "Índice do dia no roteiro (1-based)" }
-      },
-      required: ["dayIndex"]
-    }
+    description:
+      "Enfileira a regeneração completa dos itens de um determinado dia do roteiro (preserva os itens marcados como 'pinned').",
+    parameters: z.object({
+      dayIndex: z.number().describe("Índice do dia no roteiro (1-based)")
+    })
   },
   {
     name: "remove_item",
     description: "Remove um item específico do roteiro pelo id.",
-    input_schema: {
-      type: "object",
-      properties: {
-        itemId: { type: "string", description: "UUID do item do roteiro" }
-      },
-      required: ["itemId"]
-    }
+    parameters: z.object({
+      itemId: z.string().describe("UUID do item do roteiro")
+    })
   },
   {
     name: "pin_item",
-    description: "Fixa ou desfixa um item do roteiro para que ele não seja alterado durante a regeneração do dia.",
-    input_schema: {
-      type: "object",
-      properties: {
-        itemId: { type: "string", description: "UUID do item do roteiro" },
-        pinned: { type: "boolean", description: "True para fixar, false para desafixar. Padrão: true" }
-      },
-      required: ["itemId"]
-    }
+    description:
+      "Fixa ou desfixa um item do roteiro para que ele não seja alterado durante a regeneração do dia.",
+    parameters: z.object({
+      itemId: z.string().describe("UUID do item do roteiro"),
+      pinned: z
+        .boolean()
+        .optional()
+        .describe("True para fixar, false para desafixar. Padrão: true")
+    })
   },
   {
     name: "find_hotel",
     description: "Busca opções de hotéis na região do destino.",
-    input_schema: {
-      type: "object",
-      properties: {
-        near: { type: "string", description: "Região ou referência de busca opcional" }
-      }
-    }
+    parameters: z.object({
+      near: z.string().optional().describe("Região ou referência de busca opcional")
+    })
   },
   {
     name: "swap_restaurant",
     description: "Troca o restaurante de um item do tipo 'meal' por outro restaurante na mesma área.",
-    input_schema: {
-      type: "object",
-      properties: {
-        itemId: { type: "string", description: "UUID do item do roteiro a trocar" },
-        cuisine: { type: "string", description: "Tipo de culinária (ex: 'italiana', 'sushi')" }
-      },
-      required: ["itemId"]
-    }
+    parameters: z.object({
+      itemId: z.string().describe("UUID do item do roteiro a trocar"),
+      cuisine: z.string().optional().describe("Tipo de culinária (ex: 'italiana', 'sushi')")
+    })
   },
   {
     name: "search_flights",
     description: "Busca opções de voos para a viagem.",
-    input_schema: {
-      type: "object",
-      properties: {}
-    }
+    parameters: z.object({})
   }
 ];

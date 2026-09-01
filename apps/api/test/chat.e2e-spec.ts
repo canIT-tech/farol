@@ -5,7 +5,7 @@ import request from "supertest";
 import { inArray } from "drizzle-orm";
 import { createDbClient, users } from "@farol/db";
 import { startFakeJwks, type FakeJwks } from "./support/test-jwt";
-import { LlmService } from "../src/llm/llm.service";
+import { LLM } from "../src/llm/llm.types";
 
 const dbUrl = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!dbUrl) throw new Error("DATABASE_URL ausente para o e2e de chat");
@@ -27,16 +27,19 @@ beforeAll(async () => {
   const { AppModule } = await import("../src/app.module");
 
   const mockLlm = {
+    // Forma da porta neutra, não do fio da Anthropic.
     chat: vi.fn().mockResolvedValue({
-      content: [{ type: "text", text: "Olá! Como posso ajudar na sua viagem?" }],
-      usage: { input_tokens: 50, output_tokens: 10 }
+      text: "Olá! Como posso ajudar na sua viagem?",
+      toolCalls: [],
+      model: "fake-model",
+      usage: { inputTokens: 50, outputTokens: 10 }
     }),
     rankDestinations: vi.fn(),
     buildItinerary: vi.fn()
   };
 
   const mod = await Test.createTestingModule({ imports: [AppModule] })
-    .overrideProvider(LlmService)
+    .overrideProvider(LLM)
     .useValue(mockLlm)
     .compile();
 

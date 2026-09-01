@@ -1,14 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { isDomainError } from "@farol/shared";
-import {
-  LlmService,
-  extractJsonArray,
-  extractJsonObject,
-  parseItineraryOutput,
-  parseRanking,
-  type AnthropicLike
-} from "./llm.service";
-import type { BuildItineraryInput, RankDestinationsInput } from "./llm.types";
+import { LlmService } from "./llm.service";
+import type { BuildItineraryInput, LlmProvider, RankDestinationsInput } from "./llm.types";
 
 const input: RankDestinationsInput = {
   shortlist: [
@@ -26,328 +19,135 @@ const input: RankDestinationsInput = {
   trip: { originIata: "GRU", budgetTotal: 18000, currency: "BRL", party: { adults: 2 } }
 };
 
-const R = (rationale = "Justificativa longa o suficiente para o schema.") => rationale;
-const VALID_JSON = JSON.stringify([
-  { iata: "LIS", score: 0.9, rationale: R() },
-  { iata: "OPO", score: 0.8, rationale: R() },
-  { iata: "MAD", score: 0.7, rationale: R() }
-]);
-
-function fakeClient(texts: string[]) {
-  const calls: { model: string; system: string; content: string }[] = [];
-  let i = 0;
-  const client: AnthropicLike = {
-    messages: {
-      create: vi.fn(async (args) => {
-        calls.push({ model: args.model, system: args.system, content: args.messages[0]!.content });
-        const text = texts[Math.min(i, texts.length - 1)]!;
-        i += 1;
-        return {
-          model: "claude-sonnet-5",
-          content: [{ type: "text", text }],
-          usage: { input_tokens: 1200, output_tokens: 300 }
-        };
-      })
-    }
-  };
-  return { client, calls };
-}
-
-describe("extractJsonArray", () => {
-  it("devolve o array quando o texto já é só o array", () => {
-    expect(extractJsonArray("[1,2,3]")).toBe("[1,2,3]");
-  });
-
-  it("recorta o array de dentro de prosa", () => {
-    expect(extractJsonArray('bla bla [{"a":1}] e mais texto')).toBe('[{"a":1}]');
-  });
-
-  it("vai do primeiro '[' ao último ']'", () => {
-    expect(extractJsonArray("x [a] y [b] z")).toBe("[a] y [b]");
-  });
-
-  it("devolve o texto original quando não há '['", () => {
-    expect(extractJsonArray("sem colchetes")).toBe("sem colchetes");
-  });
-
-  it("devolve o texto original quando só há '[' (sem ']')", () => {
-    expect(extractJsonArray("abre [ mas nao fecha")).toBe("abre [ mas nao fecha");
-  });
-
-  it("devolve o texto original quando ']' vem antes de '['", () => {
-    expect(extractJsonArray("fecha ] antes de abrir [")).toBe("fecha ] antes de abrir [");
-  });
-});
-
-describe("LlmService.rankDestinations", () => {
-  it("resolve com o ranking na primeira tentativa e loga uma métrica", async () => {
-    const { client, calls } = fakeClient([VALID_JSON]);
-    const logger = { info: vi.fn() };
-    const service = new LlmService(client, "claude-sonnet-5", logger);
-
-    const ranking = await service.rankDestinations(input);
-
-    expect(ranking.map((r) => r.iata)).toEqual(["LIS", "OPO", "MAD"]);
-    expect(calls).toHaveLength(1);
-    expect(calls[0]!.model).toBe("claude-sonnet-5");
-    expect(logger.info).toHaveBeenCalledTimes(1);
-    expect(logger.info.mock.calls[0]![0]).toMatchObject({
-      model: "claude-sonnet-5",
-      inputTokens: 1200,
-      outputTokens: 300,
-      kind: "rank_destinations"
-    });
-    expect(logger.info.mock.calls[0]![0].estimatedUsd).toBeGreaterThan(0);
-    const { latencyMs } = logger.info.mock.calls[0]![0];
-    expect(latencyMs).toBeGreaterThanOrEqual(0);
-    expect(latencyMs).toBeLessThan(5000);
-  });
-
-  it("extrai o JSON mesmo quando vem cercado de prosa", async () => {
-    const { client } = fakeClient([`Claro! Aqui:\n${VALID_JSON}\nEspero ter ajudado.`]);
-    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
-    const ranking = await service.rankDestinations(input);
-    expect(ranking).toHaveLength(3);
-  });
-
-  it("ignora blocos de conteúdo sem texto ao montar a resposta", async () => {
-    const client: AnthropicLike = {
-      messages: {
-        create: vi.fn(async () => ({
-          model: "claude-sonnet-5",
-          content: [{ type: "image" }, { type: "text", text: VALID_JSON }],
-          usage: { input_tokens: 10, output_tokens: 5 }
-        }))
-      }
-    };
-    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
-    const ranking = await service.rankDestinations(input);
-    expect(ranking).toHaveLength(3);
-  });
-
-  it("faz 1 retry quando a 1ª resposta não é JSON e inclui o erro no novo prompt", async () => {
-    const { client, calls } = fakeClient(["desculpe, não consigo", VALID_JSON]);
-    const logger = { info: vi.fn() };
-    const service = new LlmService(client, "claude-sonnet-5", logger);
-
-    const ranking = await service.rankDestinations(input);
-
-    expect(ranking).toHaveLength(3);
-    expect(calls).toHaveLength(2);
-    expect(calls[1]!.content).toContain("rejeitada: a resposta não era JSON válido");
-    expect(logger.info).toHaveBeenCalledTimes(2);
-  });
-
-  it("no retry após iata inválido, informa exatamente qual iata saiu da lista", async () => {
-    const stray = JSON.stringify([
-      { iata: "ZZZ", score: 0.9, rationale: R() },
-      { iata: "OPO", score: 0.8, rationale: R() },
-      { iata: "MAD", score: 0.7, rationale: R() }
-    ]);
-    const { client, calls } = fakeClient([stray, VALID_JSON]);
-    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
-    await service.rankDestinations(input);
-    expect(calls[1]!.content).toContain("iata fora da shortlist: ZZZ");
-  });
-
-  it("no retry após schema inválido, repassa a mensagem do zod", async () => {
-    const badScore = JSON.stringify([
-      { iata: "LIS", score: 9, rationale: R() },
-      { iata: "OPO", score: 0.8, rationale: R() },
-      { iata: "MAD", score: 0.7, rationale: R() }
-    ]);
-    const { client, calls } = fakeClient([badScore, VALID_JSON]);
-    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
-    await service.rankDestinations(input);
-    expect(calls[1]!.content.toLowerCase()).toContain("rejeitada");
-    expect(calls[1]!.content).not.toContain("não era JSON");
-  });
-
-  it("rejeita com DomainError llm_invalid_output quando as 2 tentativas falham", async () => {
-    const { client, calls } = fakeClient(["nada", "também nada"]);
-    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
-
-    await service.rankDestinations(input).then(
-      () => expect.unreachable("deveria ter rejeitado"),
-      (err: unknown) => {
-        expect(isDomainError(err)).toBe(true);
-        expect((err as { code: string }).code).toBe("llm_invalid_output");
-      }
-    );
-    expect(calls).toHaveLength(2);
-  });
-
-  it("rejeita quando o ranking tem iata fora da shortlist", async () => {
-    const stray = JSON.stringify([
-      { iata: "XXX", score: 0.9, rationale: R() },
-      { iata: "OPO", score: 0.8, rationale: R() },
-      { iata: "MAD", score: 0.7, rationale: R() }
-    ]);
-    const { client } = fakeClient([stray, stray]);
-    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
-    await expect(service.rankDestinations(input)).rejects.toThrow("ranking válido");
-  });
-
-  it("rejeita quando o schema falha (menos de 3 itens)", async () => {
-    const short = JSON.stringify([{ iata: "LIS", score: 0.9, rationale: R() }]);
-    const { client } = fakeClient([short, short]);
-    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
-    await expect(service.rankDestinations(input)).rejects.toThrow();
-  });
-});
-
-describe("extractJsonObject", () => {
-  it("devolve o objeto quando o texto já é só o objeto", () => {
-    expect(extractJsonObject('{"a":1}')).toBe('{"a":1}');
-  });
-
-  it("recorta o objeto de dentro de prosa", () => {
-    expect(extractJsonObject('claro: {"days":[]} pronto')).toBe('{"days":[]}');
-  });
-
-  it("vai do primeiro '{' ao último '}'", () => {
-    expect(extractJsonObject("x {a} y {b} z")).toBe("{a} y {b}");
-  });
-
-  it("devolve o texto quando não há '{'", () => {
-    expect(extractJsonObject("sem chaves")).toBe("sem chaves");
-  });
-
-  it("devolve o texto quando '}' vem antes de '{'", () => {
-    expect(extractJsonObject("} antes de {")).toBe("} antes de {");
-  });
-});
-
-const VALID_ITINERARY = JSON.stringify({
-  days: [
-    {
-      dayIndex: 1,
-      slots: [
-        { slot: "morning", type: "activity", title: "Caminhada guiada pelo centro" },
-        { slot: "afternoon", type: "meal", title: "Almoço no mercado municipal" }
-      ]
-    }
-  ]
-});
-
-describe("parseRanking", () => {
-  const allowed = new Set(["LIS", "OPO", "MAD"]);
-
-  it("aceita um ranking válido dentro da shortlist", () => {
-    const result = parseRanking(VALID_JSON, allowed);
-    expect(result.ok).toBe(true);
-    expect(result.ok && result.value).toHaveLength(3);
-  });
-
-  it("erro de não-JSON", () => {
-    expect(parseRanking("nada", allowed)).toEqual({
-      ok: false,
-      error: "a resposta não era JSON válido"
-    });
-  });
-
-  it("junta várias mensagens do zod com '; '", () => {
-    const bad = JSON.stringify([
-      { iata: "LIS", score: 9, rationale: "x" },
-      { iata: "OPO", score: 0.8, rationale: R() },
-      { iata: "MAD", score: 0.7, rationale: R() }
-    ]);
-    const result = parseRanking(bad, allowed);
-    expect(result.ok).toBe(false);
-    expect(result.ok === false && result.error).toContain("; ");
-  });
-
-  it("lista os iata fora da shortlist separados por ', '", () => {
-    const strays = JSON.stringify([
-      { iata: "AAA", score: 0.9, rationale: R() },
-      { iata: "BBB", score: 0.8, rationale: R() },
-      { iata: "MAD", score: 0.7, rationale: R() }
-    ]);
-    const result = parseRanking(strays, allowed);
-    expect(result.ok === false && result.error).toBe("iata fora da shortlist: AAA, BBB");
-  });
-});
-
-describe("parseItineraryOutput", () => {
-  it("aceita um roteiro válido", () => {
-    const result = parseItineraryOutput(VALID_ITINERARY);
-    expect(result.ok).toBe(true);
-    expect(result.ok && result.value.days).toHaveLength(1);
-  });
-
-  it("falha quando não é JSON", () => {
-    expect(parseItineraryOutput("desculpe")).toEqual({
-      ok: false,
-      error: "a resposta não era JSON válido"
-    });
-  });
-
-  it("junta várias mensagens do zod com '; '", () => {
-    const bad = JSON.stringify({
-      days: [{ dayIndex: 1.5, slots: [{ slot: "night", type: "x", title: "a" }] }]
-    });
-    const result = parseItineraryOutput(bad);
-    expect(result.ok).toBe(false);
-    expect(result.ok === false && result.error).toContain("; ");
-  });
-});
-
 const itineraryInput: BuildItineraryInput = {
   destination: { city: "Lisboa", country: "Portugal" },
-  nights: 3,
+  nights: 2,
   pace: "moderado",
-  interests: ["gastronomia", "história"],
-  party: { adults: 2, children: 0 },
-  pinned: [{ dayIndex: 2, slot: "morning", type: "activity", title: "Torre de Belém" }]
+  interests: ["gastronomia"],
+  party: { adults: 2, children: 0 }
 };
 
+const RATIONALE = "Justificativa longa o suficiente para o schema aqui.";
+
+function providerReturning(value: unknown) {
+  const completeStructured = vi.fn<LlmProvider["completeStructured"]>(
+    () => Promise.resolve(value) as never
+  );
+  const complete = vi.fn<LlmProvider["complete"]>();
+  const provider = { complete, completeStructured } as unknown as LlmProvider;
+  return { provider, completeStructured, complete };
+}
+
+describe("LlmService.rankDestinations", () => {
+  it("devolve o ranking que o provider entregou", async () => {
+    const ranking = [
+      { iata: "LIS", score: 0.9, rationale: RATIONALE },
+      { iata: "OPO", score: 0.8, rationale: RATIONALE }
+    ];
+    const { provider } = providerReturning(ranking);
+
+    await expect(new LlmService(provider).rankDestinations(input)).resolves.toEqual(ranking);
+  });
+
+  it("pede o tier capable, informa o kind e passa o schema", async () => {
+    const { provider, completeStructured } = providerReturning([
+      { iata: "LIS", score: 0.9, rationale: RATIONALE }
+    ]);
+
+    await new LlmService(provider).rankDestinations(input);
+
+    const request = completeStructured.mock.calls[0]![0];
+    expect(request.tier).toBe("capable");
+    expect(request.kind).toBe("rank_destinations");
+    expect(request.schema).toBeDefined();
+    // A shortlist tem de chegar no prompt, senão o modelo inventa destino.
+    expect(request.prompt).toContain("LIS");
+  });
+
+  it("rejeita iata fora da shortlist com llm_invalid_output", async () => {
+    const { provider } = providerReturning([{ iata: "GIG", score: 0.9, rationale: RATIONALE }]);
+
+    try {
+      await new LlmService(provider).rankDestinations(input);
+      expect.unreachable("deveria lançar");
+    } catch (err) {
+      expect(isDomainError(err)).toBe(true);
+      expect((err as { code: string }).code).toBe("llm_invalid_output");
+      expect((err as Error).message).toContain("GIG");
+    }
+  });
+
+  it("lista todos os iata inválidos na mensagem", async () => {
+    const { provider } = providerReturning([
+      { iata: "GIG", score: 0.9, rationale: RATIONALE },
+      { iata: "LIS", score: 0.8, rationale: RATIONALE },
+      { iata: "CDG", score: 0.7, rationale: RATIONALE }
+    ]);
+
+    await expect(new LlmService(provider).rankDestinations(input)).rejects.toThrow(/GIG, CDG/);
+  });
+});
+
 describe("LlmService.buildItinerary", () => {
-  it("resolve com o roteiro e loga métrica com kind build_itinerary", async () => {
-    const { client, calls } = fakeClient([VALID_ITINERARY]);
-    const logger = { info: vi.fn() };
-    const service = new LlmService(client, "claude-sonnet-5", logger);
+  it("devolve o roteiro que o provider entregou", async () => {
+    const output = {
+      days: [{ dayIndex: 1, slots: [{ slot: "morning", type: "activity", title: "Museu" }] }]
+    };
+    const { provider } = providerReturning(output);
 
-    const out = await service.buildItinerary(itineraryInput);
-
-    expect(out.days).toHaveLength(1);
-    expect(calls).toHaveLength(1);
-    expect(logger.info.mock.calls[0]![0].kind).toBe("build_itinerary");
+    await expect(new LlmService(provider).buildItinerary(itineraryInput)).resolves.toEqual(output);
   });
 
-  it("coloca os itens pinned no prompt", async () => {
-    const { client, calls } = fakeClient([VALID_ITINERARY]);
-    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
-    await service.buildItinerary(itineraryInput);
-    expect(calls[0]!.content).toContain("dia 2, morning, activity: Torre de Belém");
+  it("pede o tier capable e informa o kind", async () => {
+    const { provider, completeStructured } = providerReturning({
+      days: [{ dayIndex: 1, slots: [] }]
+    });
+
+    await new LlmService(provider).buildItinerary(itineraryInput);
+
+    const request = completeStructured.mock.calls[0]![0];
+    expect(request.tier).toBe("capable");
+    expect(request.kind).toBe("build_itinerary");
   });
 
-  it("não menciona itens fixados quando não há pinned", async () => {
-    const { client, calls } = fakeClient([VALID_ITINERARY]);
-    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
-    await service.buildItinerary({ ...itineraryInput, pinned: undefined });
-    expect(calls[0]!.content).not.toContain("já fixados");
-  });
+  it("passa os itens pinned no prompt", async () => {
+    const { provider, completeStructured } = providerReturning({
+      days: [{ dayIndex: 1, slots: [] }]
+    });
 
-  it("faz 1 retry quando a 1ª resposta é inválida e depois resolve", async () => {
-    const { client, calls } = fakeClient(["não sei", VALID_ITINERARY]);
-    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
-    const out = await service.buildItinerary(itineraryInput);
-    expect(out.days).toHaveLength(1);
-    expect(calls).toHaveLength(2);
-    expect(calls[1]!.content).toContain("rejeitada");
-  });
+    await new LlmService(provider).buildItinerary({
+      ...itineraryInput,
+      pinned: [{ dayIndex: 1, slot: "morning", type: "activity", title: "Museu fixado" }]
+    });
 
-  it("rejeita com DomainError llm_invalid_output após 2 falhas", async () => {
-    const { client, calls } = fakeClient(["ruim", "também ruim"]);
-    const service = new LlmService(client, "claude-sonnet-5", { info: vi.fn() });
-    await service.buildItinerary(itineraryInput).then(
-      () => expect.unreachable("deveria ter rejeitado"),
-      (err: unknown) => {
-        expect(isDomainError(err)).toBe(true);
-        expect((err as { code: string }).code).toBe("llm_invalid_output");
-        expect((err as Error).message).toBe("o modelo não devolveu um roteiro válido");
-      }
-    );
-    expect(calls).toHaveLength(2);
+    const request = completeStructured.mock.calls[0]![0];
+    expect(request.prompt).toContain("Museu fixado");
+  });
+});
+
+describe("LlmService.chat", () => {
+  it("repassa system, mensagens, tools e tripId, e devolve a completion", async () => {
+    const completion = {
+      text: "pronto",
+      toolCalls: [],
+      model: "m",
+      usage: { inputTokens: 1, outputTokens: 1 }
+    };
+    const complete = vi.fn<LlmProvider["complete"]>(() => Promise.resolve(completion));
+    const provider = { complete, completeStructured: vi.fn() } as unknown as LlmProvider;
+
+    const result = await new LlmService(provider).chat({
+      system: "sys",
+      messages: [{ role: "user", content: "oi" }],
+      tools: [],
+      tripId: "t-1"
+    });
+
+    expect(result).toEqual(completion);
+    const request = complete.mock.calls[0]![0];
+    expect(request.tier).toBe("capable");
+    expect(request.kind).toBe("chat");
+    expect(request.tripId).toBe("t-1");
+    expect(request.system).toBe("sys");
   });
 });

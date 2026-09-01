@@ -101,3 +101,35 @@ describe("FakeLlmService.buildItinerary", () => {
     expect(out.days[0]!.slots[0]!.title).toBe(fakeSlotTitle("activity", "Lisboa", 1));
   });
 });
+
+describe("FakeLlmService.chat", () => {
+  it("devolve texto determinístico sem tool call por padrão", async () => {
+    const result = await new FakeLlmService().chat({
+      system: "s",
+      messages: [{ role: "user", content: "oi" }],
+      tools: [],
+      tripId: "t-1"
+    });
+
+    expect(result.toolCalls).toEqual([]);
+    expect(result.text).toContain("t-1");
+    expect(result.model).toBe("fake-model");
+    expect(result.usage).toEqual({ inputTokens: 0, outputTokens: 0 });
+  });
+
+  it("com nextToolCall a primeira chamada pede a tool e a segunda encerra", async () => {
+    const fake = new FakeLlmService({
+      nextToolCall: { id: "c-1", name: "set_budget", args: { budgetTotal: 100 } }
+    });
+
+    const first = await fake.chat({ system: "s", messages: [], tools: [], tripId: "t-1" });
+    expect(first.toolCalls).toEqual([
+      { id: "c-1", name: "set_budget", args: { budgetTotal: 100 } }
+    ]);
+    expect(first.text).toBe("");
+
+    // A segunda encerra o loop; sem isso o ChatService rodaria até MAX_TURNS.
+    const second = await fake.chat({ system: "s", messages: [], tools: [], tripId: "t-1" });
+    expect(second.toolCalls).toEqual([]);
+  });
+});

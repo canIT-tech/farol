@@ -210,3 +210,37 @@ describe("ChatToolService", () => {
     expect(res.error).toBe("item não existe");
   });
 });
+
+describe("CHAT_TOOLS", () => {
+  it("expõe as 11 tools com parameters em zod", () => {
+    expect(CHAT_TOOLS).toHaveLength(11);
+    for (const spec of CHAT_TOOLS) {
+      expect(typeof spec.name).toBe("string");
+      expect(spec.description.length).toBeGreaterThan(0);
+      expect(typeof spec.parameters.parse).toBe("function");
+    }
+  });
+
+  it("set_destination valida iata", () => {
+    const spec = CHAT_TOOLS.find((t) => t.name === "set_destination")!;
+    expect(spec.parameters.safeParse({ iata: "LIS" }).success).toBe(true);
+    expect(spec.parameters.safeParse({}).success).toBe(false);
+  });
+
+  it("set_budget exige número", () => {
+    const spec = CHAT_TOOLS.find((t) => t.name === "set_budget")!;
+    expect(spec.parameters.safeParse({ budgetTotal: 5000 }).success).toBe(true);
+    expect(spec.parameters.safeParse({ budgetTotal: "muito" }).success).toBe(false);
+  });
+
+  it("campos fora de required seguem opcionais", () => {
+    const spec = CHAT_TOOLS.find((t) => t.name === "swap_restaurant")!;
+    expect(spec.parameters.safeParse({ itemId: "i-1" }).success).toBe(true);
+    expect(spec.parameters.safeParse({}).success).toBe(false);
+  });
+
+  it("search_flights não tem parâmetro", () => {
+    const spec = CHAT_TOOLS.find((t) => t.name === "search_flights")!;
+    expect(spec.parameters.safeParse({}).success).toBe(true);
+  });
+});
