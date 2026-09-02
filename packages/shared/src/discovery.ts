@@ -31,5 +31,10 @@ export const llmRankingItemSchema = z.object({
   rationale: z.string().min(10).max(400)
 });
 export const llmRankingSchema = z.array(llmRankingItemSchema).min(3).max(5);
+// Envelope de objeto para a chamada estruturada: a Groq recusa schema cujo
+// topo seja array ("schema must have type object"). O domínio segue falando em
+// lista; o envelope existe só na fronteira do provider.
+export const llmRankingResponseSchema = z.object({ picks: llmRankingSchema });
+export type LlmRankingResponse = z.infer<typeof llmRankingResponseSchema>;
 export type LlmRankingItem = z.infer<typeof llmRankingItemSchema>;
 export type LlmRanking = z.infer<typeof llmRankingSchema>;

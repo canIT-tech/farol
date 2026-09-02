@@ -223,7 +223,7 @@ export class ItineraryRepository {
               title: slot.title,
               description: slot.description ?? null,
               durationMin: slot.durationMin ?? null,
-              estCost: slot.estCost === undefined ? null : String(slot.estCost),
+              estCost: slot.estCost === null ? null : String(slot.estCost),
               sortOrder: index,
               pinned: isPinned.has(`${day.dayIndex}|${slot.slot}|${slot.type}|${slot.title}`)
             }))
@@ -276,7 +276,7 @@ export class ItineraryRepository {
             title: slot.title,
             description: slot.description ?? null,
             durationMin: slot.durationMin ?? null,
-            estCost: slot.estCost === undefined ? null : String(slot.estCost),
+            estCost: slot.estCost === null ? null : String(slot.estCost),
             sortOrder: index,
             pinned: pinnedKeys.has(`${slot.slot}|${slot.type}|${slot.title}`)
           }))

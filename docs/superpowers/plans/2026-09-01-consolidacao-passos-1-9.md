@@ -89,7 +89,7 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
   $3/$15 que inventava custo para qualquer modelo desconhecido — mesma classe do 22 °C
   do D1. E o zero do Groq era pior: tornaria o teto do E5 inoperante sem avisar.
 
-### E4. Nenhum modelo Groq foi medido (item L1 da spec de LLM) — PARCIAL (2026-09-02)
+### E4. Nenhum modelo Groq foi medido (item L1 da spec de LLM) — FEITO (2026-09-02)
 
 - **Evidência:** `docs/superpowers/specs/2026-08-31-llm-provider-agnostico-design.md`,
   item L1. `llama-3.3-70b-versatile` e `llama-3.1-8b-instant` entraram no
@@ -103,18 +103,43 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
 - **Escolha:** `LLM_MODEL_CAPABLE=openai/gpt-oss-120b`, `LLM_MODEL_CHEAP=openai/gpt-oss-20b`.
   Preço público, já no `MODEL_PRICING`: $0,15/$0,60 e $0,075/$0,30 por MTok — contra
   $2/$10 do Sonnet 5, cerca de 13x mais barato no tier capable.
-- **Falta medir**, e precisa de `LLM_API_KEY` da Groq: (a) se o `generateObject` do AI SDK
-  usa `response_format: json_schema` contra a Groq ou cai em outro caminho, (b) se o
-  loop de tool-calling do chat funciona nos gpt-oss — a doc da Groq diz que **structured
-  output e tool use são incompatíveis**, e o chat usa tools (sem structured output, então
-  em tese ok, mas não verifiquei), (c) limites do free tier por dia.
+- **Medido contra a API real da Groq**, pelo `LlmService` + `AiSdkLlmProvider` do
+  produto, com os prompts e schemas de verdade. Os três caminhos funcionam no
+  `gpt-oss-120b`, e o tool-calling do chat também: a incompatibilidade da doc é entre
+  structured output **e** tool use na mesma chamada, não com tools sozinhos.
 
-### E5. Teto de custo de LLM por roteiro
+| Chamada | Latência | Tokens in/out | Custo |
+|---|---|---|---|
+| `rankDestinations` | 3986 ms | 461 / 703 | $0,00049 |
+| `buildItinerary` | 2657 ms | 555 / 1097 | $0,00074 |
+| `chat` (1 turno) | 749 ms | 158 / 196 | $0,00014 |
+
+- **Roteiro completo ≈ $0,0015.** A proposta de teto do E5 era $0,60 pago / $0,15
+  grátis — cerca de 400x acima do custo real. O teto vira formalidade, não trava.
+- **Dois schemas precisaram mudar**, e os dois só apareceram na chamada real:
+  `llmRankingSchema` era array no topo e a Groq exige objeto (envelope
+  `llmRankingResponseSchema` com `picks`); e `buildItinerarySlotSchema` tinha campos
+  `optional`, enquanto o structured output estrito exige que `required` liste toda
+  propriedade — viraram `nullable`, alinhando com `itineraryItemSchema`.
+- **Os gpt-oss são modelos de raciocínio.** A maior parte dos tokens de saída é
+  `reasoningTokens` (248 de 417 no 120b; 672 de 825 no 20b numa mesma tarefa). Por isso
+  o 20b não sai mais barato que o 120b em tarefa estruturada — gasta mais tokens de
+  raciocínio. O tier `cheap` foi para o `chat`, que era o único ponto previsto na spec
+  e estava sem chamador nenhum.
+- **Não medido:** limites do free tier por dia. Só aparece sob carga.
+
+### E5. Teto de custo de LLM por roteiro — REAVALIAR (2026-09-02)
 
 - **Evidência:** `LLM_ROUTE_BUDGET_USD` não existe no código. Planilha de apoio em
   `docs/negocio/2026-08-31-custo-llm-por-roteiro.md`, proposta 0,60 pago / 0,15 grátis.
-- **Bloqueado:** falta o felippebutland cravar o número.
-- **Depende de E3** — sem preço certo o teto não mede nada.
+- **Depende de E3** — sem preço certo o teto não mede nada. E3 está feito.
+- **O E4 mediu:** roteiro completo no Groq custa ≈ $0,0015. A proposta era $0,60 pago /
+  $0,15 grátis, ou seja 400x o custo real. Um teto nessa ordem nunca dispara — não
+  protege de nada e ainda dá falsa sensação de controle.
+- **Recomendação:** não implementar agora. Se implementar, que o número saia de dado —
+  por exemplo 10x o custo medido, para pegar loop de chat descontrolado, que é o risco
+  real (cada turno custa $0,00014, então mil turnos ainda são $0,14).
+- Continua precisando do felippebutland decidir, mas agora com número na mesa.
 
 ### E6. `AdvisorChat.tsx` — warning de eslint
 

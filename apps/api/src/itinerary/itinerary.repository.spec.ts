@@ -79,7 +79,14 @@ const richOutput: BuildItineraryOutput = {
           durationMin: 120,
           estCost: 0
         },
-        { slot: "evening", type: "meal", title: "Jantar típico" }
+        {
+          slot: "evening",
+          type: "meal",
+          title: "Jantar típico",
+          description: null,
+          durationMin: null,
+          estCost: null
+        }
       ]
     }
   ]
@@ -211,7 +218,14 @@ describe("ItineraryRepository", () => {
           durationMin: 90,
           estCost: 45
         },
-        { slot: "evening", type: "meal", title: "Jantar fixo" }
+        {
+          slot: "evening",
+          type: "meal",
+          title: "Jantar fixo",
+          description: null,
+          durationMin: null,
+          estCost: null
+        }
       ],
       new Set(["evening|meal|Jantar fixo"])
     );

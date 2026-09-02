@@ -44,15 +44,15 @@ describe("LlmService.rankDestinations", () => {
       { iata: "LIS", score: 0.9, rationale: RATIONALE },
       { iata: "OPO", score: 0.8, rationale: RATIONALE }
     ];
-    const { provider } = providerReturning(ranking);
+    const { provider } = providerReturning({ picks: ranking });
 
     await expect(new LlmService(provider).rankDestinations(input)).resolves.toEqual(ranking);
   });
 
   it("pede o tier capable, informa o kind e passa o schema", async () => {
-    const { provider, completeStructured } = providerReturning([
-      { iata: "LIS", score: 0.9, rationale: RATIONALE }
-    ]);
+    const { provider, completeStructured } = providerReturning({
+      picks: [{ iata: "LIS", score: 0.9, rationale: RATIONALE }]
+    });
 
     await new LlmService(provider).rankDestinations(input);
 
@@ -65,7 +65,7 @@ describe("LlmService.rankDestinations", () => {
   });
 
   it("rejeita iata fora da shortlist com llm_invalid_output", async () => {
-    const { provider } = providerReturning([{ iata: "GIG", score: 0.9, rationale: RATIONALE }]);
+    const { provider } = providerReturning({ picks: [{ iata: "GIG", score: 0.9, rationale: RATIONALE }] });
 
     try {
       await new LlmService(provider).rankDestinations(input);
@@ -78,11 +78,13 @@ describe("LlmService.rankDestinations", () => {
   });
 
   it("lista todos os iata inválidos na mensagem", async () => {
-    const { provider } = providerReturning([
-      { iata: "GIG", score: 0.9, rationale: RATIONALE },
-      { iata: "LIS", score: 0.8, rationale: RATIONALE },
-      { iata: "CDG", score: 0.7, rationale: RATIONALE }
-    ]);
+    const { provider } = providerReturning({
+      picks: [
+        { iata: "GIG", score: 0.9, rationale: RATIONALE },
+        { iata: "LIS", score: 0.8, rationale: RATIONALE },
+        { iata: "CDG", score: 0.7, rationale: RATIONALE }
+      ]
+    });
 
     await expect(new LlmService(provider).rankDestinations(input)).rejects.toThrow(/GIG, CDG/);
   });
@@ -145,7 +147,7 @@ describe("LlmService.chat", () => {
 
     expect(result).toEqual(completion);
     const request = complete.mock.calls[0]![0];
-    expect(request.tier).toBe("capable");
+    expect(request.tier).toBe("cheap");
     expect(request.kind).toBe("chat");
     expect(request.tripId).toBe("t-1");
     expect(request.system).toBe("sys");

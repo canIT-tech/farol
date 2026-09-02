@@ -72,7 +72,14 @@ describe("FakeLlmService.buildItinerary", () => {
     });
     const day2 = out.days.find((d) => d.dayIndex === 2)!;
     const pinnedSlot = day2.slots.find((s) => s.slot === "afternoon")!;
-    expect(pinnedSlot).toEqual({ slot: "afternoon", type: "activity", title: "Almoço fixo do usuário" });
+    expect(pinnedSlot).toEqual({
+      slot: "afternoon",
+      type: "activity",
+      title: "Almoço fixo do usuário",
+      description: null,
+      durationMin: null,
+      estCost: null
+    });
     // o slot morning do dia 2 continua o título gerado
     expect(day2.slots.find((s) => s.slot === "morning")!.title).toBe(
       fakeSlotTitle("activity", "Lisboa", 2)
