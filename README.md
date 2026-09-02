@@ -91,6 +91,27 @@ Playwright precisa dos browsers: `pnpm --filter @farol/web exec playwright insta
 push e PR. **Configurar no GitHub que o job `check` seja obrigatório para merge na
 `main`** (Settings → Branches → branch protection rule).
 
+## Deploy
+
+Um Web Service só no Render (free tier), descrito em `render.yaml`. A api serve
+as rotas sob `/api`, registra os handlers do pg-boss no próprio processo
+(`RUN_JOB_HANDLERS=true`) e entrega o `apps/web` como catch-all
+(`SERVE_WEB=true`). Postgres e Auth no Supabase, LLM na Groq.
+
+O prefixo `/api` não é cosmético: sem ele `GET /trips/:id` (rota da api) colide
+com `/trips/[id]/...` (página do Next).
+
+Para conferir o modo de produção localmente antes de subir:
+
+```bash
+pnpm build
+source .env && SERVE_WEB=true RUN_JOB_HANDLERS=true node apps/api/dist/main.js
+# localhost:3333 serve a landing; localhost:3333/api/health responde a api
+```
+
+As duas flags ficam **desligadas** em desenvolvimento — web e worker sobem
+separados, como antes.
+
 ## Estrutura
 
 ```

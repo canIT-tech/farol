@@ -1,0 +1,57 @@
+# Deploy de serviço único no Render (free tier).
+#
+# Um Web Service só: a api serve as rotas sob /api, registra os handlers do
+# pg-boss no próprio processo e entrega o apps/web como catch-all. O free tier
+# do Render não tem Background Worker, e um serviço a menos é um serviço a menos
+# para manter.
+#
+# Postgres e Auth ficam no Supabase; LLM na Groq. As envs marcadas sync: false
+# são preenchidas no dashboard ou pelo MCP — não entram no repo.
+services:
+  - type: web
+    name: farol
+    runtime: node
+    plan: free
+    region: oregon
+    branch: main
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build && pnpm --filter @farol/db run db:migrate && pnpm --filter @farol/db run db:seed
+    startCommand: node apps/api/dist/main.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # O prefixo /api e o catch-all do Next vivem no mesmo processo, então o
+      # front chama a api por caminho relativo.
+      - key: NEXT_PUBLIC_API_URL
+        value: /api
+      - key: SERVE_WEB
+        value: "true"
+      - key: RUN_JOB_HANDLERS
+        value: "true"
+      - key: JOBS_SCHEMA
+        value: pgboss
+      # Amadeus foi descontinuada (Passo 10 troca por Travelpayouts). O schema
+      # exige as duas, e placeholder serve: voo e hotel degradam para
+      # error "unavailable" em runtime, sem derrubar a api.
+      - key: AMADEUS_CLIENT_ID
+        value: placeholder
+      - key: AMADEUS_CLIENT_SECRET
+        value: placeholder
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_JWKS_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: GOOGLE_PLACES_KEY
+        sync: false
+      - key: LLM_PROVIDER
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_MODEL_CAPABLE
+        sync: false
+      - key: LLM_MODEL_CHEAP
+        sync: false

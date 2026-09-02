@@ -50,7 +50,7 @@ describe("fetchWaitlistCount", () => {
     const out = await fetchWaitlistCount(fetchImpl);
 
     expect(out).toEqual({ count: 9 });
-    expect(fetchImpl).toHaveBeenCalledWith("http://localhost:3333/waitlist/count", {
+    expect(fetchImpl).toHaveBeenCalledWith("http://localhost:3333/api/waitlist/count", {
       cache: "no-store"
     });
   });

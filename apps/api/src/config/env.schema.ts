@@ -14,6 +14,13 @@ const baseEnvSchema = z.object({
   LLM_MODEL_CAPABLE: z.string().min(1).optional(),
   LLM_MODEL_CHEAP: z.string().min(1).optional(),
   JOBS_SCHEMA: z.string().min(1).default("pgboss"),
+  // Deploy de serviço único (Render free não tem Background Worker): a api
+  // registra os handlers do pg-boss no próprio processo e serve o apps/web como
+  // catch-all. Em desenvolvimento os dois ficam desligados — worker e web sobem
+  // separados. Enum em vez de coerce.boolean: coerce trata qualquer string não
+  // vazia como true, inclusive "false".
+  RUN_JOB_HANDLERS: z.enum(["true", "false"]).default("false"),
+  SERVE_WEB: z.enum(["true", "false"]).default("false"),
   AMADEUS_BASE_URL: z.string().url().default("https://test.api.amadeus.com"),
   AMADEUS_CLIENT_ID: z.string().min(1),
   AMADEUS_CLIENT_SECRET: z.string().min(1),

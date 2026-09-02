@@ -1,7 +1,9 @@
 import type { ZodType } from "zod";
 
 export function apiBase(): string {
-  return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333";
+  // A api serve sob /api (o prefixo evita colidir com as rotas do Next no
+  // deploy de servico unico). No servico unico o valor e so "/api".
+  return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333/api";
 }
 
 export interface ApiSendOptions {

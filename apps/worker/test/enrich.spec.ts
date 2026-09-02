@@ -64,7 +64,7 @@ async function waitFor(predicate: () => Promise<boolean>, timeoutMs: number): Pr
 beforeAll(async () => {
   await runMigrations(url);
   const { WorkerModule } = await import("../src/worker.module");
-  const { registerHandlers } = await import("../src/register-handlers");
+  const { registerHandlers } = await import("@farol/api");
   app = await Test.createTestingModule({ imports: [WorkerModule] })
     .overrideProvider(PLACES_PROVIDER)
     .useValue(provider)

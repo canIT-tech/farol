@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { WorkerModule } from "./worker.module";
-import { registerHandlers } from "./register-handlers";
+import { registerHandlers } from "@farol/api";
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.createApplicationContext(WorkerModule, { bufferLogs: false });

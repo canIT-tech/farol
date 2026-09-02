@@ -101,6 +101,25 @@ const comLlm = {
   LLM_MODEL_CHEAP: "llama-3.1-8b-instant"
 };
 
+describe("flags de deploy", () => {
+  it("desligadas por padrão — dev sobe web e worker separados", () => {
+    const env = parseEnv({ ...valid });
+    expect(env.RUN_JOB_HANDLERS).toBe("false");
+    expect(env.SERVE_WEB).toBe("false");
+  });
+
+  it("aceita as duas ligadas", () => {
+    const env = parseEnv({ ...valid, RUN_JOB_HANDLERS: "true", SERVE_WEB: "true" });
+    expect(env.RUN_JOB_HANDLERS).toBe("true");
+    expect(env.SERVE_WEB).toBe("true");
+  });
+
+  it("rejeita valor que não é true nem false", () => {
+    expect(() => parseEnv({ ...valid, SERVE_WEB: "1" })).toThrow(/SERVE_WEB/);
+    expect(() => parseEnv({ ...valid, RUN_JOB_HANDLERS: "yes" })).toThrow(/RUN_JOB_HANDLERS/);
+  });
+});
+
 describe("env de LLM", () => {
   it("é válida sem nenhuma env de LLM (IA desligada)", () => {
     const env = parseEnv({ ...valid });

@@ -1,13 +1,53 @@
 import "reflect-metadata";
+import { resolve } from "node:path";
 import { NestFactory } from "@nestjs/core";
+import type { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module";
-import { parseEnv } from "./config/env.schema";
+import { parseEnv, type Env } from "./config/env.schema";
+import { registerHandlers } from "./jobs/register-handlers";
+
+// Prefixo de todas as rotas da api. Existe por causa do deploy de serviço
+// único: sem ele `GET /trips/:id` (rota da api) colide com `/trips/[id]/...`
+// (página do Next). O apps/web aponta NEXT_PUBLIC_API_URL para /api.
+const API_PREFIX = "api";
+
+// Serve o apps/web já construído como catch-all. Só entra quando SERVE_WEB=true,
+// para o desenvolvimento e o boot smoke não precisarem de .next nenhum.
+async function serveWeb(app: NestExpressApplication): Promise<void> {
+  const { default: next } = await import("next");
+  const nextApp = next({ dev: false, dir: resolve(__dirname, "../../web") });
+  await nextApp.prepare();
+  const handle = nextApp.getRequestHandler();
+
+  // Guarda pelo prefixo em vez de depender da ordem do middleware: qualquer
+  // caminho que não seja da api vai para o Next.
+  app.use((req: { url: string }, res: unknown, nextFn: () => void) => {
+    if (req.url.startsWith(`/${API_PREFIX}`)) {
+      nextFn();
+      return;
+    }
+    void handle(req as never, res as never);
+  });
+}
 
 async function bootstrap(): Promise<void> {
-  const env = parseEnv(process.env);
-  const app = await NestFactory.create(AppModule);
-  // A landing pública (apps/web) chama /waitlist de outra origem.
+  const env: Env = parseEnv(process.env);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.setGlobalPrefix(API_PREFIX);
+  // A landing pública chama /waitlist de outra origem quando web e api estão
+  // separados. No serviço único a origem é a mesma e isto não custa nada.
   app.enableCors();
+
+  if (env.SERVE_WEB === "true") {
+    await serveWeb(app);
+  }
+
+  await app.init();
+
+  if (env.RUN_JOB_HANDLERS === "true") {
+    await registerHandlers(app);
+  }
+
   await app.listen(env.API_PORT);
 }
 

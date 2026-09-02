@@ -24,7 +24,7 @@ let ok = false;
 
 while (Date.now() < deadline && exited === null) {
   try {
-    const res = await fetch(`http://127.0.0.1:${PORT}/health`);
+    const res = await fetch(`http://127.0.0.1:${PORT}/api/health`);
     if (res.ok) {
       console.log("boot smoke ok:", await res.text());
       ok = true;
