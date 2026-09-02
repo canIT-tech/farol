@@ -102,6 +102,12 @@ describe("PlacesService.details", () => {
     await expect(service.details("place-museu")).resolves.toEqual(FAKE_PLACE_DETAILS);
     await service.details("place-museu");
     expect(spy).toHaveBeenCalledOnce();
+
+    const rows = await db
+      .select()
+      .from(providerCache)
+      .where(eq(providerCache.key, cacheKey("google-places", "details", { placeId: "place-museu" })));
+    expect(rows).toHaveLength(1);
   });
 
   it("propaga a falha do provider (details não degrada)", async () => {

@@ -65,8 +65,27 @@ describe("ChatRepository", () => {
     });
 
     expect(mockDb.insert).toHaveBeenCalled();
-    expect(chain.values).toHaveBeenCalled();
+    expect(chain.values).toHaveBeenCalledWith(
+      expect.objectContaining({ id: expect.stringMatching(/^[0-9a-f-]{36}$/) })
+    );
     expect(saved.role).toBe("user");
+  });
+
+  it("preserva o id quando a mensagem já vem com um", async () => {
+    const row = {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      tripId: "550e8400-e29b-41d4-a716-446655440001",
+      role: "user",
+      content: "oi",
+      toolCalls: null,
+      toolCallId: null,
+      name: null,
+      createdAt: new Date("2026-08-31T10:00:00Z")
+    };
+    const chain = { values: vi.fn().mockReturnThis(), returning: vi.fn().mockResolvedValue([row]) };
+    mockDb.insert.mockReturnValue(chain);
+    await repository.saveMessage("t1", { id: "msg-fixo", role: "user", content: "oi" });
+    expect(chain.values).toHaveBeenCalledWith(expect.objectContaining({ id: "msg-fixo" }));
   });
 
 

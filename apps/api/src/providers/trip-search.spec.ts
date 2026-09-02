@@ -62,6 +62,11 @@ describe("resolveTripDates", () => {
     const trip = tripState({ dateStart: "2026-09-10", dateEnd: null, targetMonth: "2026-12", durationDays: 4 });
     expect(resolveTripDates(trip)).toEqual({ depart: "2026-12-01", return: "2026-12-05" });
   });
+
+  it("só dateEnd também cai no ramo de duração", () => {
+    const trip = tripState({ dateStart: null, dateEnd: "2026-09-17", targetMonth: "2026-12", durationDays: 4 });
+    expect(resolveTripDates(trip)).toEqual({ depart: "2026-12-01", return: "2026-12-05" });
+  });
 });
 
 describe("buildFlightParams", () => {

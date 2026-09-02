@@ -117,7 +117,7 @@ describe("ItineraryRegenerateDayHandler.handle", () => {
   it("lança quando o itinerary não existe", async () => {
     await expect(
       handler.handle({ itineraryId: crypto.randomUUID(), dayIndex: 1 })
-    ).rejects.toThrow(/não existe/);
+    ).rejects.toThrow(/^itinerary .+ não existe$/);
   });
 
   it("lança quando o dia não existe no roteiro", async () => {

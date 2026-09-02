@@ -139,6 +139,8 @@ describe("FlightsService", () => {
     const rows = await db.select().from(flightSelections).where(eq(flightSelections.tripId, tripId));
     expect(rows).toHaveLength(1);
     expect(rows[0]!.deepLink).toBe("https://parceiro.example.com/voos?id=flt-direct");
+    expect(selection.returnAt).toBe(new Date("2026-09-20T10:45:00").toISOString());
+    expect(rows[0]!.returnAt).toEqual(new Date("2026-09-20T10:45:00"));
   });
 
   it("select de uma oferta só-ida grava returnAt nulo", async () => {
