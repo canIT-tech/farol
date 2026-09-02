@@ -204,7 +204,9 @@ export const waitlist = pgTable("waitlist", {
   id: uuid("id").primaryKey(),
   email: text("email").notNull().unique(),
   source: text("source"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  // Quando o e-mail de boas-vindas saiu. Nulo = ainda não (falhou ou provider desligado).
+  welcomeSentAt: timestamp("welcome_sent_at", { withTimezone: true })
 });
 
 // Catálogo curado de destinos (design §6.1). Base determinística da descoberta.

@@ -171,3 +171,49 @@ describe("env de LLM", () => {
     expect(env.LLM_MODEL_CAPABLE).toBe("llama-3.3-70b-versatile");
   });
 });
+
+describe("env de e-mail", () => {
+  it("é válida sem nenhuma env de e-mail (envio desligado)", () => {
+    const env = parseEnv({ ...valid });
+    expect(env.EMAIL_PROVIDER).toBeUndefined();
+    expect(env.EMAIL_API_KEY).toBeUndefined();
+    expect(env.EMAIL_FROM).toBeUndefined();
+  });
+
+  it("aceita resend com chave e remetente", () => {
+    const env = parseEnv({
+      ...valid,
+      EMAIL_PROVIDER: "resend",
+      EMAIL_API_KEY: "re_x",
+      EMAIL_FROM: "Farol <oi@farol.app>"
+    });
+    expect(env.EMAIL_PROVIDER).toBe("resend");
+    expect(env.EMAIL_FROM).toBe("Farol <oi@farol.app>");
+  });
+
+  it("fake não exige chave nem remetente", () => {
+    expect(parseEnv({ ...valid, EMAIL_PROVIDER: "fake" }).EMAIL_PROVIDER).toBe("fake");
+  });
+
+  it("rejeita provider desconhecido", () => {
+    expect(() => parseEnv({ ...valid, EMAIL_PROVIDER: "sendgrid" })).toThrow(/EMAIL_PROVIDER/);
+  });
+
+  it("resend sem chave é erro de boot", () => {
+    expect(() => parseEnv({ ...valid, EMAIL_PROVIDER: "resend", EMAIL_FROM: "oi@farol.app" })).toThrow(
+      "Env inválida: EMAIL_API_KEY"
+    );
+  });
+
+  it("resend sem remetente é erro de boot", () => {
+    expect(() => parseEnv({ ...valid, EMAIL_PROVIDER: "resend", EMAIL_API_KEY: "re_x" })).toThrow(
+      "Env inválida: EMAIL_FROM"
+    );
+  });
+
+  it("faltas de LLM e de e-mail aparecem juntas, nessa ordem", () => {
+    expect(() => parseEnv({ ...valid, LLM_PROVIDER: "groq", EMAIL_PROVIDER: "resend" })).toThrow(
+      "Env inválida: LLM_API_KEY, LLM_MODEL_CAPABLE, LLM_MODEL_CHEAP, EMAIL_API_KEY, EMAIL_FROM"
+    );
+  });
+});

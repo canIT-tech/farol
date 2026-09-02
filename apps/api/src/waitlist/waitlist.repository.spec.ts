@@ -44,6 +44,23 @@ describe("WaitlistRepository", () => {
     expect(rows[0]!.source).toBeNull();
   });
 
+  it("markWelcomeSent preenche welcome_sent_at só daquele e-mail", async () => {
+    const sent = newEmail();
+    const other = newEmail();
+    await repo.add(sent, null);
+    await repo.add(other, null);
+    const before = Date.now();
+
+    await repo.markWelcomeSent(sent);
+
+    const rows = await db.select().from(waitlist).where(inArray(waitlist.email, [sent, other]));
+    const bySent = rows.find((r) => r.email === sent)!;
+    const byOther = rows.find((r) => r.email === other)!;
+    expect(bySent.welcomeSentAt).toBeInstanceOf(Date);
+    expect(bySent.welcomeSentAt!.getTime()).toBeGreaterThanOrEqual(before - 1000);
+    expect(byOther.welcomeSentAt).toBeNull();
+  });
+
   it("count reflete as linhas gravadas", async () => {
     const before = await repo.count();
     await repo.add(newEmail(), null);

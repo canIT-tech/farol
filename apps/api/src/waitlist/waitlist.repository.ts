@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { waitlist, type Database } from "@farol/db";
 import { DB } from "../db/db.module";
 
@@ -15,6 +15,10 @@ export class WaitlistRepository {
       .onConflictDoNothing({ target: waitlist.email })
       .returning({ id: waitlist.id });
     return rows.length > 0;
+  }
+
+  async markWelcomeSent(email: string): Promise<void> {
+    await this.db.update(waitlist).set({ welcomeSentAt: new Date() }).where(eq(waitlist.email, email));
   }
 
   async count(): Promise<number> {

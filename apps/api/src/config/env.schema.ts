@@ -13,6 +13,11 @@ const baseEnvSchema = z.object({
   LLM_API_KEY: z.string().min(1).optional(),
   LLM_MODEL_CAPABLE: z.string().min(1).optional(),
   LLM_MODEL_CHEAP: z.string().min(1).optional(),
+  // E-mail transacional, mesmo desenho do LLM: opcional, e com provider as
+  // outras duas viram obrigatórias. "fake" guarda em memória (testes/E2E).
+  EMAIL_PROVIDER: z.enum(["resend", "fake"]).optional(),
+  EMAIL_API_KEY: z.string().min(1).optional(),
+  EMAIL_FROM: z.string().min(1).optional(),
   JOBS_SCHEMA: z.string().min(1).default("pgboss"),
   // Deploy de serviço único (Render free não tem Background Worker): a api
   // registra os handlers do pg-boss no próprio processo e serve o apps/web como
@@ -39,19 +44,34 @@ const baseEnvSchema = z.object({
   PLACES_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(86_400)
 });
 
-export const envSchema = baseEnvSchema.superRefine((env, ctx) => {
-  if (env.LLM_PROVIDER === undefined || env.LLM_PROVIDER === "fake") {
+type BaseEnv = z.infer<typeof baseEnvSchema>;
+
+// Com provider real definido, os campos listados viram obrigatórios.
+// "fake" e ausente não exigem nada.
+function requireWithProvider(
+  env: BaseEnv,
+  ctx: z.RefinementCtx,
+  providerField: "LLM_PROVIDER" | "EMAIL_PROVIDER",
+  fields: readonly (keyof BaseEnv)[]
+): void {
+  const provider = env[providerField];
+  if (provider === undefined || provider === "fake") {
     return;
   }
-  for (const field of ["LLM_API_KEY", "LLM_MODEL_CAPABLE", "LLM_MODEL_CHEAP"] as const) {
+  for (const field of fields) {
     if (env[field] === undefined) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: [field],
-        message: `${field} é obrigatória quando LLM_PROVIDER está definida`
+        message: `${field} é obrigatória quando ${providerField} está definida`
       });
     }
   }
+}
+
+export const envSchema = baseEnvSchema.superRefine((env, ctx) => {
+  requireWithProvider(env, ctx, "LLM_PROVIDER", ["LLM_API_KEY", "LLM_MODEL_CAPABLE", "LLM_MODEL_CHEAP"]);
+  requireWithProvider(env, ctx, "EMAIL_PROVIDER", ["EMAIL_API_KEY", "EMAIL_FROM"]);
 });
 
 export type Env = z.infer<typeof envSchema>;
