@@ -1,9 +1,4 @@
-import {
-  waitlistCountSchema,
-  waitlistSignupResultSchema,
-  type WaitlistCount,
-  type WaitlistSignupResult
-} from "@farol/shared";
+import { waitlistSignupResultSchema, type WaitlistSignupResult } from "@farol/shared";
 import { apiBase } from "./api-client";
 
 // POST /waitlist na apps/api (rota pública, sem auth).
@@ -22,13 +17,4 @@ export async function submitWaitlist(
     throw new Error(`waitlist respondeu ${res.status}`);
   }
   return waitlistSignupResultSchema.parse(await res.json());
-}
-
-// GET /waitlist/count — usado só para o contador da landing.
-export async function fetchWaitlistCount(fetchImpl: typeof fetch = fetch): Promise<WaitlistCount> {
-  const res = await fetchImpl(`${apiBase()}/waitlist/count`, { cache: "no-store" });
-  if (!res.ok) {
-    throw new Error(`waitlist/count respondeu ${res.status}`);
-  }
-  return waitlistCountSchema.parse(await res.json());
 }

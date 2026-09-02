@@ -300,10 +300,20 @@ section {
   color: var(--sun-strong);
 }
 
-.count {
-  margin-top: 0.35rem;
-  font-size: 0.85rem;
-  color: var(--ink-faint);
+.signup-done {
+  margin-top: 1.9rem;
+  max-width: 34rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--sea-strong);
+  border-radius: 0.75rem;
+  color: var(--sea-strong);
+  background: var(--surface);
+}
+
+.signup-done p {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
 }
 
 /* ---- taste demo (faixa escura) ---- */
