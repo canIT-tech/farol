@@ -168,7 +168,7 @@ Backlog de implementação. Ordem = dependência. Puxe pelo número.
 | 5 | Providers voo/hotel — `packages/providers`, `provider_cache`, resiliência, `FlightsModule` / `HotelsModule` | ✅ estrutura concluída · ⚠️ provider a trocar (ver Passo 10) | felippebutland | — | 3 | (2026-08-29) |
 | 6 | Google Places + enrich — `GooglePlacesProvider`, `PlacesModule`, passo de enrich no job do roteiro, `swap_restaurant` | ✅ concluído | rafaignaulin | `rafaignaulin/passo-6-places-enrich` | 4 | (2026-08-31) |
 | 7 | Chat IA — `ChatModule`, loop de tool-calling, as 11 tools mapeadas para serviços, `chat_messages` | ✅ concluído | felippebutland | — | 4, 5, 6 | (2026-08-31) |
-| 8 | UI web + E2E — telas ligadas ao `apps/api`, fluxo Playwright login→onboarding→descoberta→destino→roteiro | 🟡 em andamento | rafaignaulin | `rafaignaulin/passo-8-ui-web-e2e` | 7 | (2026-09-01) |
+| 8 | UI web + E2E — telas ligadas ao `apps/api`, fluxo Playwright login→onboarding→descoberta→destino→roteiro | ✅ concluído | rafaignaulin | — | 7 | (2026-09-02) |
 | 9 | `packages/ui` — implementar tokens (`docs/design-system.md`) + componentes base (`Button`, `TextField`, `Chip`, `MatchBadge`, `DestinationCard`, `AppShell`, `StepNav`, `AdvisorChat`) | ✅ concluído | felippebutland | — | 1 | (2026-08-28) |
 | 10 | Migração do provider voo/hotel — Amadeus (descontinuado) → **Travelpayouts**. Trocar `Amadeus*Provider` por `Travelpayouts*Provider`, sem OAuth, `marker` de afiliado no deep-link, regravar fixtures, envs. Spec: `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` | 🟢 livre | — | — | 5 |
 | 11 | Pagamento — `PaymentModule` + webhook Stripe, ledger de crédito, gate no `itinerary.generate`. Spec: `docs/negocio/2026-08-31-spec-pagamento.md` | 🟢 livre | — | — | 4 · cadastro Stripe |
