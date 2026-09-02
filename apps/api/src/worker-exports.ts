@@ -22,3 +22,4 @@ export {
   type ItineraryRegenerateDayData
 } from "./itinerary/itinerary-regenerate-day.handler";
 export { PlacesEnrichHandler, type PlacesEnrichData } from "./itinerary/places-enrich.handler";
+export { registerHandlers } from "./jobs/register-handlers";

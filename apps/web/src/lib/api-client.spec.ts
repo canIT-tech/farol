@@ -18,9 +18,9 @@ function jsonResponse(body: unknown, status = 200): Response {
 }
 
 describe("apiBase", () => {
-  it("cai para localhost:3333 sem env", () => {
+  it("cai para localhost:3333/api sem env", () => {
     delete process.env.NEXT_PUBLIC_API_URL;
-    expect(apiBase()).toBe("http://localhost:3333");
+    expect(apiBase()).toBe("http://localhost:3333/api");
   });
 
   it("usa NEXT_PUBLIC_API_URL quando definida", () => {
@@ -54,7 +54,7 @@ describe("apiFetch", () => {
       fetchImpl
     );
 
-    expect(fetchImpl).toHaveBeenCalledWith("http://localhost:3333/me/profile", {
+    expect(fetchImpl).toHaveBeenCalledWith("http://localhost:3333/api/me/profile", {
       method: "PUT",
       headers: { authorization: "Bearer t", "content-type": "application/json" },
       body: JSON.stringify({ a: 1 }),

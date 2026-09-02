@@ -33,9 +33,9 @@ describe("fetchHealth", () => {
     await expect(fetchHealth(vi.fn().mockResolvedValue(err) as never)).rejects.toThrow(/503/);
   });
 
-  it("usa http://localhost:3333 quando NEXT_PUBLIC_API_URL não está definida", () => {
+  it("usa http://localhost:3333/api quando NEXT_PUBLIC_API_URL não está definida", () => {
     delete process.env.NEXT_PUBLIC_API_URL;
-    expect(apiBase()).toBe("http://localhost:3333");
+    expect(apiBase()).toBe("http://localhost:3333/api");
   });
 
   it("usa NEXT_PUBLIC_API_URL quando definida", () => {

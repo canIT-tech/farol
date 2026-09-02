@@ -4,7 +4,7 @@ const SUPABASE_STORAGE_KEY = "sb-localhost-auth-token";
 
 // Interceptar por origem da API, nao por glob de caminho: "**/trips**" tambem
 // casa com a navegacao do Next em localhost:3000 e devolve JSON no lugar da pagina.
-export const API = "http://localhost:3333";
+export const API = "http://localhost:3333/api";
 
 export const TRIP_ID = "11111111-1111-4111-8111-111111111111";
 export const USER_ID = "22222222-2222-4222-8222-222222222222";
