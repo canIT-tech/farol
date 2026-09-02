@@ -33,7 +33,7 @@ Canvases publicados (Claude Artifacts):
 ## Decisões já tomadas (não reabrir sem motivo)
 
 **Produto**
-- Escopo é produto completo, mas execução **faseada**: MVP (gosto → roteiro) → v1 (milhas + alertas + premium) → v2 (consultoria, grupo, reserva, mobile, B2B).
+- Escopo é produto completo, mas execução **faseada**: MVP (gosto → roteiro) → v1 (milhas + alertas + premium) → v2 (consultoria, grupo, reserva, mobile, B2B) → v3 (gerenciador de viagem: salvar, avaliar, editar ao vivo, notas aos lugares — PRD §4/§5.11).
 - Motor de milhas fica no **v1** — é o diferencial, mas tem o maior risco de viabilidade (sem API oficial dos programas BR).
 - Monetização: **pagamento por viagem** (R$ 39 avulso / R$ 89 pacote de 3; spec `docs/negocio/2026-08-31-spec-pagamento.md`) + afiliado de voo/hotel via `marker` do Travelpayouts (deep-link) + assinatura premium (v1) + consultoria/B2B (v2).
 

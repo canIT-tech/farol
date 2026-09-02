@@ -142,11 +142,42 @@ Personas foco: **todos + B2B**.
 - **Modo B2B:** multi-cliente, proposta com marca da agência, exportação PDF.
 - **Experiências e tours:** integração com GetYourGuide/Viator via afiliado.
 
+### v3 — "Gerenciador de viagem" *(4ª fase; referida internamente como "versão 4")*
+Personas foco: **Marina + David**. O produto deixa de ser só planejador e passa a
+**acompanhar a viagem** — antes, durante e depois.
+
+- **Biblioteca de viagens:** a viagem é um item persistente na conta que a pessoa
+  guarda, revisita e acompanha por todo o ciclo de vida — estados
+  `planejada → em andamento → concluída`.
+- **Avaliação da viagem pelo cliente:** ao fim (ou durante), a pessoa avalia a viagem /
+  o roteiro.
+  - **Avaliação boa →** o produto segue com **mais indicações para aquela viagem**
+    (o que fazer a mais, ajustes finos, sugestões contextuais).
+  - **Avaliação ruim →** captura **feedback estruturado** (o que não funcionou) — alimenta
+    melhoria do produto e uma possível re-geração do trecho.
+  - **"Não gostei disso" (granular) →** feedback por item — um restaurante, um dia, uma
+    parada — vira sinal para trocar/ajustar e refina o **perfil de gosto** da pessoa.
+- **Edição ao vivo durante a viagem:** marcar o que já foi feito, reordenar o que falta,
+  **dar notas aos lugares** visitados, adicionar paradas não planejadas, registrar gastos
+  reais, anexar notas/fotos. As notas aos lugares realimentam recomendações futuras
+  (dela e, se ela permitir, agregadas).
+- **Companheiro em trânsito:** o gerenciamento ao vivo também acontece por conversa
+  (chat transversal), e ganha peso real com o **app mobile / offline** do v2.
+
+Perguntas em aberto (resolver ao especificar):
+1. Avaliação é da viagem inteira, por item, ou ambos? *(a descrição sugere ambos.)*
+2. "Seguir com indicações" pós-avaliação-boa é conteúdo incluso da viagem já paga, ou
+   upsell (nova viagem / experiências pagas)?
+3. Edição ao vivo em web-mobile serve, ou depende do app nativo do v2?
+4. As notas aos lugares são privadas (só refinam o gosto dela) ou viram sinal
+   agregado / avaliação pública? *(decisão de privacidade — LGPD.)*
+5. Gerenciamento ao vivo é incluso no crédito da viagem ou é feature de assinatura?
+
 ---
 
 ## 5. Requisitos funcionais por módulo
 
-Notação: **[M]** MVP · **[1]** v1 · **[2]** v2.
+Notação: **[M]** MVP · **[1]** v1 · **[2]** v2 · **[3]** v3 (gerenciador de viagem).
 
 ### 5.1 Perfil de gosto
 - [M] Questionário de onboarding com no máximo 10 perguntas, puláveis.
@@ -171,6 +202,8 @@ Notação: **[M]** MVP · **[1]** v1 · **[2]** v2.
 - [M] Exportar (PDF e link compartilhável).
 - [1] Sincronizar com Google Calendar.
 - [2] Otimização de rota intra-dia (minimizar deslocamento).
+- [3] Modo "viagem em andamento": marcar item como feito/pulado, reordenar o que falta,
+  adicionar parada não planejada, registrar gasto real por item.
 
 ### 5.4 Voos
 - [M] Buscar voos para as datas/origem/destino; ordenar por preço, duração, nº de escalas.
@@ -211,6 +244,8 @@ Notação: **[M]** MVP · **[1]** v1 · **[2]** v2.
 - [M] Explica o "porquê" das recomendações quando perguntado.
 - [1] Responde perguntas sobre milhas ("vale a pena emitir para Lisboa em outubro?").
 - [2] Proativo: sugere ajustes ("o preço para seu destino caiu 18%").
+- [3] Companheiro em trânsito: registra nota/feedback de lugar por conversa, sugere o
+  próximo passo do dia, remaneja o roteiro quando algo atrasa.
 
 ### 5.9 Conta, planos e pagamento
 - [M] Cadastro/login (e-mail + social login).
@@ -218,10 +253,23 @@ Notação: **[M]** MVP · **[1]** v1 · **[2]** v2.
 - [1] Planos free × premium; limites e paywall; gestão de assinatura.
 - [1] Cobrança recorrente (gateway a definir — ex.: Stripe).
 - [2] Cobrança avulsa por roteiro de consultoria.
+- [3] Estado `em andamento` no ciclo de vida da viagem; a viagem vira item persistente
+  ("biblioteca de viagens") acompanhado do planejamento à conclusão.
 
 ### 5.10 Notificações
 - [1] E-mail e push web para alertas de preço e mudanças relevantes.
 - [1] Preferências de frequência e canais.
+
+### 5.11 Gerenciador de viagem e avaliação [3]
+- [3] **Avaliação da viagem** pelo cliente ao fim (ou durante): nota geral + comentário.
+- [3] **Ramificação por avaliação:** avaliação boa → mais indicações para aquela viagem;
+  avaliação ruim → coleta de feedback estruturado (o que não funcionou) e oferta de
+  re-geração do trecho.
+- [3] **Feedback granular:** "não gostei disso" por item (restaurante, dia, parada) →
+  troca sugerida + ajuste no perfil de gosto da pessoa.
+- [3] **Notas aos lugares** visitados, durante a viagem — alimentam recomendações futuras
+  dela; agregação/publicidade dessas notas é opt-in (LGPD).
+- [3] **Registro em trânsito:** itens feitos/pulados, gastos reais, notas e fotos por item.
 
 ---
 
