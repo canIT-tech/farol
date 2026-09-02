@@ -126,7 +126,24 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
   o 20b não sai mais barato que o 120b em tarefa estruturada — gasta mais tokens de
   raciocínio. O tier `cheap` foi para o `chat`, que era o único ponto previsto na spec
   e estava sem chamador nenhum.
-- **Não medido:** limites do free tier por dia. Só aparece sob carga.
+- **Limites do free tier (confirmados 2026-09-02, iguais nos dois modelos):** 30 RPM,
+  1000 RPD, 8000 TPM, 200k TPD. Cruzando com o uso medido:
+
+| Limite | Teto prático |
+|---|---|
+| TPD 200k | **43 roteiros/dia** com 5 turnos de chat (71 sem chat) |
+| TPM 8000 | **2,8 roteiros/minuto** — um `buildItinerary` sozinho come 21% da janela |
+| RPD 1000 | 142 roteiros/dia — não é o gargalo |
+
+- **TPD é o teto real do MVP: 43 roteiros por dia.** Suficiente para validar, insuficiente
+  para lançar aberto.
+- **TPM é o risco operacional.** O AI SDK repete só 2 vezes por padrão (~6 s de backoff) e
+  a janela do TPM é de 60 s, então um pico de fila desistiria antes de a janela virar.
+  `MAX_RETRIES = 5` no `AiSdkLlmProvider` soma ~62 s e cobre uma janela inteira. É
+  retry cego: se a fila crescer, o certo é limitar taxa na origem (concorrência do
+  pg-boss), não esperar no provider — marcado com `ponytail:` no código.
+- **O E2E não deve rodar contra a Groq real** — queimaria cota e é não determinístico.
+  É para isso que existe `LLM_PROVIDER=fake`.
 
 ### E5. Teto de custo de LLM por roteiro — REAVALIAR (2026-09-02)
 

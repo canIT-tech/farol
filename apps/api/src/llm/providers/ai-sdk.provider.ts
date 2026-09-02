@@ -53,9 +53,18 @@ type GenerateObjectLike = (options: {
   system: string;
   prompt: string;
   schema: unknown;
+  maxRetries: number;
 }) => Promise<{ object: unknown; usage: { inputTokens?: number; outputTokens?: number } }>;
 
 const generateObjectLoose = generateObject as unknown as GenerateObjectLike;
+
+// O default do AI SDK é 2 tentativas, backoff exponencial: cerca de 6 s no
+// total. A janela de tokens-por-minuto da Groq é de 60 s, então 429 por TPM
+// esgotado desiste antes de a janela virar. 5 tentativas somam ~62 s e cobrem
+// uma janela inteira.
+// ponytail: retry cego; se a fila crescer, o certo é limitar taxa na origem
+// (concorrência do pg-boss) em vez de esperar no provider.
+const MAX_RETRIES = 5;
 
 // Traduz as mensagens neutras para o formato do SDK.
 function toModelMessages(messages: LlmMessage[]): ModelMessage[] {
@@ -108,7 +117,8 @@ export class AiSdkLlmProvider implements LlmProvider {
       system: request.system,
       messages: toModelMessages(request.messages),
       tools: request.tools === undefined ? undefined : toSdkTools(request.tools),
-      maxOutputTokens: MAX_TOKENS
+      maxOutputTokens: MAX_TOKENS,
+      maxRetries: MAX_RETRIES
     });
 
     const usage = normalizeUsage(result.usage);
@@ -135,7 +145,8 @@ export class AiSdkLlmProvider implements LlmProvider {
       model,
       system: request.system,
       prompt: request.prompt,
-      schema: request.schema
+      schema: request.schema,
+      maxRetries: MAX_RETRIES
     });
 
     const usage = normalizeUsage(result.usage);
