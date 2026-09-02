@@ -153,7 +153,8 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - Rota `/` do `apps/web` **é a landing pública** (captura de e-mail pré-lançamento). O fluxo do app começa em `/login`.
 - `POST /waitlist` (público, sem `AuthGuard`) + `GET /waitlist/count` no `WaitlistModule`. Tabela `waitlist` (migration `0005`). `app.enableCors()` ligado no `main.ts` por causa disso.
 - Deploy exige `NEXT_PUBLIC_API_URL` do `apps/web` apontando para a API pública e a `0005` aplicada no banco.
-- Débito: sem rate-limit no `POST /waitlist` (guard por IP depois).
+- **E-mail de boas-vindas** via porta neutra `EmailModule` (`apps/api/src/email/`, mesmo desenho do LLM: `EMAIL_PROVIDER=resend|fake`, opcional; sem env o envio fica desligado e o cadastro segue). Adapter atual: **Resend** (REST puro, free 3.000/mês). `waitlist.welcome_sent_at` (migration `0008`) marca quem recebeu; nulo = reenviar depois. Falha no envio é logada (`waitlist_welcome_failed`), nunca falha o `POST`.
+- Débito: sem rate-limit no `POST /waitlist` (guard por IP depois). Resend sem domínio verificado só entrega para o e-mail da própria conta (`onboarding@resend.dev`) — precisa de `farolviagens.com` (ou outro domínio) verificado para valer para usuários.
 
 ## Próximos passos
 

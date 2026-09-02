@@ -15,6 +15,7 @@ import { FlightsModule } from "./flights/flights.module";
 import { HotelsModule } from "./hotels/hotels.module";
 import { WaitlistModule } from "./waitlist/waitlist.module";
 import { ChatModule } from "./chat/chat.module";
+import { EmailModule } from "./email/email.module";
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ChatModule } from "./chat/chat.module";
     ProvidersModule,
     FlightsModule,
     HotelsModule,
+    EmailModule,
     WaitlistModule,
     ChatModule
   ]

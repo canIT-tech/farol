@@ -180,7 +180,8 @@ describe("schema.waitlist", () => {
     id: { name: "id", sqlType: "uuid", notNull: true },
     email: { name: "email", sqlType: "text", notNull: true },
     source: { name: "source", sqlType: "text", notNull: false },
-    createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true }
+    createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true },
+    welcomeSentAt: { name: "welcome_sent_at", sqlType: TS, notNull: false }
   });
 
   it("id é primary key", () => {
