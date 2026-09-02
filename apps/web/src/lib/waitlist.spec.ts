@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { submitWaitlist, fetchWaitlistCount } from "./waitlist";
+import { submitWaitlist } from "./waitlist";
 
 const originalApiUrl = process.env.NEXT_PUBLIC_API_URL;
 afterEach(() => {
@@ -39,29 +39,5 @@ describe("submitWaitlist", () => {
   it("lança quando o payload não bate o schema", async () => {
     const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ ok: false }));
     await expect(submitWaitlist("ana@farol.app", "x", fetchImpl)).rejects.toThrow();
-  });
-});
-
-describe("fetchWaitlistCount", () => {
-  it("faz GET em {base}/waitlist/count e valida a resposta", async () => {
-    delete process.env.NEXT_PUBLIC_API_URL;
-    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ count: 9 }));
-
-    const out = await fetchWaitlistCount(fetchImpl);
-
-    expect(out).toEqual({ count: 9 });
-    expect(fetchImpl).toHaveBeenCalledWith("http://localhost:3333/api/waitlist/count", {
-      cache: "no-store"
-    });
-  });
-
-  it("lança com o status quando a resposta não é ok", async () => {
-    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({}, 503));
-    await expect(fetchWaitlistCount(fetchImpl)).rejects.toThrow("waitlist/count respondeu 503");
-  });
-
-  it("lança quando o payload não bate o schema", async () => {
-    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ count: -1 }));
-    await expect(fetchWaitlistCount(fetchImpl)).rejects.toThrow();
   });
 });

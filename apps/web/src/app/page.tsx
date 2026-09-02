@@ -1,7 +1,7 @@
 "use client";
 
-import { type FormEvent, useCallback, useEffect, useState } from "react";
-import { fetchWaitlistCount, submitWaitlist } from "../lib/waitlist";
+import { type FormEvent, useState } from "react";
+import { submitWaitlist } from "../lib/waitlist";
 import ChatDemo from "./_landing/ChatDemo";
 import Modes from "./_landing/Modes";
 import Screens from "./_landing/Screens";
@@ -11,7 +11,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 type Status = "idle" | "sending" | "ok" | "error";
 
-function WaitlistForm({ source, onJoined }: { source: string; onJoined: () => void }) {
+function WaitlistForm({ source }: { source: string }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
@@ -31,18 +31,26 @@ function WaitlistForm({ source, onJoined }: { source: string; onJoined: () => vo
       setStatus("ok");
       setMessage(
         result.created
-          ? "Pronto. Você está na lista — a gente avisa quando abrir."
-          : "Esse e-mail já estava na lista. A gente avisa quando abrir."
+          ? "A gente avisa quando abrir o acesso."
+          : "Esse e-mail já estava na lista — a gente avisa quando abrir."
       );
-      setEmail("");
-      if (result.created) onJoined();
+      setEmail(value);
     } catch {
       setStatus("error");
       setMessage("Não deu para salvar agora. Tenta de novo em instantes.");
     }
   }
 
-  const tone = status === "ok" ? "ok" : status === "error" ? "error" : undefined;
+  if (status === "ok") {
+    return (
+      <div className="signup-done" role="status">
+        <strong>Você está na lista.</strong>
+        <p>
+          {message} Guardamos <b>{email}</b>.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form
@@ -63,7 +71,7 @@ function WaitlistForm({ source, onJoined }: { source: string; onJoined: () => vo
       <button type="submit" disabled={status === "sending"}>
         {status === "sending" ? "Enviando…" : "Quero ser dos primeiros"}
       </button>
-      <p className="note" data-tone={tone} role="status">
+      <p className="note" data-tone={status === "error" ? "error" : undefined} role="status">
         {message}
       </p>
     </form>
@@ -71,33 +79,6 @@ function WaitlistForm({ source, onJoined }: { source: string; onJoined: () => vo
 }
 
 export default function HomePage() {
-  const [count, setCount] = useState<number | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    fetchWaitlistCount()
-      .then((c) => {
-        if (active) setCount(c.count);
-      })
-      .catch(() => {
-        if (active) setCount(null);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const bumpCount = useCallback(() => {
-    setCount((current) => (current === null ? current : current + 1));
-  }, []);
-
-  const countLine =
-    count !== null ? (
-      <p className="count">
-        {count} pessoa{count === 1 ? "" : "s"} já na lista.
-      </p>
-    ) : null;
-
   return (
     <>
       <nav className="nav">
@@ -121,8 +102,7 @@ export default function HomePage() {
             O Farol parte do seu gosto, acha o destino, monta o dia a dia e ajusta tudo por
             conversa. Ainda estamos construindo — entre na lista e teste antes de todo mundo.
           </p>
-          <WaitlistForm source="landing-hero" onJoined={bumpCount} />
-          {countLine}
+          <WaitlistForm source="landing-hero" />
           <p className="trust">Sem spam. Um único e-mail quando abrir o acesso.</p>
         </section>
 
@@ -200,8 +180,7 @@ export default function HomePage() {
         <section className="final wrap reveal">
           <p className="eyebrow">Lista de primeiros usuários</p>
           <h2>Entre agora e teste antes de todo mundo.</h2>
-          <WaitlistForm source="landing-footer" onJoined={bumpCount} />
-          {countLine}
+          <WaitlistForm source="landing-footer" />
         </section>
       </main>
 
