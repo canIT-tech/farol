@@ -14,7 +14,10 @@ services:
     plan: free
     region: oregon
     branch: main
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build && pnpm --filter @farol/db run db:migrate && pnpm --filter @farol/db run db:seed
+    # Migration e seed ficam FORA do build: o banco é compartilhado com outra
+    # pessoa, então migrar roda por MCP com autorização explícita, só quando o
+    # schema mudar.
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
     startCommand: node apps/api/dist/main.js
     healthCheckPath: /api/health
     envVars:
@@ -47,11 +50,13 @@ services:
         sync: false
       - key: GOOGLE_PLACES_KEY
         sync: false
+      # Provider e modelos são configuração, não segredo: ficam literais aqui.
+      # Só os gpt-oss têm structured output com JSON schema na Groq.
       - key: LLM_PROVIDER
-        sync: false
-      - key: LLM_API_KEY
-        sync: false
+        value: groq
       - key: LLM_MODEL_CAPABLE
-        sync: false
+        value: openai/gpt-oss-120b
       - key: LLM_MODEL_CHEAP
+        value: openai/gpt-oss-20b
+      - key: LLM_API_KEY
         sync: false

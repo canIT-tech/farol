@@ -64,9 +64,10 @@ export class TripsService {
     await this.db
       .update(trips)
       .set({
-        dateStart: opts.dateStart === undefined ? undefined : opts.dateStart,
-        dateEnd: opts.dateEnd === undefined ? undefined : opts.dateEnd,
-        durationDays: opts.durationDays === undefined ? undefined : opts.durationDays,
+        // undefined no set() do Drizzle = coluna não mexe; null = zera.
+        dateStart: opts.dateStart,
+        dateEnd: opts.dateEnd,
+        durationDays: opts.durationDays,
         updatedAt: new Date()
       })
       .where(eq(trips.id, tripId));
