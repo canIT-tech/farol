@@ -18,7 +18,13 @@ describe("estimateUsd", () => {
 
   it("devolve null para modelo sem preço conhecido, em vez de inventar", () => {
     expect(estimateUsd("marte:modelo-x", 1_000_000, 0)).toBeNull();
+    // llama no Groq nao entra: sem structured output e sem preco publico.
     expect(estimateUsd("groq:llama-3.3-70b-versatile", 1_000_000, 1_000_000)).toBeNull();
+  });
+
+  it("precifica os gpt-oss do Groq", () => {
+    expect(estimateUsd("groq:openai/gpt-oss-120b", 1_000_000, 1_000_000)).toBeCloseTo(0.75);
+    expect(estimateUsd("groq:openai/gpt-oss-20b", 1_000_000, 1_000_000)).toBeCloseTo(0.375);
   });
 
   it("o mesmo modelo sob outro provider é outra chave", () => {

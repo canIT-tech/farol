@@ -136,14 +136,19 @@ export interface LlmProvider {
 // fornecedores diferentes. Conferido em 2026-09-01 na tabela oficial da
 // Anthropic (platform.claude.com/docs/en/about-claude/pricing).
 //
-// Groq não está aqui de propósito: llama-3.3-70b-versatile e
-// llama-3.1-8b-instant aparecem como "Enterprise / Contact Sales", sem preço
-// público. Modelo sem preço conhecido devolve null — melhor do que inventar
-// número, e melhor ainda do que zero, que tornaria qualquer teto de orçamento
+// Groq: só os gpt-oss entram. Os llama não servem ao produto — no Groq eles
+// não têm structured output com JSON schema, só json_object, que a própria doc
+// descreve como "may not match your intended schema"; rankDestinations e
+// buildItinerary usam generateObject e quebrariam de forma imprevisível. Os
+// llama também não têm preço público ("Enterprise / Contact Sales").
+// Modelo sem preço conhecido devolve null — melhor do que inventar número, e
+// melhor ainda do que zero, que tornaria qualquer teto de orçamento
 // inoperante sem avisar.
 export const MODEL_PRICING: Record<string, { inUsdPerMTok: number; outUsdPerMTok: number }> = {
   "anthropic:claude-sonnet-5": { inUsdPerMTok: 2, outUsdPerMTok: 10 },
-  "anthropic:claude-haiku-4-5-20251001": { inUsdPerMTok: 1, outUsdPerMTok: 5 }
+  "anthropic:claude-haiku-4-5-20251001": { inUsdPerMTok: 1, outUsdPerMTok: 5 },
+  "groq:openai/gpt-oss-120b": { inUsdPerMTok: 0.15, outUsdPerMTok: 0.6 },
+  "groq:openai/gpt-oss-20b": { inUsdPerMTok: 0.075, outUsdPerMTok: 0.3 }
 };
 
 export function estimateUsd(

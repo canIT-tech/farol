@@ -89,15 +89,25 @@ pnpm lint && pnpm test && pnpm test:e2e` verdes.
   $3/$15 que inventava custo para qualquer modelo desconhecido — mesma classe do 22 °C
   do D1. E o zero do Groq era pior: tornaria o teto do E5 inoperante sem avisar.
 
-### E4. Nenhum modelo Groq foi medido (item L1 da spec de LLM)
+### E4. Nenhum modelo Groq foi medido (item L1 da spec de LLM) — PARCIAL (2026-09-02)
 
 - **Evidência:** `docs/superpowers/specs/2026-08-31-llm-provider-agnostico-design.md`,
   item L1. `llama-3.3-70b-versatile` e `llama-3.1-8b-instant` entraram no
   `MODEL_PRICING` por palpite meu, nunca por medição.
-- **Fazer:** rodar `buildItinerary` com Groq e medir se o `generateObject` obedece ao
-  schema com a mesma confiabilidade do Anthropic. É o critério que define o tier
-  `capable` do provider gratuito.
-- **Pronto quando:** existe número, não impressão, e a escolha está registrada na spec.
+- **Decisão de produto (2026-09-02): o MVP vai de Groq, free tier.** Anthropic sai.
+- **Os llama estão descartados, e não por medição — por documentação.** No Groq, structured
+  output com JSON schema existe só em `openai/gpt-oss-120b`, `openai/gpt-oss-20b` e
+  `qwen/qwen3.8-27b`. Os llama só têm `json_object`, que a doc da Groq descreve como
+  "may not match your intended schema". `rankDestinations` e `buildItinerary` usam
+  `generateObject`; com llama quebrariam de forma imprevisível.
+- **Escolha:** `LLM_MODEL_CAPABLE=openai/gpt-oss-120b`, `LLM_MODEL_CHEAP=openai/gpt-oss-20b`.
+  Preço público, já no `MODEL_PRICING`: $0,15/$0,60 e $0,075/$0,30 por MTok — contra
+  $2/$10 do Sonnet 5, cerca de 13x mais barato no tier capable.
+- **Falta medir**, e precisa de `LLM_API_KEY` da Groq: (a) se o `generateObject` do AI SDK
+  usa `response_format: json_schema` contra a Groq ou cai em outro caminho, (b) se o
+  loop de tool-calling do chat funciona nos gpt-oss — a doc da Groq diz que **structured
+  output e tool use são incompatíveis**, e o chat usa tools (sem structured output, então
+  em tese ok, mas não verifiquei), (c) limites do free tier por dia.
 
 ### E5. Teto de custo de LLM por roteiro
 
