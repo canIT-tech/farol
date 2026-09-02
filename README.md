@@ -78,8 +78,12 @@ pnpm test:e2e        # e2e da api (Vitest+Supertest) e do web (Playwright)
 pnpm test:mutation   # StrykerJS por pacote (falha abaixo do threshold.break)
 ```
 
-Os testes de banco e os e2e da api usam o Postgres do `docker-compose.yml`.
-Playwright precisa dos browsers: `pnpm exec playwright install chromium`.
+Os testes de banco e os e2e da api usam o **`farol_test`**, criado pelo
+`docker-compose.yml` junto com o `farol`. Separado de propósito: o `client.spec` de
+`@farol/db` derruba tabelas, e apontar `DATABASE_URL_TEST` para o banco de
+desenvolvimento zera o seu catálogo a cada `pnpm test`.
+Playwright precisa dos browsers: `pnpm --filter @farol/web exec playwright install chromium`
+(na raiz o `pnpm exec` não acha o binário — o playwright é devDependency do `apps/web`).
 
 ## CI
 

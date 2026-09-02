@@ -1,10 +1,17 @@
 {
   "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/api/schema/stryker-schema.json",
   "testRunner": "vitest",
-  "plugins": ["@stryker-mutator/vitest-runner"],
-  "reporters": ["progress", "clear-text", "html"],
-  "_comment": "prompts/ é texto de prompt (não lógica), fora da mutação. jobs/pgboss-queue.ts: os helpers puros (buildQueueOptions/assertJobId/pollingSeconds/deadLetterName) ficam em 100%; a classe PgBossQueue é glue de I/O do pg-boss (start/stop/createQueue/work), como client.ts/migrate.ts em @farol/db — sobreviventes ali não abaixam a agregada abaixo do break. timeoutMS alto por causa da integração real do pg-boss (retry/dead-letter levam segundos).",
+  "plugins": [
+    "@stryker-mutator/vitest-runner"
+  ],
+  "reporters": [
+    "progress",
+    "clear-text",
+    "html"
+  ],
+  "_comment": "prompts/ é texto de prompt (não lógica), fora da mutação. jobs/pgboss-queue.ts: os helpers puros (buildQueueOptions/assertJobId/pollingSeconds/deadLetterName) ficam em 100%; a classe PgBossQueue é glue de I/O do pg-boss (start/stop/createQueue/work), como client.ts/migrate.ts em @farol/db — sobreviventes ali não abaixam a agregada abaixo do break. timeoutMS alto por causa da integração real do pg-boss (retry/dead-letter levam segundos). dryRunTimeoutMinutes: o default de 5 min estourou no CI (a suite bate em Postgres real e o dry run usa perTest); 15 e folga, nao mascara falha — hang ainda quebra.",
   "timeoutMS": 90000,
+  "dryRunTimeoutMinutes": 15,
   "mutate": [
     "src/**/*.ts",
     "!src/**/*.spec.ts",
@@ -13,6 +20,12 @@
     "!src/**/*.module.ts",
     "!src/**/prompts/**"
   ],
-  "htmlReporter": { "fileName": "reports/mutation/api.html" },
-  "thresholds": { "high": 100, "low": 80, "break": 90 }
+  "htmlReporter": {
+    "fileName": "reports/mutation/api.html"
+  },
+  "thresholds": {
+    "high": 100,
+    "low": 80,
+    "break": 90
+  }
 }

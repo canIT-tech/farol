@@ -74,12 +74,15 @@ export class FakeLlmService implements LlmPort {
       const slots = SLOT_PLAN.map((plan) => {
         const fixed = findPinned(dayIndex, plan.slot);
         if (fixed !== undefined) {
-          return { slot: fixed.slot, type: fixed.type, title: fixed.title };
+          return { slot: fixed.slot, type: fixed.type, title: fixed.title, description: null, durationMin: null, estCost: null };
         }
         return {
           slot: plan.slot,
           type: plan.type,
-          title: fakeSlotTitle(plan.type, input.destination.city, dayIndex)
+          title: fakeSlotTitle(plan.type, input.destination.city, dayIndex),
+          description: null,
+          durationMin: null,
+          estCost: null
         };
       });
       return { dayIndex, slots };

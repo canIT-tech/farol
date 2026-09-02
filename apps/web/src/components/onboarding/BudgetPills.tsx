@@ -3,7 +3,9 @@
 import { budgetEnum } from "@farol/shared";
 import { SegmentedControl } from "./SegmentedControl";
 
-const BUDGET_LABELS: Record<string, string> = {
+// Record da união completa, não de string: o compilador cobra rótulo para toda
+// faixa nova e não sobra fallback inalcançável.
+const BUDGET_LABELS: Record<(typeof budgetEnum.options)[number], string> = {
   economico: "Econômico",
   medio: "Médio",
   conforto: "Conforto",
@@ -19,7 +21,7 @@ export function BudgetPills({
 }) {
   const options = budgetEnum.options.map((entry) => ({
     value: entry,
-    label: BUDGET_LABELS[entry] ?? entry
+    label: BUDGET_LABELS[entry]
   }));
   return (
     <SegmentedControl

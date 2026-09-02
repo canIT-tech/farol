@@ -152,16 +152,6 @@ describe("prefilterDestinations", () => {
     ]);
   });
 
-  it("respeita excludeIata", () => {
-    const out = prefilterDestinations({
-      catalog: [entry({ iata: "AAA" }), entry({ iata: "BBB" })],
-      trip,
-      profile,
-      excludeIata: ["AAA"]
-    });
-    expect(out.map((e) => e.iata)).toEqual(["BBB"]);
-  });
-
   it("ordena por aderência de tags (desc)", () => {
     const baixa = entry({ iata: "LOW", tags: ["compras"] });
     const alta = entry({ iata: "HIGH", tags: ["praia", "gastronomia", "natureza", "vinhos"] });

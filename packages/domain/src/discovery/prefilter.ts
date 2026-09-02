@@ -43,15 +43,13 @@ export interface PrefilterArgs {
   catalog: CatalogEntry[];
   trip: TripCriteria;
   profile: TasteProfileInput;
-  excludeIata?: string[];
   limit?: number;
 }
 
-// Pré-filtro determinístico (design §6.2): orçamento, época, visto, exclusões;
+// Pré-filtro determinístico (design §6.2): orçamento, época, visto;
 // ordena por aderência (desc) e desempata por passagem mais barata.
 export function prefilterDestinations(args: PrefilterArgs): CatalogEntry[] {
   const { catalog, trip, profile } = args;
-  const excluded = new Set(args.excludeIata);
   const limit = args.limit ?? DEFAULT_LIMIT;
 
   const nights = nightsOf(trip);
@@ -59,9 +57,6 @@ export function prefilterDestinations(args: PrefilterArgs): CatalogEntry[] {
   const budgetPerPerson = trip.budgetTotal / trip.party.adults;
 
   const eligible = catalog.filter((entry) => {
-    if (excluded.has(entry.iata)) {
-      return false;
-    }
     if (entry.region !== BRAZIL_REGION && !entry.visaFreeBr) {
       return false;
     }

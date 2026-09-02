@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 
+// Os specs abrem o banco por DATABASE_URL_TEST; o WorkerModule le DATABASE_URL.
+// Sem alinhar os dois, o worker escreve num banco e o teste confere no outro.
+if (process.env.DATABASE_URL_TEST) {
+  process.env.DATABASE_URL = process.env.DATABASE_URL_TEST;
+}
+
 process.env.SUPABASE_JWKS_URL ??= "https://example.com/jwks.json";
 process.env.AMADEUS_CLIENT_ID ??= "amadeus-worker-id";
 process.env.AMADEUS_CLIENT_SECRET ??= "amadeus-worker-secret";

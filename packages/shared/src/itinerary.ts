@@ -21,7 +21,9 @@ export const itineraryItemSchema = z.object({
   durationMin: z.number().int().nullable(),
   estCost: z.number().nullable(),
   sortOrder: z.number().int(),
-  pinned: z.boolean()
+  pinned: z.boolean(),
+  // Passo 6: o enrich do Places não achou correspondência para este item.
+  needsReview: z.boolean()
 });
 export type ItineraryItem = z.infer<typeof itineraryItemSchema>;
 
@@ -45,14 +47,17 @@ export const itinerarySchema = z.object({
 });
 export type Itinerary = z.infer<typeof itinerarySchema>;
 
-// Forma exata que o Claude devolve na geração de roteiro (design §6.3).
+// Forma exata que o LLM devolve na geração de roteiro (design §6.3).
+// nullable, não optional: o structured output estrito da Groq exige que
+// `required` liste toda propriedade de `properties`, então campo ausente tem
+// que virar campo nulo. Alinha com itineraryItemSchema, que já era nullable.
 export const buildItinerarySlotSchema = z.object({
   slot: slotEnum,
   type: itemTypeEnum,
   title: z.string().min(2).max(120),
-  description: z.string().max(400).optional(),
-  durationMin: z.number().int().positive().optional(),
-  estCost: z.number().nonnegative().optional()
+  description: z.string().max(400).nullable(),
+  durationMin: z.number().int().positive().nullable(),
+  estCost: z.number().nonnegative().nullable()
 });
 export const buildItineraryOutputSchema = z.object({
   days: z

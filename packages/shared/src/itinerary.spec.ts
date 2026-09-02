@@ -26,7 +26,8 @@ const item = {
   durationMin: null,
   estCost: null,
   sortOrder: 0,
-  pinned: false
+  pinned: false,
+  needsReview: false
 };
 
 describe("enums", () => {
@@ -56,7 +57,8 @@ describe("itineraryItemSchema", () => {
       rating: 4.6,
       durationMin: 120,
       estCost: 80,
-      pinned: true
+      pinned: true,
+      needsReview: true
     };
     expect(itineraryItemSchema.parse(enriched)).toEqual(enriched);
   });
@@ -177,7 +179,14 @@ describe("itinerarySchema", () => {
 });
 
 describe("buildItinerarySlotSchema", () => {
-  const slot = { slot: "morning", type: "activity", title: "Museu de Arte Moderna" };
+  const slot = {
+    slot: "morning",
+    type: "activity",
+    title: "Museu de Arte Moderna",
+    description: null,
+    durationMin: null,
+    estCost: null
+  };
 
   it("aceita um slot mínimo", () => {
     expect(buildItinerarySlotSchema.parse(slot)).toEqual(slot);
@@ -231,12 +240,21 @@ describe("buildItinerarySlotSchema", () => {
   });
 });
 
+const slotBase = {
+  slot: "morning" as const,
+  type: "activity" as const,
+  title: "Slot",
+  description: null,
+  durationMin: null,
+  estCost: null
+};
+
 describe("buildItineraryOutputSchema", () => {
   const validDay = {
     dayIndex: 1,
     slots: [
-      { slot: "morning", type: "activity", title: "Caminhada guiada" },
-      { slot: "afternoon", type: "meal", title: "Almoço no mercado" }
+      { ...slotBase, title: "Caminhada guiada" },
+      { ...slotBase, slot: "afternoon", type: "meal", title: "Almoço no mercado" }
     ]
   };
 
@@ -251,7 +269,7 @@ describe("buildItineraryOutputSchema", () => {
   it("rejeita slot fora do enum dentro de um dia", () => {
     expect(() =>
       buildItineraryOutputSchema.parse({
-        days: [{ dayIndex: 1, slots: [{ slot: "night", type: "activity", title: "Bar" }] }]
+        days: [{ dayIndex: 1, slots: [{ ...slotBase, slot: "night", title: "Bar" }] }]
       })
     ).toThrow();
   });

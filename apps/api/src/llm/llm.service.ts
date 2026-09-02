@@ -1,7 +1,7 @@
 import {
   DomainError,
   buildItineraryOutputSchema,
-  llmRankingSchema,
+  llmRankingResponseSchema,
   type BuildItineraryOutput,
   type LlmRanking
 } from "@farol/shared";
@@ -23,13 +23,15 @@ export class LlmService implements LlmPort {
   constructor(private readonly provider: LlmProvider) {}
 
   async rankDestinations(input: RankDestinationsInput): Promise<LlmRanking> {
-    const ranking = await this.provider.completeStructured({
+    // Envelope de objeto por exigência do structured output da Groq; o domínio
+    // continua trabalhando com a lista.
+    const { picks: ranking } = await this.provider.completeStructured({
       tier: "capable",
       kind: "rank_destinations",
       tripId: null,
       system: RANK_SYSTEM,
       prompt: buildRankUserPrompt(input),
-      schema: llmRankingSchema
+      schema: llmRankingResponseSchema
     });
 
     // O schema garante a forma, não que o modelo ficou dentro da shortlist.
@@ -57,9 +59,12 @@ export class LlmService implements LlmPort {
     });
   }
 
+  // Tier barato: o chat é a chamada de maior volume (vários turnos por viagem)
+  // e a que menos exige do modelo. Era o único ponto previsto para o tier na
+  // spec de LLM, e sem ele LLM_MODEL_CHEAP seria env obrigatória sem chamador.
   chat(input: LlmChatInput): Promise<LlmCompletion> {
     return this.provider.complete({
-      tier: "capable",
+      tier: "cheap",
       kind: "chat",
       tripId: input.tripId,
       system: input.system,

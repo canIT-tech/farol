@@ -4,12 +4,36 @@ export function apiBase(): string {
   return process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333";
 }
 
-export interface ApiFetchOptions<T> {
+export interface ApiSendOptions {
   path: string;
-  schema: ZodType<T>;
   token: string;
   method?: "GET" | "POST" | "PUT" | "DELETE";
   body?: unknown;
+}
+
+export interface ApiFetchOptions<T> extends ApiSendOptions {
+  schema: ZodType<T>;
+}
+
+function buildInit(opts: ApiSendOptions): RequestInit {
+  const headers: Record<string, string> = { authorization: `Bearer ${opts.token}` };
+  const init: RequestInit = { method: opts.method ?? "GET", headers, cache: "no-store" };
+  if (opts.body !== undefined) {
+    headers["content-type"] = "application/json";
+    init.body = JSON.stringify(opts.body);
+  }
+  return init;
+}
+
+// Para as rotas que respondem 202/201 sem corpo: chamar res.json() ali estoura.
+export async function apiSend(
+  opts: ApiSendOptions,
+  fetchImpl: typeof fetch = fetch
+): Promise<void> {
+  const res = await fetchImpl(`${apiBase()}${opts.path}`, buildInit(opts));
+  if (!res.ok) {
+    throw new Error(`api ${opts.path} respondeu ${res.status}`);
+  }
 }
 
 // Chamada autenticada à apps/api: anexa o Bearer, valida a resposta com o schema
@@ -18,13 +42,7 @@ export async function apiFetch<T>(
   opts: ApiFetchOptions<T>,
   fetchImpl: typeof fetch = fetch
 ): Promise<T> {
-  const headers: Record<string, string> = { authorization: `Bearer ${opts.token}` };
-  const init: RequestInit = { method: opts.method ?? "GET", headers, cache: "no-store" };
-  if (opts.body !== undefined) {
-    headers["content-type"] = "application/json";
-    init.body = JSON.stringify(opts.body);
-  }
-  const res = await fetchImpl(`${apiBase()}${opts.path}`, init);
+  const res = await fetchImpl(`${apiBase()}${opts.path}`, buildInit(opts));
   if (!res.ok) {
     throw new Error(`api ${opts.path} respondeu ${res.status}`);
   }

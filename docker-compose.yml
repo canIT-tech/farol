@@ -6,3 +6,5 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: farol
     ports: ["5432:5432"]
+    volumes:
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro

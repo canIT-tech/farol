@@ -8,7 +8,8 @@ const baseEnvSchema = z.object({
   // configurada, e só os fluxos de IA recusam (llm_not_configured, 503).
   // Se LLM_PROVIDER vier, as outras três passam a ser obrigatórias — meia
   // configuração é erro de boot, não falha no meio de um job.
-  LLM_PROVIDER: z.enum(["anthropic", "groq", "openai"]).optional(),
+  // "fake" é o provider determinístico do E2E: sobe a api sem chamar rede.
+  LLM_PROVIDER: z.enum(["anthropic", "groq", "openai", "fake"]).optional(),
   LLM_API_KEY: z.string().min(1).optional(),
   LLM_MODEL_CAPABLE: z.string().min(1).optional(),
   LLM_MODEL_CHEAP: z.string().min(1).optional(),
@@ -32,7 +33,7 @@ const baseEnvSchema = z.object({
 });
 
 export const envSchema = baseEnvSchema.superRefine((env, ctx) => {
-  if (env.LLM_PROVIDER === undefined) {
+  if (env.LLM_PROVIDER === undefined || env.LLM_PROVIDER === "fake") {
     return;
   }
   for (const field of ["LLM_API_KEY", "LLM_MODEL_CAPABLE", "LLM_MODEL_CHEAP"] as const) {

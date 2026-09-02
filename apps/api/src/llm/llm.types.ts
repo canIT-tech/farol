@@ -131,25 +131,35 @@ export interface LlmProvider {
   completeStructured<T>(request: LlmStructuredRequest<T>): Promise<T>;
 }
 
-// Preços aproximados em USD por 1M de tokens, por "<provider>:<model>" —
-// revisar periodicamente. O prefixo do provider importa porque o mesmo id de
-// modelo pode custar diferente em fornecedores diferentes. Modelo gratuito
-// entra explicitamente como 0 para não cair no fallback e logar custo fictício.
+// Preços em USD por 1M de tokens, por "<provider>:<model>". O prefixo do
+// provider importa porque o mesmo id de modelo pode custar diferente em
+// fornecedores diferentes. Conferido em 2026-09-01 na tabela oficial da
+// Anthropic (platform.claude.com/docs/en/about-claude/pricing).
+//
+// Groq: só os gpt-oss entram. Os llama não servem ao produto — no Groq eles
+// não têm structured output com JSON schema, só json_object, que a própria doc
+// descreve como "may not match your intended schema"; rankDestinations e
+// buildItinerary usam generateObject e quebrariam de forma imprevisível. Os
+// llama também não têm preço público ("Enterprise / Contact Sales").
+// Modelo sem preço conhecido devolve null — melhor do que inventar número, e
+// melhor ainda do que zero, que tornaria qualquer teto de orçamento
+// inoperante sem avisar.
 export const MODEL_PRICING: Record<string, { inUsdPerMTok: number; outUsdPerMTok: number }> = {
-  "anthropic:claude-sonnet-5": { inUsdPerMTok: 3, outUsdPerMTok: 15 },
-  "anthropic:claude-haiku-4-5-20251001": { inUsdPerMTok: 0.8, outUsdPerMTok: 4 },
-  "groq:llama-3.3-70b-versatile": { inUsdPerMTok: 0, outUsdPerMTok: 0 },
-  "groq:llama-3.1-8b-instant": { inUsdPerMTok: 0, outUsdPerMTok: 0 }
+  "anthropic:claude-sonnet-5": { inUsdPerMTok: 2, outUsdPerMTok: 10 },
+  "anthropic:claude-haiku-4-5-20251001": { inUsdPerMTok: 1, outUsdPerMTok: 5 },
+  "groq:openai/gpt-oss-120b": { inUsdPerMTok: 0.15, outUsdPerMTok: 0.6 },
+  "groq:openai/gpt-oss-20b": { inUsdPerMTok: 0.075, outUsdPerMTok: 0.3 }
 };
-
-const FALLBACK_PRICE = { inUsdPerMTok: 3, outUsdPerMTok: 15 };
 
 export function estimateUsd(
   providerModelKey: string,
   inputTokens: number,
   outputTokens: number
-): number {
-  const price = MODEL_PRICING[providerModelKey] ?? FALLBACK_PRICE;
+): number | null {
+  const price = MODEL_PRICING[providerModelKey];
+  if (price === undefined) {
+    return null;
+  }
   return (inputTokens * price.inUsdPerMTok + outputTokens * price.outUsdPerMTok) / 1_000_000;
 }
 
@@ -157,7 +167,8 @@ export interface LlmCallMetrics {
   model: string;
   inputTokens: number;
   outputTokens: number;
-  estimatedUsd: number;
+  // null quando o modelo nao tem preco publico conhecido.
+  estimatedUsd: number | null;
   kind: string;
   latencyMs: number;
   // Sem isto não dá para somar custo por roteiro (Q3 da spec do MVP).

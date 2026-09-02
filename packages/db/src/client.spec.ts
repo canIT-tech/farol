@@ -12,9 +12,14 @@ afterAll(() => close());
 
 // Zera o schema uma vez para que runMigrations faça trabalho de verdade
 // (mata o mutante de "corpo vazio" mesmo com o banco compartilhado do Stryker).
+//
+// Schema inteiro, não duas tabelas: dropar só `users` deixava as outras 11 com
+// linhas órfãs, e aí o runMigrations falhava ao re-adicionar a FK de `trips`.
+// Só é seguro porque DATABASE_URL_TEST aponta para um banco separado do de
+// desenvolvimento.
 beforeAll(async () => {
-  await db.execute(sql`drop table if exists "taste_profiles" cascade`);
-  await db.execute(sql`drop table if exists "users" cascade`);
+  await db.execute(sql`drop schema public cascade`);
+  await db.execute(sql`create schema public`);
   await db.execute(sql`drop schema if exists drizzle cascade`);
   await runMigrations(url);
 });
