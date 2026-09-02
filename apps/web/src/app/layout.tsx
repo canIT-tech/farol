@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   var script = document.createElement("script");
   script.async = 1;
   script.setAttribute("data-cmp-ab", "2");
-  script.src = "https://tp-em.com/NTY4OTQz.js?t=568943";
+  script.src = "https://tp-em.com/NTY5NzM4.js?t=569738";
   document.head.appendChild(script);
 })();`
           }}
