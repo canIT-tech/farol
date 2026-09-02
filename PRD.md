@@ -141,6 +141,9 @@ Personas foco: **todos + B2B**.
 - **App mobile (iOS/Android):** modo offline do roteiro, notificações em trânsito, check-ins.
 - **Modo B2B:** multi-cliente, proposta com marca da agência, exportação PDF.
 - **Experiências e tours:** integração com GetYourGuide/Viator via afiliado.
+- **Chip / eSIM de celular:** indicação de plano de dados para o destino (ex.: Airalo),
+  encaixada no roteiro, com deep-link de afiliado via **Travelpayouts** (mesma conta e
+  `marker` de voo/hotel).
 
 ### v3 — "Gerenciador de viagem" *(4ª fase; referida internamente como "versão 4")*
 Personas foco: **Marina + David**. O produto deixa de ser só planejador e passa a
@@ -271,6 +274,11 @@ Notação: **[M]** MVP · **[1]** v1 · **[2]** v2 · **[3]** v3 (gerenciador de
   dela; agregação/publicidade dessas notas é opt-in (LGPD).
 - [3] **Registro em trânsito:** itens feitos/pulados, gastos reais, notas e fotos por item.
 
+### 5.12 Extras da viagem [2]
+- [2] **Chip / eSIM:** para o destino do roteiro, indicar 1–2 planos de dados (ex.: Airalo)
+  com preço e cobertura; deep-link de afiliado via **Travelpayouts** (mesmo `marker`).
+  Aparece no roteiro (dia da chegada) e na tela de voo/hotel.
+
 ---
 
 ## 6. Requisitos não-funcionais
@@ -301,6 +309,7 @@ Notação: **[M]** MVP · **[1]** v1 · **[2]** v2 · **[3]** v3 (gerenciador de
 | Hospedagem | Booking.com Affiliate, Expedia EPS, Airbnb (afiliado limitado), Hotelbeds | Comissão varia por parceiro |
 | Restaurantes / POIs | Google Places, Foursquare, TripAdvisor Content API | Custo por chamada relevante — cachear |
 | Experiências / tours | GetYourGuide, Viator (v2) | Afiliado |
+| Chip / eSIM (v2) | Airalo e afins via **Travelpayouts** | Mesmo `marker` de voo/hotel; deep-link de afiliado |
 | Milhas / pontos | Sem API oficial na maioria — curadoria manual + possíveis parcerias (Smiles, Latam Pass, TudoAzul, Livelo, bancos) | Maior risco de viabilidade do v1 |
 | Clima / sazonalidade | Open-Meteo, dados históricos | Para "melhor época" |
 | Câmbio | provedor de FX (ex.: exchangerate API) | v1 |
