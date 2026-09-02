@@ -27,26 +27,26 @@ test("entrada mínima → plano único, sem seletor de destino", async ({ page }
     const url = new URL(request.url());
     const method = request.method();
 
-    if (url.pathname === "/me/profile" && method === "PUT") {
+    if (url.pathname === "/api/me/profile" && method === "PUT") {
       profileBody = request.postDataJSON();
       return route.fulfill(json(profile));
     }
-    if (url.pathname === "/trips" && method === "POST") {
+    if (url.pathname === "/api/trips" && method === "POST") {
       return route.fulfill(json(trip, 201));
     }
-    if (url.pathname === `/trips/${TRIP_ID}/discovery` && method === "POST") {
+    if (url.pathname === `/api/trips/${TRIP_ID}/discovery` && method === "POST") {
       return route.fulfill(json([recife, lisboa]));
     }
-    if (url.pathname === `/trips/${TRIP_ID}/destination` && method === "POST") {
+    if (url.pathname === `/api/trips/${TRIP_ID}/destination` && method === "POST") {
       chosenIata = request.postDataJSON().iata;
       return route.fulfill(json({ itineraryId: itinerary("ready").id }, 202));
     }
-    if (url.pathname === `/trips/${TRIP_ID}` && method === "GET") {
+    if (url.pathname === `/api/trips/${TRIP_ID}` && method === "GET") {
       return route.fulfill(
         json({ ...trip, destinations: [recife, lisboa], chosenDestination: lisboa })
       );
     }
-    if (url.pathname === `/trips/${TRIP_ID}/itinerary` && method === "GET") {
+    if (url.pathname === `/api/trips/${TRIP_ID}/itinerary` && method === "GET") {
       return route.fulfill(json(itinerary("ready")));
     }
     return route.continue();

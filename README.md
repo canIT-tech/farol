@@ -112,6 +112,10 @@ source .env && SERVE_WEB=true RUN_JOB_HANDLERS=true node apps/api/dist/main.js
 As duas flags ficam **desligadas** em desenvolvimento — web e worker sobem
 separados, como antes.
 
+Verificado localmente: `/api/health` responde com o banco de pé, `/` serve a
+landing pelo Next no mesmo processo, e o contador da waitlist na landing vem da
+api pela mesma origem.
+
 ## Estrutura
 
 ```

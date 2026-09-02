@@ -26,13 +26,13 @@ test("nova viagem → descoberta → destino → roteiro → ajuste por chat", a
     const url = new URL(request.url());
     const method = request.method();
 
-    if (url.pathname === "/trips" && method === "POST") {
+    if (url.pathname === "/api/trips" && method === "POST") {
       return route.fulfill(json(trip, 201));
     }
-    if (url.pathname === `/trips/${TRIP_ID}/discovery` && method === "POST") {
+    if (url.pathname === `/api/trips/${TRIP_ID}/discovery` && method === "POST") {
       return route.fulfill(json([lisboa, recife]));
     }
-    if (url.pathname === `/trips/${TRIP_ID}` && method === "GET") {
+    if (url.pathname === `/api/trips/${TRIP_ID}` && method === "GET") {
       return route.fulfill(
         json({
           ...trip,
@@ -41,15 +41,15 @@ test("nova viagem → descoberta → destino → roteiro → ajuste por chat", a
         })
       );
     }
-    if (url.pathname === `/trips/${TRIP_ID}/destination` && method === "POST") {
+    if (url.pathname === `/api/trips/${TRIP_ID}/destination` && method === "POST") {
       chosenIata = request.postDataJSON().iata;
       return route.fulfill(json({ itineraryId: itinerary("pending").id }, 202));
     }
-    if (url.pathname === `/trips/${TRIP_ID}/itinerary` && method === "GET") {
+    if (url.pathname === `/api/trips/${TRIP_ID}/itinerary` && method === "GET") {
       itineraryCalls += 1;
       return route.fulfill(json(itinerary(itineraryCalls === 1 ? "pending" : "ready")));
     }
-    if (url.pathname === `/trips/${TRIP_ID}/chat` && method === "POST") {
+    if (url.pathname === `/api/trips/${TRIP_ID}/chat` && method === "POST") {
       chatMessage = request.postDataJSON().message;
       return route.fulfill(
         json({
