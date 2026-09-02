@@ -73,7 +73,10 @@ Canvases publicados (Claude Artifacts):
   (Render). Uma vez: `doppler login` + `doppler setup --no-interactive` (lê o `doppler.yaml`).
   Depois: `doppler run -- pnpm dev` / `doppler run -- pnpm test`. `.env.example` é só a lista
   de nomes. Deploy: o Claude lê do Doppler por MCP e escreve nas envs do Render — nunca editar
-  a env do Render à mão. Design em `docs/superpowers/specs/2026-09-02-deploy-render-doppler-design.md`.
+  a env do Render à mão. **Invariante: env do Render == `farol/prd`, chave a chave.** Só entra no
+  Doppler o que algum código lê (`apps/api/src/config/env.schema.ts`, `NEXT_PUBLIC_*` do web,
+  `DATABASE_URL` dos CLIs do db); valor igual ao default do schema não entra. Design em
+  `docs/superpowers/specs/2026-09-02-deploy-render-doppler-design.md`.
 - **Uma branch por pessoa/frente:** `git switch -c <nome>/<frente>`. Merge por PR. Nunca commitar direto na `main`.
 - Para frentes paralelas na mesma máquina, usar `git worktree`.
 - Ao concluir uma decisão/descoberta relevante, registrar em `docs/` (não em vault pessoal) para o contexto ficar no repo.
