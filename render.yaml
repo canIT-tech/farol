@@ -23,6 +23,9 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "22"
+      # A api escuta em API_PORT (não em PORT); 10000 é a porta padrão do Render.
+      - key: API_PORT
+        value: "10000"
       # O prefixo /api e o catch-all do Next vivem no mesmo processo, então o
       # front chama a api por caminho relativo.
       - key: NEXT_PUBLIC_API_URL
