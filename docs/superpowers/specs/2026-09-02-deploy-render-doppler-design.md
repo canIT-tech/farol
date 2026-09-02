@@ -174,7 +174,7 @@ Qualquer item que falhe é reportado como falha. Deploy parcial não é deploy.
 | URL pública | https://farol-ekk3.onrender.com |
 | Postgres | Session pooler `aws-0-us-west-2.pooler.supabase.com:5432`, user `postgres.vvmnkqgdtgvdhheoqvjt`, db `postgres`. O host direto `db.<ref>.supabase.co` não tem A record (só AAAA) — `ENOTFOUND` de qualquer rede IPv4 |
 | Migrations | 0000–0007 aplicadas via `db:migrate` local apontando pro pooler; `db:seed` com 23 destinos |
-| Doppler `farol/prd` | `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_JWKS_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| Doppler | `farol/prd` = conjunto completo da produção (inclui `DATABASE_URL`, `LLM_*`); `farol/dev` = conjunto completo local (Postgres do docker-compose, mesma chave Groq, Supabase público). `doppler.yaml` na raiz aponta para `dev` |
 
 Desvios do desenho, aceitos para subir hoje:
 
@@ -185,8 +185,11 @@ Desvios do desenho, aceitos para subir hoje:
   quebrar o boot. Chave real fica pra depois, junto com o Doppler.
 - IA desligada (`LLM_PROVIDER` ausente): descoberta, roteiro e chat respondem
   503 `llm_not_configured`. Ligar exige a chave da Groq na env do Render.
-- `DATABASE_URL` foi escrita direto na env do Render a partir do `.env` local,
-  não via Doppler — o Doppler ficou de lado nesta rodada.
+- `DATABASE_URL` entrou no Render antes de entrar no Doppler (mesma rodada, ordem
+  invertida). Desde então o Doppler é a origem: a env do Render é escrita a partir
+  dele por MCP.
+- IA ligada em produção logo depois do primeiro deploy (`LLM_PROVIDER=groq`, chave
+  vinda do Doppler). O item "IA desligada" acima descreve só o primeiro boot.
 - A api escuta em `API_PORT` (não `PORT`); `API_PORT=10000` na env.
 
 ## Pendências para o dono

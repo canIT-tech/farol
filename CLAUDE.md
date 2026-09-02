@@ -69,6 +69,11 @@ Canvases publicados (Claude Artifacts):
 
 ## Como trabalhar em conjunto
 
+- **Credenciais: Doppler, sem `.env`.** Projeto `farol`, configs `dev` (local) e `prd`
+  (Render). Uma vez: `doppler login` + `doppler setup --no-interactive` (lê o `doppler.yaml`).
+  Depois: `doppler run -- pnpm dev` / `doppler run -- pnpm test`. `.env.example` é só a lista
+  de nomes. Deploy: o Claude lê do Doppler por MCP e escreve nas envs do Render — nunca editar
+  a env do Render à mão. Design em `docs/superpowers/specs/2026-09-02-deploy-render-doppler-design.md`.
 - **Uma branch por pessoa/frente:** `git switch -c <nome>/<frente>`. Merge por PR. Nunca commitar direto na `main`.
 - Para frentes paralelas na mesma máquina, usar `git worktree`.
 - Ao concluir uma decisão/descoberta relevante, registrar em `docs/` (não em vault pessoal) para o contexto ficar no repo.
