@@ -322,10 +322,25 @@ A2/A3/B3 são independentes entre si e todas humanas — fazer as três de uma v
 só depois de A2+A3. B2 só depois de A5 (senão o login funciona contra o app antigo) e
 de B3.
 
-### B4. Primeiro login cria o `users` row?
+### Progresso (2026-09-03)
 
-- `AuthModule` faz upsert em `users` a partir do JWT. Verificar após B2 que a linha
-  existe (`select id, email from users`) — sem ela, `/me` e o onboarding falham.
+| Item | Status | Nota |
+|---|---|---|
+| A2 Travelpayouts | ✅ | Felipe gravou `TRAVELPAYOUTS_TOKEN` + `TRAVELPAYOUTS_MARKER` no Doppler `prd` |
+| A3 LiteAPI | ✅ | Felipe gravou `LITEAPI_KEY` (sandbox) no Doppler `prd` |
+| A4 limpar Amadeus | ✅ Doppler · ⚠️ Render | Removido do Doppler. **Ainda no Render:** o MCP só faz merge, remover exige `replace: true` com a lista completa (todos os valores passariam pelo chat). Pendente: apagar as duas chaves no dashboard do Render, ou aceitar o desvio até o próximo `replace` |
+| A5 espelho + deploy | 🟡 | 3 envs escritas no Render às 16:25 UTC → deploy `dep-dacpunrl550s73d7o2r0` disparado sobre o commit `ebd4cd8` (PR #13). Aguardando boot |
+| B3 URLs Supabase | ⏳ Rafael | — |
+| B2 login real | ⏳ | depende de A5 + B3 |
+
+Lições operacionais desta rodada:
+- `doppler secrets delete` **imprime a tabela dos segredos restantes** (valores
+  truncados) — sempre `--silent`. Idem para `set`.
+- O classificador do Claude Code bloqueia `doppler secrets get` por padrão. Liberado
+  nesta máquina via `.claude/settings.local.json` (`Bash(doppler secrets get:*)`,
+  gitignored). Decisão do Rafael: preferir isso a criar um cofre paralelo para uma
+  API key do Render — **uma fonte de verdade**, mesmo que o valor passe pelo contexto
+  do Claude na hora do espelho.
 
 ---
 
