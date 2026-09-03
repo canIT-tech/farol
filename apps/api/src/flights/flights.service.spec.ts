@@ -48,6 +48,7 @@ const geo = new GeoService({
     ),
   airline: (code) =>
     Promise.resolve(code === "TP" ? { code: "TP", name: "TAP Air Portugal", isLowcost: false } : null),
+  city: () => Promise.resolve(null),
   searchAirports: () => Promise.resolve([])
 });
 const env = { FLIGHT_CACHE_TTL_SECONDS: 600, HOTEL_CACHE_TTL_SECONDS: 3600 } as never;

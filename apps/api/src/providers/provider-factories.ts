@@ -1,30 +1,19 @@
 import {
-  AmadeusHotelProvider,
   GooglePlacesProvider,
+  LiteApiHotelProvider,
   TravelpayoutsFlightProvider,
   TravelpayoutsGeoProvider,
-  type PlacesProvider,
-  type HotelProvider
+  type PlacesProvider
 } from "@farol/providers";
-import { DomainError } from "@farol/shared";
 import type { Env } from "../config/env.schema";
 
-// A Amadeus descontinuou o Self-Service e não foi substituída no hotel ainda
-// (o Hotellook não vem liberado na conta Travelpayouts). Sem credencial, o
-// provider recusa e a seção de hotel degrada — o resto do roteiro segue (§7.3).
-export function createHotelProvider(env: Env): HotelProvider {
-  if (env.AMADEUS_CLIENT_ID === undefined || env.AMADEUS_CLIENT_SECRET === undefined) {
-    return {
-      search: () =>
-        Promise.reject(
-          new DomainError("hotel_provider_not_configured", "provider de hotel não configurado")
-        )
-    };
-  }
-  return new AmadeusHotelProvider({
-    baseUrl: env.AMADEUS_BASE_URL,
-    clientId: env.AMADEUS_CLIENT_ID,
-    clientSecret: env.AMADEUS_CLIENT_SECRET,
+export function createHotelProvider(env: Env): LiteApiHotelProvider {
+  return new LiteApiHotelProvider({
+    baseUrl: env.LITEAPI_BASE_URL,
+    apiKey: env.LITEAPI_KEY,
+    currency: env.LITEAPI_CURRENCY,
+    guestNationality: env.LITEAPI_GUEST_NATIONALITY,
+    defaultRadiusMeters: env.HOTEL_SEARCH_RADIUS_METERS,
     deepLinkTemplate: env.HOTEL_DEEPLINK_TEMPLATE
   });
 }

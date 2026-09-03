@@ -13,6 +13,7 @@ import { HotelsService } from "./hotels.service";
 import { ProviderCacheRepository, cacheKey } from "../providers/provider-cache.repository";
 import { buildHotelParams } from "../providers/trip-search";
 import { TripsService } from "../trips/trips.service";
+import { GeoService } from "../geo/geo.service";
 import { FakeHotelProvider, FAKE_HOTEL_OFFERS } from "../../test/support/fake-providers";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
@@ -21,6 +22,20 @@ if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/api");
 const { db, close } = createDbClient(url);
 const trips = new TripsService(db);
 const cache = new ProviderCacheRepository(db);
+// O destino dos testes é LIS; o catálogo aqui é mínimo, só para o serviço ter
+// país e coordenada para montar a busca.
+const LISBOA = { iata: "LIS", name: "Lisbon", countryCode: "PT", lat: 38.72, lon: -9.13 };
+function geoWith(city: typeof LISBOA | null): GeoService {
+  return new GeoService({
+    whereami: () => Promise.resolve(null),
+    airport: () => Promise.resolve(null),
+    airline: () => Promise.resolve(null),
+    city: () => Promise.resolve(city),
+    searchAirports: () => Promise.resolve([])
+  });
+}
+const geo = geoWith(LISBOA);
+const hotelParams = { name: "Lisbon", countryCode: "PT", lat: 38.72, lon: -9.13 };
 const env = { FLIGHT_CACHE_TTL_SECONDS: 600, HOTEL_CACHE_TTL_SECONDS: 3600 } as never;
 
 const userIds: string[] = [];
@@ -61,7 +76,7 @@ async function tripWithChosenDestination(userId: string): Promise<string> {
 
 beforeAll(() => runMigrations(url));
 afterEach(async () => {
-  await db.delete(providerCache).where(eq(providerCache.provider, "amadeus-hotel"));
+  await db.delete(providerCache).where(eq(providerCache.provider, "liteapi-hotel"));
   if (userIds.length > 0) {
     await db.delete(users).where(inArray(users.id, userIds));
     userIds.length = 0;
@@ -73,7 +88,7 @@ describe("HotelsService", () => {
   it("search devolve as ofertas e cacheia a 2a chamada", async () => {
     const provider = new FakeHotelProvider();
     const spy = vi.spyOn(provider, "search");
-    const service = new HotelsService(db, provider, env, cache, trips);
+    const service = new HotelsService(db, provider, env, cache, trips, geo);
 
     const userId = await makeUser();
     const tripId = await tripWithChosenDestination(userId);
@@ -88,7 +103,7 @@ describe("HotelsService", () => {
   });
 
   it("degrada para 'unavailable' e loga o evento quando o provider falha", async () => {
-    const service = new HotelsService(db, new FakeHotelProvider({ fail: true }), env, cache, trips);
+    const service = new HotelsService(db, new FakeHotelProvider({ fail: true }), env, cache, trips, geo);
     const userId = await makeUser();
     const tripId = await tripWithChosenDestination(userId);
     const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
@@ -100,19 +115,21 @@ describe("HotelsService", () => {
     }
   });
 
-  it("grava o provider 'amadeus-hotel' no cache", async () => {
-    const service = new HotelsService(db, new FakeHotelProvider(), env, cache, trips);
+  it("grava o provider 'liteapi-hotel' no cache", async () => {
+    const service = new HotelsService(db, new FakeHotelProvider(), env, cache, trips, geo);
     const userId = await makeUser();
     const tripId = await tripWithChosenDestination(userId);
     await service.search(userId, tripId);
     const trip = await trips.get(userId, tripId);
-    const key = cacheKey("amadeus-hotel", "hotel-offers", { ...buildHotelParams(trip) });
+    const key = cacheKey("liteapi-hotel", "hotel-offers", {
+      ...buildHotelParams(trip, hotelParams)
+    });
     const cached = await db.select().from(providerCache).where(eq(providerCache.key, key));
-    expect(cached[0]?.provider).toBe("amadeus-hotel");
+    expect(cached[0]?.provider).toBe("liteapi-hotel");
   });
 
   it("lança no_destination_chosen sem destino escolhido", async () => {
-    const service = new HotelsService(db, new FakeHotelProvider(), env, cache, trips);
+    const service = new HotelsService(db, new FakeHotelProvider(), env, cache, trips, geo);
     const userId = await makeUser();
     const trip = await trips.create(userId, tripInput);
     try {
@@ -125,7 +142,7 @@ describe("HotelsService", () => {
   });
 
   it("select persiste a oferta de hotel com rating nulo tratado", async () => {
-    const service = new HotelsService(db, new FakeHotelProvider(), env, cache, trips);
+    const service = new HotelsService(db, new FakeHotelProvider(), env, cache, trips, geo);
     const userId = await makeUser();
     const tripId = await tripWithChosenDestination(userId);
 
@@ -141,7 +158,7 @@ describe("HotelsService", () => {
   });
 
   it("select com rating preenchido persiste o número como texto", async () => {
-    const service = new HotelsService(db, new FakeHotelProvider(), env, cache, trips);
+    const service = new HotelsService(db, new FakeHotelProvider(), env, cache, trips, geo);
     const userId = await makeUser();
     const tripId = await tripWithChosenDestination(userId);
     const selection = await service.select(userId, tripId, "htl-marriott");
@@ -149,12 +166,48 @@ describe("HotelsService", () => {
   });
 
   it("select lança NotFoundError quando o offerId é desconhecido", async () => {
-    const service = new HotelsService(db, new FakeHotelProvider(), env, cache, trips);
+    const service = new HotelsService(db, new FakeHotelProvider(), env, cache, trips, geo);
     const userId = await makeUser();
     const tripId = await tripWithChosenDestination(userId);
     await expect(service.select(userId, tripId, "xxx")).rejects.toMatchObject({
       code: "not_found",
       message: "oferta de hotel não encontrada"
+    });
+  });
+
+  it("degrada quando a cidade do destino não está no catálogo", async () => {
+    const service = new HotelsService(db, new FakeHotelProvider(), env, cache, trips, geoWith(null));
+    const userId = await makeUser();
+    const tripId = await tripWithChosenDestination(userId);
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    try {
+      await expect(service.search(userId, tripId)).resolves.toEqual({
+        offers: [],
+        stale: false,
+        fetchedAt: null,
+        error: "unavailable"
+      });
+      expect(errSpy.mock.calls[0]![0]).toContain("não está no catálogo");
+    } finally {
+      errSpy.mockRestore();
+    }
+  });
+
+  it("leva país e coordenada do catálogo para a busca do provider", async () => {
+    const provider = new FakeHotelProvider();
+    const service = new HotelsService(db, provider, env, cache, trips, geo);
+    const userId = await makeUser();
+    const tripId = await tripWithChosenDestination(userId);
+
+    await service.search(userId, tripId);
+
+    expect(provider.lastParams).toMatchObject({
+      cityCode: "LIS",
+      countryCode: "PT",
+      cityName: "Lisbon",
+      latitude: 38.72,
+      longitude: -9.13
     });
   });
 });

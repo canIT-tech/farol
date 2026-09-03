@@ -35,6 +35,12 @@ const fakeGeo: GeoProvider = {
           }
     ),
   airport: (iata) => Promise.resolve(iata.toUpperCase() === "GRU" ? GRU : null),
+  city: (iata) =>
+    Promise.resolve(
+      iata.toUpperCase() === "LIS"
+        ? { iata: "LIS", name: "Lisbon", countryCode: "PT", lat: 38.72, lon: -9.13 }
+        : null
+    ),
   airline: (code) =>
     Promise.resolve(
       code.toUpperCase() === "LA" ? { code: "LA", name: "LATAM Airlines Group", isLowcost: false } : null

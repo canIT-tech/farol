@@ -108,8 +108,10 @@ describe("LiteApiHotelProvider.search", () => {
 
   it("cai no nome da cidade quando não há coordenada", async () => {
     const { http, calls } = fakeHttp();
-    const { latitude: _lat, longitude: _lon, ...semCoordenada } = params;
-    await provider(http).search(semCoordenada);
+    const semCoordenada: Partial<typeof params> = { ...params };
+    delete semCoordenada.latitude;
+    delete semCoordenada.longitude;
+    await provider(http).search(semCoordenada as typeof params);
 
     expect(calls[0]!.query).toMatchObject({
       countryCode: "PT",
@@ -154,10 +156,11 @@ describe("LiteApiHotelProvider.search", () => {
 
   it("usa o IATA no deep link quando o destino não tem nome de cidade", async () => {
     const { http } = fakeHttp();
-    const { cityName: _drop, ...semNome } = params;
+    const semNome: Partial<typeof params> = { ...params };
+    delete semNome.cityName;
     const offers = await provider(http, {
       deepLinkTemplate: "https://parceiro.example.com/h?c={cityName}"
-    }).search(semNome);
+    }).search(semNome as typeof params);
 
     expect(offers[0]!.deepLink).toBe("https://parceiro.example.com/h?c=LIS");
   });

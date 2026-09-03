@@ -1,6 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { GeoProvider } from "@farol/providers";
-import { NotFoundError, type Airline, type Airport, type GeoLocation } from "@farol/shared";
+import {
+  NotFoundError,
+  type Airline,
+  type Airport,
+  type City,
+  type GeoLocation
+} from "@farol/shared";
 import { GEO_PROVIDER } from "../providers/providers.module";
 
 const DEFAULT_AIRPORT_LIMIT = 10;
@@ -34,6 +40,11 @@ export class GeoService {
   /** Igual a airline(), mas devolve null em vez de lançar — para enriquecimento. */
   findAirline(code: string): Promise<Airline | null> {
     return this.provider.airline(code);
+  }
+
+  /** Cidade do IATA do destino: país e coordenada de centro para a busca de hotel. */
+  findCity(iata: string): Promise<City | null> {
+    return this.provider.city(iata);
   }
 
   async airport(iata: string): Promise<Airport> {

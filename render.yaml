@@ -41,6 +41,9 @@ services:
         sync: false
       - key: TRAVELPAYOUTS_MARKER
         sync: false
+      # LiteAPI — provider de hotel.
+      - key: LITEAPI_KEY
+        sync: false
       - key: DATABASE_URL
         sync: false
       - key: SUPABASE_JWKS_URL

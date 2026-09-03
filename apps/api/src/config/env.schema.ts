@@ -35,11 +35,16 @@ const baseEnvSchema = z.object({
   TRAVELPAYOUTS_CURRENCY: z.string().min(1).default("brl"),
   // Dumps de aeroporto/companhia: pesados e praticamente estáticos.
   GEO_DUMP_TTL_SECONDS: z.coerce.number().int().positive().default(86_400),
-  // Amadeus foi descontinuado no Self-Service e só sobrou no provider de hotel.
-  // Opcional: sem credencial a seção de hotel degrada, o resto do roteiro segue.
-  AMADEUS_BASE_URL: z.string().url().default("https://test.api.amadeus.com"),
-  AMADEUS_CLIENT_ID: z.string().min(1).optional(),
-  AMADEUS_CLIENT_SECRET: z.string().min(1).optional(),
+  // LiteAPI (Nuitée) — provider de hotel, no lugar do Hotellook (encerrado em
+  // 20/10/2025) e da Amadeus (Self-Service descontinuado). Conteúdo e tarifa
+  // são gratuitos; a chave de sandbox começa com "sand_".
+  LITEAPI_KEY: z.string().min(1),
+  LITEAPI_BASE_URL: z.string().url().default("https://api.liteapi.travel/v3.0"),
+  LITEAPI_CURRENCY: z.string().min(1).default("BRL"),
+  /** Nacionalidade do hóspede: muda tarifa e imposto na LiteAPI. */
+  LITEAPI_GUEST_NATIONALITY: z.string().length(2).default("BR"),
+  /** Raio da busca em volta do centro da cidade. Mínimo aceito pela LiteAPI: 1 km. */
+  HOTEL_SEARCH_RADIUS_METERS: z.coerce.number().int().min(1000).default(5000),
   FLIGHT_DEEPLINK_TEMPLATE: z
     .string()
     .min(1)
@@ -49,7 +54,9 @@ const baseEnvSchema = z.object({
   HOTEL_DEEPLINK_TEMPLATE: z
     .string()
     .min(1)
-    .default("https://www.google.com/travel/hotels/{cityCode}?checkin={checkIn}&checkout={checkOut}"),
+    .default(
+      "https://www.google.com/travel/hotels/{cityName}?q={hotelName}&checkin={checkIn}&checkout={checkOut}"
+    ),
   // Preço do Travelpayouts é cacheado na origem e muda devagar (spec §6).
   FLIGHT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(1800),
   HOTEL_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(3600),

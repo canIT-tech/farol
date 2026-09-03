@@ -32,6 +32,7 @@ jobs:
       SUPABASE_JWKS_URL: https://example.com/auth/v1/.well-known/jwks.json
       TRAVELPAYOUTS_TOKEN: travelpayouts-ci
       TRAVELPAYOUTS_MARKER: farol-ci
+      LITEAPI_KEY: sand_ci
       GOOGLE_PLACES_KEY: google-places-ci
       JOBS_SCHEMA: pgboss_nightly
     steps:

@@ -6,6 +6,7 @@ const valid = {
   SUPABASE_JWKS_URL: "https://proj.supabase.co/auth/v1/.well-known/jwks.json",
   TRAVELPAYOUTS_TOKEN: "travelpayouts-token",
   TRAVELPAYOUTS_MARKER: "farol-ci",
+  LITEAPI_KEY: "sand_ci",
   GOOGLE_PLACES_KEY: "google-places-key"
 };
 
@@ -68,15 +69,38 @@ describe("parseEnv", () => {
     const env = parseEnv({ ...valid });
     expect(env.FLIGHT_DEEPLINK_TEMPLATE).toContain("aviasales.com");
     expect(env.FLIGHT_DEEPLINK_TEMPLATE).toContain("{marker}");
-    expect(env.HOTEL_DEEPLINK_TEMPLATE).toContain("{cityCode}");
+    expect(env.HOTEL_DEEPLINK_TEMPLATE).toContain("{hotelName}");
   });
 
-  it("credencial da Amadeus é opcional — sem ela só a seção de hotel degrada", () => {
-    const env = parseEnv({ ...valid });
-    expect(env.AMADEUS_BASE_URL).toBe("https://test.api.amadeus.com");
-    expect(env.AMADEUS_CLIENT_ID).toBeUndefined();
-    expect(env.AMADEUS_CLIENT_SECRET).toBeUndefined();
-    expect(parseEnv({ ...valid, AMADEUS_CLIENT_ID: "id" }).AMADEUS_CLIENT_ID).toBe("id");
+  it("lança quando a chave da LiteAPI falta", () => {
+    const sem: Record<string, string | undefined> = { ...valid };
+    delete sem.LITEAPI_KEY;
+    expect(() => parseEnv(sem)).toThrow(/LITEAPI_KEY/);
+  });
+
+  it("aplica os defaults da LiteAPI e respeita os valores informados", () => {
+    const padrao = parseEnv({ ...valid });
+    expect(padrao.LITEAPI_BASE_URL).toBe("https://api.liteapi.travel/v3.0");
+    expect(padrao.LITEAPI_CURRENCY).toBe("BRL");
+    expect(padrao.LITEAPI_GUEST_NATIONALITY).toBe("BR");
+    expect(padrao.HOTEL_SEARCH_RADIUS_METERS).toBe(5000);
+
+    const env = parseEnv({
+      ...valid,
+      LITEAPI_BASE_URL: "https://lite.local",
+      LITEAPI_CURRENCY: "EUR",
+      LITEAPI_GUEST_NATIONALITY: "PT",
+      HOTEL_SEARCH_RADIUS_METERS: "12000"
+    });
+    expect(env.LITEAPI_BASE_URL).toBe("https://lite.local");
+    expect(env.LITEAPI_CURRENCY).toBe("EUR");
+    expect(env.LITEAPI_GUEST_NATIONALITY).toBe("PT");
+    expect(env.HOTEL_SEARCH_RADIUS_METERS).toBe(12_000);
+  });
+
+  it("rejeita nacionalidade fora de 2 letras e raio abaixo do mínimo da LiteAPI", () => {
+    expect(() => parseEnv({ ...valid, LITEAPI_GUEST_NATIONALITY: "BRA" })).toThrow();
+    expect(() => parseEnv({ ...valid, HOTEL_SEARCH_RADIUS_METERS: "999" })).toThrow();
   });
 
   it("aplica e respeita os TTLs de cache de voo e hotel", () => {
@@ -118,7 +142,7 @@ describe("parseEnv", () => {
 
   it("lista os campos inválidos separados por vírgula", () => {
     expect(() => parseEnv({ API_PORT: "-1" })).toThrow(
-      "Env inválida: DATABASE_URL, API_PORT, SUPABASE_JWKS_URL, TRAVELPAYOUTS_TOKEN, TRAVELPAYOUTS_MARKER, GOOGLE_PLACES_KEY"
+      "Env inválida: DATABASE_URL, API_PORT, SUPABASE_JWKS_URL, TRAVELPAYOUTS_TOKEN, TRAVELPAYOUTS_MARKER, LITEAPI_KEY, GOOGLE_PLACES_KEY"
     );
   });
 });

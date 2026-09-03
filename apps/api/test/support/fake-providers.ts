@@ -2,6 +2,7 @@ import type { FlightInsightsProvider, HotelProvider, PlacesProvider } from "@far
 import type {
   FlightOffer,
   HotelOffer,
+  HotelSearchParams,
   Place,
   PlaceDetails,
   RouteDeal,
@@ -67,20 +68,32 @@ export const FAKE_HOTEL_OFFERS: HotelOffer[] = [
     id: "htl-hostel",
     name: "Independente Hostel",
     region: "Bairro Alto",
+    address: "R. de São Pedro de Alcântara 81",
     pricePerNight: 200,
     priceTotal: 1400,
     currency: "BRL",
     rating: null,
+    reviewCount: null,
+    stars: null,
+    photoUrl: null,
+    lat: 38.7156,
+    lng: -9.1444,
     deepLink: "https://parceiro.example.com/hoteis?id=htl-hostel"
   },
   {
     id: "htl-marriott",
     name: "Marriott Lisbon",
     region: null,
+    address: null,
     pricePerNight: 1000,
     priceTotal: 7000,
     currency: "BRL",
     rating: 5,
+    reviewCount: 4210,
+    stars: 5,
+    photoUrl: "https://static.cupid.travel/hotels/1.jpg",
+    lat: null,
+    lng: null,
     deepLink: "https://parceiro.example.com/hoteis?id=htl-marriott"
   }
 ];
@@ -182,9 +195,14 @@ export class FakeFlightProvider implements FlightInsightsProvider {
 
 export class FakeHotelProvider implements HotelProvider {
   constructor(private readonly behaviour: { offers?: HotelOffer[]; fail?: boolean } = {}) {}
-  search(): Promise<HotelOffer[]> {
+  /** Guarda o último params recebido: é o que prova, no teste, que país e
+   *  coordenada chegaram no provider. */
+  lastParams: HotelSearchParams | null = null;
+
+  search(params: HotelSearchParams): Promise<HotelOffer[]> {
+    this.lastParams = params;
     if (this.behaviour.fail === true) {
-      return Promise.reject(new Error("amadeus indisponível"));
+      return Promise.reject(new Error("liteapi indisponível"));
     }
     return Promise.resolve(this.behaviour.offers ?? FAKE_HOTEL_OFFERS);
   }

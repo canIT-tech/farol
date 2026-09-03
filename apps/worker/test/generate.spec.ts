@@ -9,6 +9,7 @@ if (process.env.DATABASE_URL_TEST) {
 process.env.SUPABASE_JWKS_URL ??= "https://example.com/jwks.json";
 process.env.TRAVELPAYOUTS_TOKEN ??= "travelpayouts-worker-token";
 process.env.TRAVELPAYOUTS_MARKER ??= "farol-worker";
+process.env.LITEAPI_KEY ??= "sand_worker";
 process.env.GOOGLE_PLACES_KEY ??= "google-places-worker";
 process.env.JOBS_SCHEMA = `pgboss_worker_${Math.random().toString(36).slice(2, 8)}`;
 

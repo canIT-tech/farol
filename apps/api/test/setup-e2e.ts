@@ -11,4 +11,5 @@ process.env.SUPABASE_JWKS_URL ??= "https://example.com/auth/v1/.well-known/jwks.
 process.env.JOBS_SCHEMA ??= "pgboss_e2e";
 process.env.TRAVELPAYOUTS_TOKEN ??= "travelpayouts-e2e";
 process.env.TRAVELPAYOUTS_MARKER ??= "farol-e2e";
+process.env.LITEAPI_KEY ??= "sand_e2e";
 process.env.GOOGLE_PLACES_KEY ??= "google-places-e2e";

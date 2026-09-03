@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { TravelpayoutsFlightProvider, TravelpayoutsGeoProvider, isPlacesProvider } from "@farol/providers";
-import { DomainError } from "@farol/shared";
 import {
   createFlightProvider,
   createGeoProvider,
@@ -15,9 +14,13 @@ const env = {
   TRAVELPAYOUTS_BASE_URL: "https://tp.local",
   TRAVELPAYOUTS_CURRENCY: "usd",
   GEO_DUMP_TTL_SECONDS: 86_400,
-  AMADEUS_BASE_URL: "https://amadeus.local",
+  LITEAPI_BASE_URL: "https://lite.local",
+  LITEAPI_KEY: "sand_x",
+  LITEAPI_CURRENCY: "BRL",
+  LITEAPI_GUEST_NATIONALITY: "BR",
+  HOTEL_SEARCH_RADIUS_METERS: 5000,
   FLIGHT_DEEPLINK_TEMPLATE: "https://voo.local/{origin}-{destination}?p={passengers}&m={marker}",
-  HOTEL_DEEPLINK_TEMPLATE: "https://hotel.local/{cityCode}",
+  HOTEL_DEEPLINK_TEMPLATE: "https://hotel.local/{cityName}?q={hotelName}",
   GOOGLE_PLACES_KEY: "gkey"
 } as unknown as Env;
 
@@ -126,35 +129,44 @@ describe("createPlacesProvider", () => {
 });
 
 describe("createHotelProvider", () => {
-  const withCredentials = {
-    ...env,
-    AMADEUS_CLIENT_ID: "id",
-    AMADEUS_CLIENT_SECRET: "secret"
-  } as Env;
+  const search = {
+    cityCode: "LIS",
+    countryCode: "PT",
+    cityName: "Lisbon",
+    latitude: 38.72,
+    longitude: -9.13,
+    checkIn: "2026-11-10",
+    checkOut: "2026-11-15",
+    adults: 2
+  };
 
-  const search = { cityCode: "RIO", checkIn: "2026-09-10", checkOut: "2026-09-15", adults: 2 };
+  it("monta a LiteAPI e leva base url, chave, moeda, nacionalidade e raio da env", async () => {
+    const calls = stubFetch({ data: [] });
+    await createHotelProvider({
+      ...env,
+      LITEAPI_BASE_URL: "https://lite.local",
+      LITEAPI_KEY: "sand_x",
+      LITEAPI_CURRENCY: "EUR",
+      LITEAPI_GUEST_NATIONALITY: "PT",
+      HOTEL_SEARCH_RADIUS_METERS: 3000
+    } as Env).search(search);
 
-  it("com credencial, monta a Amadeus e usa a base url da env", async () => {
-    const calls = stubFetch({ access_token: "t", expires_in: 1799 });
-
-    await createHotelProvider(withCredentials).search(search).catch(() => undefined);
-
-    expect(calls[0]!.url.startsWith("https://amadeus.local")).toBe(true);
+    expect(calls[0]!.url).toBe(
+      "https://lite.local/data/hotels?countryCode=PT&latitude=38.72&longitude=-9.13&radius=3000&limit=25"
+    );
+    expect((calls[0]!.init!.headers as Record<string, string>)["x-api-key"]).toBe("sand_x");
   });
 
-  it("recusa a busca quando falta o client id", async () => {
-    const err = await createHotelProvider({ ...env, AMADEUS_CLIENT_SECRET: "secret" } as Env)
+  it("usa moeda e nacionalidade da env na busca de tarifa", async () => {
+    const calls = stubFetch({ data: [{ id: "h1", name: "Hotel", country: "pt", city: "Lisbon" }] });
+    await createHotelProvider({ ...env, LITEAPI_CURRENCY: "EUR", LITEAPI_GUEST_NATIONALITY: "PT" } as Env)
       .search(search)
-      .catch((e: unknown) => e);
-    expect(err).toBeInstanceOf(DomainError);
-    expect((err as DomainError).code).toBe("hotel_provider_not_configured");
-    expect((err as Error).message).toBe("provider de hotel não configurado");
-  });
+      .catch(() => undefined);
 
-  it("recusa a busca quando falta o client secret", async () => {
-    const err = await createHotelProvider({ ...env, AMADEUS_CLIENT_ID: "id" } as Env)
-      .search(search)
-      .catch((e: unknown) => e);
-    expect((err as DomainError).code).toBe("hotel_provider_not_configured");
+    const rates = calls.find((c) => c.url.includes("min-rates"))!;
+    expect(JSON.parse(rates.init!.body as string)).toMatchObject({
+      currency: "EUR",
+      guestNationality: "PT"
+    });
   });
 });

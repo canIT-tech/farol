@@ -30,6 +30,7 @@ function fakeProvider(overrides: Partial<GeoProvider> = {}): GeoProvider {
     whereami: vi.fn(() => Promise.resolve(CHAPECO)),
     airport: vi.fn(() => Promise.resolve(GRU)),
     airline: vi.fn(() => Promise.resolve(LATAM)),
+    city: vi.fn(() => Promise.resolve(null)),
     searchAirports: vi.fn(() => Promise.resolve([GRU])),
     ...overrides
   };
