@@ -44,12 +44,16 @@ export function DestinationResults({
   const arranged = arrangeDestinations(destinations, { domesticOnly, nonStopOnly, sort });
 
   if (destinations.length === 0) {
-    return <p role="status">Nenhum destino combinou com o que você pediu.</p>;
+    return (
+      <p className="pane__status" role="status">
+        Nenhum destino combinou com o que você pediu.
+      </p>
+    );
   }
 
   return (
     <div>
-      <div role="group" aria-label="Filtros">
+      <div className="pane__filters" role="group" aria-label="Filtros">
         <Chip selected={domesticOnly} onClick={() => setDomesticOnly((v) => !v)}>
           Só nacional
         </Chip>
@@ -65,9 +69,11 @@ export function DestinationResults({
       </div>
 
       {arranged.length === 0 ? (
-        <p role="status">Nenhum destino combinou com os filtros escolhidos.</p>
+        <p className="pane__status" role="status">
+          Nenhum destino combinou com os filtros escolhidos.
+        </p>
       ) : (
-        <ul>
+        <ul className="pane__grid">
           {arranged.map((candidate, index) => (
             <li key={candidate.iata}>
               <DestinationCard

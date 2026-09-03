@@ -1,13 +1,9 @@
 "use client";
 
 import { Button, Chip } from "@farol/ui";
-import type { ItineraryDay, ItineraryItem, Slot } from "@farol/shared";
-
-const SLOT_LABEL: Record<Slot, string> = {
-  morning: "Manhã",
-  afternoon: "Tarde",
-  evening: "Noite"
-};
+import type { ItineraryDay, ItineraryItem } from "@farol/shared";
+import { SLOT_LABEL, groupBySlot } from "../../lib/itinerary-blocks";
+import "./itinerary.css";
 
 export function DayStrip({
   days,
@@ -19,7 +15,7 @@ export function DayStrip({
   onSelect: (dayIndex: number) => void;
 }) {
   return (
-    <div role="tablist" aria-label="Dias do roteiro">
+    <div className="it-strip" role="tablist" aria-label="Dias do roteiro">
       {days.map((day) => (
         <Chip
           key={day.id}
@@ -41,20 +37,32 @@ export function ItineraryItemCard({
   item: ItineraryItem;
   onSwapRestaurant?: (itemId: string) => void;
 }) {
+  const swappable = item.type === "meal" && onSwapRestaurant !== undefined;
+  const hasTags = item.rating !== null || item.pinned || item.needsReview || swappable;
+
   return (
-    <article aria-label={item.title}>
-      <p>{SLOT_LABEL[item.slot]}</p>
-      <h3>{item.title}</h3>
-      {item.description !== null ? <p>{item.description}</p> : null}
-      {item.rating !== null ? <p>{`Nota ${item.rating}`}</p> : null}
-      {item.pinned ? <p>Fixado</p> : null}
-      {item.needsReview ? (
-        <p title="Não achei este lugar no mapa; confira antes de ir.">A conferir</p>
-      ) : null}
-      {item.type === "meal" && onSwapRestaurant !== undefined ? (
-        <Button variant="text" size="sm" onClick={() => onSwapRestaurant(item.id)}>
-          Trocar restaurante
-        </Button>
+    <article className="it-card" aria-label={item.title}>
+      <div className="it-card__head">
+        <h3 className="it-card__title">{item.title}</h3>
+      </div>
+      {item.description !== null ? <p className="it-card__desc">{item.description}</p> : null}
+      {hasTags ? (
+        <div className="it-tags">
+          {item.rating !== null ? (
+            <span className="it-tag it-tag--rating">{`${item.rating} ★`}</span>
+          ) : null}
+          {item.pinned ? <span className="it-tag">Fixado</span> : null}
+          {item.needsReview ? (
+            <span className="it-tag it-tag--review" title="Não achei este lugar no mapa; confira antes de ir.">
+              A conferir
+            </span>
+          ) : null}
+          {swappable ? (
+            <Button variant="text" size="sm" onClick={() => onSwapRestaurant(item.id)}>
+              Trocar restaurante
+            </Button>
+          ) : null}
+        </div>
       ) : null}
     </article>
   );
@@ -73,9 +81,11 @@ export function DayTimeline({
   onSwapRestaurant: (itemId: string) => void;
   busy?: boolean;
 }) {
+  const blocks = groupBySlot(day);
+
   return (
     <section aria-label={`Dia ${day.dayIndex}`}>
-      <header>
+      <header className="it-dayhead">
         <h2>{day.date ?? `Dia ${day.dayIndex}`}</h2>
         <Button
           variant="ghost"
@@ -86,16 +96,23 @@ export function DayTimeline({
           Refazer o dia
         </Button>
       </header>
-      {day.items.length === 0 ? (
-        <p role="status">Este dia está livre.</p>
+      {blocks.length === 0 ? (
+        <p className="pane__status" role="status">
+          Este dia está livre.
+        </p>
       ) : (
-        <ol>
-          {day.items.map((item) => (
-            <li key={item.id}>
-              <ItineraryItemCard item={item} onSwapRestaurant={onSwapRestaurant} />
-            </li>
-          ))}
-        </ol>
+        blocks.map((block) => (
+          <div className="it-block" key={block.slot}>
+            <p className="it-block__title">{SLOT_LABEL[block.slot]}</p>
+            <ol className="it-list">
+              {block.items.map((item) => (
+                <li key={item.id}>
+                  <ItineraryItemCard item={item} onSwapRestaurant={onSwapRestaurant} />
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))
       )}
     </section>
   );

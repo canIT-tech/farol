@@ -2,6 +2,7 @@
 
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@farol/ui";
 import { DestinationResults } from "../../../../components/discovery/DestinationResults";
 import { useTrip } from "../../../../providers/TripProvider";
 import { chooseDestination, runDiscovery } from "../../../../lib/trip-api";
@@ -39,18 +40,33 @@ export default function DiscoveryPage({ params }: { params: Promise<{ id: string
   }
 
   if (loading || trip === null) {
-    return <p role="status">Procurando destinos…</p>;
+    return (
+      <section className="pane">
+        <p className="pane__status" role="status">
+          Procurando destinos…
+        </p>
+      </section>
+    );
   }
 
   return (
-    <section>
-      <h1>Achei estes destinos</h1>
+    <section className="pane">
+      <div className="pane__head">
+        <h1 className="pane__title">
+          {trip.destinations.length === 1
+            ? "Achei 1 destino pra você"
+            : `Achei ${trip.destinations.length} destinos pra você`}
+        </h1>
+      </div>
+      <p className="pane__sub">
+        Ordenados pelo quanto combinam com o seu gosto. Escolha um e eu monto o roteiro.
+      </p>
       {error !== null ? (
-        <div role="alert">
-          <p>{error}</p>
-          <button type="button" onClick={() => void retry()} disabled={busy}>
+        <div className="pane__error" role="alert">
+          <span>{error}</span>
+          <Button type="button" variant="ghost" onClick={() => void retry()} disabled={busy}>
             Tentar de novo
-          </button>
+          </Button>
         </div>
       ) : null}
       <DestinationResults

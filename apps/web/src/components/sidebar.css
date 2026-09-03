@@ -1,0 +1,58 @@
+/* Sidebar da viagem: resumo em cima, passos embaixo, conta no rodapé.
+   O AppShell já dá a coluna; isto é o conteúdo dela. */
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+}
+
+.side__facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 7px 12px;
+  margin: 0;
+  font-size: 12.5px;
+}
+
+.side__facts dt {
+  color: var(--text-faint);
+}
+
+.side__facts dd {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.side__account {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.side__account a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.side__account a:hover {
+  color: var(--accent-ink);
+}
+
+/* Estado de carregamento em tela cheia, antes de qualquer shell existir. */
+.boot {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-sunk);
+  color: var(--text-muted);
+  font-family: var(--font-text);
+  font-size: 14px;
+}

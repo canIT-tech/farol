@@ -3,6 +3,7 @@
 import { type ReactNode, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "../lib/supabase";
+import "./sidebar.css";
 
 // Garante uma sessão do Supabase antes de renderizar a área logada.
 // Passa o access_token para os filhos usarem no apiFetch.
@@ -25,7 +26,11 @@ export function AuthGate({ children }: { children: (token: string) => ReactNode 
   }, [router]);
 
   if (!ready) {
-    return <p role="status">Carregando…</p>;
+    return (
+      <p className="boot" role="status">
+        Carregando…
+      </p>
+    );
   }
   if (token === null) {
     return null;

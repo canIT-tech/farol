@@ -1,5 +1,6 @@
 "use client";
 
+import "./sidebar.css";
 import { StepNav, type Step } from "@farol/ui";
 import type { TripState } from "@farol/shared";
 
@@ -65,8 +66,8 @@ export function TripSidebar({
   }
 
   return (
-    <div>
-      <dl>
+    <div className="side">
+      <dl className="side__facts">
         <dt>Origem</dt>
         <dd>{trip.originIata}</dd>
         <dt>Período</dt>

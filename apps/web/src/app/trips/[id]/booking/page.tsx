@@ -80,15 +80,23 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
   }
 
   if (flights === null || hotels === null) {
-    return <p role="status">Consultando voos e hospedagem…</p>;
+    return (
+      <section className="pane">
+        <p className="pane__status" role="status">
+          Consultando voos e hospedagem…
+        </p>
+      </section>
+    );
   }
 
   return (
-    <section>
-      <h1>Voo &amp; hotel</h1>
-      <p>{bookingSubtitle(trip)}</p>
+    <section className="pane">
+      <div className="pane__head">
+        <h1 className="pane__title">Voo &amp; hotel</h1>
+      </div>
+      <p className="pane__sub">{bookingSubtitle(trip)}</p>
 
-      <div role="tablist" aria-label="Voo ou hotel">
+      <div className="bk-tabs" role="tablist" aria-label="Voo ou hotel">
         <Chip role="tab" selected={tab === "flights"} onClick={() => setTab("flights")}>
           Voos
         </Chip>

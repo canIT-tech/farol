@@ -50,16 +50,15 @@ describe("DayStrip", () => {
 });
 
 describe("ItineraryItemCard", () => {
-  it("mostra o período do dia e o título", () => {
+  it("mostra o título do item", () => {
     render(<ItineraryItemCard item={item({ id: "a" })} />);
-    expect(screen.getByText("Manhã")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Passeio pela Alfama" })).toBeInTheDocument();
   });
 
   it("mostra descrição e nota quando existem", () => {
     render(<ItineraryItemCard item={item({ id: "a", description: "Bairro antigo", rating: 4.6 })} />);
     expect(screen.getByText("Bairro antigo")).toBeInTheDocument();
-    expect(screen.getByText("Nota 4.6")).toBeInTheDocument();
+    expect(screen.getByText("4.6 ★")).toBeInTheDocument();
   });
 
   it("marca item fixado", () => {

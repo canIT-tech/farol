@@ -1,0 +1,116 @@
+/* Tela 「4 · Roteiro dia a dia」. O dia sai em blocos de período, cada item
+   num cartão — não uma lista corrida. */
+
+.it-strip {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.it-dayhead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.it-dayhead h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.it-block {
+  margin-bottom: 26px;
+}
+
+.it-block__title {
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.it-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.it-card {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.it-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.it-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.it-card__desc {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin: 8px 0 0;
+}
+
+.it-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.it-tag {
+  font-size: 11.5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunk);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.it-tag--rating {
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+
+/* "A conferir": o enrich não achou o lugar no mapa. Precisa saltar, porque é
+   a única marca de que o dado pode estar errado. */
+.it-tag--review {
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+  border: 1px solid var(--accent-border);
+  cursor: help;
+}
+
+.it-card .farol-btn {
+  margin-left: auto;
+}
+
+.it-next {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}

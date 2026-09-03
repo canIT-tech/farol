@@ -2,6 +2,7 @@
 
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@farol/ui";
 import { DayStrip, DayTimeline } from "../../../../components/itinerary/DayTimeline";
 import { useItineraryPolling } from "../../../../hooks/useItineraryPolling";
 import { useTrip } from "../../../../providers/TripProvider";
@@ -16,32 +17,48 @@ export default function ItineraryPage({ params }: { params: Promise<{ id: string
   const [busy, setBusy] = useState(false);
 
   if (loading) {
-    return <p role="status">Montando o roteiro…</p>;
+    return (
+      <section className="pane">
+        <p className="pane__status" role="status">
+          Montando o roteiro…
+        </p>
+      </section>
+    );
   }
 
   if (error !== null) {
     return (
-      <div role="alert">
-        <p>Não consegui carregar o roteiro: {error}</p>
-        <button type="button" onClick={() => void refetch()}>
-          Tentar de novo
-        </button>
-      </div>
+      <section className="pane">
+        <div className="pane__error" role="alert">
+          <span>Não consegui carregar o roteiro: {error}</span>
+          <Button type="button" variant="ghost" onClick={() => void refetch()}>
+            Tentar de novo
+          </Button>
+        </div>
+      </section>
     );
   }
 
   if (itinerary === null || itinerary.status === "pending") {
-    return <p role="status">Montando o roteiro… isso leva menos de um minuto.</p>;
+    return (
+      <section className="pane">
+        <p className="pane__status" role="status">
+          Montando o roteiro… isso leva menos de um minuto.
+        </p>
+      </section>
+    );
   }
 
   if (itinerary.status === "failed") {
     return (
-      <div role="alert">
-        <p>A geração falhou{itinerary.error !== null ? `: ${itinerary.error}` : "."}</p>
-        <button type="button" onClick={() => void refetch()}>
-          Tentar de novo
-        </button>
-      </div>
+      <section className="pane">
+        <div className="pane__error" role="alert">
+          <span>A geração falhou{itinerary.error !== null ? `: ${itinerary.error}` : "."}</span>
+          <Button type="button" variant="ghost" onClick={() => void refetch()}>
+            Tentar de novo
+          </Button>
+        </div>
+      </section>
     );
   }
 
@@ -58,11 +75,15 @@ export default function ItineraryPage({ params }: { params: Promise<{ id: string
   }
 
   return (
-    <section>
-      <h1>Seu roteiro</h1>
+    <section className="pane">
+      <div className="pane__head">
+        <h1 className="pane__title">Seu roteiro</h1>
+      </div>
       <DayStrip days={itinerary.days} activeIndex={activeIndex} onSelect={setActiveIndex} />
       {day === undefined ? (
-        <p role="status">O roteiro ficou sem dias.</p>
+        <p className="pane__status" role="status">
+          O roteiro ficou sem dias.
+        </p>
       ) : (
         <DayTimeline
           day={day}
@@ -73,11 +94,21 @@ export default function ItineraryPage({ params }: { params: Promise<{ id: string
       )}
       {/* Próxima etapa do hi-fi. A sidebar só navega para etapas concluídas, então
           a passagem roteiro → voo & hotel precisa de um botão no miolo. */}
-      <p>
-        <button type="button" onClick={() => router.push(`/trips/${id}/booking`)}>
+      <div className="it-next">
+        <Button
+          type="button"
+          size="lg"
+          onClick={() => router.push(`/trips/${id}/booking`)}
+          iconEnd={
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+                 strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          }
+        >
           Ver voo &amp; hotel
-        </button>
-      </p>
+        </Button>
+      </div>
     </section>
   );
 }

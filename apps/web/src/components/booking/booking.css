@@ -1,0 +1,100 @@
+/* Tela 「5 · Voo & hotel」. Os cartões de oferta vêm prontos do @farol/ui;
+   isto arruma as seções em volta deles. */
+
+.bk-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 26px;
+}
+
+.bk-section {
+  margin-bottom: 34px;
+}
+
+.bk-section__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+}
+
+.bk-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Aviso de preço aproximado e idade do cache: presente, mas discreto. */
+.bk-note {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-faint);
+  margin: 12px 0 0;
+}
+
+.bk-empty {
+  padding: 20px;
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  font-size: 13.5px;
+  margin: 0;
+}
+
+/* ── contexto de preço ───────────────────────────────────────────────────── */
+
+.bk-context {
+  margin-top: 8px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.bk-context__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.bk-block {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.bk-block__title {
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+
+.bk-block__lead {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.bk-block__list {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .bk-context__grid {
+    grid-template-columns: 1fr;
+  }
+}

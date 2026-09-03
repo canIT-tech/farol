@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { AdvisorChat, AppShell } from "@farol/ui";
+import { AdvisorChat, AppShell, Button } from "@farol/ui";
 import { AuthGate } from "./AuthGate";
 import { TripSidebar } from "./TripSidebar";
 import { TripProvider, useTrip } from "../providers/TripProvider";
@@ -21,7 +21,11 @@ function Rail({ tripId }: { tripId: string }) {
   return (
     <>
       <AdvisorChat messages={messages} pending={pending} onSend={(text) => void send(text)} />
-      {error !== null ? <p role="alert">{error}</p> : null}
+      {error !== null ? (
+        <p className="bk-note" role="alert">
+          {error}
+        </p>
+      ) : null}
     </>
   );
 }
@@ -32,12 +36,14 @@ export function TripFrame({ tripId, children }: { tripId: string; children: Reac
 
   if (error !== null) {
     return (
-      <div role="alert">
-        <p>Não consegui carregar a viagem: {error}</p>
-        <button type="button" onClick={() => void refetch()}>
-          Tentar de novo
-        </button>
-      </div>
+      <section className="pane">
+        <div className="pane__error" role="alert">
+          <span>Não consegui carregar a viagem: {error}</span>
+          <Button type="button" variant="ghost" onClick={() => void refetch()}>
+            Tentar de novo
+          </Button>
+        </div>
+      </section>
     );
   }
 
@@ -51,11 +57,11 @@ export function TripFrame({ tripId, children }: { tripId: string; children: Reac
       sidebar={
         <>
           <TripSidebar trip={trip} onNavigate={(step) => router.push(stepRoute(tripId, step))} />
-          <nav aria-label="Conta">
+          <nav className="side__account" aria-label="Conta">
             <a href="/trips">Minhas viagens</a>
-            <button type="button" onClick={() => void leave()}>
+            <Button type="button" variant="text" size="sm" onClick={() => void leave()}>
               Sair
-            </button>
+            </Button>
           </nav>
         </>
       }
