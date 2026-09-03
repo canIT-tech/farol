@@ -34,6 +34,12 @@ async function bootstrap(): Promise<void> {
   const env: Env = parseEnv(process.env);
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix(API_PREFIX);
+  // Atrás do proxy do Render, req.ip é o IP do próprio proxy — e o /whereami
+  // sugeriria a cidade do datacenter para todo mundo. Com um salto de
+  // confiança, req.ip passa a ser o último endereço do X-Forwarded-For.
+  // Esse cabeçalho é falsificável, então o valor só serve para o palpite de
+  // origem no onboarding — nunca para autorizar nada.
+  app.set("trust proxy", 1);
   // A landing pública chama /waitlist de outra origem quando web e api estão
   // separados. No serviço único a origem é a mesma e isto não custa nada.
   app.enableCors();

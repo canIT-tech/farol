@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { z } from "zod";
-import { apiFetch, apiFetchPublic, apiBase } from "./api-client";
+import { ApiError, apiFetch, apiFetchPublic, apiSend, apiBase } from "./api-client";
 
 const originalApiUrl = process.env.NEXT_PUBLIC_API_URL;
 afterEach(() => {
@@ -117,5 +117,67 @@ describe("apiFetchPublic", () => {
     } finally {
       errSpy.mockRestore();
     }
+  });
+
+});
+
+// A api escreve a mensagem de erro para quem lê a tela; descartá-la deixava
+// "api /trips/x/discovery respondeu 422", que não diz o que fazer.
+describe("mensagem de erro da api", () => {
+  function failing(status: number, body: unknown) {
+    return vi.fn(async () =>
+      new Response(typeof body === "string" ? body : JSON.stringify(body), {
+        status,
+        headers: { "content-type": "application/json" }
+      })
+    ) as unknown as typeof fetch;
+  }
+
+  it("usa a message do corpo quando existe", async () => {
+    const fetchImpl = failing(422, {
+      statusCode: 422,
+      code: "no_destinations_in_budget",
+      message: "nenhum destino cabe nesse orçamento"
+    });
+    await expect(
+      apiFetch({ path: "/trips/x/discovery", schema, token: "t" }, fetchImpl)
+    ).rejects.toThrow("nenhum destino cabe nesse orçamento");
+  });
+
+  it("cai no genérico quando o corpo não é JSON", async () => {
+    await expect(
+      apiFetch({ path: "/x", schema, token: "t" }, failing(500, "<html>erro</html>"))
+    ).rejects.toThrow("api /x respondeu 500");
+  });
+
+  it("cai no genérico quando o JSON não traz message", async () => {
+    await expect(
+      apiFetch({ path: "/x", schema, token: "t" }, failing(404, { statusCode: 404 }))
+    ).rejects.toThrow("api /x respondeu 404");
+  });
+
+  it("cai no genérico quando a message é vazia", async () => {
+    await expect(
+      apiFetch({ path: "/x", schema, token: "t" }, failing(400, { message: "" }))
+    ).rejects.toThrow("api /x respondeu 400");
+  });
+
+  it("vale também para apiSend e apiFetchPublic", async () => {
+    await expect(
+      apiSend({ path: "/trips/x/destination", token: "t", method: "POST" }, failing(409, { message: "já escolhido" }))
+    ).rejects.toThrow("já escolhido");
+    await expect(
+      apiFetchPublic({ path: "/geo/whereami", schema }, failing(503, { message: "fora do ar" }))
+    ).rejects.toThrow("fora do ar");
+  });
+
+  it("carrega o status, para quem precisa distinguir 404 de 500", async () => {
+    const fetchImpl = failing(404, { message: "not found" });
+    await apiFetch({ path: "/me/profile", schema, token: "t" }, fetchImpl).catch((err: unknown) => {
+      expect(err).toBeInstanceOf(ApiError);
+      expect((err as ApiError).status).toBe(404);
+      expect((err as ApiError).path).toBe("/me/profile");
+    });
+    expect.assertions(3);
   });
 });

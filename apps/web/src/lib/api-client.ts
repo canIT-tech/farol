@@ -25,6 +25,35 @@ export interface ApiFetchOptions<T> extends ApiSendOptions {
 // A resposta fora do schema é erro nosso, não da pessoa: o ZodError traz o
 // JSON inteiro das issues em `message`, e ele chegava cru na tela. Aqui vira
 // uma frase, e o detalhe técnico fica no console para quem está depurando.
+/** Erro de uma chamada à api, com o status para quem precisa distinguir —
+ *  "sem perfil ainda" (404) não é o mesmo que "a api caiu" (500). */
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly path: string
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+// A api devolve { statusCode, code, message } nos erros de domínio, e a
+// message é escrita para quem está lendo a tela. Sem isto, todo 4xx virava
+// "api /trips/x/discovery respondeu 422", que não diz o que fazer.
+async function failure(res: Response, path: string): Promise<ApiError> {
+  try {
+    const body: unknown = await res.json();
+    const message = (body as { message?: unknown }).message;
+    if (typeof message === "string" && message !== "") {
+      return new ApiError(message, res.status, path);
+    }
+  } catch {
+    // corpo vazio ou não-JSON: cai no genérico
+  }
+  return new ApiError(`api ${path} respondeu ${res.status}`, res.status, path);
+}
+
 function parseOrFail<T>(schema: ResponseSchema<T>, payload: unknown, path: string): T {
   const parsed = schema.safeParse(payload);
   if (!parsed.success) {
@@ -51,7 +80,7 @@ export async function apiSend(
 ): Promise<void> {
   const res = await fetchImpl(`${apiBase()}${opts.path}`, buildInit(opts));
   if (!res.ok) {
-    throw new Error(`api ${opts.path} respondeu ${res.status}`);
+    throw await failure(res, opts.path);
   }
 }
 
@@ -63,7 +92,7 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const res = await fetchImpl(`${apiBase()}${opts.path}`, buildInit(opts));
   if (!res.ok) {
-    throw new Error(`api ${opts.path} respondeu ${res.status}`);
+    throw await failure(res, opts.path);
   }
   return parseOrFail(opts.schema, await res.json(), opts.path);
 }
@@ -75,7 +104,7 @@ export async function apiFetchPublic<T>(
 ): Promise<T> {
   const res = await fetchImpl(`${apiBase()}${opts.path}`, { cache: "no-store" });
   if (!res.ok) {
-    throw new Error(`api ${opts.path} respondeu ${res.status}`);
+    throw await failure(res, opts.path);
   }
   return parseOrFail(opts.schema, await res.json(), opts.path);
 }

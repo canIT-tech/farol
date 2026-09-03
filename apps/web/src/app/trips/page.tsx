@@ -8,7 +8,7 @@ import { AuthGate } from "../../components/AuthGate";
 import { BrandHeader } from "../../components/common/BrandHeader";
 import "./trips.css";
 import { budgetLabel, partyLabel, periodLabel } from "../../components/TripSidebar";
-import { apiFetch } from "../../lib/api-client";
+import { ApiError, apiFetch } from "../../lib/api-client";
 import { signOut } from "../../lib/session";
 import { tripCardTitle, tripResumeRoute } from "../../lib/trip-home";
 import { listTrips } from "../../lib/trip-api";
@@ -33,7 +33,7 @@ function Home({ token }: { token: string }) {
       try {
         await apiFetch({ path: "/me/profile", schema: tasteProfileSchema, token });
       } catch (cause) {
-        if (cause instanceof Error && cause.message.endsWith("404")) {
+        if (cause instanceof ApiError && cause.status === 404) {
           router.replace("/onboarding");
           return;
         }
