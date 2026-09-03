@@ -40,7 +40,7 @@ Não altera código. Existe para separar bug pré-existente de regressão.
 ```bash
 cd .worktrees/llm-provider-agnostico
 docker compose up -d db
-source .env
+source .env.example
 pnpm install
 pnpm --filter @farol/db run db:migrate
 pnpm --filter @farol/db run db:seed
@@ -1144,7 +1144,7 @@ Trocar o mock do `LlmService` por `FakeLlmService` (ou por um objeto que impleme
 - [ ] **Step 7: Rodar a suíte do chat**
 
 ```bash
-source ../../.env
+source ../../.env.example
 ../../node_modules/.bin/vitest run src/chat --coverage.enabled=false --pool=threads
 ```
 
@@ -1274,7 +1274,7 @@ import type { LlmToolSpec } from "../llm/llm.types";
 - [ ] **Step 5: Rodar e ver passar**
 
 ```bash
-source ../../.env
+source ../../.env.example
 ../../node_modules/.bin/vitest run src/chat --coverage.enabled=false --pool=threads
 ```
 
@@ -1635,7 +1635,7 @@ Na seção Setup do `README.md`:
 - [ ] **Step 8: Suíte inteira**
 
 ```bash
-source .env
+source .env.example
 pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e && pnpm test:mutation
 ```
 

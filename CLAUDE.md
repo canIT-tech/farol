@@ -18,6 +18,7 @@ monta o dia a dia e ajusta tudo por conversa.
 | PRD (visão, escopo faseado, personas, monetização) | `PRD.md` |
 | Design técnico do MVP (arquitetura, módulos, dados) | `docs/superpowers/specs/2026-08-27-mvp-trip-design.md` |
 | Opções de provider de hotel (sem virar canal de reserva) | `docs/negocio/2026-09-03-opcoes-provider-hotel.md` |
+| Curadoria do catálogo de destinos (como levantar candidatos) | `docs/negocio/2026-09-03-curadoria-do-catalogo.md` |
 | Specs de produto (pagamento, plano grátis, migração de provider, custo de LLM, métricas) | `docs/negocio/2026-08-31-spec-pagamento.md` · `docs/negocio/2026-08-31-spec-plano-gratuito.md` · `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` · `docs/negocio/2026-08-31-custo-llm-por-roteiro.md` · `docs/negocio/2026-08-31-plano-de-metricas.md` |
 | Legal (Termos + Privacidade/LGPD — rascunhos, pré-jurídico) | `docs/legal/` |
 | Design system (tokens + specs de componentes) | `docs/design-system.md` |
@@ -155,7 +156,7 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 ## Pendências abertas (do PRD / design técnico)
 
 - Teto de custo de LLM por roteiro (`LLM_ROUTE_BUDGET_USD`) — planilha em `docs/negocio/2026-08-31-custo-llm-por-roteiro.md` (proposta: 0,60 pago / 0,15 grátis, chat no tier barato). Falta felippe cravar.
-- Catálogo de destinos: CSV curado em `packages/db/data/destinations.csv` (23 cidades no Passo 3; `pnpm --filter @farol/db db:seed`). Expandir para ~200 é curadoria contínua.
+- Catálogo de destinos: CSV curado em `packages/db/data/destinations.csv` (23 cidades no Passo 3; `pnpm --filter @farol/db db:seed`). Expandir para ~200 é curadoria contínua — o levantamento de candidatos é automatizado (`pnpm --filter @farol/db research:destinations` consulta o `/v1/city-directions` de 12 origens BR e escreve um rascunho); `tags`, `bestMonths` e os custos de hospedagem seguem sendo humanos, porque a API não os tem e deixar o LLM preencher seria inventar preço. Processo em `docs/negocio/2026-09-03-curadoria-do-catalogo.md`.
 - ~~Site parceiro para o deep-link de voo/hotel~~ — resolvido pela migração para Travelpayouts: o parceiro é Aviasales / Hotellook, o `marker` no deep-link já rende comissão.
 - Re-gravar as fixtures do **Google Places** (`packages/providers/src/google/__fixtures__/*.json`) a partir da API real — ainda escritas à mão. ~~Travelpayouts~~ ✅ gravadas da API real no Passo 10.
 - ~~Confirmar domínio~~ ✅ **`farolviagens.com`** (2026-08-31, sobre `faroltravel.com.br`). Falta: registrar (+ defensivos `farolviagens.com.br`, `faroltravel.com.br`), apontar DNS, geo-targeting BR no Search Console, e-mail transacional (SPF/DKIM/DMARC).
