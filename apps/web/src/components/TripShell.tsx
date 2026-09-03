@@ -7,6 +7,12 @@ import { AuthGate } from "./AuthGate";
 import { TripSidebar } from "./TripSidebar";
 import { TripProvider, useTrip } from "../providers/TripProvider";
 import { useChat } from "../hooks/useChat";
+import { signOut } from "../lib/session";
+
+// "profile" é a única etapa fora de /trips/:id — mora em /onboarding.
+export function stepRoute(tripId: string, step: string): string {
+  return step === "profile" ? "/onboarding" : `/trips/${tripId}/${step}`;
+}
 
 function Rail({ tripId }: { tripId: string }) {
   const { token, refetch } = useTrip();
@@ -35,10 +41,23 @@ export function TripFrame({ tripId, children }: { tripId: string; children: Reac
     );
   }
 
+  async function leave() {
+    await signOut();
+    router.replace("/");
+  }
+
   return (
     <AppShell
       sidebar={
-        <TripSidebar trip={trip} onNavigate={(step) => router.push(`/trips/${tripId}/${step}`)} />
+        <>
+          <TripSidebar trip={trip} onNavigate={(step) => router.push(stepRoute(tripId, step))} />
+          <nav aria-label="Conta">
+            <a href="/trips">Minhas viagens</a>
+            <button type="button" onClick={() => void leave()}>
+              Sair
+            </button>
+          </nav>
+        </>
       }
       rail={<Rail tripId={tripId} />}
     >

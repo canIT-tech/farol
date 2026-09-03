@@ -349,6 +349,46 @@ Lições operacionais desta rodada:
 
 ---
 
+## Parte E — Navegação: a área logada não era alcançável por clique
+
+Achado depois do login funcionar (2026-09-03): **não existia caminho clicável** da landing
+até as features. Comparação do hi-fi (`docs/design/app/*.dc.html`, sidebar "Etapas":
+Perfil de gosto → Escolher destino → Roteiro → Voo & hotel) com o que estava no ar:
+
+| # | Gap | Onde | Efeito |
+|---|---|---|---|
+| N1 | Landing sem link para o app — só CTA da waitlist e âncoras | `app/page.tsx` | login só digitando `/login` |
+| N2 | Onboarding salvo → `router.push("/")` — volta pra landing/waitlist | `onboarding/page.tsx` | beco sem saída depois do perfil |
+| N3 | StepNav "Destino" → `/trips/:id/destination`, rota **inexistente** | `TripSidebar.tsx` | 404 ao clicar numa etapa concluída |
+| N4 | StepNav com 3 etapas; hi-fi tem 4 (falta **Voo & hotel**); `booking` sem nenhum link de entrada | `TripSidebar.tsx`, `itinerary/page.tsx` | voo/hotel só por URL |
+| N5 | Nada aponta para `/auto` (modo autônomo) | landing | só por URL |
+| N6 | Sem "casa" da área logada: nenhuma tela lista as viagens nem oferece sair | — | impossível voltar a uma viagem ou trocar de conta |
+
+Decisão do Rafael: **implementar agora**, escopo mínimo, sem entrar no v3 "gerenciador de
+viagem" (salvar/avaliar/notas). Feito em `rafaignaulin/qa-navegacao-e2e`:
+
+- **`/trips` — Minhas viagens** (`app/trips/page.tsx`): lista as viagens (`GET /api/trips`, já
+  existia), card com período/viajantes/orçamento/status e "Continuar" (→ descoberta se não
+  há destino, → roteiro se há). Ações: Nova viagem, Modo autônomo, Meu perfil, Sair. Sem
+  perfil de gosto (`GET /me/profile` 404) redireciona para o onboarding.
+- **Landing** (`_landing/AppEntry.tsx`): "Entrar" sem sessão, "Minhas viagens" com sessão.
+- **Login**: quem já tem sessão vai direto para `/trips`; magic link e Google redirecionam
+  para `/trips` (que decide se falta onboarding).
+- **Onboarding** salvo → `/trips`.
+- **Sidebar** (`TripSidebar.tsx`): etapas iguais ao hi-fi, ids = segmento de rota
+  (`profile` → `/onboarding`, `discovery`, `itinerary`, `booking`). "Roteiro" fica
+  concluído assim que há destino (é gerado automaticamente), "Voo & hotel" vira a etapa
+  atual. Rodapé da sidebar: "Minhas viagens" + "Sair" (`TripShell.tsx`).
+- **Roteiro**: botão "Ver voo & hotel" (a StepNav não navega para a etapa atual, por design).
+- `lib/session.ts` (`signOut`), `lib/trip-home.ts` (rota de retomada, título do card).
+- E2E novo `e2e/home.spec.ts`: landing → Minhas viagens → Continuar → Sair; sem perfil →
+  onboarding; com sessão `/login` → `/trips`. `onboarding.spec` atualizado para `/trips`.
+
+Fora: Google OAuth (B1), lista/filtro/exclusão de viagens, título editável, StepNav
+clicável na etapa atual (mudança em `packages/ui`).
+
+---
+
 ## Parte C — Features que vão degradar mesmo com o app de pé
 
 Não bloqueiam login, mas o Rafael vai "ver quebrado" e precisa saber o que é esperado.

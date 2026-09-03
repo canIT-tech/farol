@@ -163,7 +163,13 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 
 ## Landing / waitlist (fora do backlog numerado)
 
-- Rota `/` do `apps/web` **é a landing pública** (captura de e-mail pré-lançamento). O fluxo do app começa em `/login`.
+- Rota `/` do `apps/web` **é a landing pública** (captura de e-mail pré-lançamento). O header
+  mostra "Entrar" (→ `/login`) ou, com sessão, "Minhas viagens" (→ `/trips`). **`/trips` é a casa
+  da área logada** (lista de viagens + Nova viagem / Modo autônomo / Meu perfil / Sair); sem
+  perfil de gosto ela redireciona para `/onboarding`, que volta para `/trips` ao salvar. Login
+  (magic link e Google) também cai em `/trips`. Etapas da sidebar = hi-fi: Perfil de gosto →
+  Escolher destino → Roteiro → Voo & hotel (ids = segmentos de rota; `profile` → `/onboarding`).
+  Contexto: `docs/superpowers/plans/2026-09-03-qa-manual-producao.md` Parte E.
 - `POST /waitlist` (público, sem `AuthGuard`) + `GET /waitlist/count` no `WaitlistModule`. Tabela `waitlist` (migration `0005`). `app.enableCors()` ligado no `main.ts` por causa disso.
 - Deploy exige `NEXT_PUBLIC_API_URL` do `apps/web` apontando para a API pública e a `0005` aplicada no banco.
 - **E-mail de boas-vindas** via porta neutra `EmailModule` (`apps/api/src/email/`, mesmo desenho do LLM: `EMAIL_PROVIDER=resend|fake`, opcional; sem env o envio fica desligado e o cadastro segue). Adapter atual: **Resend** (REST puro, free 3.000/mês). `waitlist.welcome_sent_at` (migration `0008`) marca quem recebeu; nulo = reenviar depois. Falha no envio é logada (`waitlist_welcome_failed`), nunca falha o `POST`.

@@ -1,18 +1,32 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
 
+// Depois de entrar a pessoa cai em /trips, que manda para o onboarding se ainda
+// não houver perfil de gosto. Quem já tem sessão nem vê esta tela.
+const AFTER_LOGIN = "/trips";
+
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void getSupabaseBrowserClient()
+      .auth.getSession()
+      .then(({ data }) => {
+        if (data.session !== null) router.replace(AFTER_LOGIN);
+      });
+  }, [router]);
 
   async function signInWithGoogle() {
     const supabase = getSupabaseBrowserClient();
     const { error: err } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/onboarding` }
+      options: { redirectTo: `${window.location.origin}${AFTER_LOGIN}` }
     });
     if (err) setError(err.message);
   }
@@ -23,7 +37,7 @@ export default function LoginPage() {
     const supabase = getSupabaseBrowserClient();
     const { error: err } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/onboarding` }
+      options: { emailRedirectTo: `${window.location.origin}${AFTER_LOGIN}` }
     });
     if (err) setError(err.message);
     else setSent(true);

@@ -2,6 +2,7 @@
 
 import { type FormEvent, useState } from "react";
 import { submitWaitlist } from "../lib/waitlist";
+import AppEntry from "./_landing/AppEntry";
 import ChatDemo from "./_landing/ChatDemo";
 import Modes from "./_landing/Modes";
 import Screens from "./_landing/Screens";
@@ -87,6 +88,7 @@ export default function HomePage() {
           <div className="nav-links">
             <a href="#experiencia">Como funciona</a>
             <a href="#precos">Preços</a>
+            <AppEntry />
             <a href="#lista" className="nav-cta">
               Entrar na lista
             </a>

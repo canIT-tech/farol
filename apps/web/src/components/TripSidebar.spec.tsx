@@ -37,24 +37,32 @@ const candidate = {
 };
 
 describe("tripSteps", () => {
-  it("sem destinos: descoberta é o passo atual", () => {
-    const steps = tripSteps(base);
-    expect(steps.map((s) => s.state)).toEqual(["current", "todo", "todo"]);
+  it("segue as etapas do hi-fi, com os ids iguais aos segmentos de rota", () => {
+    expect(tripSteps(base).map((s) => [s.id, s.label])).toEqual([
+      ["profile", "Perfil de gosto"],
+      ["discovery", "Escolher destino"],
+      ["itinerary", "Roteiro"],
+      ["booking", "Voo & hotel"]
+    ]);
   });
 
-  it("com candidatos e sem escolha: escolher destino é o passo atual", () => {
-    const steps = tripSteps({ ...base, destinations: [candidate] });
-    expect(steps[0]!.state).toBe("done");
-    expect(steps[1]!.state).toBe("current");
+  it("sem destino escolhido: perfil feito, escolher destino é o passo atual", () => {
+    expect(tripSteps(base).map((s) => s.state)).toEqual(["done", "current", "todo", "todo"]);
+    expect(tripSteps({ ...base, destinations: [candidate] }).map((s) => s.state)).toEqual([
+      "done",
+      "current",
+      "todo",
+      "todo"
+    ]);
   });
 
-  it("com destino escolhido: roteiro é o passo atual", () => {
+  it("com destino escolhido: roteiro liberado, voo & hotel é o passo atual", () => {
     const steps = tripSteps({
       ...base,
       destinations: [candidate],
       chosenDestination: candidate
     });
-    expect(steps.map((s) => s.state)).toEqual(["done", "done", "current"]);
+    expect(steps.map((s) => s.state)).toEqual(["done", "done", "done", "current"]);
   });
 
   it("sem viagem devolve tudo a fazer", () => {
@@ -118,7 +126,7 @@ describe("TripSidebar", () => {
         onNavigate={onNavigate}
       />
     );
-    await userEvent.click(screen.getByRole("button", { name: "Descoberta" }));
+    await userEvent.click(screen.getByRole("button", { name: "Escolher destino" }));
     expect(onNavigate).toHaveBeenCalledWith("discovery");
   });
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useState } from "react";
+import { useRouter } from "next/navigation";
 import { DayStrip, DayTimeline } from "../../../../components/itinerary/DayTimeline";
 import { useItineraryPolling } from "../../../../hooks/useItineraryPolling";
 import { useTrip } from "../../../../providers/TripProvider";
@@ -8,6 +9,7 @@ import { regenerateDay, swapRestaurant } from "../../../../lib/trip-api";
 
 export default function ItineraryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const router = useRouter();
   const { token } = useTrip();
   const { itinerary, loading, error, refetch } = useItineraryPolling(token, id);
   const [activeIndex, setActiveIndex] = useState(1);
@@ -69,6 +71,13 @@ export default function ItineraryPage({ params }: { params: Promise<{ id: string
           onSwapRestaurant={(itemId) => void run(() => swapRestaurant(token, id, itemId, {}))}
         />
       )}
+      {/* Próxima etapa do hi-fi. A sidebar só navega para etapas concluídas, então
+          a passagem roteiro → voo & hotel precisa de um botão no miolo. */}
+      <p>
+        <button type="button" onClick={() => router.push(`/trips/${id}/booking`)}>
+          Ver voo &amp; hotel
+        </button>
+      </p>
     </section>
   );
 }
