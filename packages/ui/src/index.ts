@@ -4,6 +4,8 @@ export * from "./Button/Button";
 export * from "./TextField/TextField";
 export * from "./Stepper/Stepper";
 export * from "./Slider/Slider";
+export * from "./DateRangeField/DateRangeField";
+export * from "./DateRangeField/calendar";
 export * from "./Chip/Chip";
 export * from "./Match/Match";
 export * from "./DestinationCard/DestinationCard";
