@@ -1,5 +1,4 @@
-import pRetry from "p-retry";
-import { CircuitBreaker } from "../http/circuit-breaker.js";
+import { createResilientCall } from "../http/resilient-call.js";
 import { isRetryableStatus } from "../http/retry.js";
 import { buildQuery, type Query } from "../http/query.js";
 
@@ -38,13 +37,7 @@ export interface LiteApiHttp {
 export function createLiteApiHttp(cfg: LiteApiHttpConfig): LiteApiHttp {
   const fetchImpl = cfg.fetchImpl ?? fetch;
   const baseUrl = cfg.baseUrl ?? LITEAPI_BASE_URL;
-  const breaker = new CircuitBreaker({
-    failureThreshold: cfg.failureThreshold ?? 5,
-    cooldownMs: cfg.cooldownMs ?? 30_000,
-    now: cfg.now
-  });
-  const retries = cfg.retries ?? 3;
-  const minTimeout = cfg.retryMinTimeoutMs ?? 300;
+  const resilient = createResilientCall(cfg);
 
   async function send<T>(path: string, init: RequestInit, query: Query): Promise<T> {
     const qs = buildQuery(query);
@@ -60,14 +53,9 @@ export function createLiteApiHttp(cfg: LiteApiHttpConfig): LiteApiHttp {
   }
 
   function run<T>(path: string, init: RequestInit, query: Query): Promise<T> {
-    return breaker.exec(() =>
-      pRetry(() => send<T>(path, init, query), {
-        retries,
-        minTimeout,
-        factor: 2,
-        shouldRetry: ({ error }) =>
-          error instanceof LiteApiHttpError && isRetryableStatus(error.status)
-      })
+    return resilient.run(
+      () => send<T>(path, init, query),
+      (error) => error instanceof LiteApiHttpError && isRetryableStatus(error.status)
     );
   }
 

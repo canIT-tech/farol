@@ -28,23 +28,34 @@ export class GeoService {
     }
   }
 
+  // Igual ao whereami: provider fora do ar não pode virar 500 cru nas rotas
+  // públicas do GeoController, então cada lookup degrada pro seu "vazio".
+  private async degrade<T>(event: string, load: () => Promise<T>, empty: T): Promise<T> {
+    try {
+      return await load();
+    } catch (err) {
+      console.error(JSON.stringify({ event, message: (err as Error).message }));
+      return empty;
+    }
+  }
+
   searchAirports(term: string, limit = DEFAULT_AIRPORT_LIMIT): Promise<Airport[]> {
-    return this.provider.searchAirports(term, limit);
+    return this.degrade("geo_search_airports_failed", () => this.provider.searchAirports(term, limit), []);
   }
 
   /** Igual a airport(), mas devolve null em vez de lançar — para enriquecimento. */
   findAirport(iata: string): Promise<Airport | null> {
-    return this.provider.airport(iata);
+    return this.degrade("geo_find_airport_failed", () => this.provider.airport(iata), null);
   }
 
   /** Igual a airline(), mas devolve null em vez de lançar — para enriquecimento. */
   findAirline(code: string): Promise<Airline | null> {
-    return this.provider.airline(code);
+    return this.degrade("geo_find_airline_failed", () => this.provider.airline(code), null);
   }
 
   /** Cidade do IATA do destino: país e coordenada de centro para a busca de hotel. */
   findCity(iata: string): Promise<City | null> {
-    return this.provider.city(iata);
+    return this.degrade("geo_find_city_failed", () => this.provider.city(iata), null);
   }
 
   async airport(iata: string): Promise<Airport> {

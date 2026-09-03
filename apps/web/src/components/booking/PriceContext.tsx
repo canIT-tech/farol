@@ -1,14 +1,7 @@
 "use client";
 
 import type { ProviderSection, RouteDeal, RoutePriceSample } from "@farol/shared";
-
-function money(value: number, currency: string): string {
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-    maximumFractionDigits: 0
-  });
-}
+import { money } from "../../lib/money";
 
 // "2026-11-04" → "4 de nov". Data curta, do jeito que a pessoa lê.
 export function shortDate(isoDate: string): string {

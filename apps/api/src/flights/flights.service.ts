@@ -12,6 +12,7 @@ import { DB } from "../db/db.module";
 import { ENV } from "../config/config.module";
 import type { Env } from "../config/env.schema";
 import { ProviderCacheRepository } from "../providers/provider-cache.repository";
+import { cachedSection, degradeSection } from "../providers/provider-section";
 import { FLIGHT_PROVIDER } from "../providers/providers.module";
 import { buildFlightParams } from "../providers/trip-search";
 import { TripsService } from "../trips/trips.service";
@@ -74,32 +75,21 @@ export class FlightsService {
 
   // Uma seção = uma chamada cacheada ao provider. Falha do provider degrada só
   // esta seção e devolve error "unavailable" (design §7.3) — a página segue de pé.
-  private async section<T>(
+  private section<T>(
     tripId: string,
     endpoint: string,
     params: Record<string, unknown>,
     load: () => Promise<T[]>
   ): Promise<ProviderSection<T>> {
-    try {
-      const { value, fetchedAt } = await this.cache.getOrSet<T[]>({
+    return degradeSection("flight_provider_failed", { endpoint, tripId }, () =>
+      cachedSection(this.cache, {
         provider: PROVIDER,
         endpoint,
         params,
         ttlSeconds: this.env.FLIGHT_CACHE_TTL_SECONDS,
         load
-      });
-      return { offers: value, stale: false, fetchedAt: fetchedAt.toISOString(), error: null };
-    } catch (err) {
-      console.error(
-        JSON.stringify({
-          event: "flight_provider_failed",
-          endpoint,
-          tripId,
-          message: (err as Error).message
-        })
-      );
-      return { offers: [], stale: false, fetchedAt: null, error: "unavailable" };
-    }
+      })
+    );
   }
 
   /** Ofertas da rota escolhida — /v1/prices/cheap + /v2/prices/nearest-places-matrix. */

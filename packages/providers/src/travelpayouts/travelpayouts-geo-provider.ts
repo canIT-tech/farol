@@ -170,6 +170,23 @@ export class TravelpayoutsGeoProvider implements GeoProvider {
     this.now = cfg.now ?? (() => Date.now());
   }
 
+  // Os três dumps (aeroportos, companhias, cidades) são o mesmo shape:
+  // cache em memória com TTL, path fixo, normalizador próprio.
+  private async cachedDump<Raw, T>(
+    cache: CacheEntry<T> | null,
+    setCache: (entry: CacheEntry<T>) => void,
+    path: string,
+    normalize: (raw: Raw[]) => T
+  ): Promise<T> {
+    if (cache !== null && cache.expiresAt > this.now()) {
+      return cache.value;
+    }
+    const raw = await this.http.get<Raw[]>(path.replace("{locale}", this.locale));
+    const value = normalize(raw);
+    setCache({ value, expiresAt: this.now() + this.ttlMs });
+    return value;
+  }
+
   /** Origem provável do usuário a partir do IP. null quando o IP é desconhecido. */
   async whereami(ip: string, locale = "br"): Promise<GeoLocation | null> {
     const body = await this.http.getText(WHEREAMI_URL, {
@@ -181,37 +198,30 @@ export class TravelpayoutsGeoProvider implements GeoProvider {
   }
 
   async airports(): Promise<Airport[]> {
-    if (this.airportsCache !== null && this.airportsCache.expiresAt > this.now()) {
-      return this.airportsCache.value;
-    }
-    const raw = await this.http.get<TpAirport[]>(
-      AIRPORTS_PATH.replace("{locale}", this.locale)
+    return this.cachedDump<TpAirport, Airport[]>(
+      this.airportsCache,
+      (entry) => (this.airportsCache = entry),
+      AIRPORTS_PATH,
+      normalizeAirports
     );
-    const value = normalizeAirports(raw);
-    this.airportsCache = { value, expiresAt: this.now() + this.ttlMs };
-    return value;
   }
 
   async airlines(): Promise<Airline[]> {
-    if (this.airlinesCache !== null && this.airlinesCache.expiresAt > this.now()) {
-      return this.airlinesCache.value;
-    }
-    const raw = await this.http.get<TpAirline[]>(
-      AIRLINES_PATH.replace("{locale}", this.locale)
+    return this.cachedDump<TpAirline, Airline[]>(
+      this.airlinesCache,
+      (entry) => (this.airlinesCache = entry),
+      AIRLINES_PATH,
+      normalizeAirlines
     );
-    const value = normalizeAirlines(raw);
-    this.airlinesCache = { value, expiresAt: this.now() + this.ttlMs };
-    return value;
   }
 
   async cities(): Promise<City[]> {
-    if (this.citiesCache !== null && this.citiesCache.expiresAt > this.now()) {
-      return this.citiesCache.value;
-    }
-    const raw = await this.http.get<TpCity[]>(CITIES_PATH.replace("{locale}", this.locale));
-    const value = normalizeCities(raw);
-    this.citiesCache = { value, expiresAt: this.now() + this.ttlMs };
-    return value;
+    return this.cachedDump<TpCity, City[]>(
+      this.citiesCache,
+      (entry) => (this.citiesCache = entry),
+      CITIES_PATH,
+      normalizeCities
+    );
   }
 
   // Um IATA pode ser de cidade (LIS) ou de aeroporto (GRU). Tenta cidade

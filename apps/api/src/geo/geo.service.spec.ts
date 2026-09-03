@@ -94,4 +94,28 @@ describe("GeoService.airport e airline", () => {
     expect(isDomainError(airlineErr)).toBe(true);
     expect((airlineErr as Error).message).toContain("ZZ");
   });
+
+  it("degradam pro vazio e logam quando o provider falha, em vez de propagar 500 cru", async () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const service = new GeoService(
+      fakeProvider({
+        airport: () => Promise.reject(new Error("503")),
+        airline: () => Promise.reject(new Error("503")),
+        city: () => Promise.reject(new Error("503")),
+        searchAirports: () => Promise.reject(new Error("503"))
+      })
+    );
+
+    await expect(service.findAirport("GRU")).resolves.toBeNull();
+    await expect(service.findAirline("LA")).resolves.toBeNull();
+    await expect(service.findCity("GRU")).resolves.toBeNull();
+    await expect(service.searchAirports("gua")).resolves.toEqual([]);
+    expect(logged.mock.calls.map((c) => c[0])).toEqual([
+      expect.stringContaining("geo_find_airport_failed"),
+      expect.stringContaining("geo_find_airline_failed"),
+      expect.stringContaining("geo_find_city_failed"),
+      expect.stringContaining("geo_search_airports_failed")
+    ]);
+    logged.mockRestore();
+  });
 });

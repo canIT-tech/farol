@@ -1,5 +1,4 @@
-import pRetry from "p-retry";
-import { CircuitBreaker } from "../http/circuit-breaker.js";
+import { createResilientCall } from "../http/resilient-call.js";
 import { isRetryableStatus } from "../http/retry.js";
 import { buildQuery, type Query } from "../http/query.js";
 
@@ -41,13 +40,7 @@ export interface TravelpayoutsHttp {
 export function createTravelpayoutsHttp(cfg: TravelpayoutsHttpConfig): TravelpayoutsHttp {
   const fetchImpl = cfg.fetchImpl ?? fetch;
   const baseUrl = cfg.baseUrl ?? TRAVELPAYOUTS_BASE_URL;
-  const breaker = new CircuitBreaker({
-    failureThreshold: cfg.failureThreshold ?? 5,
-    cooldownMs: cfg.cooldownMs ?? 30_000,
-    now: cfg.now
-  });
-  const retries = cfg.retries ?? 3;
-  const minTimeout = cfg.retryMinTimeoutMs ?? 300;
+  const resilient = createResilientCall(cfg);
 
   function resolve(path: string, query: Query): string {
     const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
@@ -66,14 +59,9 @@ export function createTravelpayoutsHttp(cfg: TravelpayoutsHttpConfig): Travelpay
   }
 
   function run<T>(path: string, query: Query, read: (res: Response) => Promise<T>): Promise<T> {
-    return breaker.exec(() =>
-      pRetry(async () => read(await doGet(path, query)), {
-        retries,
-        minTimeout,
-        factor: 2,
-        shouldRetry: ({ error }) =>
-          error instanceof TravelpayoutsHttpError && isRetryableStatus(error.status)
-      })
+    return resilient.run(
+      async () => read(await doGet(path, query)),
+      (error) => error instanceof TravelpayoutsHttpError && isRetryableStatus(error.status)
     );
   }
 

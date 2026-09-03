@@ -44,6 +44,14 @@ describe("addMinutes", () => {
   it("devolve o mesmo instante quando soma zero", () => {
     expect(addMinutes("2026-10-22T10:00:00Z", 0)).toBe("2026-10-22T10:00:00.000Z");
   });
+
+  it("preserva offset negativo em vez de converter para UTC", () => {
+    expect(addMinutes("2027-05-02T10:10:00-03:00", 60)).toBe("2027-05-02T11:10:00-03:00");
+  });
+
+  it("preserva offset positivo em vez de converter para UTC", () => {
+    expect(addMinutes("2027-05-02T22:10:00+09:00", 60)).toBe("2027-05-02T23:10:00+09:00");
+  });
 });
 
 describe("buildDeepLink", () => {
@@ -197,7 +205,7 @@ describe("normalizeNearestPlaces", () => {
     expect(offer.carrierName).toBeNull();
     expect(offer.originName).toBeNull();
     expect(offer.stops).toBe(2);
-    expect(offer.arriveAt).toBe("2027-05-02T14:10:00.000Z");
+    expect(offer.arriveAt).toBe("2027-05-02T11:10:00-03:00");
     expect(offer.deepLink).toBe(`${AVIASALES_BASE_URL}/search/SAO0205RIO1?t=abc&marker=555`);
   });
 

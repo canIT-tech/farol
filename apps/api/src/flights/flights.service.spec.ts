@@ -91,7 +91,7 @@ async function tripWithChosenDestination(userId: string): Promise<string> {
 
 beforeAll(() => runMigrations(url));
 afterEach(async () => {
-  // só o cache deste provider — o spec de hotéis usa "amadeus-hotel", sem corrida
+  // só o cache deste provider — o spec de hotéis usa "liteapi-hotel", sem corrida
   await db.delete(providerCache).where(eq(providerCache.provider, "travelpayouts-flight"));
   if (userIds.length > 0) {
     await db.delete(users).where(inArray(users.id, userIds));

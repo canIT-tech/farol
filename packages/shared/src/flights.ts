@@ -3,7 +3,7 @@ import { isoDateSchema } from "./trip.js";
 
 const iata = z.string().length(3);
 
-// Parâmetros de busca de voo (traduzidos para o Amadeus na camada de provider).
+// Parâmetros de busca de voo (traduzidos para o Travelpayouts na camada de provider).
 export const flightSearchParamsSchema = z.object({
   originIata: iata,
   destinationIata: iata,

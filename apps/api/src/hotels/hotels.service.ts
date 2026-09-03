@@ -6,6 +6,7 @@ import { DB } from "../db/db.module";
 import { ENV } from "../config/config.module";
 import type { Env } from "../config/env.schema";
 import { ProviderCacheRepository } from "../providers/provider-cache.repository";
+import { cachedSection, degradeSection } from "../providers/provider-section";
 import { HOTEL_PROVIDER } from "../providers/providers.module";
 import { buildHotelParams, chosenIata } from "../providers/trip-search";
 import { TripsService } from "../trips/trips.service";
@@ -28,10 +29,10 @@ export class HotelsService {
 
   async search(userId: string, tripId: string): Promise<ProviderSection<HotelOffer>> {
     const trip = await this.trips.get(userId, tripId);
-    // Fora do try: sem destino escolhido é erro de uso, não provider fora do ar.
+    // Fora do degrade: sem destino escolhido é erro de uso, não provider fora do ar.
     const iata = chosenIata(trip);
 
-    try {
+    return degradeSection("hotel_search_failed", { tripId }, async () => {
       // Sem cidade no catálogo não há país nem coordenada, e a LiteAPI exige
       // país. Degrada como qualquer falha de provider (§7.3).
       const city = await this.geo.findCity(iata);
@@ -48,22 +49,14 @@ export class HotelsService {
         lon: city.lon
       });
 
-      const { value, fetchedAt } = await this.cache.getOrSet<HotelOffer[]>({
+      return cachedSection(this.cache, {
         provider: PROVIDER,
         endpoint: ENDPOINT,
         params: { ...params },
         ttlSeconds: this.env.HOTEL_CACHE_TTL_SECONDS,
         load: () => this.provider.search(params)
       });
-      return { offers: value, stale: false, fetchedAt: fetchedAt.toISOString(), error: null };
-    } catch (err) {
-      // §7.3: falha do provider degrada a seção sem derrubar a página.
-      // no_destination_chosen é lançado por chosenIata (fora do try) e propaga.
-      console.error(
-        JSON.stringify({ event: "hotel_search_failed", tripId, message: (err as Error).message })
-      );
-      return { offers: [], stale: false, fetchedAt: null, error: "unavailable" };
-    }
+    });
   }
 
   async select(userId: string, tripId: string, offerId: string): Promise<HotelSelection> {

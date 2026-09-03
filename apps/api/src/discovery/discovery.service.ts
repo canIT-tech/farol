@@ -51,10 +51,13 @@ export class DiscoveryService {
   private async realFlights(
     userId: string,
     tripId: string
-  ): Promise<Map<string, { price: number; stops: number }>> {
+  ): Promise<Map<string, { price: number; stops: number; currency: string }>> {
     const section = await this.flights.cityDirections(userId, tripId);
     return new Map(
-      section.offers.map((deal) => [deal.destination, { price: deal.price, stops: deal.transfers }])
+      section.offers.map((deal) => [
+        deal.destination,
+        { price: deal.price, stops: deal.transfers, currency: deal.currency }
+      ])
     );
   }
 
@@ -132,7 +135,7 @@ function toCandidate(
   item: LlmRankingItem,
   entry: CatalogEntry,
   currency: string,
-  realFlight?: { price: number; stops: number }
+  realFlight?: { price: number; stops: number; currency: string }
 ): DestinationCandidate {
   return destinationCandidateSchema.parse({
     iata: item.iata,
@@ -144,7 +147,10 @@ function toCandidate(
       flight: realFlight?.price ?? entry.avgFlightCostFromGru,
       lodgingPerNight: entry.avgLodgingNight,
       dailyLocal: entry.avgDailyLocal,
-      currency
+      // sem realFlight, os três campos são estimativa do catálogo na moeda da
+      // viagem; com realFlight, o preço real vem na moeda do provider
+      // (TRAVELPAYOUTS_CURRENCY) e essa é a moeda que rotula o valor exibido.
+      currency: realFlight?.currency ?? currency
     },
     climate: {
       // sem fonte de clima no MVP; bestMonths e summary saem do catalogo

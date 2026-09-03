@@ -4,10 +4,7 @@ import { useState } from "react";
 import { Chip, DestinationCard } from "@farol/ui";
 import type { DestinationCandidate } from "@farol/shared";
 import { arrangeDestinations, type DestinationSort } from "../../lib/destination-filters";
-
-function money(value: number, currency: string): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency, maximumFractionDigits: 0 });
-}
+import { money } from "../../lib/money";
 
 export function stopsLabel(stops: number): string {
   if (stops === 0) {

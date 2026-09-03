@@ -115,8 +115,18 @@ export function buildDeepLink(ctx: DeepLinkContext, route: Route): string {
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
+// Soma minutos preservando o offset original — .toISOString() sempre devolve
+// "Z", o que faria arriveAt virar UTC enquanto departAt fica no offset local
+// do aeroporto, quebrando a dupla para exibição.
 export function addMinutes(iso: string, minutes: number): string {
-  return new Date(Date.parse(iso) + minutes * 60_000).toISOString();
+  // Timestamps do Travelpayouts sempre terminam em "Z" ou "±hh:mm" (ISO 8601).
+  const offset = iso.match(/(Z|[+-]\d{2}:\d{2})$/)![0];
+  const offsetMinutes =
+    offset === "Z" ? 0 : (offset[0] === "+" ? 1 : -1) * (Number(offset.slice(1, 3)) * 60 + Number(offset.slice(4, 6)));
+  const shifted = new Date(Date.parse(iso) + minutes * 60_000 + offsetMinutes * 60_000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const stamp = `${shifted.getUTCFullYear()}-${pad(shifted.getUTCMonth() + 1)}-${pad(shifted.getUTCDate())}T${pad(shifted.getUTCHours())}:${pad(shifted.getUTCMinutes())}:${pad(shifted.getUTCSeconds())}`;
+  return offset === "Z" ? `${stamp}.000Z` : `${stamp}${offset}`;
 }
 
 const DEFAULT_CURRENCY = "brl";

@@ -44,18 +44,25 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
-    // Provider fora do ar é seção degradada, não tela de erro (design §7.3).
-    setFlights(await getFlights(token, id).catch(() => OFFLINE));
-    setHotels(await getHotels(token, id).catch(() => OFFLINE));
-    // Contexto de preço: cada recorte carrega sozinho e some se falhar.
-    setNearby(await getFlightNearby(token, id).catch(() => OFFLINE));
-    setMonths(await getFlightMonths(token, id).catch(() => OFFLINE));
-    setCalendar(await getFlightCalendar(token, id).catch(() => OFFLINE));
-    setLatest(await getFlightLatest(token, id).catch(() => OFFLINE));
-    // O roteiro só serve para dizer quantas paradas ficam a pé de cada hotel;
-    // se falhar, o cartão some com a linha em vez de a tela quebrar.
-    const itinerary = await getItinerary(token, id).catch(() => null);
-    setItems(itinerary === null ? [] : itinerary.days.flatMap((day) => day.items));
+    // 7 seções independentes: cada uma já degrada sozinha no catch, então
+    // rodam em paralelo em vez de uma esperar a outra terminar.
+    const [flightsRes, hotelsRes, nearbyRes, monthsRes, calendarRes, latestRes, itineraryRes] =
+      await Promise.all([
+        getFlights(token, id).catch(() => OFFLINE),
+        getHotels(token, id).catch(() => OFFLINE),
+        getFlightNearby(token, id).catch(() => OFFLINE),
+        getFlightMonths(token, id).catch(() => OFFLINE),
+        getFlightCalendar(token, id).catch(() => OFFLINE),
+        getFlightLatest(token, id).catch(() => OFFLINE),
+        getItinerary(token, id).catch(() => null)
+      ]);
+    setFlights(flightsRes);
+    setHotels(hotelsRes);
+    setNearby(nearbyRes);
+    setMonths(monthsRes);
+    setCalendar(calendarRes);
+    setLatest(latestRes);
+    setItems(itineraryRes === null ? [] : itineraryRes.days.flatMap((day) => day.items));
   }, [token, id]);
 
   useEffect(() => {

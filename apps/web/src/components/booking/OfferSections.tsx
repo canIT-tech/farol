@@ -9,6 +9,7 @@ import type {
   ProviderSection
 } from "@farol/shared";
 import { walkingNote } from "../../lib/walking-distance";
+import { money } from "../../lib/money";
 
 // Nome do parceiro que recebe o clique. O Travelpayouts leva a busca do
 // Aviasales, e o hi-fi exige dizer para onde a pessoa está indo antes do clique.
@@ -18,14 +19,6 @@ export const FLIGHT_PARTNER = "Aviasales";
 // final é o do parceiro. Dizer isso é a diferença entre assessor e vitrine.
 export const APPROX_PRICE_NOTICE =
   "Preço aproximado, do cache do parceiro. O valor final é confirmado no site do parceiro.";
-
-function money(value: number, currency: string): string {
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-    maximumFractionDigits: 0
-  });
-}
 
 // "há 8 min" — o hi-fi mostra a idade do preço junto das ofertas.
 export function freshnessLabel(fetchedAt: string | null, now: number = Date.now()): string | null {
