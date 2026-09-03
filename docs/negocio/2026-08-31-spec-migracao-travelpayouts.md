@@ -211,3 +211,68 @@ Reabre 1 linha do débito A2 (que estava fechado).
 - `prices_for_dates` traz `duration` e `transfers`? (deve trazer — confirmar para manter `flightTimeHours` / `stops`).
 - Segundo provider (Duffel / SerpApi) como fallback para rotas não cobertas — **item futuro**, não MVP.
 - **Skyscanner Partners:** aplicar depois do lançamento, quando houver tráfego — é a graduação natural.
+
+---
+
+## 11. O que a implementação decidiu (2026-09-02, Passo 10)
+
+Esta seção fecha as decisões abertas de §10 com o que foi verificado contra a API real.
+
+### Endpoints — o que a conta libera de fato
+
+Os nove endpoints abaixo responderam com o token da conta e estão implementados em
+`packages/providers/src/travelpayouts/`, cada um com fixture gravada da resposta real.
+`aviasales/v3/prices_for_dates` e `v1/prices/calendar` (o caminho que §3 supunha) **não**
+foram usados — os endpoints v1/v2 abaixo cobrem o mesmo e vieram confirmados.
+
+| Endpoint | Papel no produto | Normalizador |
+|---|---|---|
+| `GET /v1/prices/cheap` | tarifa mais barata da rota no mês | `normalizeCheap` → `FlightOffer[]` |
+| `GET /v1/prices/monthly` | melhor preço mês a mês — "quando ir" | `normalizeKeyedDeals` → `RouteDeal[]` |
+| `GET /v1/city-directions` | destinos baratos saindo da origem — descoberta | `normalizeKeyedDeals` |
+| `GET /v2/prices/latest` | faixa de preço recente da rota | `normalizeMatrixSamples` → `RoutePriceSample[]` |
+| `GET /v2/prices/month-matrix` | preço por dia — melhor dia do mês | `normalizeMatrixSamples` |
+| `GET /v2/prices/nearest-places-matrix` | aeroportos vizinhos, **com `link` da tarifa exata** | `normalizeNearestPlaces` → `FlightOffer[]` |
+| `GET /whereami` (host `www.travelpayouts.com`) | origem provável pelo IP; responde **JSONP** | `parseJsonp` + `normalizeWhereami` |
+| `GET /data/{locale}/airports.json` | catálogo de aeroportos (2,5 MB) | `normalizeAirports` |
+| `GET /data/{locale}/airlines.json` | catálogo de companhias (117 KB) | `normalizeAirlines` |
+
+**Hotellook: fora.** `engine.hotellook.com/api/v2/lookup.json` e `.../cache.json` devolvem
+**404** com este token (idem `yasen.hotellook.com`). A conta não tem o programa de hotel
+liberado. Consequência: `HOTEL_PROVIDER` só monta a Amadeus quando `AMADEUS_CLIENT_ID` e
+`AMADEUS_CLIENT_SECRET` existirem; sem elas a busca recusa com `hotel_provider_not_configured`
+e a seção de hotel degrada para `error: "unavailable"` — o roteiro segue de pé (§7.3).
+Hotel volta a ter provider quando o Hotellook for liberado ou entrar outro afiliado.
+
+### Respostas às decisões abertas de §10
+
+- **`currency=brl` em voo:** funciona em todos os endpoints de preço. Default do provider.
+- **Deep-link:** as duas formas convivem. Onde a API devolve `link` (nearest-places-matrix),
+  usa-se a URL do Aviasales com o `marker` anexado — cai na tarifa exata. Nos demais, o
+  `FLIGHT_DEEPLINK_TEMPLATE` monta a busca (`/search/{origin}{departDdmm}{destination}{returnDdmm}{passengers}?marker={marker}`).
+  Sem redirect `tp.media`.
+- **`duration` e `transfers`:** vêm nos dois formatos. `nearest-places-matrix` traz
+  `main_airline`, `transfers` e `duration` em minutos; `month-matrix`/`latest` trazem
+  `number_of_changes` e `duration`, **mas não a companhia** — por isso viraram
+  `RoutePriceSample` (amostra de preço), não `FlightOffer`. Inventar `carrier` seria mentir.
+- **Data exata vs mês:** `nearest-places-matrix` com `depart_date` **e** `return_date`
+  exatos volta vazio na maioria das rotas; `/v1/prices/cheap` com **mês** (`YYYY-MM`)
+  responde de forma confiável. Por isso `search()` chama as duas fontes em paralelo
+  (`Promise.allSettled`), funde por id e ordena por preço: uma fonte fora do ar não zera
+  a seção; as duas fora propagam o erro.
+- **Precisão do preço:** é cache. `FLIGHT_CACHE_TTL_SECONDS` subiu de 600 para **1800**.
+  A UI mostra o aviso de preço aproximado junto das ofertas e o system prompt do chat
+  obriga o assessor a dizer isso ao citar valor.
+
+### Superfície nova
+
+- API: `GET /trips/:id/flights/{nearby,calendar,latest,months,directions}` e o
+  `GeoModule` público (`GET /geo/whereami`, `/geo/airports?q=`, `/geo/airports/:iata`,
+  `/geo/airlines/:code`).
+- Chat: 5 tools novas (11 → 16) — `price_calendar`, `best_months`, `price_range`,
+  `nearby_airports`, `cheap_destinations`.
+- `@farol/shared`: `RoutePriceSample`, `RouteDeal`, `GeoLocation`, `Airport`, `Airline`.
+  `FlightOffer.durationMinutes` passou a aceitar `0` — o cache nem sempre traz duração.
+- Envs: `TRAVELPAYOUTS_TOKEN`, `TRAVELPAYOUTS_MARKER`, `TRAVELPAYOUTS_BASE_URL`,
+  `TRAVELPAYOUTS_CURRENCY`, `GEO_DUMP_TTL_SECONDS`. `AMADEUS_CLIENT_ID`/`SECRET` viraram
+  **opcionais**. Credenciais vão no Doppler (`farol/dev` e `farol/prd`), nunca em `.env`.
