@@ -8,6 +8,7 @@ import {
 } from "@farol/shared";
 import { fillTemplate } from "../template.js";
 import { aviasalesLink, ddmm } from "./deep-link.js";
+import { nullIfEmpty } from "../text.js";
 
 // ── Shapes crus do Travelpayouts ────────────────────────────────────────────
 
@@ -113,11 +114,6 @@ export function buildDeepLink(ctx: DeepLinkContext, route: Route): string {
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
-
-/** Campo textual do Travelpayouts que vem "" quando não há valor. */
-export function nullIfEmpty(value: string | undefined): string | null {
-  return value === undefined || value === "" ? null : value;
-}
 
 export function addMinutes(iso: string, minutes: number): string {
   return new Date(Date.parse(iso) + minutes * 60_000).toISOString();

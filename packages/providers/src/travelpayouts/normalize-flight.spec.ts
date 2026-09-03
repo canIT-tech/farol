@@ -9,13 +9,13 @@ import {
   normalizeKeyedDeals,
   normalizeMatrixSamples,
   normalizeNearestPlaces,
-  nullIfEmpty,
   type TpCheapResponse,
   type TpKeyedDealsResponse,
   type TpMatrixResponse,
   type TpNearestResponse
 } from "./normalize-flight.js";
 import { AVIASALES_BASE_URL, AVIASALES_SEARCH_TEMPLATE } from "./deep-link.js";
+import { nullIfEmpty } from "../text.js";
 
 function fixture<T>(name: string): T {
   return JSON.parse(

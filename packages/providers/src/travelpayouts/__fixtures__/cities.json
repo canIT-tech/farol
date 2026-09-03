@@ -1,0 +1,104 @@
+[
+  {
+    "name_translations": {
+      "en": "Bangkok"
+    },
+    "cases": {
+      "su": "Bangkok"
+    },
+    "country_code": "TH",
+    "code": "BKK",
+    "time_zone": "Asia/Bangkok",
+    "name": "Bangkok",
+    "coordinates": {
+      "lat": 13.7563309,
+      "lon": 100.5017651
+    },
+    "has_flightable_airport": true
+  },
+  {
+    "name_translations": {
+      "en": "Lisbon"
+    },
+    "cases": {
+      "su": "Lisbon"
+    },
+    "country_code": "PT",
+    "code": "LIS",
+    "time_zone": "Europe/Lisbon",
+    "name": "Lisbon",
+    "coordinates": {
+      "lat": 38.7222524,
+      "lon": -9.1393366
+    },
+    "has_flightable_airport": true
+  },
+  {
+    "name_translations": {
+      "en": "Rio de Janeiro"
+    },
+    "cases": {
+      "su": "Rio de Janeiro"
+    },
+    "country_code": "BR",
+    "code": "RIO",
+    "time_zone": "America/Sao_Paulo",
+    "name": "Rio de Janeiro",
+    "coordinates": {
+      "lat": -22.9068467,
+      "lon": -43.1728965
+    },
+    "has_flightable_airport": true
+  },
+  {
+    "name_translations": {
+      "en": "Cartagena"
+    },
+    "cases": {
+      "su": "Cartagena"
+    },
+    "country_code": "CO",
+    "code": "CTG",
+    "time_zone": "America/Bogota",
+    "name": "Cartagena",
+    "coordinates": {
+      "lat": 10.3910485,
+      "lon": -75.4794257
+    },
+    "has_flightable_airport": true
+  },
+  {
+    "name_translations": {
+      "en": "Sao Paulo"
+    },
+    "cases": {
+      "su": "Sao Paulo"
+    },
+    "country_code": "BR",
+    "code": "SAO",
+    "time_zone": "America/Sao_Paulo",
+    "name": "Sao Paulo",
+    "coordinates": {
+      "lat": -23.5505199,
+      "lon": -46.6333094
+    },
+    "has_flightable_airport": true
+  },
+  {
+    "name_translations": {
+      "en": "Mexico City"
+    },
+    "cases": {
+      "su": "Mexico City"
+    },
+    "country_code": "MX",
+    "code": "MEX",
+    "time_zone": "America/Mexico_City",
+    "name": "Mexico City",
+    "coordinates": {
+      "lat": 19.4270499,
+      "lon": -99.1275711
+    },
+    "has_flightable_airport": true
+  }
+]

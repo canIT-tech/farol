@@ -7,13 +7,16 @@ import {
   TravelpayoutsGeoProvider,
   WHEREAMI_CALLBACK,
   WHEREAMI_URL,
+  CITIES_PATH,
   normalizeAirlines,
   normalizeAirports,
+  normalizeCities,
   normalizeWhereami,
   parseCoordinates,
   parseJsonp,
   type TpAirline,
-  type TpAirport
+  type TpAirport,
+  type TpCity
 } from "./travelpayouts-geo-provider.js";
 import type { Query, TravelpayoutsHttp } from "./http.js";
 
@@ -23,6 +26,7 @@ function read(name: string): string {
 
 const airportsFixture = JSON.parse(read("airports.json")) as TpAirport[];
 const airlinesFixture = JSON.parse(read("airlines.json")) as TpAirline[];
+const citiesFixture = JSON.parse(read("cities.json")) as TpCity[];
 const whereamiFixture = read("whereami.jsonp");
 
 interface Recorded {
@@ -35,7 +39,9 @@ function fakeHttp(text = whereamiFixture): { http: TravelpayoutsHttp; calls: Rec
   const http: TravelpayoutsHttp = {
     get: vi.fn(async (path: string, query: Query = {}) => {
       calls.push({ path, query });
-      return path.includes("airlines") ? airlinesFixture : airportsFixture;
+      if (path.includes("airlines")) return airlinesFixture;
+      if (path.includes("cities")) return citiesFixture;
+      return airportsFixture;
     }) as TravelpayoutsHttp["get"],
     getText: vi.fn(async (path: string, query: Query = {}) => {
       calls.push({ path, query });
@@ -141,6 +147,24 @@ describe("normalizeAirlines", () => {
 
   it("assume não-lowcost quando o campo não vem", () => {
     expect(normalizeAirlines([{ code: "ZZ", name: "Z Air" }])[0]!.isLowcost).toBe(false);
+  });
+});
+
+describe("normalizeCities", () => {
+  it("normaliza a fixture real do dump de cidades", () => {
+    const cities = normalizeCities(citiesFixture);
+    expect(cities.length).toBe(citiesFixture.length);
+    const lis = cities.find((c) => c.iata === "LIS")!;
+    expect(lis.name).toBe("Lisbon");
+    expect(lis.countryCode).toBe("PT");
+    expect(lis.lat).toBeCloseTo(38.72, 1);
+    expect(lis.lon).toBeCloseTo(-9.14, 1);
+  });
+
+  it("aceita cidade sem coordenada", () => {
+    expect(
+      normalizeCities([{ code: "ZZZ", name: "Nowhere", country_code: "BR" }])[0]
+    ).toEqual({ iata: "ZZZ", name: "Nowhere", countryCode: "BR", lat: null, lon: null });
   });
 });
 
@@ -278,5 +302,61 @@ describe("TravelpayoutsGeoProvider", () => {
 
   it("monta o http real quando nenhum é injetado", () => {
     expect(() => new TravelpayoutsGeoProvider({ token: "t" })).not.toThrow();
+  });
+
+  it("city resolve o IATA de cidade direto, ignorando caixa", async () => {
+    const { http, calls } = fakeHttp();
+    const city = await provider(http).city("lis");
+
+    expect(city!.name).toBe("Lisbon");
+    expect(calls.map((c) => c.path)).toEqual([CITIES_PATH.replace("{locale}", "en")]);
+  });
+
+  it("city de um IATA de aeroporto resolve pelo city_code — GRU vira São Paulo", async () => {
+    const { http } = fakeHttp();
+    const city = await provider(http).city("GRU");
+
+    expect(city!.iata).toBe("SAO");
+    expect(city!.countryCode).toBe("BR");
+  });
+
+  it("city devolve null para código desconhecido e para aeroporto sem cidade no dump", async () => {
+    const { http } = fakeHttp();
+    const geo = provider(http);
+    await expect(geo.city("ZZZ")).resolves.toBeNull();
+    // XAP está no dump de aeroportos, mas a cidade dele não está no de cidades.
+    await expect(geo.city("XAP")).resolves.toBeNull();
+  });
+
+  it("city devolve null quando o aeroporto não tem city_code", async () => {
+    const semCidade: TravelpayoutsGeoProvider = new TravelpayoutsGeoProvider({
+      token: "t",
+      http: {
+        get: (async (path: string) =>
+          path.includes("cities")
+            ? []
+            : [{ code: "ZZZ", name: "Solto", country_code: "BR" }]) as never,
+        getText: async () => ""
+      }
+    });
+    await expect(semCidade.city("ZZZ")).resolves.toBeNull();
+  });
+
+  it("cacheia o dump de cidades entre chamadas", async () => {
+    const { http, calls } = fakeHttp();
+    const geo = provider(http, () => 0);
+    await geo.cities();
+    await geo.cities();
+    expect(calls).toHaveLength(1);
+  });
+
+  it("rebusca o dump de cidades depois do TTL", async () => {
+    const { http, calls } = fakeHttp();
+    let clock = 0;
+    const geo = new TravelpayoutsGeoProvider({ token: "t", http, dumpTtlMs: 1000, now: () => clock });
+    await geo.cities();
+    clock = 5000;
+    await geo.cities();
+    expect(calls).toHaveLength(2);
   });
 });

@@ -49,6 +49,17 @@ export const geoLocationSchema = z.object({
 });
 export type GeoLocation = z.infer<typeof geoLocationSchema>;
 
+// Cidade do dump /data/{locale}/cities.json. É a ponte entre o IATA do destino
+// e uma coordenada de centro de cidade — o que a busca de hotel precisa.
+export const citySchema = z.object({
+  iata: iata,
+  name: z.string().min(1),
+  countryCode: z.string().length(2),
+  lat: z.number().nullable(),
+  lon: z.number().nullable()
+});
+export type City = z.infer<typeof citySchema>;
+
 // Aeroporto do dump /data/en/airports.json.
 export const airportSchema = z.object({
   iata: iata,

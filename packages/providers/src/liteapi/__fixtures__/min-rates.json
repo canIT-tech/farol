@@ -1,0 +1,23 @@
+{
+  "data": [
+    {
+      "hotelId": "lp65571137",
+      "price": 4324.75,
+      "suggestedSellingPrice": 5613.53,
+      "offerId": "3gAWonJzkd4AEaRzcmlk2gFf…"
+    },
+    {
+      "hotelId": "lp74dd5",
+      "price": 4041.51,
+      "suggestedSellingPrice": 4719.95,
+      "offerId": "3gAWonJzkd4AEaRzcmlk2gFN…"
+    },
+    {
+      "hotelId": "lp36b7f",
+      "price": 9317.65,
+      "suggestedSellingPrice": 10958.56,
+      "offerId": "3gAWonJzkd4AEaRzcmlk2gEX…"
+    }
+  ],
+  "sandbox": true
+}

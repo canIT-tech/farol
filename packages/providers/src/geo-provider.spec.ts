@@ -5,11 +5,12 @@ const complete = {
   whereami: () => Promise.resolve(null),
   airport: () => Promise.resolve(null),
   airline: () => Promise.resolve(null),
+  city: () => Promise.resolve(null),
   searchAirports: () => Promise.resolve([])
 };
 
 describe("isGeoProvider", () => {
-  it("aceita um objeto com os quatro métodos", () => {
+  it("aceita um objeto com todos os métodos", () => {
     expect(isGeoProvider(complete)).toBe(true);
   });
 

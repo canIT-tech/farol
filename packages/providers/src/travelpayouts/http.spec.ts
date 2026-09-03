@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
 import {
-  buildQuery,
   createTravelpayoutsHttp,
   TravelpayoutsHttpError,
   TRAVELPAYOUTS_BASE_URL
@@ -25,20 +24,6 @@ function fetchSeq(specs: ResSpec[]): {
 }
 
 const base = { token: "tok", retryMinTimeoutMs: 0, now: () => 0 };
-
-describe("buildQuery", () => {
-  it("serializa os valores string, número e boolean", () => {
-    expect(buildQuery({ a: "x", b: 2, c: true })).toBe("a=x&b=2&c=true");
-  });
-
-  it("omite as chaves undefined", () => {
-    expect(buildQuery({ a: "x", b: undefined })).toBe("a=x");
-  });
-
-  it("devolve string vazia quando não há query", () => {
-    expect(buildQuery({})).toBe("");
-  });
-});
 
 describe("createTravelpayoutsHttp", () => {
   it("usa a base pública por padrão e manda o token no header", async () => {

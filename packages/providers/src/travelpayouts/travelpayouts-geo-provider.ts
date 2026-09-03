@@ -1,9 +1,11 @@
 import {
   airlineSchema,
   airportSchema,
+  citySchema,
   geoLocationSchema,
   type Airline,
   type Airport,
+  type City,
   type GeoLocation
 } from "@farol/shared";
 import {
@@ -16,6 +18,7 @@ import type { GeoProvider } from "../geo-provider.js";
 export const WHEREAMI_URL = "https://www.travelpayouts.com/whereami";
 export const AIRPORTS_PATH = "/data/{locale}/airports.json";
 export const AIRLINES_PATH = "/data/{locale}/airlines.json";
+export const CITIES_PATH = "/data/{locale}/cities.json";
 
 /** Callback fixo do JSONP do /whereami — o endpoint exige um e ecoa este. */
 export const WHEREAMI_CALLBACK = "useriata";
@@ -52,6 +55,13 @@ export interface TpAirline {
   code: string;
   name: string;
   is_lowcost?: boolean;
+}
+
+export interface TpCity {
+  code: string;
+  name: string;
+  country_code: string;
+  coordinates?: { lat: number; lon: number } | null;
 }
 
 // "useriata({...})" → objeto. O /whereami só fala JSONP; sem callback ele
@@ -112,6 +122,18 @@ export function normalizeAirports(raw: TpAirport[]): Airport[] {
   );
 }
 
+export function normalizeCities(raw: TpCity[]): City[] {
+  return raw.map((item) =>
+    citySchema.parse({
+      iata: item.code,
+      name: item.name,
+      countryCode: item.country_code,
+      lat: item.coordinates?.lat ?? null,
+      lon: item.coordinates?.lon ?? null
+    })
+  );
+}
+
 export function normalizeAirlines(raw: TpAirline[]): Airline[] {
   return raw.map((item) =>
     airlineSchema.parse({
@@ -139,6 +161,7 @@ export class TravelpayoutsGeoProvider implements GeoProvider {
   private readonly now: () => number;
   private airportsCache: CacheEntry<Airport[]> | null = null;
   private airlinesCache: CacheEntry<Airline[]> | null = null;
+  private citiesCache: CacheEntry<City[]> | null = null;
 
   constructor(cfg: TravelpayoutsGeoProviderConfig) {
     this.http = cfg.http ?? createTravelpayoutsHttp(cfg);
@@ -179,6 +202,33 @@ export class TravelpayoutsGeoProvider implements GeoProvider {
     const value = normalizeAirlines(raw);
     this.airlinesCache = { value, expiresAt: this.now() + this.ttlMs };
     return value;
+  }
+
+  async cities(): Promise<City[]> {
+    if (this.citiesCache !== null && this.citiesCache.expiresAt > this.now()) {
+      return this.citiesCache.value;
+    }
+    const raw = await this.http.get<TpCity[]>(CITIES_PATH.replace("{locale}", this.locale));
+    const value = normalizeCities(raw);
+    this.citiesCache = { value, expiresAt: this.now() + this.ttlMs };
+    return value;
+  }
+
+  // Um IATA pode ser de cidade (LIS) ou de aeroporto (GRU). Tenta cidade
+  // primeiro e, não achando, resolve pelo city_code do aeroporto — é assim que
+  // "GRU" vira o centro de São Paulo, e não a coordenada do terminal.
+  async city(iata: string): Promise<City | null> {
+    const upper = iata.toUpperCase();
+    const cities = await this.cities();
+    const direct = cities.find((c) => c.iata === upper);
+    if (direct !== undefined) {
+      return direct;
+    }
+    const airport = await this.airport(upper);
+    if (airport === null || airport.cityCode === null) {
+      return null;
+    }
+    return cities.find((c) => c.iata === airport.cityCode) ?? null;
   }
 
   async airport(iata: string): Promise<Airport | null> {

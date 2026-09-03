@@ -1,6 +1,7 @@
 import pRetry from "p-retry";
 import { CircuitBreaker } from "../http/circuit-breaker.js";
 import { isRetryableStatus } from "../http/retry.js";
+import { buildQuery, type Query } from "../http/query.js";
 
 export interface TravelpayoutsHttpConfig {
   /** Base da Data API. Default: https://api.travelpayouts.com */
@@ -25,20 +26,6 @@ export class TravelpayoutsHttpError extends Error {
     super(`Travelpayouts respondeu ${status}`);
     this.name = "TravelpayoutsHttpError";
   }
-}
-
-export type Query = Record<string, string | number | boolean | undefined>;
-
-// Query string do Travelpayouts: chave com valor undefined é omitida (os
-// endpoints tratam param vazio como filtro, não como ausência).
-export function buildQuery(query: Query): string {
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(query)) {
-    if (value !== undefined) {
-      params.set(key, String(value));
-    }
-  }
-  return params.toString();
 }
 
 export interface TravelpayoutsHttp {
