@@ -13,6 +13,7 @@ import { isDomainError, type TasteProfileInput, type TripInput } from "@farol/sh
 import { DiscoveryService } from "./discovery.service";
 import { CatalogRepository } from "./catalog.repository";
 import { TripsService } from "../trips/trips.service";
+import type { FlightsService } from "../flights/flights.service";
 import { ProfileService } from "../profile/profile.service";
 import { FakeLlmService } from "../llm/fake-llm.service";
 
@@ -22,11 +23,18 @@ if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/api");
 const { db, close } = createDbClient(url);
 const tripsService = new TripsService(db);
 const profileService = new ProfileService(db);
+// city-directions com preço real fica fora deste spec de integração — a rota
+// depende da rede. O comportamento com e sem preço real está no .unit.spec.
+const noRealPrices = {
+  cityDirections: () => Promise.resolve({ offers: [], stale: false, error: null })
+} as unknown as FlightsService;
+
 const service = new DiscoveryService(
   db,
   new CatalogRepository(db),
   tripsService,
   profileService,
+  noRealPrices,
   new FakeLlmService()
 );
 

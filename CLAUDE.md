@@ -137,7 +137,8 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - **Testes de integração e o Postgres único.** A serialização no `turbo.json` resolve o CI (Postgres novo a cada run), mas localmente exige banco limpo. Opção definitiva: `DATABASE_URL_TEST` apontando pra um banco `farol_test` dedicado (docker-compose cria; specs já preferem `DATABASE_URL_TEST`).
 
 **Placeholders da pipeline**
-- `discovery`: `climate.expectedC = 22` fixo e `flightTimeHours = null` (sem fonte de clima/tempo de voo no MVP). **Segue aberto** — o Passo 6 não trouxe fonte de clima.
+- `discovery`: `climate.expectedC` nulo e `flightTimeHours = null` (sem fonte de clima/tempo de voo no MVP). **Segue aberto.**
+- ~~`estCost.flight` sempre da média `avgFlightCostFromGru` do catálogo~~ — resolvido no Passo 10: a descoberta consulta `/v1/city-directions` a partir da origem real da viagem e usa o preço do provider quando o destino aparece na lista; sem cobertura (ou provider fora do ar) cai na média do catálogo.
 - ~~`itinerary_items.placeId/lat/lng/rating = null`~~ — preenchidos pelo enrich do Passo 6; item sem match fica `needsReview = true` e é reprocessado pelo job `places.enrich`.
 - `prefilterDestinations({ excludeIata })` existe mas não é usado (não há conceito de "destino rejeitado" no schema).
 

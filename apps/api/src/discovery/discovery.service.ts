@@ -16,6 +16,7 @@ import { LLM, type LlmPort } from "../llm/llm.types";
 import { ProfileService } from "../profile/profile.service";
 import { TripsService } from "../trips/trips.service";
 import type { TripState } from "../trips/trip-state";
+import { FlightsService } from "../flights/flights.service";
 import { CatalogRepository } from "./catalog.repository";
 
 const MIN_SHORTLIST = 3;
@@ -38,8 +39,18 @@ export class DiscoveryService {
     private readonly catalog: CatalogRepository,
     private readonly trips: TripsService,
     private readonly profiles: ProfileService,
+    private readonly flights: FlightsService,
     @Inject(LLM) private readonly llm: LlmPort
   ) {}
+
+  // Preço real de voo por destino a partir da origem da viagem
+  // (/v1/city-directions). Substitui a média do catálogo, que é sempre "saindo
+  // de GRU" e não sabe nada sobre quem está buscando. Provider fora do ar
+  // devolve mapa vazio e a estimativa do catálogo continua valendo.
+  private async realFlightPrices(userId: string, tripId: string): Promise<Map<string, number>> {
+    const section = await this.flights.cityDirections(userId, tripId);
+    return new Map(section.offers.map((deal) => [deal.destination, deal.price]));
+  }
 
   async run(userId: string, tripId: string): Promise<DestinationCandidate[]> {
     const trip = await this.trips.get(userId, tripId);
@@ -71,7 +82,10 @@ export class DiscoveryService {
     });
 
     const byIata = new Map(catalog.map((entry) => [entry.iata, entry]));
-    const candidates = ranking.map((item) => toCandidate(item, byIata.get(item.iata)!, trip.currency));
+    const realPrices = await this.realFlightPrices(userId, tripId);
+    const candidates = ranking.map((item) =>
+      toCandidate(item, byIata.get(item.iata)!, trip.currency, realPrices.get(item.iata))
+    );
 
     await this.db.transaction(async (tx) => {
       await tx.delete(tripDestinations).where(eq(tripDestinations.tripId, tripId));
@@ -111,7 +125,8 @@ export class DiscoveryService {
 function toCandidate(
   item: LlmRankingItem,
   entry: CatalogEntry,
-  currency: string
+  currency: string,
+  realFlightPrice?: number
 ): DestinationCandidate {
   return destinationCandidateSchema.parse({
     iata: item.iata,
@@ -120,7 +135,7 @@ function toCandidate(
     score: item.score,
     rationale: item.rationale,
     estCost: {
-      flight: entry.avgFlightCostFromGru,
+      flight: realFlightPrice ?? entry.avgFlightCostFromGru,
       lodgingPerNight: entry.avgLodgingNight,
       dailyLocal: entry.avgDailyLocal,
       currency
