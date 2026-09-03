@@ -330,8 +330,13 @@ de B3.
 | A3 LiteAPI | ✅ | Felipe gravou `LITEAPI_KEY` (sandbox) no Doppler `prd` |
 | A4 limpar Amadeus | ✅ Doppler · ⚠️ Render | Removido do Doppler. **Ainda no Render:** o MCP só faz merge, remover exige `replace: true` com a lista completa (todos os valores passariam pelo chat). Pendente: apagar as duas chaves no dashboard do Render, ou aceitar o desvio até o próximo `replace` |
 | A5 espelho + deploy | ✅ | 3 envs escritas no Render às 16:25 UTC → deploy `dep-dacpunrl550s73d7o2r0` **live às 16:27** sobre `ebd4cd8` (PR #13). Instância `vq8mv`: `Nest application successfully started`, sem `Env inválida`, sem `*_failed` no boot. Instância antiga (`965a3a2`) `deactivated`. Health `db: up`, `/api/waitlist/count` = 2, landing 200 |
-| B3 URLs Supabase | ⏳ Rafael | — |
-| B2 login real | ⏳ | depende de A5 + B3 |
+| B3 URLs Supabase | ✅ | Rafael no dashboard + PAT (`SUPABASE_ACCESS_TOKEN`) no Doppler `prd`. Lido pela Management API: `site_url` e `uri_allow_list` corretos; `localhost:3000/**` tinha sumido, re-adicionado por `PATCH /v1/projects/{ref}/config/auth`. **`rate_limit_email_sent: 2`/hora** no mailer embutido — um link mágico por tentativa, sem repetir |
+| B2 login real | ✅ | Link disparado por `POST /auth/v1/otp` (implicit flow → sem armadilha PKCE, funciona em qualquer browser). Rafael clicou, caiu em `/onboarding` no domínio do Render. `auth.users`: `confirmed_at` e `last_sign_in_at` = 16:36:58 UTC |
+| B4 `users` row | 🟡 | `public.users` ainda vazio — esperado: `AuthGate` só lê sessão; a linha nasce no primeiro request autenticado (`PUT /profile`, D5). Verificar após D5 |
+
+Ajuste ao B2 para o futuro: **pedir o link pela API** (`otp` com a anon key) em vez de pela tela
+evita o PKCE e deixa clicar do celular. Vale documentar no `login/page.tsx` como alternativa
+para QA — não muda o fluxo do usuário final.
 
 Lições operacionais desta rodada:
 - `doppler secrets delete` **imprime a tabela dos segredos restantes** (valores
