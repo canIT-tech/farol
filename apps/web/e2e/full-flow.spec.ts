@@ -26,6 +26,10 @@ test("nova viagem → descoberta → destino → roteiro → ajuste por chat", a
     const url = new URL(request.url());
     const method = request.method();
 
+    if (url.pathname === "/api/geo/whereami") {
+      // O formulário sugere a origem pelo IP; aqui o palpite não resolve.
+      return route.fulfill(json(null));
+    }
     if (url.pathname === "/api/trips" && method === "POST") {
       return route.fulfill(json(trip, 201));
     }
