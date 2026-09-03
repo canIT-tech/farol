@@ -1,0 +1,76 @@
+import { createResilientCall } from "../http/resilient-call.js";
+import { isRetryableStatus } from "../http/retry.js";
+import { buildQuery, type Query } from "../http/query.js";
+
+export interface TravelpayoutsHttpConfig {
+  /** Base da Data API. Default: https://api.travelpayouts.com */
+  baseUrl?: string;
+  /** Token da conta. Vai no header X-Access-Token. */
+  token: string;
+  fetchImpl?: typeof fetch;
+  now?: () => number;
+  retries?: number;
+  retryMinTimeoutMs?: number;
+  failureThreshold?: number;
+  cooldownMs?: number;
+}
+
+export const TRAVELPAYOUTS_BASE_URL = "https://api.travelpayouts.com";
+
+export class TravelpayoutsHttpError extends Error {
+  constructor(
+    readonly status: number,
+    readonly body: string
+  ) {
+    super(`Travelpayouts respondeu ${status}`);
+    this.name = "TravelpayoutsHttpError";
+  }
+}
+
+export interface TravelpayoutsHttp {
+  /** JSON de um path relativo à baseUrl, ou de uma URL absoluta. */
+  get<T>(path: string, query?: Query): Promise<T>;
+  /** Corpo cru — o /whereami devolve JSONP, não JSON. */
+  getText(path: string, query?: Query): Promise<string>;
+}
+
+// Cliente GET do Travelpayouts (spec de migração §6). Sem OAuth: o token vai no
+// header X-Access-Token. p-retry em 429/5xx e erro de rede, tudo dentro de um
+// CircuitBreaker compartilhado entre os endpoints.
+export function createTravelpayoutsHttp(cfg: TravelpayoutsHttpConfig): TravelpayoutsHttp {
+  const fetchImpl = cfg.fetchImpl ?? fetch;
+  const baseUrl = cfg.baseUrl ?? TRAVELPAYOUTS_BASE_URL;
+  const resilient = createResilientCall(cfg);
+
+  function resolve(path: string, query: Query): string {
+    const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
+    const qs = buildQuery(query);
+    return qs === "" ? url : `${url}?${qs}`;
+  }
+
+  async function doGet(path: string, query: Query): Promise<Response> {
+    const res = await fetchImpl(resolve(path, query), {
+      headers: { "x-access-token": cfg.token }
+    });
+    if (res.ok) {
+      return res;
+    }
+    throw new TravelpayoutsHttpError(res.status, await res.text());
+  }
+
+  function run<T>(path: string, query: Query, read: (res: Response) => Promise<T>): Promise<T> {
+    return resilient.run(
+      async () => read(await doGet(path, query)),
+      (error) => error instanceof TravelpayoutsHttpError && isRetryableStatus(error.status)
+    );
+  }
+
+  return {
+    get<T>(path: string, query: Query = {}): Promise<T> {
+      return run(path, query, (res) => res.json() as Promise<T>);
+    },
+    getText(path: string, query: Query = {}): Promise<string> {
+      return run(path, query, (res) => res.text());
+    }
+  };
+}

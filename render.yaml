@@ -36,13 +36,14 @@ services:
         value: "true"
       - key: JOBS_SCHEMA
         value: pgboss
-      # Amadeus foi descontinuada (Passo 10 troca por Travelpayouts). O schema
-      # exige as duas, e placeholder serve: voo e hotel degradam para
-      # error "unavailable" em runtime, sem derrubar a api.
-      - key: AMADEUS_CLIENT_ID
-        value: placeholder
-      - key: AMADEUS_CLIENT_SECRET
-        value: placeholder
+      # Travelpayouts (Passo 10). Token é segredo, marker é id de afiliado.
+      - key: TRAVELPAYOUTS_TOKEN
+        sync: false
+      - key: TRAVELPAYOUTS_MARKER
+        sync: false
+      # LiteAPI — provider de hotel.
+      - key: LITEAPI_KEY
+        sync: false
       - key: DATABASE_URL
         sync: false
       - key: SUPABASE_JWKS_URL

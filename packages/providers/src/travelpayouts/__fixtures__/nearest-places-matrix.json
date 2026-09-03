@@ -1,0 +1,80 @@
+{
+    "prices": [
+        {
+            "link": "/search/SAO0205RIO1?t=AD18092526001809256200000060GRUSDU_f6c31d9bcae6d516bbeb2ec611c9e7cf_2732&search_date=31082026&expected_price_uuid=01a057be-5ca3-8030-e7d2-022f44025525&static_fare_key=TY%7CP1%7CH1%7CL0%7CCH0%7CR0%7CTBC0&itinerary_key=JYf7qt1mMyqquC4Y4cA8Kw&expected_price_source=share&expected_price_currency=brl&expected_price=164",
+            "origin": "SAO",
+            "gate": "Trip.com",
+            "main_airline": "AD",
+            "depart_date": "2027-05-02T10:10:00-03:00",
+            "destination": "RIO",
+            "found_at": "2026-08-31T12:14:48Z",
+            "transfers": 0,
+            "distance": 343,
+            "duration": 60,
+            "price": 164,
+            "trip_class": 0
+        },
+        {
+            "link": "/search/SAO0805RIO1?t=AD18098037001809807300000060GRUSDU_afd75b1fa1a2d2e81219caf9fa984b60_2781&search_date=31082026&expected_price_uuid=01a057be-4163-8030-6e16-7d402c4a6d77&static_fare_key=TY%7CP1%7CH1%7CL0%7CCH0%7CR0%7CTBC0&itinerary_key=vSMvuFWHGC8oOjXt1Fw1uQ&expected_price_source=share&expected_price_currency=brl&expected_price=167",
+            "origin": "SAO",
+            "gate": "Trip.com",
+            "main_airline": "AD",
+            "depart_date": "2027-05-08T19:15:00-03:00",
+            "destination": "RIO",
+            "found_at": "2026-08-31T12:14:41Z",
+            "transfers": 0,
+            "distance": 343,
+            "duration": 60,
+            "price": 167,
+            "trip_class": 0
+        },
+        {
+            "link": "/search/SAO2811RIO1?t=AD17958933001795896900000060GRUSDU_a816c9523cf4aeb41005f41caea4d2d2_2858&search_date=31082026&expected_price_uuid=01a056f2-bb7e-8050-a157-a55be8bbc895&static_fare_key=TY%7CP1%7CH1%7CL0%7CCH0%7CR0%7CTBC0&itinerary_key=vSMvuFWHGC8oOjXt1Fw1uQ&expected_price_source=share&expected_price_currency=brl&expected_price=172",
+            "origin": "SAO",
+            "gate": "Kiwi.com",
+            "main_airline": "AD",
+            "depart_date": "2026-11-28T19:15:00-03:00",
+            "destination": "RIO",
+            "found_at": "2026-08-31T08:32:23Z",
+            "transfers": 0,
+            "distance": 343,
+            "duration": 60,
+            "price": 172,
+            "trip_class": 0
+        },
+        {
+            "link": "/search/SAO1802RIO1?t=AD18029328001802936400000060GRUSDU_2a784faccf2dc203c2eef258a8bd67e7_2880&search_date=29082026&expected_price_uuid=01a04f2f-7086-8050-6296-b0be8da50d8f&static_fare_key=TY%7CP1%7CH1%7CL0%7CCH0%7CR0%7CTBC0&itinerary_key=e8hGgVHZDz4wKL8TLwGeKA&expected_price_source=share&expected_price_currency=brl&expected_price=174",
+            "origin": "SAO",
+            "gate": "Trip.com",
+            "main_airline": "AD",
+            "depart_date": "2027-02-18T06:40:00-03:00",
+            "destination": "RIO",
+            "found_at": "2026-08-29T20:21:44Z",
+            "transfers": 0,
+            "distance": 343,
+            "duration": 60,
+            "price": 174,
+            "trip_class": 0
+        },
+        {
+            "link": "/search/SAO1311RIO1?t=AD17946042001794608100000065GRUSDU_3b3197dc3a56e08815f255b9f99385aa_2933&search_date=31082026&expected_price_uuid=01a058e1-aef5-8040-a171-5c2d36128544&static_fare_key=TY%7CP0%7CH1%7CL0%7CCH0%7CR0%7CTBC0&itinerary_key=2H-6uRq09qLgS6P6UKhNvw&expected_price_source=share&expected_price_currency=brl&expected_price=176",
+            "origin": "SAO",
+            "gate": "Trip.com",
+            "main_airline": "AD",
+            "depart_date": "2026-11-13T21:10:00-03:00",
+            "destination": "RIO",
+            "found_at": "2026-08-31T17:33:00Z",
+            "transfers": 0,
+            "distance": 343,
+            "duration": 65,
+            "price": 176,
+            "trip_class": 0
+        }
+    ],
+    "origins": [
+        "SAO"
+    ],
+    "destinations": [
+        "RIO"
+    ]
+}

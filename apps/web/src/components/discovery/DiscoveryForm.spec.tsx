@@ -3,6 +3,13 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DiscoveryForm } from "./DiscoveryForm";
 
+// O campo de origem chama /geo no mount e a cada tecla. Sem este mock a suíte
+// bateria na rede; o comportamento do campo está em OriginField.spec.tsx.
+vi.mock("../../lib/geo-api", () => ({
+  whereami: vi.fn(() => Promise.resolve(null)),
+  searchAirports: vi.fn(() => Promise.resolve([]))
+}));
+
 vi.mock("next/link", () => ({
   default: ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
@@ -123,4 +130,5 @@ describe("DiscoveryForm", () => {
       "/onboarding"
     );
   });
+
 });

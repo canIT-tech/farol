@@ -53,7 +53,9 @@ describe("ProviderCacheRepository.getOrSet", () => {
       load
     });
 
-    expect(out).toEqual({ value: [{ id: "a" }], stale: false });
+    expect(out.value).toEqual([{ id: "a" }]);
+    expect(out.stale).toBe(false);
+    expect(out.fetchedAt).toBeInstanceOf(Date);
     expect(load).toHaveBeenCalledOnce();
 
     const key = cacheKey("cache-spec-provider", "cache-spec-endpoint", params);
@@ -78,6 +80,12 @@ describe("ProviderCacheRepository.getOrSet", () => {
 
     expect(second.value).toEqual([{ id: "b" }]);
     expect(load).toHaveBeenCalledOnce();
+    // No acerto de cache o fetchedAt é o da gravação, não "agora".
+    const [row] = await db
+      .select()
+      .from(providerCache)
+      .where(eq(providerCache.key, cacheKey("cache-spec-provider", "cache-spec-endpoint", params)));
+    expect(second.fetchedAt).toEqual(row!.fetchedAt);
   });
 
   it("quando o registro está expirado, recarrega e sobrescreve", async () => {

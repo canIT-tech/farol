@@ -35,7 +35,12 @@ describe("ChatToolService", () => {
       search: vi.fn().mockResolvedValue({ offers: [{ id: "h1", name: "Hotel Sol" }], error: null })
     };
     mockFlights = {
-      search: vi.fn().mockResolvedValue({ offers: [{ id: "f1", price: 500 }], error: null })
+      search: vi.fn().mockResolvedValue({ offers: [{ id: "f1", price: 500 }], error: null }),
+      priceCalendar: vi.fn().mockResolvedValue({ offers: [{ departDate: "2026-11-04" }], error: null }),
+      monthlyPrices: vi.fn().mockResolvedValue({ offers: [{ key: "2026-11" }], error: null }),
+      latestPrices: vi.fn().mockResolvedValue({ offers: [{ price: 3198 }], error: null }),
+      nearbyOptions: vi.fn().mockResolvedValue({ offers: [{ id: "np:SAO:LIS" }], error: null }),
+      cityDirections: vi.fn().mockResolvedValue({ offers: [{ destination: "RIO" }], error: null })
     };
 
 
@@ -209,11 +214,24 @@ describe("ChatToolService", () => {
     expect(res.success).toBe(false);
     expect(res.error).toBe("item não existe");
   });
+  it.each([
+    ["price_calendar", "priceCalendar"],
+    ["best_months", "monthlyPrices"],
+    ["price_range", "latestPrices"],
+    ["nearby_airports", "nearbyOptions"],
+    ["cheap_destinations", "cityDirections"]
+  ])("executa a tool %s no FlightsService.%s", async (tool, method) => {
+    const res = await service.executeTool("u1", "t1", { name: tool, args: {} });
+    expect(mockFlights[method]).toHaveBeenCalledWith("u1", "t1");
+    expect(res.success).toBe(true);
+    expect(res.data).toEqual(await mockFlights[method].mock.results[0]!.value);
+  });
+
 });
 
 describe("CHAT_TOOLS", () => {
-  it("expõe as 11 tools com parameters em zod", () => {
-    expect(CHAT_TOOLS).toHaveLength(11);
+  it("expõe as 16 tools com parameters em zod", () => {
+    expect(CHAT_TOOLS).toHaveLength(16);
     for (const spec of CHAT_TOOLS) {
       expect(typeof spec.name).toBe("string");
       expect(spec.description.length).toBeGreaterThan(0);

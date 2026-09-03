@@ -26,18 +26,39 @@ const baseEnvSchema = z.object({
   // vazia como true, inclusive "false".
   RUN_JOB_HANDLERS: z.enum(["true", "false"]).default("false"),
   SERVE_WEB: z.enum(["true", "false"]).default("false"),
-  AMADEUS_BASE_URL: z.string().url().default("https://test.api.amadeus.com"),
-  AMADEUS_CLIENT_ID: z.string().min(1),
-  AMADEUS_CLIENT_SECRET: z.string().min(1),
+  // Travelpayouts (Aviasales) — provider de voo do MVP. Sem OAuth: o token vai
+  // no header X-Access-Token e o marker de afiliado em todo deep link de saída.
+  // Spec: docs/negocio/2026-08-31-spec-migracao-travelpayouts.md
+  TRAVELPAYOUTS_TOKEN: z.string().min(1),
+  TRAVELPAYOUTS_MARKER: z.string().min(1),
+  TRAVELPAYOUTS_BASE_URL: z.string().url().default("https://api.travelpayouts.com"),
+  TRAVELPAYOUTS_CURRENCY: z.string().min(1).default("brl"),
+  // Dumps de aeroporto/companhia: pesados e praticamente estáticos.
+  GEO_DUMP_TTL_SECONDS: z.coerce.number().int().positive().default(86_400),
+  // LiteAPI (Nuitée) — provider de hotel, no lugar do Hotellook (encerrado em
+  // 20/10/2025) e da Amadeus (Self-Service descontinuado). Conteúdo e tarifa
+  // são gratuitos; a chave de sandbox começa com "sand_".
+  LITEAPI_KEY: z.string().min(1),
+  LITEAPI_BASE_URL: z.string().url().default("https://api.liteapi.travel/v3.0"),
+  LITEAPI_CURRENCY: z.string().min(1).default("BRL"),
+  /** Nacionalidade do hóspede: muda tarifa e imposto na LiteAPI. */
+  LITEAPI_GUEST_NATIONALITY: z.string().length(2).default("BR"),
+  /** Raio da busca em volta do centro da cidade. Mínimo aceito pela LiteAPI: 1 km. */
+  HOTEL_SEARCH_RADIUS_METERS: z.coerce.number().int().min(1000).default(5000),
   FLIGHT_DEEPLINK_TEMPLATE: z
     .string()
     .min(1)
-    .default("https://www.google.com/travel/flights?q=voos%20{origin}%20{destination}%20{departDate}"),
+    .default(
+      "https://www.aviasales.com/search/{origin}{departDdmm}{destination}{returnDdmm}{passengers}?marker={marker}"
+    ),
   HOTEL_DEEPLINK_TEMPLATE: z
     .string()
     .min(1)
-    .default("https://www.google.com/travel/hotels/{cityCode}?checkin={checkIn}&checkout={checkOut}"),
-  FLIGHT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(600),
+    .default(
+      "https://www.google.com/travel/hotels/{cityName}?q={hotelName}&checkin={checkIn}&checkout={checkOut}"
+    ),
+  // Preço do Travelpayouts é cacheado na origem e muda devagar (spec §6).
+  FLIGHT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(1800),
   HOTEL_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(3600),
   // Google Places (Passo 6). Cache de 24 h: lugar não muda de lugar.
   GOOGLE_PLACES_KEY: z.string().min(1),

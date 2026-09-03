@@ -125,3 +125,85 @@ export function itinerary(status: "pending" | "ready") {
 export function json(body: unknown, status = 200) {
   return { status, contentType: "application/json", body: JSON.stringify(body) };
 }
+
+// ── Reserva (Passo 10 — Travelpayouts) ──────────────────────────────────────
+
+export const flightOffer = {
+  id: "np:SAO:LIS:2026-11-04T18:05:00-03:00:3198",
+  price: 3198,
+  currency: "brl",
+  carrier: "TP",
+  carrierName: "TAP Air Portugal",
+  originIata: "GRU",
+  originName: "São Paulo — Guarulhos",
+  destinationIata: "LIS",
+  destinationName: "Lisboa",
+  stops: 0,
+  departAt: "2026-11-04T18:05:00-03:00",
+  arriveAt: "2026-11-05T07:15:00.000Z",
+  returnAt: null,
+  durationMinutes: 610,
+  deepLink: "https://www.aviasales.com/search/SAO0411LIS1?marker=555"
+};
+
+export const nearbyOffer = {
+  ...flightOffer,
+  id: "np:VCP:LIS:2026-11-04T20:00:00-03:00:2890",
+  price: 2890,
+  carrier: "AD",
+  carrierName: "Azul",
+  originIata: "VCP",
+  originName: "Campinas — Viracopos",
+  departAt: "2026-11-04T20:00:00-03:00",
+  arriveAt: "2026-11-05T09:30:00+00:00",
+  stops: 1
+};
+
+export const priceSample = (departDate: string, price: number) => ({
+  origin: "SAO",
+  destination: "LIS",
+  departDate,
+  returnDate: null,
+  price,
+  currency: "brl",
+  transfers: 0,
+  durationMinutes: 610,
+  gate: "Trip.com",
+  foundAt: null,
+  deepLink: "https://www.aviasales.com/search/SAO0411LIS1?marker=555"
+});
+
+export const routeDeal = (key: string, price: number) => ({
+  key,
+  origin: "SAO",
+  destination: "LIS",
+  airline: "TP",
+  departAt: `${key}-04T18:05:00-03:00`,
+  returnAt: null,
+  price,
+  currency: "brl",
+  flightNumber: "748",
+  transfers: 0,
+  deepLink: "https://www.aviasales.com/search/SAO0411LIS1?marker=555"
+});
+
+export const hotelOffer = {
+  id: "htl-1",
+  name: "Hotel do Chiado",
+  region: "Chiado",
+  address: "R. Nova do Almada 114",
+  pricePerNight: 480,
+  priceTotal: 3360,
+  currency: "BRL",
+  rating: 4.5,
+  reviewCount: 1280,
+  stars: 4,
+  photoUrl: "https://static.cupid.travel/hotels/1.jpg",
+  lat: 38.7107,
+  lng: -9.1401,
+  deepLink: "https://exemplo.test/hotel"
+};
+
+export function section<T>(offers: T[], error: "unavailable" | null = null) {
+  return { offers, stale: false, fetchedAt: new Date().toISOString(), error };
+}

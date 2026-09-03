@@ -12,6 +12,7 @@ import { JobsModule } from "./jobs/jobs.module";
 import { ItineraryModule } from "./itinerary/itinerary.module";
 import { ProvidersModule } from "./providers/providers.module";
 import { FlightsModule } from "./flights/flights.module";
+import { GeoModule } from "./geo/geo.module";
 import { HotelsModule } from "./hotels/hotels.module";
 import { WaitlistModule } from "./waitlist/waitlist.module";
 import { ChatModule } from "./chat/chat.module";
@@ -32,6 +33,7 @@ import { EmailModule } from "./email/email.module";
     ItineraryModule,
     ProvidersModule,
     FlightsModule,
+    GeoModule,
     HotelsModule,
     EmailModule,
     WaitlistModule,

@@ -4,21 +4,29 @@ import { useState } from "react";
 import { Chip, DestinationCard } from "@farol/ui";
 import type { DestinationCandidate } from "@farol/shared";
 import { arrangeDestinations, type DestinationSort } from "../../lib/destination-filters";
+import { money } from "../../lib/money";
 
-function money(value: number, currency: string): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency, maximumFractionDigits: 0 });
+export function stopsLabel(stops: number): string {
+  if (stops === 0) {
+    return "direto";
+  }
+  return stops === 1 ? "1 escala" : `${stops} escalas`;
 }
 
-// Só entram estatísticas com dado real. Clima está fixo em 22 °C no back e
-// flightTimeHours vem sempre null (item D1 do plano de consolidação) — exibir
-// qualquer um dos dois seria inventar número para o usuário.
+// Só entram estatísticas com dado real. Clima e flightTimeHours seguem sem
+// fonte no MVP — exibir qualquer um dos dois seria inventar número. As escalas
+// vêm do provider de voo (city-directions) e entram só quando ele cobriu a rota.
 function stats(candidate: DestinationCandidate) {
   const { estCost } = candidate;
-  return [
+  const base = [
     { label: "Voo estimado", value: money(estCost.flight, estCost.currency) },
     { label: "Diária", value: money(estCost.lodgingPerNight, estCost.currency) },
     { label: "Por dia no destino", value: money(estCost.dailyLocal, estCost.currency) }
   ];
+  if (candidate.flightStops === null) {
+    return base;
+  }
+  return [{ label: "Voo", value: stopsLabel(candidate.flightStops) }, ...base];
 }
 
 export function DestinationResults({
@@ -29,10 +37,11 @@ export function DestinationResults({
   onChoose: (iata: string) => void;
 }) {
   const [domesticOnly, setDomesticOnly] = useState(false);
+  const [nonStopOnly, setNonStopOnly] = useState(false);
   const [sort, setSort] = useState<DestinationSort>("match");
   const [saved, setSaved] = useState<string[]>([]);
 
-  const arranged = arrangeDestinations(destinations, { domesticOnly, sort });
+  const arranged = arrangeDestinations(destinations, { domesticOnly, nonStopOnly, sort });
 
   if (destinations.length === 0) {
     return <p role="status">Nenhum destino combinou com o que você pediu.</p>;
@@ -44,6 +53,9 @@ export function DestinationResults({
         <Chip selected={domesticOnly} onClick={() => setDomesticOnly((v) => !v)}>
           Só nacional
         </Chip>
+        <Chip selected={nonStopOnly} onClick={() => setNonStopOnly((v) => !v)}>
+          Sem escala
+        </Chip>
         <Chip
           selected={sort === "price"}
           onClick={() => setSort((s) => (s === "price" ? "match" : "price"))}
@@ -53,7 +65,7 @@ export function DestinationResults({
       </div>
 
       {arranged.length === 0 ? (
-        <p role="status">Nenhum destino nacional entre os candidatos.</p>
+        <p role="status">Nenhum destino combinou com os filtros escolhidos.</p>
       ) : (
         <ul>
           {arranged.map((candidate, index) => (

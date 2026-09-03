@@ -1,7 +1,9 @@
 import { z } from "zod";
 import type { LlmToolSpec } from "../llm/llm.types";
 
-// As 11 tools do chat (design §6.4 da spec do MVP, que ainda fala em 9).
+// As 16 tools do chat (design §6.4 da spec do MVP, que ainda fala em 9).
+// As cinco últimas vieram com o Travelpayouts (Passo 10): são o que deixa o
+// assessor responder "quando ir", "está caro?" e "e se eu sair de outro aeroporto?".
 // parameters em zod: a mesma definição descreve a tool para o modelo e valida
 // o args que volta. Antes era JSON Schema escrito à mão, duplicando o zod e
 // sem validar nada de fato.
@@ -88,6 +90,36 @@ export const CHAT_TOOLS: LlmToolSpec[] = [
   {
     name: "search_flights",
     description: "Busca opções de voos para a viagem.",
+    parameters: z.object({})
+  },
+  {
+    name: "price_calendar",
+    description:
+      "Preço do voo dia a dia no próximo mês da rota escolhida. Use para responder qual é o melhor dia para sair.",
+    parameters: z.object({})
+  },
+  {
+    name: "best_months",
+    description:
+      "Melhor preço de voo mês a mês na rota escolhida. Use para responder em que mês a viagem sai mais barata.",
+    parameters: z.object({})
+  },
+  {
+    name: "price_range",
+    description:
+      "Preços recentes encontrados na rota escolhida. Use para dizer se a oferta atual está cara ou barata para o padrão da rota.",
+    parameters: z.object({})
+  },
+  {
+    name: "nearby_airports",
+    description:
+      "Opções de voo saindo ou chegando em aeroportos vizinhos da rota escolhida. Use quando o usuário topar trocar de aeroporto para pagar menos.",
+    parameters: z.object({})
+  },
+  {
+    name: "cheap_destinations",
+    description:
+      "Destinos mais baratos a partir da origem da viagem, com preço e companhia. Use na descoberta, quando ainda não há destino escolhido.",
     parameters: z.object({})
   }
 ];

@@ -20,7 +20,10 @@ export const destinationCandidateSchema = z.object({
     summary: z.string().min(1),
     bestMonths: z.array(z.number().int().min(1).max(12))
   }),
-  flightTimeHours: z.number().nonnegative().nullable()
+  flightTimeHours: z.number().nonnegative().nullable(),
+  // Escalas do voo mais barato até o destino, do city-directions do provider.
+  // Nulo quando o provider não cobre a rota — aí a UI não mostra nada.
+  flightStops: z.number().int().nonnegative().nullable().default(null)
 });
 export type DestinationCandidate = z.infer<typeof destinationCandidateSchema>;
 

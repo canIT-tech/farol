@@ -8,6 +8,13 @@ export function isDomestic(candidate: DestinationCandidate): boolean {
   return candidate.country === HOME_COUNTRY;
 }
 
+// Só conta como direto quando o provider confirmou zero escalas. Sem cobertura
+// (flightStops nulo) o destino fica de fora do filtro — não dá para prometer
+// voo direto por falta de dado.
+export function isNonStop(candidate: DestinationCandidate): boolean {
+  return candidate.flightStops === 0;
+}
+
 export function totalEstimate(candidate: DestinationCandidate): number {
   return candidate.estCost.flight + candidate.estCost.lodgingPerNight + candidate.estCost.dailyLocal;
 }
@@ -16,9 +23,12 @@ export function totalEstimate(candidate: DestinationCandidate): number {
 // candidatos, não vale uma ida ao back para reordenar cinco cartões.
 export function arrangeDestinations(
   candidates: DestinationCandidate[],
-  options: { domesticOnly: boolean; sort: DestinationSort }
+  options: { domesticOnly: boolean; nonStopOnly?: boolean; sort: DestinationSort }
 ): DestinationCandidate[] {
-  const filtered = options.domesticOnly ? candidates.filter(isDomestic) : [...candidates];
+  let filtered = options.domesticOnly ? candidates.filter(isDomestic) : [...candidates];
+  if (options.nonStopOnly === true) {
+    filtered = filtered.filter(isNonStop);
+  }
   return filtered.sort((a, b) =>
     options.sort === "price" ? totalEstimate(a) - totalEstimate(b) : b.score - a.score
   );

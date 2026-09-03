@@ -13,6 +13,7 @@ function candidate(
     estCost: { flight: 3000, lodgingPerNight: 200, dailyLocal: 100, currency: "BRL" },
     climate: { expectedC: 22, summary: "ameno", bestMonths: [9] },
     flightTimeHours: null,
+  flightStops: null,
     ...over
   };
 }

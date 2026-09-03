@@ -5,6 +5,7 @@ import { DiscoveryService } from "./discovery.service";
 import type { CatalogRepository } from "./catalog.repository";
 import type { ProfileService } from "../profile/profile.service";
 import type { TripsService } from "../trips/trips.service";
+import type { FlightsService } from "../flights/flights.service";
 import type { LlmPort } from "../llm/llm.types";
 import type { TripState } from "../trips/trip-state";
 
@@ -57,6 +58,11 @@ function makeService(opts: {
   trip?: TripState;
   catalog?: CatalogEntry[];
   rank?: ReturnType<typeof vi.fn>;
+  cityDirections?: {
+    offers: { destination: string; price: number; transfers: number }[];
+    stale: boolean;
+    error: "unavailable" | null;
+  };
 }) {
   const tx = {
     delete: () => ({ where: () => Promise.resolve() }),
@@ -76,10 +82,15 @@ function makeService(opts: {
   } as unknown as ProfileService;
   const rankDestinations = opts.rank ?? vi.fn();
   const llm = { rankDestinations } as unknown as LlmPort;
+  const cityDirections = vi
+    .fn()
+    .mockResolvedValue(opts.cityDirections ?? { offers: [], stale: false, error: null });
+  const flights = { cityDirections } as unknown as FlightsService;
   return {
-    service: new DiscoveryService(db, catalog, trips, profiles, llm),
+    service: new DiscoveryService(db, catalog, trips, profiles, flights, llm),
     catalog,
-    rankDestinations
+    rankDestinations,
+    cityDirections
   };
 }
 
@@ -141,5 +152,76 @@ describe("DiscoveryService.run — casos de borda", () => {
     });
     // summary do clima lista os meses separados por vírgula
     expect(candidates[0]!.climate.summary).toBe("melhor época nos meses 9, 10");
+  });
+
+  const threeDestinations = {
+    catalog: [
+      catalogEntry({ iata: "AAA", tags: ["praia", "gastronomia", "cultura e museus"] }),
+      catalogEntry({ iata: "BBB", tags: ["praia", "gastronomia"] }),
+      catalogEntry({ iata: "CCC", tags: ["praia"] })
+    ],
+    rank: vi.fn().mockResolvedValue([
+      { iata: "AAA", score: 0.9, rationale: "Justificativa longa o suficiente para o schema." },
+      { iata: "BBB", score: 0.8, rationale: "Justificativa longa o suficiente para o schema." },
+      { iata: "CCC", score: 0.7, rationale: "Justificativa longa o suficiente para o schema." }
+    ])
+  };
+
+  it("usa o preço real do city-directions no lugar da média do catálogo", async () => {
+    const { service, cityDirections } = makeService({
+      ...threeDestinations,
+      cityDirections: {
+        offers: [
+          { destination: "AAA", price: 1234, transfers: 0 },
+          { destination: "CCC", price: 999, transfers: 2 }
+        ],
+        stale: false,
+        error: null
+      }
+    });
+
+    const candidates = await service.run("u-1", "t-1");
+
+    expect(cityDirections).toHaveBeenCalledWith("u-1", "t-1");
+    expect(candidates.find((c) => c.iata === "AAA")!.estCost.flight).toBe(1234);
+    expect(candidates.find((c) => c.iata === "CCC")!.estCost.flight).toBe(999);
+    // Destino sem preço real cai na média do catálogo.
+    const catalogAverage = threeDestinations.catalog[0]!.avgFlightCostFromGru;
+    expect(candidates.find((c) => c.iata === "BBB")!.estCost.flight).toBe(catalogAverage);
+  });
+
+  it("traz as escalas do voo mais barato — a única fonte de 'direto' no MVP", async () => {
+    const { service } = makeService({
+      ...threeDestinations,
+      cityDirections: {
+        offers: [
+          { destination: "AAA", price: 1234, transfers: 0 },
+          { destination: "CCC", price: 999, transfers: 2 }
+        ],
+        stale: false,
+        error: null
+      }
+    });
+
+    const candidates = await service.run("u-1", "t-1");
+
+    expect(candidates.find((c) => c.iata === "AAA")!.flightStops).toBe(0);
+    expect(candidates.find((c) => c.iata === "CCC")!.flightStops).toBe(2);
+    // Sem cobertura do provider não há escala — melhor nulo que palpite.
+    expect(candidates.find((c) => c.iata === "BBB")!.flightStops).toBeNull();
+  });
+
+  it("cai na média do catálogo quando o provider de voo está fora do ar", async () => {
+    const { service } = makeService({
+      ...threeDestinations,
+      cityDirections: { offers: [], stale: false, error: "unavailable" }
+    });
+
+    const candidates = await service.run("u-1", "t-1");
+    const catalogAverage = threeDestinations.catalog[0]!.avgFlightCostFromGru;
+    for (const candidate of candidates) {
+      expect(candidate.estCost.flight).toBe(catalogAverage);
+      expect(candidate.flightStops).toBeNull();
+    }
   });
 });

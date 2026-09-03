@@ -16,6 +16,7 @@ import { LLM, type LlmPort } from "../llm/llm.types";
 import { ProfileService } from "../profile/profile.service";
 import { TripsService } from "../trips/trips.service";
 import type { TripState } from "../trips/trip-state";
+import { FlightsService } from "../flights/flights.service";
 import { CatalogRepository } from "./catalog.repository";
 
 const MIN_SHORTLIST = 3;
@@ -38,8 +39,27 @@ export class DiscoveryService {
     private readonly catalog: CatalogRepository,
     private readonly trips: TripsService,
     private readonly profiles: ProfileService,
+    private readonly flights: FlightsService,
     @Inject(LLM) private readonly llm: LlmPort
   ) {}
+
+  // Preço e escalas reais por destino a partir da origem da viagem
+  // (/v1/city-directions). O preço substitui a média do catálogo, que é sempre
+  // "saindo de GRU" e não sabe nada sobre quem está buscando; as escalas são a
+  // única fonte de "direto ou com escala" que o MVP tem. Provider fora do ar
+  // devolve mapa vazio: o preço cai na média e as escalas ficam nulas.
+  private async realFlights(
+    userId: string,
+    tripId: string
+  ): Promise<Map<string, { price: number; stops: number; currency: string }>> {
+    const section = await this.flights.cityDirections(userId, tripId);
+    return new Map(
+      section.offers.map((deal) => [
+        deal.destination,
+        { price: deal.price, stops: deal.transfers, currency: deal.currency }
+      ])
+    );
+  }
 
   async run(userId: string, tripId: string): Promise<DestinationCandidate[]> {
     const trip = await this.trips.get(userId, tripId);
@@ -71,7 +91,10 @@ export class DiscoveryService {
     });
 
     const byIata = new Map(catalog.map((entry) => [entry.iata, entry]));
-    const candidates = ranking.map((item) => toCandidate(item, byIata.get(item.iata)!, trip.currency));
+    const realFlights = await this.realFlights(userId, tripId);
+    const candidates = ranking.map((item) =>
+      toCandidate(item, byIata.get(item.iata)!, trip.currency, realFlights.get(item.iata))
+    );
 
     await this.db.transaction(async (tx) => {
       await tx.delete(tripDestinations).where(eq(tripDestinations.tripId, tripId));
@@ -111,7 +134,8 @@ export class DiscoveryService {
 function toCandidate(
   item: LlmRankingItem,
   entry: CatalogEntry,
-  currency: string
+  currency: string,
+  realFlight?: { price: number; stops: number; currency: string }
 ): DestinationCandidate {
   return destinationCandidateSchema.parse({
     iata: item.iata,
@@ -120,10 +144,13 @@ function toCandidate(
     score: item.score,
     rationale: item.rationale,
     estCost: {
-      flight: entry.avgFlightCostFromGru,
+      flight: realFlight?.price ?? entry.avgFlightCostFromGru,
       lodgingPerNight: entry.avgLodgingNight,
       dailyLocal: entry.avgDailyLocal,
-      currency
+      // sem realFlight, os três campos são estimativa do catálogo na moeda da
+      // viagem; com realFlight, o preço real vem na moeda do provider
+      // (TRAVELPAYOUTS_CURRENCY) e essa é a moeda que rotula o valor exibido.
+      currency: realFlight?.currency ?? currency
     },
     climate: {
       // sem fonte de clima no MVP; bestMonths e summary saem do catalogo
@@ -131,6 +158,7 @@ function toCandidate(
       summary: `melhor época nos meses ${entry.bestMonths.join(", ")}`,
       bestMonths: entry.bestMonths
     },
-    flightTimeHours: null
+    flightTimeHours: null,
+    flightStops: realFlight?.stops ?? null
   });
 }

@@ -54,4 +54,31 @@ describe("Chip", () => {
     expect(cls).not.toContain("farol-chip--interactive");
     expect(cls).not.toContain("farol-chip--selected");
   });
+
+  it("como aba usa aria-selected, não aria-pressed", () => {
+    render(
+      <Chip role="tab" selected onClick={() => {}}>
+        Voos
+      </Chip>
+    );
+    const tab = screen.getByRole("tab", { name: "Voos" });
+    expect(tab).toHaveAttribute("aria-selected", "true");
+    expect(tab).not.toHaveAttribute("aria-pressed");
+  });
+
+  it("aba não selecionada marca aria-selected false", () => {
+    render(
+      <Chip role="tab" onClick={() => {}}>
+        Hotéis
+      </Chip>
+    );
+    expect(screen.getByRole("tab", { name: "Hotéis" })).toHaveAttribute("aria-selected", "false");
+  });
+
+  it("fora de um tablist segue usando aria-pressed", () => {
+    render(<Chip onClick={() => {}}>Só nacional</Chip>);
+    const chip = screen.getByRole("button", { name: "Só nacional" });
+    expect(chip).toHaveAttribute("aria-pressed", "false");
+    expect(chip).not.toHaveAttribute("aria-selected");
+  });
 });

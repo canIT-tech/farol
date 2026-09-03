@@ -30,8 +30,9 @@ jobs:
       DATABASE_URL_TEST: postgres://postgres:postgres@localhost:5432/farol_test
       NEXT_PUBLIC_API_URL: http://localhost:3333/api
       SUPABASE_JWKS_URL: https://example.com/auth/v1/.well-known/jwks.json
-      AMADEUS_CLIENT_ID: amadeus-ci-id
-      AMADEUS_CLIENT_SECRET: amadeus-ci-secret
+      TRAVELPAYOUTS_TOKEN: travelpayouts-ci
+      TRAVELPAYOUTS_MARKER: farol-ci
+      LITEAPI_KEY: sand_ci
       GOOGLE_PLACES_KEY: google-places-ci
       JOBS_SCHEMA: pgboss_nightly
     steps:

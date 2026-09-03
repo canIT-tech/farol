@@ -29,8 +29,9 @@ jobs:
       # Envs de app: os specs trazem defaults próprios, mas o CI declara aqui
       # para o banco/config ficarem em estado conhecido (débito do Passo 5).
       SUPABASE_JWKS_URL: https://example.com/auth/v1/.well-known/jwks.json
-      AMADEUS_CLIENT_ID: amadeus-ci-id
-      AMADEUS_CLIENT_SECRET: amadeus-ci-secret
+      TRAVELPAYOUTS_TOKEN: travelpayouts-ci
+      TRAVELPAYOUTS_MARKER: farol-ci
+      LITEAPI_KEY: sand_ci
       GOOGLE_PLACES_KEY: google-places-ci
       JOBS_SCHEMA: pgboss_ci
     steps:
@@ -64,59 +65,3 @@ jobs:
       # não faz hoisting, então `pnpm exec` na raiz não acha o binário.
       - run: pnpm --filter @farol/web exec playwright install --with-deps chromium
       - run: pnpm test:e2e
-
-  # Job separado e em paralelo ao check: a espera do PR passa a ser o maior dos
-  # dois, não a soma. E só os pacotes tocados no PR são mutados — mutação é caro
-  # por natureza (a suíte da api bate em Postgres real e o dry run do Stryker usa
-  # coverageAnalysis perTest). A mutação completa roda no nightly.
-  mutation:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: farol
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/farol
-      # Banco separado: o client.spec de @farol/db derruba tabelas.
-      DATABASE_URL_TEST: postgres://postgres:postgres@localhost:5432/farol_test
-      NEXT_PUBLIC_API_URL: http://localhost:3333/api
-      SUPABASE_JWKS_URL: https://example.com/auth/v1/.well-known/jwks.json
-      AMADEUS_CLIENT_ID: amadeus-ci-id
-      AMADEUS_CLIENT_SECRET: amadeus-ci-secret
-      GOOGLE_PLACES_KEY: google-places-ci
-      JOBS_SCHEMA: pgboss_mutation
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          # O filtro de diff do Turbo precisa do histórico, não do checkout raso.
-          fetch-depth: 0
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      # O service do Postgres nao monta docker/init-test-db.sql, entao aqui o
-      # banco de teste e criado a mao.
-      - run: PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE farol_test"
-      - run: pnpm build
-      - run: pnpm --filter @farol/db run db:migrate
-      - run: pnpm --filter @farol/db run db:seed
-      # O farol_test tambem precisa de schema e catalogo: os CLIs de migracao
-      # apontam para DATABASE_URL, e os specs usam DATABASE_URL_TEST.
-      - run: pnpm --filter @farol/db run db:migrate
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/farol_test
-      - run: pnpm --filter @farol/db run db:seed
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/farol_test
-      - run: pnpm exec turbo run test:mutation --filter='...[origin/main]'

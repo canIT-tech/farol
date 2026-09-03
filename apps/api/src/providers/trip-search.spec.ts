@@ -3,6 +3,8 @@ import { isDomainError } from "@farol/shared";
 import { addDays, resolveTripDates, buildFlightParams, buildHotelParams } from "./trip-search";
 import type { TripState } from "../trips/trip-state";
 
+const LISBOA = { name: "Lisbon", countryCode: "PT", lat: 38.72, lon: -9.13 };
+
 function tripState(over: Partial<TripState> = {}): TripState {
   return {
     id: "t-1",
@@ -29,7 +31,8 @@ function tripState(over: Partial<TripState> = {}): TripState {
       rationale: "Justificativa longa o suficiente para o schema.",
       estCost: { flight: 3000, lodgingPerNight: 200, dailyLocal: 150, currency: "BRL" },
       climate: { expectedC: 22, summary: "ameno", bestMonths: [9] },
-      flightTimeHours: null
+      flightTimeHours: null,
+    flightStops: null
     },
     ...over
   };
@@ -97,16 +100,28 @@ describe("buildFlightParams", () => {
 describe("buildHotelParams", () => {
   it("usa o iata do destino como cityCode e as datas resolvidas", () => {
     const trip = tripState({ targetMonth: "2026-09", durationDays: 5 });
-    expect(buildHotelParams(trip)).toEqual({
+    expect(buildHotelParams(trip, LISBOA)).toEqual({
       cityCode: "LIS",
+      countryCode: "PT",
+      cityName: "Lisbon",
+      latitude: 38.72,
+      longitude: -9.13,
       checkIn: "2026-09-01",
       checkOut: "2026-09-06",
       adults: 2
     });
   });
 
+  it("omite a coordenada quando o catálogo não tem — aí a busca é por nome", () => {
+    const trip = tripState({ targetMonth: "2026-09", durationDays: 5 });
+    const params = buildHotelParams(trip, { ...LISBOA, lat: null, lon: null });
+    expect(params.latitude).toBeUndefined();
+    expect(params.longitude).toBeUndefined();
+    expect(params.cityName).toBe("Lisbon");
+  });
+
   it("lança no_destination_chosen sem destino", () => {
     const trip = tripState({ chosenDestination: null, targetMonth: "2026-09", durationDays: 5 });
-    expect(() => buildHotelParams(trip)).toThrow(/destino/);
+    expect(() => buildHotelParams(trip, LISBOA)).toThrow(/destino/);
   });
 });

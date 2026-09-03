@@ -1,0 +1,194 @@
+[
+  {
+    "name_translations": {
+      "en": "Suvarnabhumi Airport"
+    },
+    "city_code": "BKK",
+    "country_code": "TH",
+    "time_zone": "Asia/Bangkok",
+    "code": "BKK",
+    "iata_type": "airport",
+    "name": "Suvarnabhumi Airport",
+    "coordinates": {
+      "lat": 13.693062,
+      "lon": 100.752045
+    },
+    "flightable": true
+  },
+  {
+    "name_translations": {
+      "en": "Viracopos Airport"
+    },
+    "city_code": "SAO",
+    "country_code": "BR",
+    "time_zone": "America/Sao_Paulo",
+    "code": "VCP",
+    "iata_type": "airport",
+    "name": "Viracopos Airport",
+    "coordinates": {
+      "lat": -23.009892,
+      "lon": -47.141674
+    },
+    "flightable": true
+  },
+  {
+    "name_translations": {
+      "en": "Chapeco Airport"
+    },
+    "city_code": "XAP",
+    "country_code": "BR",
+    "time_zone": "America/Sao_Paulo",
+    "code": "XAP",
+    "iata_type": "airport",
+    "name": "Chapeco Airport",
+    "coordinates": {
+      "lat": -27.088612,
+      "lon": -52.629723
+    },
+    "flightable": true
+  },
+  {
+    "name_translations": {
+      "en": "Sheremetyevo International Airport"
+    },
+    "city_code": "MOW",
+    "country_code": "RU",
+    "time_zone": "Europe/Moscow",
+    "code": "SVO",
+    "iata_type": "airport",
+    "name": "Sheremetyevo International Airport",
+    "coordinates": {
+      "lat": 55.966324,
+      "lon": 37.416573
+    },
+    "flightable": true
+  },
+  {
+    "name_translations": {
+      "en": "Sao Paulo-Guarulhos International Airport"
+    },
+    "city_code": "SAO",
+    "country_code": "BR",
+    "time_zone": "America/Sao_Paulo",
+    "code": "GRU",
+    "iata_type": "airport",
+    "name": "Sao Paulo-Guarulhos International Airport",
+    "coordinates": {
+      "lat": -23.425669,
+      "lon": -46.481926
+    },
+    "flightable": true
+  },
+  {
+    "name_translations": {
+      "en": "Arturo Merino Benitez Airport"
+    },
+    "city_code": "SCL",
+    "country_code": "CL",
+    "time_zone": "America/Santiago",
+    "code": "SCL",
+    "iata_type": "airport",
+    "name": "Arturo Merino Benitez Airport",
+    "coordinates": {
+      "lat": -33.397175,
+      "lon": -70.79382
+    },
+    "flightable": true
+  },
+  {
+    "name_translations": {
+      "en": "Lisbon Portela Airport"
+    },
+    "city_code": "LIS",
+    "country_code": "PT",
+    "time_zone": "Europe/Lisbon",
+    "code": "LIS",
+    "iata_type": "airport",
+    "name": "Lisbon Portela Airport",
+    "coordinates": {
+      "lat": 38.770042,
+      "lon": -9.128165
+    },
+    "flightable": true
+  },
+  {
+    "name_translations": {
+      "en": "Sao Paulo/Congonhas Airport"
+    },
+    "city_code": "SAO",
+    "country_code": "BR",
+    "time_zone": "America/Sao_Paulo",
+    "code": "CGH",
+    "iata_type": "airport",
+    "name": "Sao Paulo/Congonhas Airport",
+    "coordinates": {
+      "lat": -23.626902,
+      "lon": -46.659557
+    },
+    "flightable": true
+  },
+  {
+    "name_translations": {
+      "en": "Brasilia International Airport"
+    },
+    "city_code": "BSB",
+    "country_code": "BR",
+    "time_zone": "America/Sao_Paulo",
+    "code": "BSB",
+    "iata_type": "airport",
+    "name": "Brasilia International Airport",
+    "coordinates": {
+      "lat": -15.869807,
+      "lon": -47.921486
+    },
+    "flightable": true
+  },
+  {
+    "name_translations": {
+      "en": "Santos Dumont Airport"
+    },
+    "city_code": "RIO",
+    "country_code": "BR",
+    "time_zone": "America/Sao_Paulo",
+    "code": "SDU",
+    "iata_type": "airport",
+    "name": "Santos Dumont Airport",
+    "coordinates": {
+      "lat": -22.911541,
+      "lon": -43.167095
+    },
+    "flightable": true
+  },
+  {
+    "name_translations": {
+      "en": "Galeao Antonio Carlos Jobim International Airport"
+    },
+    "city_code": "RIO",
+    "country_code": "BR",
+    "time_zone": "America/Sao_Paulo",
+    "code": "GIG",
+    "iata_type": "airport",
+    "name": "Galeao Antonio Carlos Jobim International Airport",
+    "coordinates": {
+      "lat": -22.814653,
+      "lon": -43.24651
+    },
+    "flightable": true
+  },
+  {
+    "name_translations": {
+      "en": "John F. Kennedy International Airport"
+    },
+    "city_code": "NYC",
+    "country_code": "US",
+    "time_zone": "America/New_York",
+    "code": "JFK",
+    "iata_type": "airport",
+    "name": "John F. Kennedy International Airport",
+    "coordinates": {
+      "lat": 40.642334,
+      "lon": -73.78817
+    },
+    "flightable": true
+  }
+]

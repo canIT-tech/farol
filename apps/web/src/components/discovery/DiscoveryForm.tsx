@@ -16,6 +16,7 @@ import {
   type DiscoveryFormState
 } from "../../lib/discovery-form";
 import { SegmentedControl } from "../onboarding/SegmentedControl";
+import { OriginField } from "./OriginField";
 
 const MODE_OPTIONS = [
   { value: "month", label: "Mês aproximado" },
@@ -40,6 +41,7 @@ export function DiscoveryForm({
   const [state, setState] = useState<DiscoveryFormState>(EMPTY_DISCOVERY_FORM);
   const patch = (next: Partial<DiscoveryFormState>) => setState((s) => ({ ...s, ...next }));
 
+
   return (
     <form
       onSubmit={(event) => {
@@ -50,14 +52,7 @@ export function DiscoveryForm({
         }
       }}
     >
-      <TextField
-        label="Saindo de"
-        value={state.originIata}
-        onChange={(originIata) => patch({ originIata })}
-        placeholder="GRU"
-        maxLength={3}
-        hint="Código IATA do aeroporto de origem"
-      />
+      <OriginField value={state.originIata} onChange={(originIata) => patch({ originIata })} />
 
       <SegmentedControl
         label="Quando"

@@ -11,7 +11,8 @@ const CHAT_SYSTEM_PROMPT = `Você é o assistente virtual do Farol Viagens, um a
 Seu objetivo é ajudar o usuário a planejar a viagem, ajustando destino, datas, orçamento, gostos e itinerário.
 Você tem ferramentas (tools) para executar ações diretamente na viagem e no perfil do usuário.
 Sempre use as ferramentas apropriadas quando o usuário pedir alterações ou buscas.
-Após executar uma ferramenta, explique brevemente o resultado de forma calma e natural.`;
+Após executar uma ferramenta, explique brevemente o resultado de forma calma e natural.
+Preço de voo vem de cache do parceiro, não de busca ao vivo: trate como aproximado, diga isso quando citar valor e lembre que o preço final é confirmado no site do parceiro.`;
 
 @Injectable()
 export class ChatService {

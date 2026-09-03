@@ -211,3 +211,133 @@ Reabre 1 linha do débito A2 (que estava fechado).
 - `prices_for_dates` traz `duration` e `transfers`? (deve trazer — confirmar para manter `flightTimeHours` / `stops`).
 - Segundo provider (Duffel / SerpApi) como fallback para rotas não cobertas — **item futuro**, não MVP.
 - **Skyscanner Partners:** aplicar depois do lançamento, quando houver tráfego — é a graduação natural.
+
+---
+
+## 11. O que a implementação decidiu (2026-09-02, Passo 10)
+
+Esta seção fecha as decisões abertas de §10 com o que foi verificado contra a API real.
+
+### Endpoints — o que a conta libera de fato
+
+Os nove endpoints abaixo responderam com o token da conta e estão implementados em
+`packages/providers/src/travelpayouts/`, cada um com fixture gravada da resposta real.
+`aviasales/v3/prices_for_dates` e `v1/prices/calendar` (o caminho que §3 supunha) **não**
+foram usados — os endpoints v1/v2 abaixo cobrem o mesmo e vieram confirmados.
+
+| Endpoint | Papel no produto | Normalizador |
+|---|---|---|
+| `GET /v1/prices/cheap` | tarifa mais barata da rota no mês | `normalizeCheap` → `FlightOffer[]` |
+| `GET /v1/prices/monthly` | melhor preço mês a mês — "quando ir" | `normalizeKeyedDeals` → `RouteDeal[]` |
+| `GET /v1/city-directions` | destinos baratos saindo da origem — descoberta | `normalizeKeyedDeals` |
+| `GET /v2/prices/latest` | faixa de preço recente da rota | `normalizeMatrixSamples` → `RoutePriceSample[]` |
+| `GET /v2/prices/month-matrix` | preço por dia — melhor dia do mês | `normalizeMatrixSamples` |
+| `GET /v2/prices/nearest-places-matrix` | aeroportos vizinhos, **com `link` da tarifa exata** | `normalizeNearestPlaces` → `FlightOffer[]` |
+| `GET /whereami` (host `www.travelpayouts.com`) | origem provável pelo IP; responde **JSONP** | `parseJsonp` + `normalizeWhereami` |
+| `GET /data/{locale}/airports.json` | catálogo de aeroportos (2,5 MB) | `normalizeAirports` |
+| `GET /data/{locale}/airlines.json` | catálogo de companhias (117 KB) | `normalizeAirlines` |
+
+**Hotellook: acabou.** O §3 desta spec propunha `engine.hotellook.com/api/v2/lookup.json` e
+`.../cache.json` para hotel. **O Hotellook foi encerrado como marca em 20/10/2025**, junto com
+o programa de afiliado e a API. Verificado em 2026-09-03: todo o host responde 404, inclusive
+a raiz e os `static/*` — é CloudFront sem origem configurada, não erro de permissão. Também
+não há substituto: a doc de API do Travelpayouts hoje cobre só voo, e hotel virou intermediação
+de afiliados (Booking.com, Agoda, Trip.com), sem API de dados própria. **Pedir liberação não
+resolve.**
+
+Consequência: `HOTEL_PROVIDER` só monta a Amadeus quando `AMADEUS_CLIENT_ID` e
+`AMADEUS_CLIENT_SECRET` existirem; sem elas a busca recusa com `hotel_provider_not_configured`
+e a seção de hotel degrada para `error: "unavailable"` — o roteiro segue de pé (§7.3).
+
+Caminhos para hotel, em ordem de esforço:
+
+| Opção | O que dá | Custo |
+|---|---|---|
+| Afiliado de hotel pelo Travelpayouts (Booking.com / Agoda / Trip.com) | deep-link com comissão, **sem preço nem nome de hotel na nossa UI** | zero técnico; a tela de hotel do hi-fi não se sustenta |
+| API de dados de terceiro (Hotelbeds, LiteAPI, RateHawk) | preço, foto, geo — o hi-fi inteiro | contrato/aprovação, alguns pagos |
+| Amadeus Enterprise | preço e conteúdo | setup + mensalidade + fee (foi o que fez a gente sair) |
+| Manter degradado | nada | zero; decide no v1 |
+
+### Respostas às decisões abertas de §10
+
+- **`currency=brl` em voo:** funciona em todos os endpoints de preço. Default do provider.
+- **Deep-link:** as duas formas convivem. Onde a API devolve `link` (nearest-places-matrix),
+  usa-se a URL do Aviasales com o `marker` anexado — cai na tarifa exata. Nos demais, o
+  `FLIGHT_DEEPLINK_TEMPLATE` monta a busca (`/search/{origin}{departDdmm}{destination}{returnDdmm}{passengers}?marker={marker}`).
+  Sem redirect `tp.media`.
+- **`duration` e `transfers`:** vêm nos dois formatos. `nearest-places-matrix` traz
+  `main_airline`, `transfers` e `duration` em minutos; `month-matrix`/`latest` trazem
+  `number_of_changes` e `duration`, **mas não a companhia** — por isso viraram
+  `RoutePriceSample` (amostra de preço), não `FlightOffer`. Inventar `carrier` seria mentir.
+- **Data exata vs mês:** `nearest-places-matrix` com `depart_date` **e** `return_date`
+  exatos volta vazio na maioria das rotas; `/v1/prices/cheap` com **mês** (`YYYY-MM`)
+  responde de forma confiável. Por isso `search()` chama as duas fontes em paralelo
+  (`Promise.allSettled`), funde por id e ordena por preço: uma fonte fora do ar não zera
+  a seção; as duas fora propagam o erro.
+- **Precisão do preço:** é cache. `FLIGHT_CACHE_TTL_SECONDS` subiu de 600 para **1800**.
+  A UI mostra o aviso de preço aproximado junto das ofertas e o system prompt do chat
+  obriga o assessor a dizer isso ao citar valor.
+
+### Superfície nova
+
+- API: `GET /trips/:id/flights/{nearby,calendar,latest,months,directions}` e o
+  `GeoModule` público (`GET /geo/whereami`, `/geo/airports?q=`, `/geo/airports/:iata`,
+  `/geo/airlines/:code`).
+- Chat: 5 tools novas (11 → 16) — `price_calendar`, `best_months`, `price_range`,
+  `nearby_airports`, `cheap_destinations`.
+- `@farol/shared`: `RoutePriceSample`, `RouteDeal`, `GeoLocation`, `Airport`, `Airline`.
+  `FlightOffer.durationMinutes` passou a aceitar `0` — o cache nem sempre traz duração.
+- Envs: `TRAVELPAYOUTS_TOKEN`, `TRAVELPAYOUTS_MARKER`, `TRAVELPAYOUTS_BASE_URL`,
+  `TRAVELPAYOUTS_CURRENCY`, `GEO_DUMP_TTL_SECONDS`. `AMADEUS_CLIENT_ID`/`SECRET` viraram
+  **opcionais**. Credenciais vão no Doppler (`farol/dev` e `farol/prd`), nunca em `.env`.
+
+### Como conferir que a conta ainda libera tudo
+
+As fixtures são gravadas, e a conta pode perder ou ganhar endpoint sem aviso.
+
+```bash
+pnpm --filter @farol/providers build
+doppler run -- pnpm --filter @farol/providers smoke:travelpayouts
+```
+
+Bate nos nove endpoints com a credencial real e imprime uma amostra normalizada de
+cada um; sai com código 1 se algum falhar. Só leitura. Rode antes de mexer no
+provider e quando alguma seção começar a vir vazia em produção.
+
+---
+
+## 12. Hotel: LiteAPI no lugar do Hotellook (2026-09-03)
+
+O §11 fechou "hotel não tem caminho pelo Travelpayouts". O provider escolhido foi a
+**LiteAPI (Nuitée)** — `https://api.liteapi.travel/v3.0`.
+
+| Endpoint | Papel | Custo |
+|---|---|---|
+| `GET /data/hotels` | nome, estrelas, nota, avaliações, foto, endereço, coordenada | grátis |
+| `POST /hotels/min-rates` | preço mínimo por hotel nas datas | grátis |
+
+Chave de sandbox é self-serve, sem cartão e sem contrato; produção exige apenas cadastrar
+um cartão, sem aprovação. A receita é por **margem** na reserva — mesma lógica do afiliado
+de voo. Endpoints pagos (`places` a US$ 0,01/req, `price index` a US$ 0,05) **não** são usados.
+
+### Decisões que o dado real forçou
+
+- **Busca por coordenada, não por nome.** `cityName=Lisboa` devolve 2 hotéis; `Lisbon`,
+  6.748; `Cidade do México`, zero. Nosso catálogo é em português, então casar por nome
+  seria uma armadilha silenciosa. A coordenada vem do dump `/data/{locale}/cities.json` do
+  Travelpayouts (mesma família dos dumps de aeroporto e companhia, já em cache de 24 h).
+- **IATA de aeroporto ≠ IATA de cidade.** `TravelpayoutsGeoProvider.city()` tenta cidade
+  direto e, não achando, resolve pelo `city_code` do aeroporto — senão "GRU" buscaria
+  hotéis a 25 km do centro de São Paulo.
+- **Hotel sem tarifa sai da lista.** Numa busca real, 4 hotéis pedidos devolveram 3 preços.
+  O cartão promete uma diária; mostrar hotel sem preço quebraria a comparação.
+- **`address` vem como `""`.** Não estava na fixture; apareceu no dado real e reprovava no
+  `min(1)` do schema, derrubando a busca inteira. Virou `nullIfEmpty` + teste de regressão.
+- **`price` é o total da estadia**, não a diária: `pricePerNight = price / noites`.
+- **Nota é de 0 a 10** na LiteAPI e de 0 a 5 na nossa UI — convertida na normalização.
+
+### Aberto
+
+A chave em uso é de **sandbox**: conteúdo real, tarifa de teste. Ir para produção exige
+cartão no painel da Nuitée e implica o Farol ser o canal de reserva de hotel — decisão
+comercial. Enquanto isso, a tela mostra o aviso de preço aproximado, como em voo.

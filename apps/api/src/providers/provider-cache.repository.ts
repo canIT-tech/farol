@@ -25,14 +25,16 @@ export interface GetOrSetArgs<T> {
 export class ProviderCacheRepository {
   constructor(@Inject(DB) private readonly db: Database) {}
 
-  async getOrSet<T>(args: GetOrSetArgs<T>): Promise<{ value: T; stale: boolean }> {
+  // fetchedAt sai da linha do cache no acerto e é "agora" na busca — é o que
+  // deixa a UI dizer há quanto tempo o preço foi visto.
+  async getOrSet<T>(args: GetOrSetArgs<T>): Promise<{ value: T; stale: boolean; fetchedAt: Date }> {
     const key = cacheKey(args.provider, args.endpoint, args.params);
     const now = new Date();
 
     const rows = await this.db.select().from(providerCache).where(eq(providerCache.key, key));
     const hit = rows[0];
     if (hit !== undefined && hit.expiresAt > now) {
-      return { value: hit.payload as T, stale: false };
+      return { value: hit.payload as T, stale: false, fetchedAt: hit.fetchedAt };
     }
 
     const value = await args.load();
@@ -45,6 +47,6 @@ export class ProviderCacheRepository {
         set: { payload: value, fetchedAt: now, expiresAt }
       });
 
-    return { value, stale: false };
+    return { value, stale: false, fetchedAt: now };
   }
 }

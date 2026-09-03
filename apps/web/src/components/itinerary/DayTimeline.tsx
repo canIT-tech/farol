@@ -23,6 +23,7 @@ export function DayStrip({
       {days.map((day) => (
         <Chip
           key={day.id}
+          role="tab"
           selected={day.dayIndex === activeIndex}
           onClick={() => onSelect(day.dayIndex)}
         >

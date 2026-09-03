@@ -18,7 +18,7 @@ export function resolveTripDates(trip: TripState): { depart: string; return: str
   return { depart, return: addDays(depart, trip.durationDays ?? DEFAULT_NIGHTS) };
 }
 
-function chosenIata(trip: TripState): string {
+export function chosenIata(trip: TripState): string {
   const iata = trip.chosenDestination?.iata;
   if (iata === undefined) {
     throw new DomainError(
@@ -41,10 +41,26 @@ export function buildFlightParams(trip: TripState): FlightSearchParams {
   };
 }
 
-export function buildHotelParams(trip: TripState): HotelSearchParams {
+/** Cidade do destino, resolvida no catálogo — dá país e coordenada de centro. */
+export interface DestinationPlace {
+  name: string;
+  countryCode: string;
+  lat: number | null;
+  lon: number | null;
+}
+
+// A busca de hotel precisa de país e, de preferência, de coordenada: buscar por
+// nome de cidade depende do idioma do catálogo do provider ("Lisboa" acha 2
+// hotéis, "Lisbon" acha 6.748). O nome vai junto só para o deep link.
+export function buildHotelParams(trip: TripState, place: DestinationPlace): HotelSearchParams {
   const dates = resolveTripDates(trip);
+  const hasCoordinates = place.lat !== null && place.lon !== null;
   return {
     cityCode: chosenIata(trip),
+    countryCode: place.countryCode,
+    cityName: place.name,
+    latitude: hasCoordinates ? place.lat! : undefined,
+    longitude: hasCoordinates ? place.lon! : undefined,
     checkIn: dates.depart,
     checkOut: dates.return,
     adults: trip.party.adults

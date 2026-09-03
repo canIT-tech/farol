@@ -26,6 +26,17 @@ describe("destinationCandidateSchema", () => {
     expect(destinationCandidateSchema.parse(semTemp).climate.expectedC).toBeNull();
   });
 
+  it("assume flightStops nulo quando não vem e aceita zero (voo direto)", () => {
+    expect(destinationCandidateSchema.parse(candidate).flightStops).toBeNull();
+    expect(destinationCandidateSchema.parse({ ...candidate, flightStops: 0 }).flightStops).toBe(0);
+    expect(destinationCandidateSchema.parse({ ...candidate, flightStops: 2 }).flightStops).toBe(2);
+  });
+
+  it("rejeita flightStops negativo ou fracionário", () => {
+    expect(() => destinationCandidateSchema.parse({ ...candidate, flightStops: -1 })).toThrow();
+    expect(() => destinationCandidateSchema.parse({ ...candidate, flightStops: 1.5 })).toThrow();
+  });
+
   it("aceita flightTimeHours nulo", () => {
     expect(destinationCandidateSchema.parse({ ...candidate, flightTimeHours: null }).flightTimeHours).toBeNull();
   });

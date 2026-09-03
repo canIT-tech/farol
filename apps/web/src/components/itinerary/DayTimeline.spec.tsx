@@ -37,14 +37,14 @@ describe("DayStrip", () => {
 
   it("mostra um chip por dia", () => {
     render(<DayStrip days={days} activeIndex={1} onSelect={vi.fn()} />);
-    expect(screen.getByRole("button", { name: "Dia 1" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Dia 2" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Dia 1" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "Dia 2" })).toBeInTheDocument();
   });
 
   it("seleciona o dia clicado", async () => {
     const onSelect = vi.fn();
     render(<DayStrip days={days} activeIndex={1} onSelect={onSelect} />);
-    await userEvent.click(screen.getByRole("button", { name: "Dia 2" }));
+    await userEvent.click(screen.getByRole("tab", { name: "Dia 2" }));
     expect(onSelect).toHaveBeenCalledWith(2);
   });
 });
