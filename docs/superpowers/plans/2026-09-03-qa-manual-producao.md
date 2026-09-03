@@ -329,7 +329,7 @@ de B3.
 | A2 Travelpayouts | ✅ | Felipe gravou `TRAVELPAYOUTS_TOKEN` + `TRAVELPAYOUTS_MARKER` no Doppler `prd` |
 | A3 LiteAPI | ✅ | Felipe gravou `LITEAPI_KEY` (sandbox) no Doppler `prd` |
 | A4 limpar Amadeus | ✅ Doppler · ⚠️ Render | Removido do Doppler. **Ainda no Render:** o MCP só faz merge, remover exige `replace: true` com a lista completa (todos os valores passariam pelo chat). Pendente: apagar as duas chaves no dashboard do Render, ou aceitar o desvio até o próximo `replace` |
-| A5 espelho + deploy | 🟡 | 3 envs escritas no Render às 16:25 UTC → deploy `dep-dacpunrl550s73d7o2r0` disparado sobre o commit `ebd4cd8` (PR #13). Aguardando boot |
+| A5 espelho + deploy | ✅ | 3 envs escritas no Render às 16:25 UTC → deploy `dep-dacpunrl550s73d7o2r0` **live às 16:27** sobre `ebd4cd8` (PR #13). Instância `vq8mv`: `Nest application successfully started`, sem `Env inválida`, sem `*_failed` no boot. Instância antiga (`965a3a2`) `deactivated`. Health `db: up`, `/api/waitlist/count` = 2, landing 200 |
 | B3 URLs Supabase | ⏳ Rafael | — |
 | B2 login real | ⏳ | depende de A5 + B3 |
 
