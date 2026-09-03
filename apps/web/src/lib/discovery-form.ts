@@ -1,4 +1,4 @@
-import { tripInputSchema, type TripInput } from "@farol/shared";
+import { tripInputSchema, type TasteProfileInput, type TripInput } from "@farol/shared";
 
 export type DateMode = "exact" | "month";
 
@@ -52,4 +52,47 @@ export function toTripInput(state: DiscoveryFormState): TripInput | null {
 
 export function canSubmitDiscovery(state: DiscoveryFormState): boolean {
   return toTripInput(state) !== null;
+}
+
+/** O que a sidebar precisa de uma viagem. TripState satisfaz isto, e o
+ *  formulário de /trips/new também — assim a sidebar espelha o que a pessoa
+ *  está preenchendo, antes de a viagem existir. */
+export interface TripSummary {
+  originIata: string | null;
+  dateStart: string | null;
+  dateEnd: string | null;
+  targetMonth: string | null;
+  durationDays: number | null;
+  party: { adults: number; children: number } | null;
+  budgetTotal: number | null;
+  currency: string;
+  chosenDestination: { city: string; country: string } | null;
+}
+
+function filled(value: string): string | null {
+  return value.trim() === "" ? null : value.trim();
+}
+
+/** Campo em branco vira null para a sidebar mostrar "a definir"; o modo decide
+ *  se valem as datas exatas ou o mês aproximado. */
+export function draftSummary(state: DiscoveryFormState): TripSummary {
+  const exact = state.mode === "exact";
+  return {
+    originIata: filled(state.originIata.toUpperCase()),
+    dateStart: exact ? filled(state.dateStart) : null,
+    dateEnd: exact ? filled(state.dateEnd) : null,
+    targetMonth: exact ? null : filled(state.targetMonth),
+    durationDays: exact ? null : state.durationDays,
+    party: { adults: state.adults, children: state.children },
+    budgetTotal: state.budgetTotal,
+    currency: "BRL",
+    chosenDestination: null
+  };
+}
+
+/** Quantos adultos supor a partir da companhia do perfil de gosto.
+ *  Só "sozinho" é dedutível sem chutar: casal, família e amigos variam demais
+ *  para adivinhar, e ficam no padrão de 2 — que a pessoa ajusta no stepper. */
+export function defaultAdults(partyType: TasteProfileInput["partyType"] | null): number {
+  return partyType === "sozinho" ? 1 : EMPTY_DISCOVERY_FORM.adults;
 }

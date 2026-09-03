@@ -1,5 +1,6 @@
 import {
   tasteProfileInputSchema,
+  type TasteProfile,
   type TasteProfileInput
 } from "@farol/shared";
 
@@ -58,4 +59,15 @@ export function toTasteProfileInput(state: OnboardingState): TasteProfileInput {
     budgetBand: state.budgetBand,
     constraints: {}
   });
+}
+
+/** Perfil salvo → estado da tela, para "Meu perfil" abrir com o que já foi
+ *  escolhido em vez de um formulário em branco. */
+export function fromTasteProfile(profile: TasteProfile): OnboardingState {
+  return {
+    interests: [...profile.interests],
+    pace: profile.pace,
+    partyType: profile.partyType,
+    budgetBand: profile.budgetBand
+  };
 }

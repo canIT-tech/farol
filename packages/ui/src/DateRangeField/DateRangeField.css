@@ -75,7 +75,11 @@
 .farol-daterange__month {
   font-weight: 600;
   font-size: 14px;
-  text-transform: capitalize;
+}
+
+/* `capitalize` subiria também o "de" de "janeiro de 2026". Só a inicial. */
+.farol-daterange__month::first-letter {
+  text-transform: uppercase;
 }
 
 .farol-daterange__nav {
@@ -105,7 +109,8 @@
 }
 
 .farol-daterange__weekdays {
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-8);
+  padding: 0 var(--space-2);
 }
 
 .farol-daterange__weekdays span {
@@ -116,11 +121,11 @@
 }
 
 .farol-daterange__gap {
-  aspect-ratio: 1;
+  height: 32px;
 }
 
 .farol-daterange__day {
-  aspect-ratio: 1;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;

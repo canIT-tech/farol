@@ -11,6 +11,8 @@ import {
   monthOf,
   nextRange,
   parseIso,
+  parseMonthKey,
+  toMonthKey,
   toIso
 } from "./calendar";
 
@@ -180,5 +182,19 @@ describe("nextRange", () => {
       start: "2026-05-10",
       end: "2026-05-10"
     });
+  });
+});
+
+describe("parseMonthKey / toMonthKey", () => {
+  it("lê a chave de mês", () => {
+    expect(parseMonthKey("2026-09")).toEqual({ year: 2026, month: 9 });
+  });
+
+  it("escreve com zero à esquerda", () => {
+    expect(toMonthKey({ year: 2026, month: 3 })).toBe("2026-03");
+  });
+
+  it("ida e volta preserva o valor", () => {
+    expect(toMonthKey(parseMonthKey("2027-11"))).toBe("2027-11");
   });
 });

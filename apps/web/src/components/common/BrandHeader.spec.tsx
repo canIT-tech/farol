@@ -18,4 +18,15 @@ describe("BrandHeader", () => {
     );
     expect(screen.getByText("Modo autônomo")).toBeInTheDocument();
   });
+
+  it("com href, a marca vira o caminho de volta", () => {
+    render(<BrandHeader href="/trips" />);
+    const link = screen.getByRole("link", { name: /voltar para minhas viagens/i });
+    expect(link).toHaveAttribute("href", "/trips");
+  });
+
+  it("sem href, a marca não é link", () => {
+    render(<BrandHeader />);
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
+  });
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { TripState } from "@farol/shared";
+import type { TripSummary } from "../lib/discovery-form";
 import { useRouter } from "next/navigation";
 import { AdvisorChat, AppShell, Button } from "@farol/ui";
 import { AuthGate } from "./AuthGate";
@@ -42,7 +42,7 @@ export function ShellFrame({
   children
 }: {
   tripId: string | null;
-  trip: TripState | null;
+  trip: TripSummary | null;
   onNavigate: (step: string) => void;
   children: ReactNode;
 }) {

@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   EMPTY_DISCOVERY_FORM,
   canSubmitDiscovery,
+  defaultAdults,
+  draftSummary,
   toTripInput,
   type DiscoveryFormState
 } from "./discovery-form";
@@ -72,5 +74,61 @@ describe("canSubmitDiscovery", () => {
 
   it("bloqueia o formulário vazio", () => {
     expect(canSubmitDiscovery(EMPTY_DISCOVERY_FORM)).toBe(false);
+  });
+});
+
+describe("draftSummary", () => {
+  it("origem em branco fica a definir", () => {
+    expect(draftSummary(EMPTY_DISCOVERY_FORM).originIata).toBeNull();
+  });
+
+  it("normaliza a origem para maiúsculas", () => {
+    expect(draftSummary({ ...EMPTY_DISCOVERY_FORM, originIata: "gru" }).originIata).toBe("GRU");
+  });
+
+  it("no modo mês leva o mês e a duração, e nenhuma data", () => {
+    const out = draftSummary({ ...EMPTY_DISCOVERY_FORM, targetMonth: "2026-09", dateStart: "2026-05-10" });
+    expect(out.targetMonth).toBe("2026-09");
+    expect(out.durationDays).toBe(7);
+    expect(out.dateStart).toBeNull();
+    expect(out.dateEnd).toBeNull();
+  });
+
+  it("no modo datas leva as datas, e nenhum mês", () => {
+    const out = draftSummary({
+      ...EMPTY_DISCOVERY_FORM,
+      mode: "exact",
+      dateStart: "2026-05-10",
+      dateEnd: "2026-05-17",
+      targetMonth: "2026-09"
+    });
+    expect(out.dateStart).toBe("2026-05-10");
+    expect(out.dateEnd).toBe("2026-05-17");
+    expect(out.targetMonth).toBeNull();
+    expect(out.durationDays).toBeNull();
+  });
+
+  it("leva viajantes e orçamento, e nunca um destino", () => {
+    const out = draftSummary({ ...EMPTY_DISCOVERY_FORM, adults: 3, children: 1, budgetTotal: 9000 });
+    expect(out.party).toEqual({ adults: 3, children: 1 });
+    expect(out.budgetTotal).toBe(9000);
+    expect(out.currency).toBe("BRL");
+    expect(out.chosenDestination).toBeNull();
+  });
+});
+
+describe("defaultAdults", () => {
+  it("quem viaja sozinho começa com 1 adulto", () => {
+    expect(defaultAdults("sozinho")).toBe(1);
+  });
+
+  it("casal, família e amigos ficam no padrão", () => {
+    expect(defaultAdults("casal")).toBe(2);
+    expect(defaultAdults("familia")).toBe(2);
+    expect(defaultAdults("amigos")).toBe(2);
+  });
+
+  it("sem perfil, fica no padrão", () => {
+    expect(defaultAdults(null)).toBe(2);
   });
 });

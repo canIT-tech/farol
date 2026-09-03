@@ -48,6 +48,24 @@
   color: var(--accent);
 }
 
+/* Saída das telas de coluna única: sem isto, /onboarding e /auto não têm
+   caminho de volta nenhum além do botão do navegador. */
+.screen__back {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.screen__back:hover {
+  color: var(--accent-ink);
+}
+
+.screen__logo {
+  text-decoration: none;
+  color: inherit;
+}
+
 .screen__badge {
   font-size: 12px;
   color: var(--text-faint);

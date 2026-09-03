@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Button, DateRangeField, Slider, Stepper, TextField } from "@farol/ui";
+import { Button, DateRangeField, MonthField, Slider, Stepper } from "@farol/ui";
 import type { TripInput } from "@farol/shared";
 import {
   BUDGET_MAX,
@@ -33,13 +33,24 @@ function brl(value: number): string {
 
 export function DiscoveryForm({
   onSubmit,
+  onStateChange,
+  adults = EMPTY_DISCOVERY_FORM.adults,
   pending = false
 }: {
   onSubmit: (input: TripInput) => void;
+  /** A sidebar espelha o que está sendo preenchido, como no hi-fi. */
+  onStateChange?: (state: DiscoveryFormState) => void;
+  /** Palpite inicial de adultos, vindo da companhia do perfil de gosto. */
+  adults?: number;
   pending?: boolean;
 }) {
-  const [state, setState] = useState<DiscoveryFormState>(EMPTY_DISCOVERY_FORM);
-  const patch = (next: Partial<DiscoveryFormState>) => setState((s) => ({ ...s, ...next }));
+  const [state, setState] = useState<DiscoveryFormState>({ ...EMPTY_DISCOVERY_FORM, adults });
+  const patch = (next: Partial<DiscoveryFormState>) =>
+    setState((s) => {
+      const merged = { ...s, ...next };
+      onStateChange?.(merged);
+      return merged;
+    });
 
   return (
     <form
@@ -67,10 +78,8 @@ export function DiscoveryForm({
             />
           ) : (
             <>
-              <TextField
+              <MonthField
                 label="Mês"
-                type="month"
-                required
                 value={state.targetMonth}
                 onChange={(targetMonth) => patch({ targetMonth })}
               />

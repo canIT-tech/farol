@@ -2,7 +2,7 @@
 
 import "./sidebar.css";
 import { StepNav, type Step } from "@farol/ui";
-import type { TripState } from "@farol/shared";
+import type { TripSummary } from "../lib/discovery-form";
 import { BrandMark } from "./common/BrandHeader";
 import { dayPillDate, monthShort } from "../lib/booking-summary";
 
@@ -15,7 +15,7 @@ const UNDEFINED_LABEL = "a definir";
 // Quem chega em qualquer tela do fluxo já passou pelo perfil de gosto — sem
 // ele a descoberta nem roda. Viagem ainda não criada (/trips/new) está em
 // "Escolher destino", que é exatamente o que a tela faz.
-export function tripSteps(trip: TripState | null): Step[] {
+export function tripSteps(trip: TripSummary | null): Step[] {
   const hasChosen = trip?.chosenDestination != null;
 
   return [
@@ -27,7 +27,7 @@ export function tripSteps(trip: TripState | null): Step[] {
 }
 
 export function periodLabel(
-  trip: Pick<TripState, "dateStart" | "dateEnd" | "targetMonth" | "durationDays">
+  trip: Pick<TripSummary, "dateStart" | "dateEnd" | "targetMonth" | "durationDays">
 ): string {
   if (trip.dateStart !== null && trip.dateEnd !== null) {
     // Data crua ("2026-05-10 → 2026-05-17") é ilegível na sidebar estreita.
@@ -39,7 +39,10 @@ export function periodLabel(
   return UNDEFINED_LABEL;
 }
 
-export function partyLabel(party: TripState["party"]): string {
+export function partyLabel(party: TripSummary["party"]): string {
+  if (party === null) {
+    return UNDEFINED_LABEL;
+  }
   const adults = `${party.adults} ${party.adults === 1 ? "adulto" : "adultos"}`;
   if (party.children === 0) {
     return adults;
@@ -47,7 +50,7 @@ export function partyLabel(party: TripState["party"]): string {
   return `${adults} · ${party.children} ${party.children === 1 ? "criança" : "crianças"}`;
 }
 
-export function budgetLabel(trip: Pick<TripState, "budgetTotal" | "currency">): string {
+export function budgetLabel(trip: Pick<TripSummary, "budgetTotal" | "currency">): string {
   if (trip.budgetTotal === null) {
     return UNDEFINED_LABEL;
   }
@@ -58,7 +61,7 @@ export function budgetLabel(trip: Pick<TripState, "budgetTotal" | "currency">): 
   });
 }
 
-export function destinationLabel(trip: Pick<TripState, "chosenDestination">): string {
+export function destinationLabel(trip: Pick<TripSummary, "chosenDestination">): string {
   const chosen = trip.chosenDestination;
   return chosen === null ? UNDEFINED_LABEL : `${chosen.city}, ${chosen.country}`;
 }
@@ -81,17 +84,17 @@ export function TripSidebar({
   trip,
   onNavigate
 }: {
-  trip: TripState | null;
+  trip: TripSummary | null;
   onNavigate?: (id: string) => void;
 }) {
   return (
     <div className="side">
-      <BrandMark />
+      <BrandMark href="/trips" />
 
       <div>
         <h2 className="side__heading">Sua viagem</h2>
         <div className="side__card">
-          <Fact label="Origem" value={trip === null ? UNDEFINED_LABEL : trip.originIata} />
+          <Fact label="Origem" value={trip?.originIata ?? UNDEFINED_LABEL} />
           <Fact label="Datas" value={trip === null ? UNDEFINED_LABEL : periodLabel(trip)} />
           <Fact label="Viajantes" value={trip === null ? UNDEFINED_LABEL : partyLabel(trip.party)} />
           <Fact label="Orçamento" value={trip === null ? UNDEFINED_LABEL : budgetLabel(trip)} />

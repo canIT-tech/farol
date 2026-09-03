@@ -6,6 +6,7 @@ export * from "./Stepper/Stepper";
 export * from "./Slider/Slider";
 export * from "./DateRangeField/DateRangeField";
 export * from "./DateRangeField/calendar";
+export * from "./MonthField/MonthField";
 export * from "./Chip/Chip";
 export * from "./Match/Match";
 export * from "./DestinationCard/DestinationCard";

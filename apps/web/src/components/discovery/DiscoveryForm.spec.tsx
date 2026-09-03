@@ -18,13 +18,15 @@ vi.mock("next/link", () => ({
 
 async function preencherPorMes(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Saindo de"), "gru");
-  await user.type(screen.getByLabelText("Mês"), "2026-09");
+  // O seletor de mês abre em 2026; setembro está na grade do ano.
+  await user.click(screen.getByRole("button", { name: /^Mês/ }));
+  await user.click(screen.getByRole("button", { name: "set" }));
 }
 
 describe("DiscoveryForm", () => {
   it("começa no modo mês, com dias de viagem", () => {
     render(<DiscoveryForm onSubmit={vi.fn()} />);
-    expect(screen.getByLabelText("Mês")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Mês/ })).toBeInTheDocument();
     expect(screen.getByLabelText("Dias de viagem")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Datas/ })).not.toBeInTheDocument();
   });
@@ -34,7 +36,7 @@ describe("DiscoveryForm", () => {
     render(<DiscoveryForm onSubmit={vi.fn()} />);
     await user.click(screen.getByRole("radio", { name: "Datas exatas" }));
     expect(screen.getByRole("button", { name: /Datas/ })).toBeInTheDocument();
-    expect(screen.queryByLabelText("Mês")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^Mês/ })).not.toBeInTheDocument();
   });
 
   it("submit fica bloqueado enquanto o input não é válido", () => {
@@ -136,4 +138,17 @@ describe("DiscoveryForm", () => {
     );
   });
 
+
+  // A sidebar de /trips/new espelha o formulário, então cada tecla precisa
+  // chegar lá — não só o submit.
+  it("avisa a cada mudança quem estiver ouvindo", async () => {
+    const user = userEvent.setup();
+    const onStateChange = vi.fn();
+    render(<DiscoveryForm onSubmit={vi.fn()} onStateChange={onStateChange} />);
+
+    await user.type(screen.getByLabelText("Saindo de"), "GRU");
+
+    expect(onStateChange).toHaveBeenCalled();
+    expect(onStateChange.mock.calls.at(-1)![0]).toMatchObject({ originIata: "GRU" });
+  });
 });

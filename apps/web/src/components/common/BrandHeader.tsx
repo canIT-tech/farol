@@ -1,9 +1,9 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 
-/** A marca sozinha: farol + palavra. */
-export function BrandMark({ className = "screen__logo" }: { className?: string }) {
+function Mark() {
   return (
-    <div className={className}>
+    <>
       <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2.8"
              strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M17 43h14" />
@@ -13,16 +13,45 @@ export function BrandMark({ className = "screen__logo" }: { className?: string }
           <path d="M22 18 h4 l-1 -3 h-2 z" />
         </svg>
       Farol
-    </div>
+    </>
+  );
+}
+
+/** A marca sozinha: farol + palavra. Com `href`, vira o caminho de volta —
+ *  numa área logada, clicar na marca é o gesto esperado para sair da tela. */
+export function BrandMark({
+  className = "screen__logo",
+  href
+}: {
+  className?: string;
+  href?: string;
+}) {
+  if (href === undefined) {
+    return (
+      <div className={className}>
+        <Mark />
+      </div>
+    );
+  }
+  return (
+    <Link className={className} href={href} aria-label="Farol — voltar para minhas viagens">
+      <Mark />
+    </Link>
   );
 }
 
 /** Cabeçalho de marca das telas de coluna única, como no hi-fi: farol à
  *  esquerda, e à direita o que a tela quiser dizer (modo, ações). */
-export function BrandHeader({ children }: { children?: ReactNode }) {
+export function BrandHeader({
+  children,
+  href
+}: {
+  children?: ReactNode;
+  href?: string;
+}) {
   return (
     <header className="screen__top">
-      <BrandMark />
+      <BrandMark href={href} />
       {children}
     </header>
   );

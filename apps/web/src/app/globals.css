@@ -1218,7 +1218,7 @@ p {
   margin-bottom: 15px;
 }
 
-.ob-tile {
+.landing .ob-tile {
   font-family: inherit;
   border: 1.5px solid var(--line);
   border-radius: 10px;
@@ -1233,11 +1233,11 @@ p {
     background 120ms var(--ease);
 }
 
-.ob-tile:hover {
+.landing .ob-tile:hover {
   border-color: var(--ink-faint);
 }
 
-.ob-tile.on {
+.landing .ob-tile.on {
   border-color: var(--sun);
   background: var(--sun-wash);
   color: var(--sun-strong);
@@ -1251,7 +1251,7 @@ p {
   margin-bottom: 7px;
 }
 
-.ob-seg {
+.landing .ob-seg {
   display: inline-flex;
   border: 1.5px solid var(--line);
   border-radius: 9px;
@@ -1259,7 +1259,7 @@ p {
   margin-bottom: 14px;
 }
 
-.ob-seg button {
+.landing .ob-seg button {
   font-family: inherit;
   background: var(--surface);
   border: 0;
@@ -1270,11 +1270,11 @@ p {
   cursor: pointer;
 }
 
-.ob-seg button:last-child {
+.landing .ob-seg button:last-child {
   border-right: 0;
 }
 
-.ob-seg button.on {
+.landing .ob-seg button.on {
   background: var(--ink);
   color: var(--surface);
 }

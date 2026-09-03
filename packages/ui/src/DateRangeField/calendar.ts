@@ -12,7 +12,7 @@ const MONTHS_LONG = [
   "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
 ];
 
-const MONTHS_SHORT = [
+export const MONTHS_SHORT = [
   "jan", "fev", "mar", "abr", "mai", "jun",
   "jul", "ago", "set", "out", "nov", "dez"
 ];
@@ -105,4 +105,14 @@ export function nextRange(
     return { start: clicked, end: "" };
   }
   return { start, end: clicked };
+}
+
+/** "2026-09" → { year: 2026, month: 9 }. */
+export function parseMonthKey(key: string): YearMonth {
+  return { year: Number(key.slice(0, 4)), month: Number(key.slice(5, 7)) };
+}
+
+/** { year: 2026, month: 9 } → "2026-09", o formato que o TripInput espera. */
+export function toMonthKey({ year, month }: YearMonth): string {
+  return `${year}-${String(month).padStart(2, "0")}`;
 }

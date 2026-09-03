@@ -67,7 +67,9 @@ test("nova viagem → descoberta → destino → roteiro → ajuste por chat", a
 
   await page.goto("/trips/new");
   await page.getByLabel("Saindo de").fill("GRU");
-  await page.getByLabel("Mês").fill("2026-09");
+  // O seletor de mês abre em 2026.
+  await page.getByRole("button", { name: /^Mês/ }).click();
+  await page.getByRole("button", { name: "set", exact: true }).click();
   await page.getByRole("button", { name: "Buscar destinos" }).click();
 
   await page.waitForURL(`**/trips/${TRIP_ID}/discovery`);

@@ -26,7 +26,10 @@ export function StepNav({ steps, onNavigate }: StepNavProps) {
   return (
     <ol className="farol-stepnav">
       {steps.map((step) => {
-        const clickable = step.state === "done" && Boolean(onNavigate);
+        // Etapa "todo" ainda não existe e não se navega para ela. A atual,
+        // sim: estando no roteiro, "Voo & hotel" é a atual e precisa ser o
+        // caminho para lá — senão só o botão no fim da página leva.
+        const clickable = step.state !== "todo" && Boolean(onNavigate);
         const body = (
           <>
             <Marker done={step.state === "done"} />

@@ -8,6 +8,13 @@
   align-items: start;
 }
 
+/* Datas exatas usam um campo só; sem isto ele fica com meia linha e a outra
+   metade vazia. */
+.df-grid > .farol-daterange:only-child {
+  grid-column: 1 / -1;
+  max-width: 320px;
+}
+
 .df-cta {
   margin-top: 10px;
   width: 100%;
@@ -57,25 +64,4 @@
   margin-top: 9px;
   font-size: 11.5px;
   color: var(--text-faint);
-}
-
-/* Campo de mês vazio mostra "--------- ----" no Chrome; o rótulo já diz o que
-   é. O indicador nativo cobre o campo inteiro, então o clique segue abrindo o
-   seletor em qualquer ponto. */
-.df-grid .farol-field__control {
-  position: relative;
-}
-
-.df-grid input[type="month"]::-webkit-calendar-picker-indicator {
-  position: absolute;
-  inset: 0;
-  width: auto;
-  height: auto;
-  margin: 0;
-  opacity: 0;
-  cursor: pointer;
-}
-
-.df-grid input[type="month"]:not(:focus):invalid::-webkit-datetime-edit {
-  color: transparent;
 }

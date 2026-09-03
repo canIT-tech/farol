@@ -1,0 +1,138 @@
+/* Seletor de mês, par do DateRangeField. Mesma anatomia: rótulo acima,
+   controle com ícone, popover ancorado. */
+
+.farol-monthfield {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.farol-monthfield__label {
+  font-family: var(--font-text);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-8);
+}
+
+.farol-monthfield__control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+  min-height: var(--control-h-md);
+  padding: 0 var(--space-16);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.farol-monthfield__control:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+}
+
+.farol-monthfield__icon {
+  display: flex;
+  color: var(--text-faint);
+  flex: none;
+}
+
+.farol-monthfield__value {
+  text-transform: lowercase;
+}
+
+.farol-monthfield__value::first-letter {
+  text-transform: uppercase;
+}
+
+.farol-monthfield__value--empty {
+  color: var(--text-faint);
+}
+
+.farol-monthfield__pop {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 30;
+  width: 264px;
+  margin-top: var(--space-4);
+  padding: var(--space-16);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--elev-2);
+}
+
+.farol-monthfield__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-12);
+}
+
+.farol-monthfield__year {
+  font-weight: 600;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.farol-monthfield__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.farol-monthfield__nav:hover,
+.farol-monthfield__nav:focus-visible {
+  background: var(--surface-sunk);
+  outline: none;
+}
+
+.farol-monthfield__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.farol-monthfield__month {
+  height: 34px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--ease);
+}
+
+.farol-monthfield__month::first-letter {
+  text-transform: uppercase;
+}
+
+.farol-monthfield__month:hover,
+.farol-monthfield__month:focus-visible {
+  background: var(--surface-sunk);
+  outline: none;
+}
+
+.farol-monthfield__month--on,
+.farol-monthfield__month--on:hover {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}

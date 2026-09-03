@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { TripState } from "@farol/shared";
-import { TripSidebar, tripSteps } from "./TripSidebar";
+import { TripSidebar, partyLabel, tripSteps } from "./TripSidebar";
 
 const base: TripState = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -48,7 +48,7 @@ describe("tripSteps", () => {
 
   it("sem destino escolhido: perfil feito, escolher destino é o passo atual", () => {
     expect(tripSteps(base).map((s) => s.state)).toEqual(["done", "current", "todo", "todo"]);
-    expect(tripSteps({ ...base, destinations: [candidate] }).map((s) => s.state)).toEqual([
+    expect(tripSteps({ ...base }).map((s) => s.state)).toEqual([
       "done",
       "current",
       "todo",
@@ -57,11 +57,7 @@ describe("tripSteps", () => {
   });
 
   it("com destino escolhido: roteiro liberado, voo & hotel é o passo atual", () => {
-    const steps = tripSteps({
-      ...base,
-      destinations: [candidate],
-      chosenDestination: candidate
-    });
+    const steps = tripSteps({ ...base, chosenDestination: candidate });
     expect(steps.map((s) => s.state)).toEqual(["done", "done", "done", "current"]);
   });
 
@@ -69,6 +65,16 @@ describe("tripSteps", () => {
   // trás — sem ele a descoberta nem roda.
   it("sem viagem, o perfil está concluído e a etapa atual é escolher destino", () => {
     expect(tripSteps(null).map((s) => s.state)).toEqual(["done", "current", "todo", "todo"]);
+  });
+});
+
+describe("partyLabel", () => {
+  it("sem viajantes definidos fica a definir", () => {
+    expect(partyLabel(null)).toBe("a definir");
+  });
+
+  it("conta adultos e crianças", () => {
+    expect(partyLabel({ adults: 2, children: 1 })).toBe("2 adultos · 1 criança");
   });
 });
 
@@ -134,7 +140,7 @@ describe("TripSidebar", () => {
     const onNavigate = vi.fn();
     render(
       <TripSidebar
-        trip={{ ...base, destinations: [candidate], chosenDestination: candidate }}
+        trip={{ ...base, chosenDestination: candidate }}
         onNavigate={onNavigate}
       />
     );

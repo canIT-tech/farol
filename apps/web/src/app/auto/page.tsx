@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import "./auto.css";
 import { tasteProfileSchema } from "@farol/shared";
@@ -46,8 +47,11 @@ function Auto({ token }: { token: string }) {
 
   return (
     <main className="screen">
-      <BrandHeader>
+      <BrandHeader href="/trips">
         <span className="screen__badge">Modo autônomo</span>
+        <Link className="screen__back" href="/trips">
+          ← Minhas viagens
+        </Link>
       </BrandHeader>
 
       <div className="screen__card">

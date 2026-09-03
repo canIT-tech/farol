@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@farol/ui";
 import "./onboarding.css";
@@ -11,6 +12,7 @@ import { apiFetch } from "../../lib/api-client";
 import {
   EMPTY_ONBOARDING,
   canSubmit,
+  fromTasteProfile,
   toTasteProfileInput,
   toggleInterest,
   type OnboardingState
@@ -40,6 +42,22 @@ function OnboardingForm({ token }: { token: string }) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  // "Meu perfil" reabre esta tela: quem já respondeu vê as próprias escolhas,
+  // não um formulário em branco. Sem perfil ainda (404), segue vazio.
+  useEffect(() => {
+    let cancelled = false;
+    void apiFetch({ path: "/me/profile", schema: tasteProfileSchema, token })
+      .then((profile) => {
+        if (!cancelled) {
+          setState(fromTasteProfile(profile));
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
   function patch(next: Partial<OnboardingState>) {
     setState((current) => ({ ...current, ...next }));
   }
@@ -64,7 +82,11 @@ function OnboardingForm({ token }: { token: string }) {
 
   return (
     <main className="screen screen--wide">
-      <BrandHeader />
+      <BrandHeader href="/trips">
+        <Link className="screen__back" href="/trips">
+          ← Minhas viagens
+        </Link>
+      </BrandHeader>
 
       <div className="screen__card">
         <h1 className="screen__title">O que te move numa viagem?</h1>

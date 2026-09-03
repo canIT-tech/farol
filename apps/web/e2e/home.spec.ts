@@ -44,7 +44,9 @@ test("com sessão: landing → Minhas viagens → Continuar → Sair", async ({ 
 
   await page.getByRole("button", { name: "Continuar" }).click();
   await page.waitForURL(`**/trips/${TRIP_ID}/discovery`);
-  await expect(page.getByRole("link", { name: "Minhas viagens" })).toHaveAttribute("href", "/trips");
+  await expect(
+    page.getByRole("link", { name: "Minhas viagens", exact: true }).first()
+  ).toHaveAttribute("href", "/trips");
 
   await page.getByRole("button", { name: "Sair" }).click();
   await page.waitForURL(/\/$/);
