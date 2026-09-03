@@ -70,8 +70,13 @@ describe("apiFetch", () => {
   });
 
   it("lança quando o payload não bate o schema", async () => {
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
     const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ id: 42 }));
-    await expect(apiFetch({ path: "/x", schema, token: "t" }, fetchImpl)).rejects.toThrow();
+    try {
+      await expect(apiFetch({ path: "/x", schema, token: "t" }, fetchImpl)).rejects.toThrow();
+    } finally {
+      errSpy.mockRestore();
+    }
   });
 });
 
@@ -96,5 +101,21 @@ describe("apiFetchPublic", () => {
   it("lança quando o payload não bate o schema", async () => {
     const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ id: 42 }));
     await expect(apiFetchPublic({ path: "/x", schema }, fetchImpl)).rejects.toThrow();
+  });
+
+  it("resposta fora do schema vira frase legível, com o detalhe no console", async () => {
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const fetchImpl = vi.fn(async () =>
+      new Response(JSON.stringify({ nome: 123 }), { status: 200 })
+    ) as unknown as typeof fetch;
+
+    try {
+      await expect(
+        apiFetch({ path: "/me/profile", token: "t", schema: z.object({ nome: z.string() }) }, fetchImpl)
+      ).rejects.toThrow("a api respondeu /me/profile num formato que eu não reconheço");
+      expect(errSpy.mock.calls[0]![0]).toContain("api_response_invalid /me/profile");
+    } finally {
+      errSpy.mockRestore();
+    }
   });
 });

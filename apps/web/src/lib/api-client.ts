@@ -22,6 +22,18 @@ export interface ApiFetchOptions<T> extends ApiSendOptions {
   schema: ResponseSchema<T>;
 }
 
+// A resposta fora do schema é erro nosso, não da pessoa: o ZodError traz o
+// JSON inteiro das issues em `message`, e ele chegava cru na tela. Aqui vira
+// uma frase, e o detalhe técnico fica no console para quem está depurando.
+function parseOrFail<T>(schema: ResponseSchema<T>, payload: unknown, path: string): T {
+  const parsed = schema.safeParse(payload);
+  if (!parsed.success) {
+    console.error(`api_response_invalid ${path}`, parsed.error.issues);
+    throw new Error(`a api respondeu ${path} num formato que eu não reconheço`);
+  }
+  return parsed.data;
+}
+
 function buildInit(opts: ApiSendOptions): RequestInit {
   const headers: Record<string, string> = { authorization: `Bearer ${opts.token}` };
   const init: RequestInit = { method: opts.method ?? "GET", headers, cache: "no-store" };
@@ -53,7 +65,7 @@ export async function apiFetch<T>(
   if (!res.ok) {
     throw new Error(`api ${opts.path} respondeu ${res.status}`);
   }
-  return opts.schema.parse(await res.json());
+  return parseOrFail(opts.schema, await res.json(), opts.path);
 }
 
 // Rotas públicas (/geo, /waitlist): não têm Bearer. Mesmo contrato de validação.
@@ -65,5 +77,5 @@ export async function apiFetchPublic<T>(
   if (!res.ok) {
     throw new Error(`api ${opts.path} respondeu ${res.status}`);
   }
-  return opts.schema.parse(await res.json());
+  return parseOrFail(opts.schema, await res.json(), opts.path);
 }
