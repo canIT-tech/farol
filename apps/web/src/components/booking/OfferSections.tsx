@@ -1,15 +1,21 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Button, FlightOfferCard } from "@farol/ui";
-import type { FlightOffer, HotelOffer, ProviderSection } from "@farol/shared";
+import { FlightOfferCard, HotelOfferCard } from "@farol/ui";
+import type {
+  FlightOffer,
+  HotelOffer,
+  ItineraryItem,
+  ProviderSection
+} from "@farol/shared";
+import { walkingNote } from "../../lib/walking-distance";
 
 // Nome do parceiro que recebe o clique. O Travelpayouts leva a busca do
 // Aviasales, e o hi-fi exige dizer para onde a pessoa está indo antes do clique.
 export const FLIGHT_PARTNER = "Aviasales";
 
-// O Travelpayouts entrega preço cacheado, não busca ao vivo: o valor final é o
-// do parceiro. Dizer isso é a diferença entre assessor honesto e vitrine.
+// Voo e hotel vêm de preço agregado do parceiro, não de busca ao vivo: o valor
+// final é o do parceiro. Dizer isso é a diferença entre assessor e vitrine.
 export const APPROX_PRICE_NOTICE =
   "Preço aproximado, do cache do parceiro. O valor final é confirmado no site do parceiro.";
 
@@ -120,33 +126,39 @@ export function FlightSection({
 export function HotelSection({
   section,
   onSelect,
-  busy = false
+  busy = false,
+  itineraryItems = []
 }: {
   section: ProviderSection<HotelOffer>;
   onSelect: (offerId: string) => void;
   busy?: boolean;
+  /** Paradas do roteiro, para dizer quantas ficam a pé de cada hotel. */
+  itineraryItems?: ItineraryItem[];
 }) {
   return (
-    <Section title="Hospedagem" section={section} empty="Nenhuma hospedagem encontrada.">
+    <Section
+      title="Hospedagem"
+      section={section}
+      empty="Nenhuma hospedagem encontrada para estas datas."
+    >
       <ul>
         {section.offers.map((offer) => (
           <li key={offer.id}>
-            <article aria-label={offer.name}>
-              <h3>{offer.name}</h3>
-              {offer.region !== null ? <p>{offer.region}</p> : null}
-              <p>{`${money(offer.pricePerNight, offer.currency)} por noite`}</p>
-              <p>{`${money(offer.priceTotal, offer.currency)} no total`}</p>
-              {offer.rating !== null ? <p>{`Nota ${offer.rating}`}</p> : null}
-              <a href={offer.deepLink} target="_blank" rel="noreferrer">
-                Ver no site
-              </a>
-              <Button size="sm" disabled={busy} onClick={() => onSelect(offer.id)}>
-                Escolher
-              </Button>
-            </article>
+            <HotelOfferCard
+              name={offer.name}
+              region={offer.region}
+              walkingNote={walkingNote(offer, itineraryItems)}
+              photoUrl={offer.photoUrl}
+              rating={offer.rating}
+              pricePerNight={money(offer.pricePerNight, offer.currency)}
+              deepLink={offer.deepLink}
+              busy={busy}
+              onSelect={() => onSelect(offer.id)}
+            />
           </li>
         ))}
       </ul>
+      <p role="note">{APPROX_PRICE_NOTICE}</p>
     </Section>
   );
 }

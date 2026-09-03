@@ -5,6 +5,7 @@ import {
   flightOffer,
   hotelOffer,
   installSession,
+  itinerary,
   json,
   lisboa,
   nearbyOffer,
@@ -46,6 +47,7 @@ test.beforeEach(async ({ page }) => {
       return route.fulfill(json(section([routeDeal("2026-11", 3198), routeDeal("2026-12", 2480)])));
     }
     if (path === `${base}/hotels`) return route.fulfill(json(section([hotelOffer])));
+    if (path === `${base}/itinerary`) return route.fulfill(json(itinerary("ready")));
     return route.continue();
   });
 });
@@ -96,6 +98,9 @@ test("a aba de hotéis troca o conteúdo do miolo", async ({ page }) => {
   await expect(page.getByRole("tab", { name: "Hotéis" })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("region", { name: "Hospedagem" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Hotel do Chiado" })).toBeVisible();
+  await expect(page.getByText("4.5 ★")).toBeVisible();
+  await expect(page.getByText("/noite")).toBeVisible();
+  await expect(page.getByRole("img", { name: "Foto do Hotel do Chiado" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Voos" })).toHaveCount(0);
 });
 

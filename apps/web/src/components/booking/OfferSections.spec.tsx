@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { render, screen, cleanup, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import type { FlightOffer, HotelOffer, ProviderSection } from "@farol/shared";
+import type { FlightOffer, HotelOffer, ItineraryItem, ProviderSection } from "@farol/shared";
 import {
   APPROX_PRICE_NOTICE,
   FLIGHT_PARTNER,
@@ -36,12 +36,21 @@ const hotel: HotelOffer = {
   id: "h1",
   name: "Hotel do Chiado",
   region: "Chiado",
+  address: "R. Nova do Almada 114",
   pricePerNight: 480,
   priceTotal: 3360,
   currency: "BRL",
   rating: 4.5,
+  reviewCount: 1280,
+  stars: 4,
+  photoUrl: "https://static.cupid.travel/hotels/1.jpg",
+  lat: 38.7107,
+  lng: -9.1401,
   deepLink: "https://exemplo.test/hotel"
 };
+
+const parada = (lat: number, lng: number): ItineraryItem =>
+  ({ id: `i-${lat}`, lat, lng }) as unknown as ItineraryItem;
 
 function section<T>(offers: T[], over: Partial<ProviderSection<T>> = {}): ProviderSection<T> {
   return { offers, stale: false, fetchedAt: null, error: null, ...over };
@@ -155,24 +164,37 @@ describe("FlightSection", () => {
 });
 
 describe("HotelSection", () => {
-  it("mostra nome, região, preços e nota", () => {
+  it("mostra o cartão hi-fi: foto, nome, área, nota e diária", () => {
     render(<HotelSection section={section([hotel])} onSelect={vi.fn()} />);
+
     expect(screen.getByRole("heading", { name: "Hotel do Chiado" })).toBeInTheDocument();
     expect(screen.getByText("Chiado")).toBeInTheDocument();
-    expect(screen.getByText("R$ 480 por noite")).toBeInTheDocument();
-    expect(screen.getByText("R$ 3.360 no total")).toBeInTheDocument();
-    expect(screen.getByText("Nota 4.5")).toBeInTheDocument();
+    expect(screen.getByText("4.5 ★")).toBeInTheDocument();
+    expect(screen.getByText(/R\$ 480/)).toBeInTheDocument();
+    expect(screen.getByText("/noite")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Foto do Hotel do Chiado" })).toBeInTheDocument();
   });
 
-  it("omite região e nota quando não vêm", () => {
+  it("conta as paradas do roteiro que ficam a pé do hotel", () => {
     render(
       <HotelSection
-        section={section([{ ...hotel, region: null, rating: null }])}
+        section={section([hotel])}
         onSelect={vi.fn()}
+        itineraryItems={[parada(38.7108, -9.1402), parada(38.7112, -9.1405), parada(38.9, -9.5)]}
       />
     );
-    expect(screen.queryByText("Chiado")).not.toBeInTheDocument();
-    expect(screen.queryByText(/^Nota/)).not.toBeInTheDocument();
+    expect(screen.getByText("Chiado · 2 paradas a pé")).toBeInTheDocument();
+  });
+
+  it("sem roteiro carregado mostra só a área", () => {
+    render(<HotelSection section={section([hotel])} onSelect={vi.fn()} />);
+    expect(screen.getByText("Chiado")).toBeInTheDocument();
+    expect(screen.queryByText(/paradas a pé/)).not.toBeInTheDocument();
+  });
+
+  it("avisa que o preço é aproximado", () => {
+    render(<HotelSection section={section([hotel])} onSelect={vi.fn()} />);
+    expect(screen.getByRole("note")).toHaveTextContent(APPROX_PRICE_NOTICE);
   });
 
   it("chama onSelect e respeita busy", async () => {
@@ -192,6 +214,8 @@ describe("HotelSection", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Não consegui consultar agora.");
 
     rerender(<HotelSection section={section([])} onSelect={vi.fn()} />);
-    expect(screen.getByRole("status")).toHaveTextContent("Nenhuma hospedagem encontrada.");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Nenhuma hospedagem encontrada para estas datas."
+    );
   });
 });

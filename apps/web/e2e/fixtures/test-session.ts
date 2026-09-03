@@ -191,10 +191,16 @@ export const hotelOffer = {
   id: "htl-1",
   name: "Hotel do Chiado",
   region: "Chiado",
+  address: "R. Nova do Almada 114",
   pricePerNight: 480,
   priceTotal: 3360,
   currency: "BRL",
   rating: 4.5,
+  reviewCount: 1280,
+  stars: 4,
+  photoUrl: "https://static.cupid.travel/hotels/1.jpg",
+  lat: 38.7107,
+  lng: -9.1401,
   deepLink: "https://exemplo.test/hotel"
 };
 
