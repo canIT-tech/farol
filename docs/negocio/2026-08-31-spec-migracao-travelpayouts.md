@@ -303,3 +303,41 @@ doppler run -- pnpm --filter @farol/providers smoke:travelpayouts
 Bate nos nove endpoints com a credencial real e imprime uma amostra normalizada de
 cada um; sai com código 1 se algum falhar. Só leitura. Rode antes de mexer no
 provider e quando alguma seção começar a vir vazia em produção.
+
+---
+
+## 12. Hotel: LiteAPI no lugar do Hotellook (2026-09-03)
+
+O §11 fechou "hotel não tem caminho pelo Travelpayouts". O provider escolhido foi a
+**LiteAPI (Nuitée)** — `https://api.liteapi.travel/v3.0`.
+
+| Endpoint | Papel | Custo |
+|---|---|---|
+| `GET /data/hotels` | nome, estrelas, nota, avaliações, foto, endereço, coordenada | grátis |
+| `POST /hotels/min-rates` | preço mínimo por hotel nas datas | grátis |
+
+Chave de sandbox é self-serve, sem cartão e sem contrato; produção exige apenas cadastrar
+um cartão, sem aprovação. A receita é por **margem** na reserva — mesma lógica do afiliado
+de voo. Endpoints pagos (`places` a US$ 0,01/req, `price index` a US$ 0,05) **não** são usados.
+
+### Decisões que o dado real forçou
+
+- **Busca por coordenada, não por nome.** `cityName=Lisboa` devolve 2 hotéis; `Lisbon`,
+  6.748; `Cidade do México`, zero. Nosso catálogo é em português, então casar por nome
+  seria uma armadilha silenciosa. A coordenada vem do dump `/data/{locale}/cities.json` do
+  Travelpayouts (mesma família dos dumps de aeroporto e companhia, já em cache de 24 h).
+- **IATA de aeroporto ≠ IATA de cidade.** `TravelpayoutsGeoProvider.city()` tenta cidade
+  direto e, não achando, resolve pelo `city_code` do aeroporto — senão "GRU" buscaria
+  hotéis a 25 km do centro de São Paulo.
+- **Hotel sem tarifa sai da lista.** Numa busca real, 4 hotéis pedidos devolveram 3 preços.
+  O cartão promete uma diária; mostrar hotel sem preço quebraria a comparação.
+- **`address` vem como `""`.** Não estava na fixture; apareceu no dado real e reprovava no
+  `min(1)` do schema, derrubando a busca inteira. Virou `nullIfEmpty` + teste de regressão.
+- **`price` é o total da estadia**, não a diária: `pricePerNight = price / noites`.
+- **Nota é de 0 a 10** na LiteAPI e de 0 a 5 na nossa UI — convertida na normalização.
+
+### Aberto
+
+A chave em uso é de **sandbox**: conteúdo real, tarifa de teste. Ir para produção exige
+cartão no painel da Nuitée e implica o Farol ser o canal de reserva de hotel — decisão
+comercial. Enquanto isso, a tela mostra o aviso de preço aproximado, como em voo.
