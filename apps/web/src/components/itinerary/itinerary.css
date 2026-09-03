@@ -8,6 +8,55 @@
   flex-wrap: wrap;
 }
 
+/* Seletor de dias: cartão com o número e a data, como no hi-fi — o chip
+   simples não comportava os dois níveis de informação. */
+.it-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 62px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font: inherit;
+  cursor: pointer;
+}
+
+.it-pill:hover {
+  border-color: var(--accent-border);
+}
+
+.it-pill:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+.it-pill__n {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.it-pill__d {
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.it-pill--on {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.it-pill--on .it-pill__n {
+  color: var(--surface);
+}
+
+.it-pill--on .it-pill__d {
+  color: var(--text-faint);
+}
+
 .it-dayhead {
   display: flex;
   align-items: center;

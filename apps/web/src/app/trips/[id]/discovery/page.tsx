@@ -3,6 +3,7 @@
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@farol/ui";
+import { partyLabel } from "../../../../components/TripSidebar";
 import { DestinationResults } from "../../../../components/discovery/DestinationResults";
 import { useTrip } from "../../../../providers/TripProvider";
 import { chooseDestination, runDiscovery } from "../../../../lib/trip-api";
@@ -52,15 +53,18 @@ export default function DiscoveryPage({ params }: { params: Promise<{ id: string
   return (
     <section className="pane">
       <div className="pane__head">
-        <h1 className="pane__title">
-          {trip.destinations.length === 1
-            ? "Achei 1 destino pra você"
-            : `Achei ${trip.destinations.length} destinos pra você`}
-        </h1>
+        <div>
+          <h1 className="pane__title">
+            {trip.destinations.length === 1
+              ? "1 destino pra você"
+              : `${trip.destinations.length} destinos pra você`}
+          </h1>
+          <p className="pane__sub pane__sub--tight">
+            Ordenados por aderência ao seu perfil. Custo = voo + hospedagem + gastos locais, para{" "}
+            {partyLabel(trip.party)}.
+          </p>
+        </div>
       </div>
-      <p className="pane__sub">
-        Ordenados pelo quanto combinam com o seu gosto. Escolha um e eu monto o roteiro.
-      </p>
       {error !== null ? (
         <div className="pane__error" role="alert">
           <span>{error}</span>

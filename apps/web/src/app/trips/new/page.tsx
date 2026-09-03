@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TripInput } from "@farol/shared";
 import { AuthGate } from "../../../components/AuthGate";
-import { BrandHeader } from "../../../components/common/BrandHeader";
+import { ShellFrame } from "../../../components/TripShell";
 import { DiscoveryForm } from "../../../components/discovery/DiscoveryForm";
 import { createTrip, runDiscovery } from "../../../lib/trip-api";
 
@@ -27,24 +27,25 @@ function NewTrip({ token }: { token: string }) {
   }
 
   return (
-    <main className="screen">
-      <BrandHeader>
-        <span className="screen__badge">Nova viagem</span>
-      </BrandHeader>
-
-      <div className="screen__card">
-        <h1 className="screen__title">Para onde vamos?</h1>
-        <p className="screen__sub">
-          Me diz de onde você sai, quando e quanto dá para gastar. Eu acho o destino.
+    <ShellFrame tripId={null} trip={null} onNavigate={() => undefined}>
+      <section className="pane">
+        <p className="pane__eyebrow">Descoberta de destino</p>
+        <div className="pane__head">
+          <h1 className="pane__title">Vamos achar seu destino</h1>
+        </div>
+        <p className="pane__sub">
+          Alguns detalhes e o assessor cruza com o seu perfil pra sugerir para onde ir.
         </p>
-        <DiscoveryForm onSubmit={(input) => void submit(input)} pending={pending} />
-        {error !== null ? (
-          <p className="screen__error" role="alert">
-            {error}
-          </p>
-        ) : null}
-      </div>
-    </main>
+        <div className="pane__form">
+          <DiscoveryForm onSubmit={(input) => void submit(input)} pending={pending} />
+          {error !== null ? (
+            <p className="screen__error" role="alert">
+              {error}
+            </p>
+          ) : null}
+        </div>
+      </section>
+    </ShellFrame>
   );
 }
 

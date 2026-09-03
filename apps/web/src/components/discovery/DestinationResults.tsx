@@ -54,6 +54,15 @@ export function DestinationResults({
   return (
     <div>
       <div className="pane__filters" role="group" aria-label="Filtros">
+        <Chip
+          selected={!domesticOnly && !nonStopOnly}
+          onClick={() => {
+            setDomesticOnly(false);
+            setNonStopOnly(false);
+          }}
+        >
+          Todos
+        </Chip>
         <Chip selected={domesticOnly} onClick={() => setDomesticOnly((v) => !v)}>
           Só nacional
         </Chip>

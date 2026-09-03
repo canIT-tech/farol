@@ -48,4 +48,18 @@ describe("StepNav", () => {
     expect(items[1].className).toContain("farol-stepnav__item--current");
     expect(items[2].className).toContain("farol-stepnav__item--todo");
   });
+
+  it("marca com visto só os passos concluídos", () => {
+    const { container } = render(
+      <StepNav
+        steps={[
+          { id: "a", label: "Perfil", state: "done" },
+          { id: "b", label: "Destino", state: "current" },
+          { id: "c", label: "Roteiro", state: "todo" }
+        ]}
+      />
+    );
+    expect(container.querySelectorAll(".farol-stepnav__marker")).toHaveLength(3);
+    expect(container.querySelectorAll(".farol-stepnav__marker svg")).toHaveLength(1);
+  });
 });

@@ -1,8 +1,9 @@
 "use client";
 
-import { Button, Chip } from "@farol/ui";
+import { Button } from "@farol/ui";
 import type { ItineraryDay, ItineraryItem } from "@farol/shared";
 import { SLOT_LABEL, groupBySlot } from "../../lib/itinerary-blocks";
+import { dayPillDate } from "../../lib/booking-summary";
 import "./itinerary.css";
 
 export function DayStrip({
@@ -16,16 +17,23 @@ export function DayStrip({
 }) {
   return (
     <div className="it-strip" role="tablist" aria-label="Dias do roteiro">
-      {days.map((day) => (
-        <Chip
-          key={day.id}
-          role="tab"
-          selected={day.dayIndex === activeIndex}
-          onClick={() => onSelect(day.dayIndex)}
-        >
-          {`Dia ${day.dayIndex}`}
-        </Chip>
-      ))}
+      {days.map((day) => {
+        const date = dayPillDate(day.date);
+        const on = day.dayIndex === activeIndex;
+        return (
+          <button
+            key={day.id}
+            type="button"
+            role="tab"
+            className={on ? "it-pill it-pill--on" : "it-pill"}
+            aria-selected={on}
+            onClick={() => onSelect(day.dayIndex)}
+          >
+            <span className="it-pill__n">{`Dia ${day.dayIndex}`}</span>
+            {date !== null ? <span className="it-pill__d">{date}</span> : null}
+          </button>
+        );
+      })}
     </div>
   );
 }

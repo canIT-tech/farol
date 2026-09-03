@@ -105,6 +105,9 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
         </Chip>
       </div>
 
+      {/* O hi-fi mostra voo e hotel na mesma tela: as abas são atalho para a
+          parte que interessa agora, não troca de página. Por isso a aba de voos
+          termina com a hospedagem, e a de hotéis mostra só ela. */}
       {tab === "flights" ? (
         <>
           <FlightSection
@@ -120,6 +123,13 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
             onSelect={(offerId) => void choose(() => selectFlight(token, id, offerId))}
           />
           <PriceContext months={months} calendar={calendar} latest={latest} />
+          <HotelSection
+            section={hotels}
+            busy={busy}
+            itineraryItems={items}
+            title="Hotéis bem posicionados para o seu roteiro"
+            onSelect={(offerId) => void choose(() => selectHotel(token, id, offerId))}
+          />
         </>
       ) : (
         <HotelSection

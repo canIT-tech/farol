@@ -3,6 +3,8 @@
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@farol/ui";
+import { partyLabel } from "../../../../components/TripSidebar";
+import { itinerarySubtitle, itineraryTitle } from "../../../../lib/booking-summary";
 import { DayStrip, DayTimeline } from "../../../../components/itinerary/DayTimeline";
 import { useItineraryPolling } from "../../../../hooks/useItineraryPolling";
 import { useTrip } from "../../../../providers/TripProvider";
@@ -11,7 +13,7 @@ import { regenerateDay, swapRestaurant } from "../../../../lib/trip-api";
 export default function ItineraryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { token } = useTrip();
+  const { token, trip } = useTrip();
   const { itinerary, loading, error, refetch } = useItineraryPolling(token, id);
   const [activeIndex, setActiveIndex] = useState(1);
   const [busy, setBusy] = useState(false);
@@ -63,6 +65,7 @@ export default function ItineraryPage({ params }: { params: Promise<{ id: string
   }
 
   const day = itinerary.days.find((d) => d.dayIndex === activeIndex) ?? itinerary.days[0];
+  const subtitle = itinerarySubtitle(trip, trip === null ? null : partyLabel(trip.party));
 
   async function run(action: () => Promise<unknown>) {
     setBusy(true);
@@ -77,7 +80,10 @@ export default function ItineraryPage({ params }: { params: Promise<{ id: string
   return (
     <section className="pane">
       <div className="pane__head">
-        <h1 className="pane__title">Seu roteiro</h1>
+        <div>
+          <h1 className="pane__title">{itineraryTitle(trip, itinerary.days.length)}</h1>
+          {subtitle !== null ? <p className="pane__sub pane__sub--tight">{subtitle}</p> : null}
+        </div>
       </div>
       <DayStrip days={itinerary.days} activeIndex={activeIndex} onSelect={setActiveIndex} />
       {day === undefined ? (

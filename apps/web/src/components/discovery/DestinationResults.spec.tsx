@@ -151,4 +151,22 @@ describe("DestinationResults", () => {
     );
     expect(screen.getByText("3 escalas")).toBeInTheDocument();
   });
+
+  it("\"Todos\" limpa os filtros e fica marcado quando nenhum está ligado", async () => {
+    const user = userEvent.setup();
+    render(<DestinationResults destinations={[recife, lisboa]} onChoose={vi.fn()} />);
+
+    const todos = screen.getByRole("button", { name: "Todos" });
+    expect(todos).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(screen.getByRole("button", { name: "Só nacional" }));
+    expect(todos).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(todos);
+    expect(screen.getByRole("button", { name: "Só nacional" })).toHaveAttribute(
+      "aria-pressed",
+      "false"
+    );
+    expect(todos).toHaveAttribute("aria-pressed", "true");
+  });
 });

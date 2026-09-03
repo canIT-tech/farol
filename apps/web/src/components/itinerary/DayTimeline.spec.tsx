@@ -41,6 +41,22 @@ describe("DayStrip", () => {
     expect(screen.getByRole("tab", { name: "Dia 2" })).toBeInTheDocument();
   });
 
+  it("mostra a data curta quando o dia tem uma", () => {
+    render(
+      <DayStrip
+        days={[day({ id: "d1", dayIndex: 1, date: "2026-05-10" })]}
+        activeIndex={1}
+        onSelect={vi.fn()}
+      />
+    );
+    expect(screen.getByText("10 mai")).toBeInTheDocument();
+  });
+
+  it("dia sem data mostra só o número", () => {
+    render(<DayStrip days={days} activeIndex={1} onSelect={vi.fn()} />);
+    expect(screen.getByRole("tab", { name: "Dia 1" })).toHaveTextContent(/^Dia 1$/);
+  });
+
   it("seleciona o dia clicado", async () => {
     const onSelect = vi.fn();
     render(<DayStrip days={days} activeIndex={1} onSelect={onSelect} />);

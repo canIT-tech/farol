@@ -8,7 +8,9 @@
 }
 
 .farol-stepnav__link {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
   width: 100%;
   text-align: left;
   font-family: var(--font-text);
@@ -44,4 +46,31 @@ button.farol-stepnav__link:focus-visible {
   background: var(--ink);
   color: var(--on-accent);
   font-weight: 500;
+}
+
+/* Marcador circular do hi-fi: contorno na cor do texto do passo, preenchido
+   com visto quando concluído. */
+.farol-stepnav__marker {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+.farol-stepnav__marker svg {
+  width: 9px;
+  height: 9px;
+}
+
+.farol-stepnav__item--done .farol-stepnav__marker {
+  background: currentColor;
+  color: var(--surface);
+}
+
+.farol-stepnav__item--done .farol-stepnav__marker svg {
+  color: var(--surface);
 }

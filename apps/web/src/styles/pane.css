@@ -7,6 +7,18 @@
   max-width: 980px;
 }
 
+/* Migalha acima do título, como nas telas 2 a 5 do hi-fi. */
+.pane__eyebrow {
+  font-size: 13px;
+  color: var(--text-faint);
+  margin: 0 0 14px;
+}
+
+/* Formulário não acompanha a largura do painel: linha longa demais cansa. */
+.pane__form {
+  max-width: 620px;
+}
+
 .pane__head {
   display: flex;
   align-items: flex-end;
@@ -29,6 +41,11 @@
   line-height: 1.6;
   color: var(--text-muted);
   margin: 0 0 24px;
+}
+
+/* Quando o subtítulo mora dentro do head-row, o espaço de baixo é do head. */
+.pane__sub--tight {
+  margin: 6px 0 0;
 }
 
 .pane__filters {

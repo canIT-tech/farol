@@ -90,7 +90,11 @@ test("mostra voo, aeroporto vizinho e quando sai mais barato", async ({ page }) 
 test("a aba de hotéis troca o conteúdo do miolo", async ({ page }) => {
   await page.goto(`/trips/${TRIP_ID}/booking`);
 
+  // O hi-fi mostra hotel junto do voo; a aba é atalho, não troca de página.
   await expect(page.getByRole("tab", { name: "Voos" })).toHaveAttribute("aria-selected", "true");
+  await expect(
+    page.getByRole("region", { name: "Hotéis bem posicionados para o seu roteiro" })
+  ).toBeVisible();
   await expect(page.getByRole("region", { name: "Hospedagem" })).toHaveCount(0);
 
   await page.getByRole("tab", { name: "Hotéis" }).click();
@@ -101,6 +105,9 @@ test("a aba de hotéis troca o conteúdo do miolo", async ({ page }) => {
   await expect(page.getByText("4.5 ★")).toBeVisible();
   await expect(page.getByText("/noite")).toBeVisible();
   await expect(page.getByRole("img", { name: "Foto do Hotel do Chiado" })).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Hotéis bem posicionados para o seu roteiro" })
+  ).toHaveCount(0);
   await expect(page.getByRole("region", { name: "Voos" })).toHaveCount(0);
 });
 

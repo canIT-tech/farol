@@ -100,7 +100,8 @@ describe("TripSidebar", () => {
 
   it("período indefinido quando não há data nem mês", () => {
     render(<TripSidebar trip={{ ...base, targetMonth: null, durationDays: null }} />);
-    expect(screen.getByText("a definir")).toBeInTheDocument();
+    // "Destino" também fica pendente nesta viagem: por isso getAllBy.
+    expect(screen.getAllByText("a definir").length).toBeGreaterThan(0);
   });
 
   it("orçamento a definir quando é nulo", () => {
@@ -113,9 +114,13 @@ describe("TripSidebar", () => {
     expect(screen.getByText("Lisboa, Portugal")).toBeInTheDocument();
   });
 
-  it("estado de carregando quando não há viagem", () => {
-    render(<TripSidebar trip={null} />);
-    expect(screen.getByRole("status")).toHaveTextContent("Carregando");
+  // Sem viagem ainda (/trips/new) a sidebar aparece assim mesmo, com tudo
+  // pendente — é o que o hi-fi 「2 · Descoberta」 mostra.
+  it("sem viagem, mostra o cartão inteiro pendente e nenhum passo concluído", () => {
+    const { container } = render(<TripSidebar trip={null} />);
+    expect(screen.getAllByText("a definir")).toHaveLength(5);
+    expect(container.querySelectorAll(".side__fact--pending")).toHaveLength(5);
+    expect(container.querySelectorAll(".farol-stepnav__item--done")).toHaveLength(0);
   });
 
   it("navega pelos passos já concluídos", async () => {

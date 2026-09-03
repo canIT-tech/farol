@@ -125,17 +125,19 @@ export function HotelSection({
   section,
   onSelect,
   busy = false,
-  itineraryItems = []
+  itineraryItems = [],
+  title = "Hospedagem"
 }: {
   section: ProviderSection<HotelOffer>;
   onSelect: (offerId: string) => void;
   busy?: boolean;
   /** Paradas do roteiro, para dizer quantas ficam a pé de cada hotel. */
   itineraryItems?: ItineraryItem[];
+  title?: string;
 }) {
   return (
     <Section
-      title="Hospedagem"
+      title={title}
       section={section}
       empty="Nenhuma hospedagem encontrada para estas datas."
     >
