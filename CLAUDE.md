@@ -147,7 +147,7 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - `packages/providers/**/__fixtures__/*.json` — escritas à mão (ver Pendências).
 - `apps/web` ainda **não** tem as telas de roteiro/voo/hotel ligadas ao `apps/api` (é o Passo 8); o "polling no web" citado no título do Passo 4 não foi implementado — a rota `GET /trips/:id/itinerary` já devolve `status: pending`, falta o front.
 - `packages/ui/src/AdvisorChat/AdvisorChat.tsx:26` — warning de `Unused eslint-disable directive` (pré-existente, Passo 9). Não quebra o CI (`eslint` sem `--max-warnings 0`).
-- `apps/api` mutação ~94,6% (equivalentes de `extractJson*` — `start === -1` vs `end <= start` — e strings de erro/prompt); documentado, dentro do break 90.
+- `apps/api` mutação **92,09%** e `@farol/providers` **96,81%** (medidos em 2026-09-02, depois do Passo 10). Sobreviventes são equivalentes de `extractJson*` (`start === -1` vs `end <= start`) e strings de erro/prompt; documentado, dentro do break 90.
 
 ## Pendências abertas (do PRD / design técnico)
 
