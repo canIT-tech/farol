@@ -148,7 +148,7 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - `packages/providers/**/__fixtures__/*.json` — escritas à mão (ver Pendências).
 - ~~`apps/web` sem as telas de roteiro/voo/hotel ligadas à api~~ — resolvido nos Passos 8 e 10. A tela **5 · Voo & hotel** do hi-fi está completa na parte de voos (cartão, abas, subtítulo, idade do preço, aeroportos vizinhos, contexto de preço). A metade de **hotel** ainda é lista simples: o hi-fi pede cartão com foto, bairro e distância a pé do roteiro — e não há provider de hotel (ver débito).
 - `packages/ui/src/AdvisorChat/AdvisorChat.tsx:26` — warning de `Unused eslint-disable directive` (pré-existente, Passo 9). Não quebra o CI (`eslint` sem `--max-warnings 0`).
-- Mutação medida em 2026-09-02, depois do Passo 10: `@farol/providers` **96,81%** · `@farol/web` **93,97%** · `@farol/ui` **93,56%** · `@farol/api` **92,65%** · `@farol/shared` **97,90%**. Sobreviventes da api são equivalentes de `extractJson*` (`start === -1` vs `end <= start`) e strings de erro/prompt; documentado, dentro do break 90.
+- Mutação medida em 2026-09-03, com voo e hotel completos: `@farol/shared` **97,22%** · `@farol/providers` **95,87%** · `@farol/ui` **93,61%** · `@farol/api` **92,11%** · `@farol/web` **91,99%**. Sobreviventes da api são equivalentes de `extractJson*` (`start === -1` vs `end <= start`) e strings de erro/prompt; documentado, dentro do break 90.
 
 ## Pendências abertas (do PRD / design técnico)
 
