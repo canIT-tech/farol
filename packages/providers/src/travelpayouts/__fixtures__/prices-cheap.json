@@ -1,0 +1,19 @@
+{
+    "data": {
+        "SAO": {
+            "0": {
+                "airline": "LA",
+                "departure_at": "2026-09-17T09:50:00-03:00",
+                "return_at": "2026-09-21T07:05:00-03:00",
+                "expires_at": "2026-09-03T01:22:22Z",
+                "price": 1097,
+                "flight_number": 3279,
+                "duration": 190,
+                "duration_to": 90,
+                "duration_back": 100
+            }
+        }
+    },
+    "currency": "brl",
+    "success": true
+}

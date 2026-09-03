@@ -25,7 +25,7 @@ export const flightOfferSchema = z.object({
   departAt: z.string().min(1),
   arriveAt: z.string().min(1),
   returnAt: z.string().min(1).nullable(),
-  durationMinutes: z.number().int().positive(),
+  durationMinutes: z.number().int().min(0),
   deepLink: z.string().url()
 });
 export type FlightOffer = z.infer<typeof flightOfferSchema>;

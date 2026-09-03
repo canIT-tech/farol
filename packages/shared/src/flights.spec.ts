@@ -83,8 +83,12 @@ describe("flightOfferSchema", () => {
     expect(() => flightOfferSchema.parse({ ...baseOffer, price: 0 })).toThrow();
   });
 
-  it("rejeita durationMinutes não-positivo ou fracionário", () => {
-    expect(() => flightOfferSchema.parse({ ...baseOffer, durationMinutes: 0 })).toThrow();
+  it("aceita durationMinutes zero — o cache do Travelpayouts nem sempre traz duração", () => {
+    expect(flightOfferSchema.parse({ ...baseOffer, durationMinutes: 0 }).durationMinutes).toBe(0);
+  });
+
+  it("rejeita durationMinutes negativo ou fracionário", () => {
+    expect(() => flightOfferSchema.parse({ ...baseOffer, durationMinutes: -1 })).toThrow();
     expect(() => flightOfferSchema.parse({ ...baseOffer, durationMinutes: 12.5 })).toThrow();
   });
 

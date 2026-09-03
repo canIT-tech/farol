@@ -1,0 +1,58 @@
+[
+  {
+    "name_translations": {
+      "en": "LATAM Airlines Brasil"
+    },
+    "code": "JJ",
+    "name": "LATAM Airlines Brasil",
+    "is_lowcost": false
+  },
+  {
+    "name_translations": {
+      "en": "Gol Transportes Aéreos"
+    },
+    "code": "G3",
+    "name": "Gol Transportes Aéreos",
+    "is_lowcost": true
+  },
+  {
+    "name_translations": {
+      "en": "Avianca Brazil"
+    },
+    "code": "O6",
+    "name": "Avianca Brazil",
+    "is_lowcost": false
+  },
+  {
+    "name_translations": {
+      "en": "TAP Air Portugal"
+    },
+    "code": "TP",
+    "name": "TAP Air Portugal",
+    "is_lowcost": false
+  },
+  {
+    "name_translations": {
+      "en": "American Airlines"
+    },
+    "code": "AA",
+    "name": "American Airlines",
+    "is_lowcost": false
+  },
+  {
+    "name_translations": {
+      "en": "Azul Airlines"
+    },
+    "code": "AD",
+    "name": "Azul Airlines",
+    "is_lowcost": true
+  },
+  {
+    "name_translations": {
+      "en": "LATAM Airlines Group"
+    },
+    "code": "LA",
+    "name": "LATAM Airlines Group",
+    "is_lowcost": false
+  }
+]

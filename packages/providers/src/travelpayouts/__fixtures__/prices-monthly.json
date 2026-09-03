@@ -1,0 +1,50 @@
+{
+    "data": {
+        "2026-09": {
+            "origin": "SAO",
+            "destination": "BSB",
+            "airline": "G3",
+            "departure_at": "2026-09-26T08:40:00-03:00",
+            "return_at": "2026-09-29T11:30:00-03:00",
+            "expires_at": "2026-09-03T01:22:23Z",
+            "price": 760,
+            "flight_number": 1456,
+            "transfers": 0
+        },
+        "2026-10": {
+            "origin": "SAO",
+            "destination": "BSB",
+            "airline": "LA",
+            "departure_at": "2026-10-11T07:25:00-03:00",
+            "return_at": "2026-10-17T03:15:00-03:00",
+            "expires_at": "2026-09-03T01:22:23Z",
+            "price": 840,
+            "flight_number": 4676,
+            "transfers": 0
+        },
+        "2026-12": {
+            "origin": "SAO",
+            "destination": "BSB",
+            "airline": "G3",
+            "departure_at": "2026-12-30T21:40:00-03:00",
+            "return_at": "2027-01-02T08:40:00-03:00",
+            "expires_at": "2026-09-03T01:22:23Z",
+            "price": 603,
+            "flight_number": 1462,
+            "transfers": 0
+        },
+        "2027-01": {
+            "origin": "SAO",
+            "destination": "BSB",
+            "airline": "G3",
+            "departure_at": "2027-01-21T06:00:00-03:00",
+            "return_at": "2027-01-24T06:35:00-03:00",
+            "expires_at": "2026-09-03T01:22:23Z",
+            "price": 529,
+            "flight_number": 1454,
+            "transfers": 0
+        }
+    },
+    "currency": "BRL",
+    "success": true
+}

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { createAmadeusHttp, AmadeusHttpError, isRetryableStatus } from "./http.js";
+import { createAmadeusHttp, AmadeusHttpError } from "./http.js";
 
 function jsonRes(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -37,16 +37,6 @@ const baseCfg = {
   now: () => 0
 };
 
-describe("isRetryableStatus", () => {
-  it("retenta em 429 e 5xx, não em 4xx comuns", () => {
-    expect(isRetryableStatus(429)).toBe(true);
-    expect(isRetryableStatus(503)).toBe(true);
-    expect(isRetryableStatus(500)).toBe(true);
-    expect(isRetryableStatus(400)).toBe(false);
-    expect(isRetryableStatus(404)).toBe(false);
-    expect(isRetryableStatus(200)).toBe(false);
-  });
-});
 
 describe("createAmadeusHttp", () => {
   it("monta com os defaults quando só recebe as credenciais", () => {

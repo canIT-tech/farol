@@ -1,5 +1,5 @@
 import { hotelOfferSchema, type HotelOffer } from "@farol/shared";
-import { fillTemplate } from "./deep-link.js";
+import { fillTemplate } from "../template.js";
 
 const MS_PER_DAY = 86_400_000;
 const MIN_RATING = 1;

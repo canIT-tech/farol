@@ -1,6 +1,7 @@
 import pRetry from "p-retry";
 import { AmadeusAuth } from "./amadeus-auth.js";
 import { CircuitBreaker } from "../http/circuit-breaker.js";
+import { isRetryableStatus } from "../http/retry.js";
 
 export interface AmadeusHttpConfig {
   baseUrl: string;
@@ -22,12 +23,6 @@ export class AmadeusHttpError extends Error {
     super(`Amadeus respondeu ${status}`);
     this.name = "AmadeusHttpError";
   }
-}
-
-const RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
-
-export function isRetryableStatus(status: number): boolean {
-  return RETRYABLE_STATUS.has(status);
 }
 
 export interface AmadeusHttp {
