@@ -179,7 +179,7 @@ Backlog de implementação. Ordem = dependência. Puxe pelo número.
 | 7 | Chat IA — `ChatModule`, loop de tool-calling, as 11 tools mapeadas para serviços, `chat_messages` | ✅ concluído | felippebutland | — | 4, 5, 6 | (2026-08-31) |
 | 8 | UI web + E2E — telas ligadas ao `apps/api`, fluxo Playwright login→onboarding→descoberta→destino→roteiro | ✅ concluído | rafaignaulin | — | 7 | (2026-09-02) |
 | 9 | `packages/ui` — implementar tokens (`docs/design-system.md`) + componentes base (`Button`, `TextField`, `Chip`, `MatchBadge`, `DestinationCard`, `AppShell`, `StepNav`, `AdvisorChat`) | ✅ concluído | felippebutland | — | 1 | (2026-08-28) |
-| 10 | Migração do provider voo/hotel — Amadeus (descontinuado) → **Travelpayouts**. Trocar `Amadeus*Provider` por `Travelpayouts*Provider`, sem OAuth, `marker` de afiliado no deep-link, regravar fixtures, envs. Spec: `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` | 🟢 livre | — | — | 5 |
+| 10 | Migração do provider voo/hotel — Amadeus (descontinuado) → **Travelpayouts**. Trocar `Amadeus*Provider` por `Travelpayouts*Provider`, sem OAuth, `marker` de afiliado no deep-link, regravar fixtures, envs. Spec: `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` | 🟡 em andamento | felippebutland | `felippebutland/passo-10-travelpayouts` | 5 | (2026-09-02) |
 | 11 | Pagamento — `PaymentModule` + webhook Stripe, ledger de crédito, gate no `itinerary.generate`. Spec: `docs/negocio/2026-08-31-spec-pagamento.md` | 🟢 livre | — | — | 4 · cadastro Stripe |
 
 Legenda de status: 🟢 livre · 🟡 em andamento · ✅ concluído · 🔴 bloqueado.
