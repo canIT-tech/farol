@@ -76,6 +76,10 @@ export function AutoForm({
           onChange={(budgetTotal) => patch({ budgetTotal })}
           formatValue={brl}
         />
+        <div className="auto-scale">
+          <span>{brl(BUDGET_MIN)}</span>
+          <span>{`${brl(BUDGET_MAX)}+`}</span>
+        </div>
       </div>
 
       <fieldset className="screen__row">

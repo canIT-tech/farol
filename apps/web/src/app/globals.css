@@ -160,7 +160,9 @@ p {
 }
 
 /* ---- section rhythm ---- */
-section {
+/* Escopado à landing: `section` cru pegava também as telas do app, que usam
+   <section> como bloco de conteúdo e ganhavam 96px de respiro fantasma. */
+.landing section {
   padding-block: clamp(3.25rem, 2rem + 5vw, 6rem);
 }
 

@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { Chip, DestinationCard } from "@farol/ui";
 import type { DestinationCandidate } from "@farol/shared";
-import { arrangeDestinations, type DestinationSort } from "../../lib/destination-filters";
+import {
+  arrangeDestinations,
+  matchPercent,
+  type DestinationSort
+} from "../../lib/destination-filters";
 import { money } from "../../lib/money";
 
 export function stopsLabel(stops: number): string {
@@ -88,7 +92,7 @@ export function DestinationResults({
               <DestinationCard
                 city={candidate.city}
                 country={candidate.country}
-                matchValue={candidate.score}
+                matchValue={matchPercent(candidate.score)}
                 rationale={candidate.rationale}
                 stats={stats(candidate)}
                 featured={index === 0}

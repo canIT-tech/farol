@@ -40,14 +40,14 @@ test("com sessão: landing → Minhas viagens → Continuar → Sair", async ({ 
 
   await expect(page.getByRole("heading", { name: "Minhas viagens" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Saindo de GRU" })).toBeVisible();
-  await expect(page.getByText("2026-09 · 7 dias")).toBeVisible();
+  await expect(page.getByText("set 2026 · 7 dias")).toBeVisible();
 
   await page.getByRole("button", { name: "Continuar" }).click();
   await page.waitForURL(`**/trips/${TRIP_ID}/discovery`);
   await expect(page.getByRole("link", { name: "Minhas viagens" })).toHaveAttribute("href", "/trips");
 
   await page.getByRole("button", { name: "Sair" }).click();
-  await page.waitForURL("http://localhost:3000/");
+  await page.waitForURL(/\/$/);
   await expect(page.getByRole("link", { name: "Entrar", exact: true })).toBeVisible();
 });
 
@@ -61,7 +61,7 @@ test("sem perfil de gosto, Minhas viagens manda para o onboarding", async ({ pag
 
   await page.goto("/trips");
   await page.waitForURL("**/onboarding");
-  await expect(page.getByRole("heading", { name: "Seu perfil de viagem" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "O que te move numa viagem?" })).toBeVisible();
 });
 
 test("quem já tem sessão não vê o login", async ({ page }) => {

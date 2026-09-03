@@ -4,6 +4,7 @@ import "./sidebar.css";
 import { StepNav, type Step } from "@farol/ui";
 import type { TripState } from "@farol/shared";
 import { BrandMark } from "./common/BrandHeader";
+import { dayPillDate, monthShort } from "../lib/booking-summary";
 
 const UNDEFINED_LABEL = "a definir";
 
@@ -11,6 +12,9 @@ const UNDEFINED_LABEL = "a definir";
 // destino → Roteiro → Voo & hotel. Os ids são os segmentos de rota em
 // /trips/:id/<id>; "profile" é a exceção e vai para /onboarding (TripShell).
 // Quem já tem viagem passou pelo perfil, então ele está sempre concluído.
+// Quem chega em qualquer tela do fluxo já passou pelo perfil de gosto — sem
+// ele a descoberta nem roda. Viagem ainda não criada (/trips/new) está em
+// "Escolher destino", que é exatamente o que a tela faz.
 export function tripSteps(trip: TripState | null): Step[] {
   const hasChosen = trip?.chosenDestination != null;
 
@@ -19,17 +23,18 @@ export function tripSteps(trip: TripState | null): Step[] {
     { id: "discovery", label: "Escolher destino", state: hasChosen ? "done" : "current" },
     { id: "itinerary", label: "Roteiro", state: hasChosen ? "done" : "todo" },
     { id: "booking", label: "Voo & hotel", state: hasChosen ? "current" : "todo" }
-  ].map((step) => (trip === null ? { ...step, state: "todo" as const } : step)) as Step[];
+  ] as Step[];
 }
 
 export function periodLabel(
   trip: Pick<TripState, "dateStart" | "dateEnd" | "targetMonth" | "durationDays">
 ): string {
   if (trip.dateStart !== null && trip.dateEnd !== null) {
-    return `${trip.dateStart} → ${trip.dateEnd}`;
+    // Data crua ("2026-05-10 → 2026-05-17") é ilegível na sidebar estreita.
+    return `${dayPillDate(trip.dateStart)} – ${dayPillDate(trip.dateEnd)} ${trip.dateEnd.slice(0, 4)}`;
   }
   if (trip.targetMonth !== null && trip.durationDays !== null) {
-    return `${trip.targetMonth} · ${trip.durationDays} dias`;
+    return `${monthShort(trip.targetMonth)} · ${trip.durationDays} dias`;
   }
   return UNDEFINED_LABEL;
 }

@@ -85,7 +85,7 @@ describe("DiscoveryForm", () => {
     render(<DiscoveryForm onSubmit={onSubmit} />);
     await preencherPorMes(user);
     // input[type=range] não aceita type(); o evento de mudança é o caminho.
-    fireEvent.change(screen.getByLabelText("Orçamento total"), { target: { value: "20000" } });
+    fireEvent.change(screen.getByLabelText(/Orçamento total/), { target: { value: "20000" } });
     await user.click(screen.getByRole("button", { name: /Buscar destinos/ }));
     expect(onSubmit.mock.calls[0]![0]!.budgetTotal).toBe(20_000);
   });

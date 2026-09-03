@@ -67,3 +67,8 @@ export function itinerarySubtitle(trip: TripState | null, party: string | null):
 export function dayPillDate(isoDate: string | null): string | null {
   return isoDate === null ? null : `${day(isoDate)} ${MONTHS[Number(isoDate.slice(5, 7)) - 1]!.slice(0, 3)}`;
 }
+
+// "2026-09" → "set 2026". O mês ISO cru não se lê na sidebar.
+export function monthShort(targetMonth: string): string {
+  return `${MONTHS[Number(targetMonth.slice(5, 7)) - 1]!.slice(0, 3)} ${targetMonth.slice(0, 4)}`;
+}

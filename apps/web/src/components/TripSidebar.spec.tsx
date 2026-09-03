@@ -65,8 +65,10 @@ describe("tripSteps", () => {
     expect(steps.map((s) => s.state)).toEqual(["done", "done", "done", "current"]);
   });
 
-  it("sem viagem devolve tudo a fazer", () => {
-    expect(tripSteps(null).every((s) => s.state === "todo")).toBe(true);
+  // /trips/new: a viagem ainda não existe, mas o perfil de gosto já ficou para
+  // trás — sem ele a descoberta nem roda.
+  it("sem viagem, o perfil está concluído e a etapa atual é escolher destino", () => {
+    expect(tripSteps(null).map((s) => s.state)).toEqual(["done", "current", "todo", "todo"]);
   });
 });
 
@@ -74,7 +76,7 @@ describe("TripSidebar", () => {
   it("mostra origem, período, viajantes e orçamento", () => {
     render(<TripSidebar trip={base} />);
     expect(screen.getByText("GRU")).toBeInTheDocument();
-    expect(screen.getByText("2026-09 · 7 dias")).toBeInTheDocument();
+    expect(screen.getByText("set 2026 · 7 dias")).toBeInTheDocument();
     expect(screen.getByText("2 adultos · 1 criança")).toBeInTheDocument();
     expect(screen.getByText(/12\.000/)).toBeInTheDocument();
   });
@@ -85,7 +87,7 @@ describe("TripSidebar", () => {
         trip={{ ...base, dateStart: "2026-09-10", dateEnd: "2026-09-17", targetMonth: null, durationDays: null }}
       />
     );
-    expect(screen.getByText("2026-09-10 → 2026-09-17")).toBeInTheDocument();
+    expect(screen.getByText("10 set – 17 set 2026")).toBeInTheDocument();
   });
 
   it("singular de adulto e ausência de criança", () => {
@@ -120,7 +122,12 @@ describe("TripSidebar", () => {
     const { container } = render(<TripSidebar trip={null} />);
     expect(screen.getAllByText("a definir")).toHaveLength(5);
     expect(container.querySelectorAll(".side__fact--pending")).toHaveLength(5);
-    expect(container.querySelectorAll(".farol-stepnav__item--done")).toHaveLength(0);
+    // O perfil de gosto já ficou para trás; a etapa atual é escolher o destino.
+    expect(container.querySelectorAll(".farol-stepnav__item--done")).toHaveLength(1);
+    expect(screen.getByText("Escolher destino").closest("li")).toHaveAttribute(
+      "aria-current",
+      "step"
+    );
   });
 
   it("navega pelos passos já concluídos", async () => {

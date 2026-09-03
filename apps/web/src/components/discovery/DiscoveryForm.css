@@ -18,3 +18,64 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Alternador de modo abaixo do campo de datas, como no hi-fi: é um ajuste do
+   campo acima, não uma pergunta separada. */
+.df-toggle {
+  display: inline-flex;
+  margin-top: 10px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.df-toggle__item {
+  padding: 8px 14px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.df-toggle__item:hover {
+  background: var(--surface-sunk);
+}
+
+.df-toggle__item--on,
+.df-toggle__item--on:hover {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+/* Extremos do orçamento, para o valor do meio ter referência. */
+.df-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 9px;
+  font-size: 11.5px;
+  color: var(--text-faint);
+}
+
+/* Campo de mês vazio mostra "--------- ----" no Chrome; o rótulo já diz o que
+   é. O indicador nativo cobre o campo inteiro, então o clique segue abrindo o
+   seletor em qualquer ponto. */
+.df-grid .farol-field__control {
+  position: relative;
+}
+
+.df-grid input[type="month"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.df-grid input[type="month"]:not(:focus):invalid::-webkit-datetime-edit {
+  color: transparent;
+}

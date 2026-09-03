@@ -66,11 +66,10 @@ button.farol-stepnav__link:focus-visible {
   height: 9px;
 }
 
+/* `background: currentColor` junto de `color: var(--surface)` pinta o círculo
+   de branco sobre fundo claro — o visto some. A cor do preenchimento é fixa. */
 .farol-stepnav__item--done .farol-stepnav__marker {
-  background: currentColor;
-  color: var(--surface);
-}
-
-.farol-stepnav__item--done .farol-stepnav__marker svg {
+  background: var(--ink-muted);
+  border-color: var(--ink-muted);
   color: var(--surface);
 }

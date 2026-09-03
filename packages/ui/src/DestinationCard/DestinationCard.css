@@ -34,8 +34,9 @@
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 15px;
-  color: var(--on-accent);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  /* Sem foto o fundo é claro: texto branco com sombra some. O nome aqui é
+     ornamento — quem lê de fato é o título logo abaixo. */
+  color: var(--text-faint);
   background: linear-gradient(155deg, var(--surface-sunk), var(--field-border));
 }
 
@@ -93,9 +94,16 @@
   font-size: 12px;
 }
 
+/* dt e dd em linha ficam colados ("Voo estimadoR$ 3.200"): o espaço entre
+   blocos inline não sobrevive à quebra de linha do HTML. */
 .farol-dcard__stat dt {
   color: var(--text-muted);
   display: inline;
+}
+
+.farol-dcard__stat dt::after {
+  content: " ";
+  white-space: pre;
 }
 
 .farol-dcard__stat dd {

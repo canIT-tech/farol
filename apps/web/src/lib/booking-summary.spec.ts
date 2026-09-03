@@ -5,7 +5,8 @@ import {
   dateRangeLabel,
   dayPillDate,
   itinerarySubtitle,
-  itineraryTitle
+  itineraryTitle,
+  monthShort
 } from "./booking-summary";
 
 const CLOSING = "A reserva é concluída no site do parceiro.";
@@ -136,5 +137,15 @@ describe("dayPillDate", () => {
 
   it("dia sem data não mostra nada", () => {
     expect(dayPillDate(null)).toBeNull();
+  });
+});
+
+describe("monthShort", () => {
+  it("abrevia o mês e mantém o ano", () => {
+    expect(monthShort("2026-09")).toBe("set 2026");
+  });
+
+  it("funciona em janeiro", () => {
+    expect(monthShort("2027-01")).toBe("jan 2027");
   });
 });

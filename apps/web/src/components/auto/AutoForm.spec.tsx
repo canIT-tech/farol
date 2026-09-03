@@ -60,7 +60,7 @@ describe("AutoForm", () => {
     const onSubmit = vi.fn();
     render(<AutoForm onSubmit={onSubmit} />);
     await preencher(user);
-    fireEvent.change(screen.getByLabelText("Orçamento total"), { target: { value: "20000" } });
+    fireEvent.change(screen.getByLabelText(/Orçamento total/), { target: { value: "20000" } });
     await user.click(screen.getByRole("button", { name: /Montar minha viagem/ }));
 
     expect(onSubmit.mock.calls[0]![0]).toEqual({

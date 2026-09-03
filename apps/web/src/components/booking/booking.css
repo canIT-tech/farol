@@ -28,6 +28,23 @@
   list-style: none;
 }
 
+/* O cartão de hotel é desenhado para grade (foto no topo, 118px). Numa lista
+   de coluna ele ocupa a largura inteira e a foto estica. */
+.bk-hotels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (max-width: 900px) {
+  .bk-hotels {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Aviso de preço aproximado e idade do cache: presente, mas discreto. */
 .bk-note {
   font-size: 12px;
@@ -49,6 +66,7 @@
 
 .bk-context {
   margin-top: 8px;
+  margin-bottom: 34px;
   padding-top: 28px;
   border-top: 1px solid var(--line);
 }

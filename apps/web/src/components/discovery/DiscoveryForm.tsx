@@ -15,7 +15,6 @@ import {
   toTripInput,
   type DiscoveryFormState
 } from "../../lib/discovery-form";
-import { SegmentedControl } from "../onboarding/SegmentedControl";
 import { OriginField } from "./OriginField";
 import "./DiscoveryForm.css";
 
@@ -53,42 +52,54 @@ export function DiscoveryForm({
       }}
     >
       <div className="screen__row">
-        <div className="screen__label">De onde você sai</div>
         <OriginField value={state.originIata} onChange={(originIata) => patch({ originIata })} />
       </div>
 
-      <SegmentedControl
-        label="Quando"
-        options={MODE_OPTIONS}
-        value={state.mode}
-        onChange={(mode) => patch({ mode: mode as DiscoveryFormState["mode"] })}
-      />
-
-      <div className="screen__row df-grid">
-        {state.mode === "exact" ? (
-          <DateRangeField
-            label="Datas"
-            start={state.dateStart}
-            end={state.dateEnd}
-            onChange={({ start, end }) => patch({ dateStart: start, dateEnd: end })}
-          />
-        ) : (
-          <>
-            <TextField
-              label="Mês"
-              type="month"
-              value={state.targetMonth}
-              onChange={(targetMonth) => patch({ targetMonth })}
+      <div className="screen__row">
+        <div className="screen__label">Quando</div>
+        <div className="df-grid">
+          {state.mode === "exact" ? (
+            <DateRangeField
+              label="Datas"
+              start={state.dateStart}
+              end={state.dateEnd}
+              onChange={({ start, end }) => patch({ dateStart: start, dateEnd: end })}
             />
-            <Stepper
-              label="Dias de viagem"
-              value={state.durationDays}
-              min={DURATION_MIN}
-              max={DURATION_MAX}
-              onChange={(durationDays) => patch({ durationDays })}
-            />
-          </>
-        )}
+          ) : (
+            <>
+              <TextField
+                label="Mês"
+                type="month"
+                required
+                value={state.targetMonth}
+                onChange={(targetMonth) => patch({ targetMonth })}
+              />
+              <Stepper
+                label="Dias de viagem"
+                value={state.durationDays}
+                min={DURATION_MIN}
+                max={DURATION_MAX}
+                onChange={(durationDays) => patch({ durationDays })}
+              />
+            </>
+          )}
+        </div>
+        <div className="df-toggle">
+          {MODE_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              role="radio"
+              aria-checked={state.mode === option.value}
+              className={
+                state.mode === option.value ? "df-toggle__item df-toggle__item--on" : "df-toggle__item"
+              }
+              onClick={() => patch({ mode: option.value as DiscoveryFormState["mode"] })}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="screen__row df-grid">
@@ -110,7 +121,7 @@ export function DiscoveryForm({
 
       <div className="screen__row">
         <Slider
-          label="Orçamento total"
+          label="Orçamento total (voo + hospedagem + gastos locais)"
           value={state.budgetTotal}
           min={BUDGET_MIN}
           max={BUDGET_MAX}
@@ -118,6 +129,10 @@ export function DiscoveryForm({
           onChange={(budgetTotal) => patch({ budgetTotal })}
           formatValue={brl}
         />
+        <div className="df-scale">
+          <span>{brl(BUDGET_MIN)}</span>
+          <span>{`${brl(BUDGET_MAX)}+`}</span>
+        </div>
       </div>
 
       <p className="screen__hint">

@@ -141,7 +141,7 @@ export function HotelSection({
       section={section}
       empty="Nenhuma hospedagem encontrada para estas datas."
     >
-      <ul className="bk-list">
+      <ul className="bk-hotels">
         {section.offers.map((offer) => (
           <li key={offer.id}>
             <HotelOfferCard
