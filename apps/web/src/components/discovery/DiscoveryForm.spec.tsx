@@ -26,14 +26,14 @@ describe("DiscoveryForm", () => {
     render(<DiscoveryForm onSubmit={vi.fn()} />);
     expect(screen.getByLabelText("Mês")).toBeInTheDocument();
     expect(screen.getByLabelText("Dias de viagem")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Ida")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Datas/ })).not.toBeInTheDocument();
   });
 
   it("o toggle troca para datas exatas", async () => {
     const user = userEvent.setup();
     render(<DiscoveryForm onSubmit={vi.fn()} />);
     await user.click(screen.getByRole("radio", { name: "Datas exatas" }));
-    expect(screen.getByLabelText("Ida")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Datas/ })).toBeInTheDocument();
     expect(screen.queryByLabelText("Mês")).not.toBeInTheDocument();
   });
 
@@ -64,8 +64,13 @@ describe("DiscoveryForm", () => {
     render(<DiscoveryForm onSubmit={onSubmit} />);
     await user.type(screen.getByLabelText("Saindo de"), "GRU");
     await user.click(screen.getByRole("radio", { name: "Datas exatas" }));
-    await user.type(screen.getByLabelText("Ida"), "2026-09-10");
-    await user.type(screen.getByLabelText("Volta"), "2026-09-17");
+    // O calendário abre em janeiro de 2026; setembro fica 8 meses à frente.
+    await user.click(screen.getByRole("button", { name: /Datas/ }));
+    for (let i = 0; i < 8; i += 1) {
+      await user.click(screen.getByRole("button", { name: "Próximo mês" }));
+    }
+    await user.click(screen.getByRole("gridcell", { name: "10" }));
+    await user.click(screen.getByRole("gridcell", { name: "17" }));
     await user.click(screen.getByRole("button", { name: /Buscar destinos/ }));
 
     expect(onSubmit.mock.calls[0]![0]).toMatchObject({

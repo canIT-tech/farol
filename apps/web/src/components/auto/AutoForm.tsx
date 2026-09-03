@@ -53,8 +53,8 @@ export function AutoForm({
         }
       }}
     >
-      <div className="auto-row">
-        <div className="auto-row__label">Quando &amp; de onde</div>
+      <div className="screen__row">
+        <div className="screen__label">Quando &amp; de onde</div>
         <div className="auto-two">
           <DateRangeField
             label="Quando"
@@ -66,7 +66,7 @@ export function AutoForm({
         </div>
       </div>
 
-      <div className="auto-row">
+      <div className="screen__row">
         <Slider
           label="Orçamento total"
           value={state.budgetTotal}
@@ -78,8 +78,8 @@ export function AutoForm({
         />
       </div>
 
-      <fieldset className="auto-row">
-        <legend className="auto-row__label">
+      <fieldset className="screen__row">
+        <legend className="screen__label">
           O que você curte <span>— até {MAX_AUTO_INTERESTS}</span>
         </legend>
         <div className="auto-chips" role="group" aria-label="Gostos">
@@ -94,7 +94,7 @@ export function AutoForm({
             </Chip>
           ))}
         </div>
-        <p className="auto-hint" aria-live="polite">
+        <p className="screen__hint" aria-live="polite">
           {`${state.interests.length} de ${MAX_AUTO_INTERESTS} — é só um empurrão inicial. O plano se ajusta depois conforme você reage a ele.`}
         </p>
       </fieldset>

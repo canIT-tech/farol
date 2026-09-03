@@ -1,0 +1,149 @@
+/* Tela 「1 · Onboarding de gosto」 (docs/design/app/Onboarding.dc.html).
+   Coluna de 760px — mais larga que a de /auto porque o miolo é uma grade de
+   três colunas de interesses. */
+
+/* ── grade de interesses ─────────────────────────────────────────────────── */
+
+.ob-tiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ob-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 92px;
+  padding: 18px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font: inherit;
+  color: var(--ink-muted);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast) var(--ease),
+    background var(--motion-fast) var(--ease);
+}
+
+.ob-tile:hover {
+  border-color: var(--accent-border);
+}
+
+.ob-tile:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+.ob-tile--on {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+
+.ob-tile__icon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+
+.ob-tile__label {
+  font-size: 14.5px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.ob-tile__check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* ── segmentado e pills ──────────────────────────────────────────────────── */
+
+.ob-seg {
+  display: inline-flex;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.ob-seg__item {
+  padding: 11px 20px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.ob-seg__item:last-child {
+  border-right: 0;
+}
+
+.ob-seg__item:hover {
+  background: var(--surface-sunk);
+}
+
+.ob-seg__item--on {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.ob-seg__item--on:hover {
+  background: var(--ink);
+}
+
+.ob-pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ob-pill {
+  padding: 10px 18px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font: inherit;
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.ob-pill:hover {
+  border-color: var(--accent-border);
+}
+
+.ob-pill--on {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+  font-weight: 500;
+}
+
+@media (max-width: 680px) {
+  .ob-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ob-seg {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}

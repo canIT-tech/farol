@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import "@farol/ui/tokens.css";
+import "../styles/screen.css";
 import "./globals.css";
 
 export const metadata = {

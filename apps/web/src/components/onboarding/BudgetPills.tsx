@@ -26,6 +26,7 @@ export function BudgetPills({
   return (
     <SegmentedControl
       label="Orçamento por pessoa"
+      variant="pills"
       options={options}
       value={value}
       onChange={onChange}

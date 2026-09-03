@@ -2,7 +2,10 @@
 
 import { type FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button, TextField } from "@farol/ui";
+import { BrandHeader } from "../../components/common/BrandHeader";
 import { getSupabaseBrowserClient } from "../../lib/supabase";
+import "./login.css";
 
 // Depois de entrar a pessoa cai em /trips, que manda para o onboarding se ainda
 // não houver perfil de gosto. Quem já tem sessão nem vê esta tela.
@@ -44,27 +47,46 @@ export default function LoginPage() {
   }
 
   return (
-    <main>
-      <h1>Entrar no Farol</h1>
+    <main className="screen login">
+      <BrandHeader />
 
-      <button type="button" onClick={signInWithGoogle}>
-        Entrar com Google
-      </button>
+      <div className="screen__card">
+        <h1 className="screen__title">Entrar no Farol</h1>
+        <p className="screen__sub">
+          Seu roteiro, suas viagens salvas e o assessor continuam de onde pararam.
+        </p>
 
-      <form onSubmit={signInWithEmail}>
-        <label htmlFor="email">E-mail</label>
-        <input
-          id="email"
-          type="email"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-        />
-        <button type="submit">Enviar link mágico</button>
-      </form>
+        <Button type="button" size="lg" variant="ghost" onClick={() => void signInWithGoogle()}>
+          Entrar com Google
+        </Button>
 
-      {sent ? <p role="status">Link enviado. Confira seu e-mail.</p> : null}
-      {error ? <p role="alert">{error}</p> : null}
+        <p className="login__or">ou</p>
+
+        <form className="login__form" onSubmit={signInWithEmail}>
+          <TextField
+            label="E-mail"
+            type="email"
+            required
+            placeholder="voce@exemplo.com"
+            value={email}
+            onChange={setEmail}
+          />
+          <Button type="submit" size="lg">
+            Enviar link mágico
+          </Button>
+        </form>
+
+        {sent ? (
+          <p className="screen__status" role="status">
+            Link enviado. Confira seu e-mail.
+          </p>
+        ) : null}
+        {error ? (
+          <p className="screen__error" role="alert">
+            {error}
+          </p>
+        ) : null}
+      </div>
     </main>
   );
 }

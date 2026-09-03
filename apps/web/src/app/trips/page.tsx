@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { tasteProfileSchema, type Trip } from "@farol/shared";
+import { Button } from "@farol/ui";
 import { AuthGate } from "../../components/AuthGate";
+import { BrandHeader } from "../../components/common/BrandHeader";
+import "./trips.css";
 import { budgetLabel, partyLabel, periodLabel } from "../../components/TripSidebar";
 import { apiFetch } from "../../lib/api-client";
 import { signOut } from "../../lib/session";
@@ -55,56 +58,89 @@ function Home({ token }: { token: string }) {
   }
 
   return (
-    <main>
-      <header>
-        <h1>Minhas viagens</h1>
-        <nav aria-label="Ações">
-          <button type="button" onClick={() => router.push("/trips/new")}>
-            Nova viagem
-          </button>
-          <button type="button" onClick={() => router.push("/auto")}>
-            Modo autônomo
-          </button>
-          <button type="button" onClick={() => router.push("/onboarding")}>
+    <main className="screen screen--wide">
+      <BrandHeader>
+        <nav className="trips__nav" aria-label="Ações">
+          <Button type="button" variant="text" onClick={() => router.push("/onboarding")}>
             Meu perfil
-          </button>
-          <button type="button" onClick={() => void leave()}>
+          </Button>
+          <Button type="button" variant="text" onClick={() => void leave()}>
             Sair
-          </button>
+          </Button>
         </nav>
-      </header>
+      </BrandHeader>
 
-      {error !== null ? <p role="alert">{error}</p> : null}
-      {trips === null && error === null ? <p role="status">Carregando suas viagens…</p> : null}
+      <div className="screen__card">
+        <h1 className="screen__title">Minhas viagens</h1>
+        <p className="screen__sub">
+          Retome de onde parou, ou comece uma nova — do jeito que preferir.
+        </p>
 
-      {trips !== null && trips.length === 0 ? (
-        <p>Você ainda não tem viagem. Comece por uma nova ou deixe o Farol decidir no modo autônomo.</p>
-      ) : null}
+        <div className="screen__row trips__nav">
+          <Button type="button" onClick={() => router.push("/trips/new")}>
+            Nova viagem
+          </Button>
+          <Button type="button" variant="ghost" onClick={() => router.push("/auto")}>
+            Modo autônomo
+          </Button>
+        </div>
 
-      {trips !== null && trips.length > 0 ? (
-        <ul aria-label="Viagens">
-          {trips.map((trip) => (
-            <li key={trip.id}>
-              <article>
-                <h2>{tripCardTitle(trip)}</h2>
-                <dl>
-                  <dt>Período</dt>
-                  <dd>{periodLabel(trip)}</dd>
-                  <dt>Viajantes</dt>
-                  <dd>{partyLabel(trip.party)}</dd>
-                  <dt>Orçamento</dt>
-                  <dd>{budgetLabel(trip)}</dd>
-                  <dt>Status</dt>
-                  <dd>{STATUS_LABEL[trip.status]}</dd>
-                </dl>
-                <button type="button" onClick={() => router.push(tripResumeRoute(trip))}>
-                  Continuar
-                </button>
-              </article>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+        {error !== null ? (
+          <p className="screen__error" role="alert">
+            {error}
+          </p>
+        ) : null}
+        {trips === null && error === null ? (
+          <p className="screen__status" role="status">
+            Carregando suas viagens…
+          </p>
+        ) : null}
+
+        {trips !== null && trips.length === 0 ? (
+          <p className="trips__empty">
+            Você ainda não tem viagem. Comece por uma nova ou deixe o Farol decidir no modo
+            autônomo.
+          </p>
+        ) : null}
+
+        {trips !== null && trips.length > 0 ? (
+          <ul className="trips__list" aria-label="Viagens">
+            {trips.map((trip) => (
+              <li key={trip.id}>
+                <article className="trips__card">
+                  <div className="trips__card-head">
+                    <h2 className="trips__city">{tripCardTitle(trip)}</h2>
+                    <span
+                      className={
+                        trip.status === "draft"
+                          ? "trips__status"
+                          : "trips__status trips__status--planned"
+                      }
+                    >
+                      {STATUS_LABEL[trip.status]}
+                    </span>
+                  </div>
+                  <dl className="trips__facts">
+                    <dt>Período</dt>
+                    <dd>{periodLabel(trip)}</dd>
+                    <dt>Viajantes</dt>
+                    <dd>{partyLabel(trip.party)}</dd>
+                    <dt>Orçamento</dt>
+                    <dd>{budgetLabel(trip)}</dd>
+                  </dl>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => router.push(tripResumeRoute(trip))}
+                  >
+                    Continuar
+                  </Button>
+                </article>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
     </main>
   );
 }

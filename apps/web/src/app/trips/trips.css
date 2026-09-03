@@ -1,0 +1,97 @@
+/* Casa da área logada: as viagens em cartão, não em <dl> corrido. */
+
+.trips__nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.trips__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trips__card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.trips__card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.trips__city {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 19px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.trips__status {
+  flex: none;
+  font-size: 11.5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunk);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.trips__status--planned {
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+
+.trips__facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  margin: 0 0 18px;
+  font-size: 13.5px;
+}
+
+.trips__facts dt {
+  color: var(--text-faint);
+}
+
+.trips__facts dd {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.trips__card .farol-btn {
+  margin-top: auto;
+  align-self: flex-start;
+}
+
+.trips__empty {
+  padding: 32px 24px;
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+@media (max-width: 680px) {
+  .trips__list {
+    grid-template-columns: 1fr;
+  }
+}

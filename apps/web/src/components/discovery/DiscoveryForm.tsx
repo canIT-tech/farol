@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Button, Slider, Stepper, TextField } from "@farol/ui";
+import { Button, DateRangeField, Slider, Stepper, TextField } from "@farol/ui";
 import type { TripInput } from "@farol/shared";
 import {
   BUDGET_MAX,
@@ -17,6 +17,7 @@ import {
 } from "../../lib/discovery-form";
 import { SegmentedControl } from "../onboarding/SegmentedControl";
 import { OriginField } from "./OriginField";
+import "./DiscoveryForm.css";
 
 const MODE_OPTIONS = [
   { value: "month", label: "Mês aproximado" },
@@ -41,7 +42,6 @@ export function DiscoveryForm({
   const [state, setState] = useState<DiscoveryFormState>(EMPTY_DISCOVERY_FORM);
   const patch = (next: Partial<DiscoveryFormState>) => setState((s) => ({ ...s, ...next }));
 
-
   return (
     <form
       onSubmit={(event) => {
@@ -52,7 +52,10 @@ export function DiscoveryForm({
         }
       }}
     >
-      <OriginField value={state.originIata} onChange={(originIata) => patch({ originIata })} />
+      <div className="screen__row">
+        <div className="screen__label">De onde você sai</div>
+        <OriginField value={state.originIata} onChange={(originIata) => patch({ originIata })} />
+      </div>
 
       <SegmentedControl
         label="Quando"
@@ -61,69 +64,73 @@ export function DiscoveryForm({
         onChange={(mode) => patch({ mode: mode as DiscoveryFormState["mode"] })}
       />
 
-      {state.mode === "exact" ? (
-        <>
-          <TextField
-            label="Ida"
-            type="date"
-            value={state.dateStart}
-            onChange={(dateStart) => patch({ dateStart })}
+      <div className="screen__row df-grid">
+        {state.mode === "exact" ? (
+          <DateRangeField
+            label="Datas"
+            start={state.dateStart}
+            end={state.dateEnd}
+            onChange={({ start, end }) => patch({ dateStart: start, dateEnd: end })}
           />
-          <TextField
-            label="Volta"
-            type="date"
-            value={state.dateEnd}
-            onChange={(dateEnd) => patch({ dateEnd })}
-          />
-        </>
-      ) : (
-        <>
-          <TextField
-            label="Mês"
-            type="month"
-            value={state.targetMonth}
-            onChange={(targetMonth) => patch({ targetMonth })}
-          />
-          <Stepper
-            label="Dias de viagem"
-            value={state.durationDays}
-            min={DURATION_MIN}
-            max={DURATION_MAX}
-            onChange={(durationDays) => patch({ durationDays })}
-          />
-        </>
-      )}
+        ) : (
+          <>
+            <TextField
+              label="Mês"
+              type="month"
+              value={state.targetMonth}
+              onChange={(targetMonth) => patch({ targetMonth })}
+            />
+            <Stepper
+              label="Dias de viagem"
+              value={state.durationDays}
+              min={DURATION_MIN}
+              max={DURATION_MAX}
+              onChange={(durationDays) => patch({ durationDays })}
+            />
+          </>
+        )}
+      </div>
 
-      <Stepper
-        label="Adultos"
-        value={state.adults}
-        min={1}
-        max={9}
-        onChange={(adults) => patch({ adults })}
-      />
-      <Stepper
-        label="Crianças"
-        value={state.children}
-        min={0}
-        max={9}
-        onChange={(children) => patch({ children })}
-      />
+      <div className="screen__row df-grid">
+        <Stepper
+          label="Adultos"
+          value={state.adults}
+          min={1}
+          max={9}
+          onChange={(adults) => patch({ adults })}
+        />
+        <Stepper
+          label="Crianças"
+          value={state.children}
+          min={0}
+          max={9}
+          onChange={(children) => patch({ children })}
+        />
+      </div>
 
-      <Slider
-        label="Orçamento total"
-        value={state.budgetTotal}
-        min={BUDGET_MIN}
-        max={BUDGET_MAX}
-        step={BUDGET_STEP}
-        onChange={(budgetTotal) => patch({ budgetTotal })}
-        formatValue={brl}
-      />
+      <div className="screen__row">
+        <Slider
+          label="Orçamento total"
+          value={state.budgetTotal}
+          min={BUDGET_MIN}
+          max={BUDGET_MAX}
+          step={BUDGET_STEP}
+          onChange={(budgetTotal) => patch({ budgetTotal })}
+          formatValue={brl}
+        />
+      </div>
 
-      <p>
+      <p className="screen__hint">
         O roteiro usa o seu perfil de gosto. <Link href="/onboarding">Ajustar gostos</Link>
       </p>
 
-      <Button type="submit" disabled={!canSubmitDiscovery(state) || pending} loading={pending}>
+      <Button
+        type="submit"
+        size="lg"
+        className="df-cta"
+        disabled={!canSubmitDiscovery(state) || pending}
+        loading={pending}
+      >
         Buscar destinos
       </Button>
     </form>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { TripInput } from "@farol/shared";
 import { AuthGate } from "../../../components/AuthGate";
+import { BrandHeader } from "../../../components/common/BrandHeader";
 import { DiscoveryForm } from "../../../components/discovery/DiscoveryForm";
 import { createTrip, runDiscovery } from "../../../lib/trip-api";
 
@@ -26,11 +27,23 @@ function NewTrip({ token }: { token: string }) {
   }
 
   return (
-    <main>
-      <h1>Para onde vamos?</h1>
-      <p>Me diz de onde você sai, quando e quanto dá para gastar. Eu acho o destino.</p>
-      <DiscoveryForm onSubmit={(input) => void submit(input)} pending={pending} />
-      {error !== null ? <p role="alert">{error}</p> : null}
+    <main className="screen">
+      <BrandHeader>
+        <span className="screen__badge">Nova viagem</span>
+      </BrandHeader>
+
+      <div className="screen__card">
+        <h1 className="screen__title">Para onde vamos?</h1>
+        <p className="screen__sub">
+          Me diz de onde você sai, quando e quanto dá para gastar. Eu acho o destino.
+        </p>
+        <DiscoveryForm onSubmit={(input) => void submit(input)} pending={pending} />
+        {error !== null ? (
+          <p className="screen__error" role="alert">
+            {error}
+          </p>
+        ) : null}
+      </div>
     </main>
   );
 }
