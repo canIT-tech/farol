@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { z } from "zod";
-import { apiFetch, apiBase } from "./api-client";
+import { apiFetch, apiFetchPublic, apiBase } from "./api-client";
 
 const originalApiUrl = process.env.NEXT_PUBLIC_API_URL;
 afterEach(() => {
@@ -72,5 +72,29 @@ describe("apiFetch", () => {
   it("lança quando o payload não bate o schema", async () => {
     const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ id: 42 }));
     await expect(apiFetch({ path: "/x", schema, token: "t" }, fetchImpl)).rejects.toThrow();
+  });
+});
+
+describe("apiFetchPublic", () => {
+  it("chama sem Authorization e valida o payload", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ id: "x" }));
+    await expect(apiFetchPublic({ path: "/geo/whereami", schema }, fetchImpl)).resolves.toEqual({
+      id: "x"
+    });
+    expect(fetchImpl).toHaveBeenCalledWith("http://localhost:3333/api/geo/whereami", {
+      cache: "no-store"
+    });
+  });
+
+  it("lança com path e status quando a resposta não é ok", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({}, 503));
+    await expect(apiFetchPublic({ path: "/geo/whereami", schema }, fetchImpl)).rejects.toThrow(
+      "api /geo/whereami respondeu 503"
+    );
+  });
+
+  it("lança quando o payload não bate o schema", async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(jsonResponse({ id: 42 }));
+    await expect(apiFetchPublic({ path: "/x", schema }, fetchImpl)).rejects.toThrow();
   });
 });

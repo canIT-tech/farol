@@ -20,8 +20,7 @@ export function stopsLabel(stops: number): string {
 }
 
 // Degradação graciosa do design §7.3: provider fora do ar não derruba a tela,
-// vira aviso. Hoje é o caso permanente de voo/hotel — a Amadeus foi
-// descontinuada e o provider real entra no Passo 10.
+// vira aviso.
 function Section<T>({
   title,
   section,
@@ -50,17 +49,27 @@ function Section<T>({
   );
 }
 
+// O Travelpayouts entrega preço cacheado, não busca ao vivo: o valor final é o
+// do parceiro. Dizer isso é a diferença entre assessor honesto e vitrine.
+export const APPROX_PRICE_NOTICE =
+  "Preço aproximado, do cache do parceiro. O valor final é confirmado no site do parceiro.";
+
 export function FlightSection({
   section,
   onSelect,
-  busy = false
+  busy = false,
+  title = "Voos",
+  empty = "Nenhum voo encontrado para estas datas."
 }: {
   section: ProviderSection<FlightOffer>;
   onSelect: (offerId: string) => void;
   busy?: boolean;
+  title?: string;
+  empty?: string;
 }) {
   return (
-    <Section title="Voos" section={section} empty="Nenhum voo encontrado para estas datas.">
+    <Section title={title} section={section} empty={empty}>
+      <p role="note">{APPROX_PRICE_NOTICE}</p>
       <ul>
         {section.offers.map((offer) => (
           <li key={offer.id}>

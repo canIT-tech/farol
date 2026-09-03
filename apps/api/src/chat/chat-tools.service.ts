@@ -98,6 +98,26 @@ export class ChatToolService {
           const result = await this.flights.search(userId, tripId);
           return { success: true, data: result };
         }
+        case "price_calendar": {
+          const result = await this.flights.priceCalendar(userId, tripId);
+          return { success: true, data: result };
+        }
+        case "best_months": {
+          const result = await this.flights.monthlyPrices(userId, tripId);
+          return { success: true, data: result };
+        }
+        case "price_range": {
+          const result = await this.flights.latestPrices(userId, tripId);
+          return { success: true, data: result };
+        }
+        case "nearby_airports": {
+          const result = await this.flights.nearbyOptions(userId, tripId);
+          return { success: true, data: result };
+        }
+        case "cheap_destinations": {
+          const result = await this.flights.cityDirections(userId, tripId);
+          return { success: true, data: result };
+        }
         default:
           return { success: false, error: `Ferramenta desconhecida: ${toolCall.name}` };
       }

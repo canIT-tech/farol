@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button, Slider, Stepper, TextField } from "@farol/ui";
 import type { TripInput } from "@farol/shared";
@@ -16,6 +16,7 @@ import {
   type DiscoveryFormState
 } from "../../lib/discovery-form";
 import { SegmentedControl } from "../onboarding/SegmentedControl";
+import { whereami } from "../../lib/geo-api";
 
 const MODE_OPTIONS = [
   { value: "month", label: "Mês aproximado" },
@@ -32,13 +33,33 @@ function brl(value: number): string {
 
 export function DiscoveryForm({
   onSubmit,
-  pending = false
+  pending = false,
+  detectOrigin = whereami
 }: {
   onSubmit: (input: TripInput) => void;
   pending?: boolean;
+  detectOrigin?: typeof whereami;
 }) {
   const [state, setState] = useState<DiscoveryFormState>(EMPTY_DISCOVERY_FORM);
+  const [suggestedOrigin, setSuggestedOrigin] = useState<string | null>(null);
   const patch = (next: Partial<DiscoveryFormState>) => setState((s) => ({ ...s, ...next }));
+
+  // Sugestão de origem pelo IP. Só preenche campo vazio — o que a pessoa
+  // digitou vale mais que o palpite —, e falhar aqui não muda nada na tela.
+  useEffect(() => {
+    let active = true;
+    detectOrigin()
+      .then((place) => {
+        if (active && place !== null) {
+          setSuggestedOrigin(`${place.name} (${place.iata})`);
+          setState((s) => (s.originIata === "" ? { ...s, originIata: place.iata } : s));
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [detectOrigin]);
 
   return (
     <form
@@ -56,7 +77,11 @@ export function DiscoveryForm({
         onChange={(originIata) => patch({ originIata })}
         placeholder="GRU"
         maxLength={3}
-        hint="Código IATA do aeroporto de origem"
+        hint={
+          suggestedOrigin === null
+            ? "Código IATA do aeroporto de origem"
+            : `Sugeri ${suggestedOrigin} pela sua conexão. Troque se não for daí.`
+        }
       />
 
       <SegmentedControl

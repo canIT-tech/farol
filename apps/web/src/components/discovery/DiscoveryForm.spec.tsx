@@ -3,6 +3,12 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DiscoveryForm } from "./DiscoveryForm";
 
+// O DiscoveryForm chama /geo/whereami no mount. Sem este mock a suíte bateria
+// na rede de verdade; os testes que se importam com a sugestão passam a prop.
+vi.mock("../../lib/geo-api", () => ({
+  whereami: vi.fn(() => Promise.resolve(null))
+}));
+
 vi.mock("next/link", () => ({
   default: ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
@@ -122,5 +128,58 @@ describe("DiscoveryForm", () => {
       "href",
       "/onboarding"
     );
+  });
+
+  it("sugere a origem detectada pelo IP e explica de onde veio", async () => {
+    const detectOrigin = vi.fn(() =>
+      Promise.resolve({
+        iata: "XAP",
+        name: "Chapeco",
+        countryName: "Brazil",
+        countryCode: "BR",
+        lat: -27.1,
+        lon: -52.6
+      })
+    );
+    render(<DiscoveryForm onSubmit={vi.fn()} detectOrigin={detectOrigin} />);
+
+    expect(await screen.findByText(/Sugeri Chapeco \(XAP\)/)).toBeInTheDocument();
+    expect(screen.getByLabelText("Saindo de")).toHaveValue("XAP");
+  });
+
+  it("não sobrescreve a origem que a pessoa já digitou", async () => {
+    const chapeco = {
+      iata: "XAP",
+      name: "Chapeco",
+      countryName: "Brazil",
+      countryCode: "BR",
+      lat: -27.1,
+      lon: -52.6
+    };
+    let resolveDetect: (value: typeof chapeco) => void = () => undefined;
+    const detectOrigin = vi.fn(
+      () =>
+        new Promise<typeof chapeco>((resolve) => {
+          resolveDetect = resolve;
+        })
+    );
+    const user = userEvent.setup();
+    render(<DiscoveryForm onSubmit={vi.fn()} detectOrigin={detectOrigin as never} />);
+
+    const origin = screen.getByLabelText("Saindo de");
+    await user.type(origin, "gig");
+    resolveDetect(chapeco);
+
+    // A sugestão aparece no hint, mas o campo continua com o que a pessoa pôs.
+    expect(await screen.findByText(/Sugeri Chapeco \(XAP\)/)).toBeInTheDocument();
+    expect(origin).toHaveValue("gig");
+  });
+
+  it("segue funcionando quando a detecção de origem falha", async () => {
+    const detectOrigin = vi.fn(() => Promise.reject(new Error("503")));
+    render(<DiscoveryForm onSubmit={vi.fn()} detectOrigin={detectOrigin as never} />);
+
+    expect(await screen.findByLabelText("Saindo de")).toHaveValue("");
+    expect(screen.getByText("Código IATA do aeroporto de origem")).toBeInTheDocument();
   });
 });

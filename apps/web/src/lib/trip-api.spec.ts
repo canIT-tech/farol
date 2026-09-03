@@ -2,6 +2,11 @@ import { describe, it, expect, vi } from "vitest";
 import {
   chooseDestination,
   createTrip,
+  getFlightCalendar,
+  getFlightDirections,
+  getFlightLatest,
+  getFlightMonths,
+  getFlightNearby,
   getFlights,
   getHotels,
   getItinerary,
@@ -207,5 +212,82 @@ describe("rotas sem corpo de resposta", () => {
   it("propaga erro HTTP", async () => {
     const f = vi.fn(async () => new Response(null, { status: 503 })) as unknown as typeof fetch;
     await expect(regenerateDay(TOKEN, TRIP_ID, 1, f)).rejects.toThrow(/503/);
+  });
+});
+
+const flightOffer = {
+  id: "np:SAO:LIS:2026-11-04T18:05:00-03:00:3198",
+  price: 3198,
+  currency: "brl",
+  carrier: "TP",
+  stops: 0,
+  departAt: "2026-11-04T18:05:00-03:00",
+  arriveAt: "2026-11-05T07:15:00.000Z",
+  returnAt: null,
+  durationMinutes: 610,
+  deepLink: "https://www.aviasales.com/search/SAO0411LIS1?marker=555"
+};
+
+const sample = {
+  origin: "SAO",
+  destination: "LIS",
+  departDate: "2026-11-04",
+  returnDate: null,
+  price: 3198,
+  currency: "brl",
+  transfers: 0,
+  durationMinutes: 610,
+  gate: "Trip.com",
+  foundAt: "2026-08-29T04:34:14Z",
+  deepLink: "https://www.aviasales.com/search/SAO0411LIS1?marker=555"
+};
+
+const deal = {
+  key: "2026-11",
+  origin: "SAO",
+  destination: "LIS",
+  airline: "TP",
+  departAt: "2026-11-04T18:05:00-03:00",
+  returnAt: null,
+  price: 3198,
+  currency: "brl",
+  flightNumber: "748",
+  transfers: 0,
+  deepLink: "https://www.aviasales.com/search/SAO0411LIS1?marker=555"
+};
+
+const section = <T,>(offers: T[]) => ({ offers, stale: false, error: null });
+
+describe("contexto de preço do voo", () => {
+  it("getFlightNearby chama /flights/nearby e valida as ofertas", async () => {
+    const f = jsonFetch(section([flightOffer]));
+    await expect(getFlightNearby(TOKEN, TRIP_ID, f)).resolves.toEqual(section([flightOffer]));
+    expect(lastCall(f)[0]).toContain(`/trips/${TRIP_ID}/flights/nearby`);
+  });
+
+  it("getFlightCalendar e getFlightLatest devolvem amostras de preço", async () => {
+    const calendar = jsonFetch(section([sample]));
+    await expect(getFlightCalendar(TOKEN, TRIP_ID, calendar)).resolves.toEqual(section([sample]));
+    expect(lastCall(calendar)[0]).toContain("/flights/calendar");
+
+    const latest = jsonFetch(section([sample]));
+    await expect(getFlightLatest(TOKEN, TRIP_ID, latest)).resolves.toEqual(section([sample]));
+    expect(lastCall(latest)[0]).toContain("/flights/latest");
+  });
+
+  it("getFlightMonths e getFlightDirections devolvem achados por chave", async () => {
+    const months = jsonFetch(section([deal]));
+    await expect(getFlightMonths(TOKEN, TRIP_ID, months)).resolves.toEqual(section([deal]));
+    expect(lastCall(months)[0]).toContain("/flights/months");
+
+    const directions = jsonFetch(section([deal]));
+    await expect(getFlightDirections(TOKEN, TRIP_ID, directions)).resolves.toEqual(section([deal]));
+    expect(lastCall(directions)[0]).toContain("/flights/directions");
+  });
+
+  it("rejeita payload fora do schema", async () => {
+    await expect(
+      getFlightMonths(TOKEN, TRIP_ID, jsonFetch(section([{ key: "2026-11" }])))
+    ).rejects.toThrow();
   });
 });

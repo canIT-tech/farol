@@ -50,3 +50,15 @@ export async function apiFetch<T>(
   }
   return opts.schema.parse(await res.json());
 }
+
+// Rotas públicas (/geo, /waitlist): não têm Bearer. Mesmo contrato de validação.
+export async function apiFetchPublic<T>(
+  opts: { path: string; schema: ZodType<T> },
+  fetchImpl: typeof fetch = fetch
+): Promise<T> {
+  const res = await fetchImpl(`${apiBase()}${opts.path}`, { cache: "no-store" });
+  if (!res.ok) {
+    throw new Error(`api ${opts.path} respondeu ${res.status}`);
+  }
+  return opts.schema.parse(await res.json());
+}

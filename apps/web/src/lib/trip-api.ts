@@ -4,6 +4,8 @@ import {
   destinationCandidateSchema,
   flightOfferSchema,
   hotelOfferSchema,
+  routeDealSchema,
+  routePriceSampleSchema,
   itineraryItemSchema,
   itinerarySchema,
   providerSectionSchema,
@@ -13,6 +15,8 @@ import {
   type DestinationCandidate,
   type FlightOffer,
   type HotelOffer,
+  type RouteDeal,
+  type RoutePriceSample,
   type Itinerary,
   type ItineraryItem,
   type ProviderSection,
@@ -119,6 +123,61 @@ export function getFlights(
     { path: `/trips/${tripId}/flights`, schema: providerSectionSchema(flightOfferSchema), token },
     f
   );
+}
+
+// Os recortes de contexto de preço do Travelpayouts: melhor dia, melhor mês,
+// faixa recente, aeroporto vizinho e destinos baratos saindo da origem.
+function flightSection<T>(
+  path: string,
+  schema: Parameters<typeof providerSectionSchema>[0],
+  token: string,
+  tripId: string,
+  f?: typeof fetch
+): Promise<ProviderSection<T>> {
+  return apiFetch(
+    { path: `/trips/${tripId}/flights/${path}`, schema: providerSectionSchema(schema), token },
+    f
+  ) as Promise<ProviderSection<T>>;
+}
+
+export function getFlightNearby(
+  token: string,
+  tripId: string,
+  f?: typeof fetch
+): Promise<ProviderSection<FlightOffer>> {
+  return flightSection("nearby", flightOfferSchema, token, tripId, f);
+}
+
+export function getFlightCalendar(
+  token: string,
+  tripId: string,
+  f?: typeof fetch
+): Promise<ProviderSection<RoutePriceSample>> {
+  return flightSection("calendar", routePriceSampleSchema, token, tripId, f);
+}
+
+export function getFlightLatest(
+  token: string,
+  tripId: string,
+  f?: typeof fetch
+): Promise<ProviderSection<RoutePriceSample>> {
+  return flightSection("latest", routePriceSampleSchema, token, tripId, f);
+}
+
+export function getFlightMonths(
+  token: string,
+  tripId: string,
+  f?: typeof fetch
+): Promise<ProviderSection<RouteDeal>> {
+  return flightSection("months", routeDealSchema, token, tripId, f);
+}
+
+export function getFlightDirections(
+  token: string,
+  tripId: string,
+  f?: typeof fetch
+): Promise<ProviderSection<RouteDeal>> {
+  return flightSection("directions", routeDealSchema, token, tripId, f);
 }
 
 // O corpo da seleção não é usado pela UI — depois de selecionar, a tela relê a

@@ -255,7 +255,8 @@ describe("normalizeCheap", () => {
     expect(withTo.returnAt).toBeNull();
     expect(withTo.currency).toBe("brl");
 
-    const { duration_to: _omit, ...noTo } = item;
+    const noTo: Omit<typeof item, "duration_to"> & { duration_to?: number } = { ...item };
+    delete noTo.duration_to;
     const fallback = normalizeCheap({ data: { SAO: { "0": noTo } } }, ctx, "XAP")[0]!;
     expect(fallback.arriveAt).toBe("2026-09-17T13:00:00.000Z");
   });

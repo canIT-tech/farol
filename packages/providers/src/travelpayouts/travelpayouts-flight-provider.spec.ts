@@ -112,7 +112,8 @@ describe("TravelpayoutsFlightProvider.search", () => {
 
   it("omite return_date quando a viagem é só de ida", async () => {
     const { http, calls } = fakeHttp();
-    const { returnDate: _drop, ...oneWay } = params;
+    const oneWay: Omit<typeof params, "returnDate"> & { returnDate?: string } = { ...params };
+    delete oneWay.returnDate;
     await provider(http).search(oneWay);
 
     expect(calls.find((c) => c.path === CHEAP_PATH)!.query.return_date).toBeUndefined();
