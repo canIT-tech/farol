@@ -276,3 +276,16 @@ Hotel volta a ter provider quando o Hotellook for liberado ou entrar outro afili
 - Envs: `TRAVELPAYOUTS_TOKEN`, `TRAVELPAYOUTS_MARKER`, `TRAVELPAYOUTS_BASE_URL`,
   `TRAVELPAYOUTS_CURRENCY`, `GEO_DUMP_TTL_SECONDS`. `AMADEUS_CLIENT_ID`/`SECRET` viraram
   **opcionais**. Credenciais vão no Doppler (`farol/dev` e `farol/prd`), nunca em `.env`.
+
+### Como conferir que a conta ainda libera tudo
+
+As fixtures são gravadas, e a conta pode perder ou ganhar endpoint sem aviso.
+
+```bash
+pnpm --filter @farol/providers build
+doppler run -- pnpm --filter @farol/providers smoke:travelpayouts
+```
+
+Bate nos nove endpoints com a credencial real e imprime uma amostra normalizada de
+cada um; sai com código 1 se algum falhar. Só leitura. Rode antes de mexer no
+provider e quando alguma seção começar a vir vazia em produção.

@@ -10,7 +10,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint src",
     "test": "vitest run --coverage",
-    "test:mutation": "stryker run"
+    "test:mutation": "stryker run",
+    "smoke:travelpayouts": "node scripts/smoke-travelpayouts.mjs"
   },
   "devDependencies": {
     "@stryker-mutator/core": "^8.6.0",
