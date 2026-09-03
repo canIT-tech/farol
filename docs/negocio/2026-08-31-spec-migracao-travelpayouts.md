@@ -237,12 +237,26 @@ foram usados — os endpoints v1/v2 abaixo cobrem o mesmo e vieram confirmados.
 | `GET /data/{locale}/airports.json` | catálogo de aeroportos (2,5 MB) | `normalizeAirports` |
 | `GET /data/{locale}/airlines.json` | catálogo de companhias (117 KB) | `normalizeAirlines` |
 
-**Hotellook: fora.** `engine.hotellook.com/api/v2/lookup.json` e `.../cache.json` devolvem
-**404** com este token (idem `yasen.hotellook.com`). A conta não tem o programa de hotel
-liberado. Consequência: `HOTEL_PROVIDER` só monta a Amadeus quando `AMADEUS_CLIENT_ID` e
+**Hotellook: acabou.** O §3 desta spec propunha `engine.hotellook.com/api/v2/lookup.json` e
+`.../cache.json` para hotel. **O Hotellook foi encerrado como marca em 20/10/2025**, junto com
+o programa de afiliado e a API. Verificado em 2026-09-03: todo o host responde 404, inclusive
+a raiz e os `static/*` — é CloudFront sem origem configurada, não erro de permissão. Também
+não há substituto: a doc de API do Travelpayouts hoje cobre só voo, e hotel virou intermediação
+de afiliados (Booking.com, Agoda, Trip.com), sem API de dados própria. **Pedir liberação não
+resolve.**
+
+Consequência: `HOTEL_PROVIDER` só monta a Amadeus quando `AMADEUS_CLIENT_ID` e
 `AMADEUS_CLIENT_SECRET` existirem; sem elas a busca recusa com `hotel_provider_not_configured`
 e a seção de hotel degrada para `error: "unavailable"` — o roteiro segue de pé (§7.3).
-Hotel volta a ter provider quando o Hotellook for liberado ou entrar outro afiliado.
+
+Caminhos para hotel, em ordem de esforço:
+
+| Opção | O que dá | Custo |
+|---|---|---|
+| Afiliado de hotel pelo Travelpayouts (Booking.com / Agoda / Trip.com) | deep-link com comissão, **sem preço nem nome de hotel na nossa UI** | zero técnico; a tela de hotel do hi-fi não se sustenta |
+| API de dados de terceiro (Hotelbeds, LiteAPI, RateHawk) | preço, foto, geo — o hi-fi inteiro | contrato/aprovação, alguns pagos |
+| Amadeus Enterprise | preço e conteúdo | setup + mensalidade + fee (foi o que fez a gente sair) |
+| Manter degradado | nada | zero; decide no v1 |
 
 ### Respostas às decisões abertas de §10
 
