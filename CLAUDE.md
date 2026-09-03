@@ -17,6 +17,7 @@ monta o dia a dia e ajusta tudo por conversa.
 |---|---|
 | PRD (visão, escopo faseado, personas, monetização) | `PRD.md` |
 | Design técnico do MVP (arquitetura, módulos, dados) | `docs/superpowers/specs/2026-08-27-mvp-trip-design.md` |
+| Opções de provider de hotel (sem virar canal de reserva) | `docs/negocio/2026-09-03-opcoes-provider-hotel.md` |
 | Specs de produto (pagamento, plano grátis, migração de provider, custo de LLM, métricas) | `docs/negocio/2026-08-31-spec-pagamento.md` · `docs/negocio/2026-08-31-spec-plano-gratuito.md` · `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` · `docs/negocio/2026-08-31-custo-llm-por-roteiro.md` · `docs/negocio/2026-08-31-plano-de-metricas.md` |
 | Legal (Termos + Privacidade/LGPD — rascunhos, pré-jurídico) | `docs/legal/` |
 | Design system (tokens + specs de componentes) | `docs/design-system.md` |
@@ -132,7 +133,7 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 
 **Bloqueiam / arriscam o CI**
 - ~~`.github/workflows/ci.yml` — trocar `AMADEUS_*` por `TRAVELPAYOUTS_*`~~ Resolvido no Passo 10 (`ci.yml`, `nightly-mutation.yml`, `.env.example`, `render.yaml`).
-- ~~Hotel sem provider~~ — resolvido com a **LiteAPI** (o Hotellook foi encerrado em 20/10/2025; `engine.hotellook.com` responde 404 até na raiz, é CloudFront sem origem — não adianta pedir liberação). **Aberto:** a chave em uso é de **sandbox**, que devolve conteúdo real mas tarifa de teste. Produção exige cadastrar um cartão no painel da Nuitée, e a reserva passaria a acontecer no Farol (somos o canal) — decisão comercial, não técnica.
+- ~~Hotel sem provider~~ — resolvido com a **LiteAPI** (o Hotellook foi encerrado em 20/10/2025; `engine.hotellook.com` responde 404 até na raiz, é CloudFront sem origem — não adianta pedir liberação). **Aberto:** a chave em uso é de **sandbox**, que devolve conteúdo real mas tarifa de teste. Produção exige cadastrar um cartão no painel da Nuitée, e a reserva passaria a acontecer no Farol (somos o canal) — decisão comercial, não técnica. Alternativas sem essa amarra estão levantadas em `docs/negocio/2026-09-03-opcoes-provider-hotel.md`.
 - ~~**CI roda `db:migrate` mas não `db:seed`.**~~ Resolvido no Passo 6: `db:seed` entrou como step explícito.
 - **`pnpm test:mutation` no CI roda tudo** (api grande + worker + db + pg-boss real dentro da mutação). Lento e potencialmente instável. Avaliar rodar mutação só nos pacotes tocados no PR, ou mover pra job separado/nightly.
 - **Testes de integração e o Postgres único.** A serialização no `turbo.json` resolve o CI (Postgres novo a cada run), mas localmente exige banco limpo. Opção definitiva: `DATABASE_URL_TEST` apontando pra um banco `farol_test` dedicado (docker-compose cria; specs já preferem `DATABASE_URL_TEST`).
