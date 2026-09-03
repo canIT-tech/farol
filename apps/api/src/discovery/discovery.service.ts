@@ -43,13 +43,19 @@ export class DiscoveryService {
     @Inject(LLM) private readonly llm: LlmPort
   ) {}
 
-  // Preço real de voo por destino a partir da origem da viagem
-  // (/v1/city-directions). Substitui a média do catálogo, que é sempre "saindo
-  // de GRU" e não sabe nada sobre quem está buscando. Provider fora do ar
-  // devolve mapa vazio e a estimativa do catálogo continua valendo.
-  private async realFlightPrices(userId: string, tripId: string): Promise<Map<string, number>> {
+  // Preço e escalas reais por destino a partir da origem da viagem
+  // (/v1/city-directions). O preço substitui a média do catálogo, que é sempre
+  // "saindo de GRU" e não sabe nada sobre quem está buscando; as escalas são a
+  // única fonte de "direto ou com escala" que o MVP tem. Provider fora do ar
+  // devolve mapa vazio: o preço cai na média e as escalas ficam nulas.
+  private async realFlights(
+    userId: string,
+    tripId: string
+  ): Promise<Map<string, { price: number; stops: number }>> {
     const section = await this.flights.cityDirections(userId, tripId);
-    return new Map(section.offers.map((deal) => [deal.destination, deal.price]));
+    return new Map(
+      section.offers.map((deal) => [deal.destination, { price: deal.price, stops: deal.transfers }])
+    );
   }
 
   async run(userId: string, tripId: string): Promise<DestinationCandidate[]> {
@@ -82,9 +88,9 @@ export class DiscoveryService {
     });
 
     const byIata = new Map(catalog.map((entry) => [entry.iata, entry]));
-    const realPrices = await this.realFlightPrices(userId, tripId);
+    const realFlights = await this.realFlights(userId, tripId);
     const candidates = ranking.map((item) =>
-      toCandidate(item, byIata.get(item.iata)!, trip.currency, realPrices.get(item.iata))
+      toCandidate(item, byIata.get(item.iata)!, trip.currency, realFlights.get(item.iata))
     );
 
     await this.db.transaction(async (tx) => {
@@ -126,7 +132,7 @@ function toCandidate(
   item: LlmRankingItem,
   entry: CatalogEntry,
   currency: string,
-  realFlightPrice?: number
+  realFlight?: { price: number; stops: number }
 ): DestinationCandidate {
   return destinationCandidateSchema.parse({
     iata: item.iata,
@@ -135,7 +141,7 @@ function toCandidate(
     score: item.score,
     rationale: item.rationale,
     estCost: {
-      flight: realFlightPrice ?? entry.avgFlightCostFromGru,
+      flight: realFlight?.price ?? entry.avgFlightCostFromGru,
       lodgingPerNight: entry.avgLodgingNight,
       dailyLocal: entry.avgDailyLocal,
       currency
@@ -146,6 +152,7 @@ function toCandidate(
       summary: `melhor época nos meses ${entry.bestMonths.join(", ")}`,
       bestMonths: entry.bestMonths
     },
-    flightTimeHours: null
+    flightTimeHours: null,
+    flightStops: realFlight?.stops ?? null
   });
 }

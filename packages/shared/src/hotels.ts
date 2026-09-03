@@ -25,11 +25,19 @@ export const hotelOfferSchema = z.object({
 export type HotelOffer = z.infer<typeof hotelOfferSchema>;
 
 // Seção de resultados de provider com degradação graciosa (design §7.3).
+// fetchedAt é o instante em que o dado veio do provider (do provider_cache
+// quando é acerto de cache) — é o que permite dizer "preços de 8 min atrás".
 export function providerSectionSchema<T extends z.ZodTypeAny>(item: T) {
   return z.object({
     offers: z.array(item),
     stale: z.boolean(),
+    fetchedAt: z.string().min(1).nullable().default(null),
     error: z.literal("unavailable").nullable()
   });
 }
-export type ProviderSection<T> = { offers: T[]; stale: boolean; error: "unavailable" | null };
+export type ProviderSection<T> = {
+  offers: T[];
+  stale: boolean;
+  fetchedAt: string | null;
+  error: "unavailable" | null;
+};

@@ -220,6 +220,11 @@ const flightOffer = {
   price: 3198,
   currency: "brl",
   carrier: "TP",
+  carrierName: "TAP Air Portugal",
+  originIata: "SAO",
+  originName: null,
+  destinationIata: "LIS",
+  destinationName: "Lisboa",
   stops: 0,
   departAt: "2026-11-04T18:05:00-03:00",
   arriveAt: "2026-11-05T07:15:00.000Z",
@@ -256,7 +261,7 @@ const deal = {
   deepLink: "https://www.aviasales.com/search/SAO0411LIS1?marker=555"
 };
 
-const section = <T,>(offers: T[]) => ({ offers, stale: false, error: null });
+const section = <T,>(offers: T[]) => ({ offers, stale: false, fetchedAt: null, error: null });
 
 describe("contexto de preço do voo", () => {
   it("getFlightNearby chama /flights/nearby e valida as ofertas", async () => {

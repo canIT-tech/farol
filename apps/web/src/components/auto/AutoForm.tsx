@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button, Chip, Slider, TextField } from "@farol/ui";
+import { OriginField } from "../discovery/OriginField";
 import {
   BUDGET_MAX,
   BUDGET_MIN,
@@ -43,13 +44,7 @@ export function AutoForm({
         }
       }}
     >
-      <TextField
-        label="Saindo de"
-        value={state.originIata}
-        onChange={(originIata) => patch({ originIata })}
-        placeholder="GRU"
-        maxLength={3}
-      />
+      <OriginField value={state.originIata} onChange={(originIata) => patch({ originIata })} />
       <TextField
         label="Ida"
         type="date"

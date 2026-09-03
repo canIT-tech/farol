@@ -23,7 +23,16 @@ test.beforeEach(async ({ page }) => {
     const base = `/api/trips/${TRIP_ID}`;
 
     if (path === base) {
-      return route.fulfill(json({ ...trip, destinations: [lisboa], chosenDestination: lisboa }));
+      return route.fulfill(
+        json({
+          ...trip,
+          dateStart: "2026-05-10",
+          dateEnd: "2026-05-17",
+          targetMonth: null,
+          destinations: [lisboa],
+          chosenDestination: lisboa
+        })
+      );
     }
     if (path === `${base}/flights`) return route.fulfill(json(section([flightOffer])));
     if (path === `${base}/flights/nearby`) return route.fulfill(json(section([nearbyOffer])));
@@ -44,17 +53,29 @@ test.beforeEach(async ({ page }) => {
 test("mostra voo, aeroporto vizinho e quando sai mais barato", async ({ page }) => {
   await page.goto(`/trips/${TRIP_ID}/booking`);
 
-  await expect(page.getByRole("heading", { name: "Como chegar e onde ficar" })).toBeVisible();
-
-  // Oferta principal, com o aviso de preço aproximado que a fonte cacheada exige.
+  await expect(page.getByRole("heading", { name: "Voo & hotel" })).toBeVisible();
   await expect(
-    page.getByRole("region", { name: "Voos" }).getByRole("heading", { name: "TP" })
+    page.getByText(
+      "Melhores opções para 10 – 17 de maio, GRU → LIS. A reserva é concluída no site do parceiro."
+    )
   ).toBeVisible();
+
+  // Cartão de voo no formato do hi-fi: horários, rota com nome, duração, preço.
+  const voos = page.getByRole("region", { name: "Voos" });
+  await expect(voos.getByText("18:05 → 07:15")).toBeVisible();
+  await expect(
+    voos.getByText("TAP Air Portugal · GRU São Paulo — Guarulhos → LIS Lisboa")
+  ).toBeVisible();
+  await expect(voos.getByText("R$ 3.198")).toBeVisible();
+  await expect(voos.getByText("só ida / pessoa")).toBeVisible();
+  await expect(voos.getByRole("link", { name: "abre no Aviasales ↗" })).toBeVisible();
   await expect(page.getByText(/Preço aproximado/).first()).toBeVisible();
 
-  // Alternativa de aeroporto vizinho, mais barata.
+  // Alternativa de aeroporto vizinho: outro aeroporto de origem, mais barata.
   const vizinhos = page.getByRole("region", { name: "Aeroportos vizinhos" });
-  await expect(vizinhos.getByRole("heading", { name: "AD" })).toBeVisible();
+  await expect(vizinhos.getByText("R$ 2.890")).toBeVisible();
+  await expect(vizinhos.getByText(/VCP Campinas/)).toBeVisible();
+  await expect(vizinhos.getByText("1 escala")).toBeVisible();
 
   // Contexto de preço.
   await expect(page.getByRole("heading", { name: "Quando sai mais barato" })).toBeVisible();
@@ -62,6 +83,20 @@ test("mostra voo, aeroporto vizinho e quando sai mais barato", async ({ page }) 
   await expect(page.getByText(/dez.* de 2026/).first()).toBeVisible();
   await expect(page.getByText(/18 de nov/).first()).toBeVisible();
   await expect(page.getByText(/esta rota saiu entre/)).toBeVisible();
+});
+
+test("a aba de hotéis troca o conteúdo do miolo", async ({ page }) => {
+  await page.goto(`/trips/${TRIP_ID}/booking`);
+
+  await expect(page.getByRole("tab", { name: "Voos" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("region", { name: "Hospedagem" })).toHaveCount(0);
+
+  await page.getByRole("tab", { name: "Hotéis" }).click();
+
+  await expect(page.getByRole("tab", { name: "Hotéis" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("region", { name: "Hospedagem" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Hotel do Chiado" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Voos" })).toHaveCount(0);
 });
 
 test("some com o contexto de preço quando o provider está fora do ar", async ({ page }) => {

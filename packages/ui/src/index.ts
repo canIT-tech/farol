@@ -7,6 +7,7 @@ export * from "./Slider/Slider";
 export * from "./Chip/Chip";
 export * from "./Match/Match";
 export * from "./DestinationCard/DestinationCard";
+export * from "./FlightOfferCard/FlightOfferCard";
 export * from "./AppShell/AppShell";
 export * from "./StepNav/StepNav";
 export * from "./AdvisorChat/AdvisorChat";

@@ -1,4 +1,9 @@
-import type { ZodType } from "zod";
+import type { ZodType, ZodTypeDef } from "zod";
+
+// O corpo da resposta é JSON não confiável: o schema recebe `unknown` de
+// entrada e devolve T. Sem isso, schema com `.default()` não casa com
+// ZodType<T>, que assumiria entrada igual à saída.
+type ResponseSchema<T> = ZodType<T, ZodTypeDef, unknown>;
 
 export function apiBase(): string {
   // A api serve sob /api (o prefixo evita colidir com as rotas do Next no
@@ -14,7 +19,7 @@ export interface ApiSendOptions {
 }
 
 export interface ApiFetchOptions<T> extends ApiSendOptions {
-  schema: ZodType<T>;
+  schema: ResponseSchema<T>;
 }
 
 function buildInit(opts: ApiSendOptions): RequestInit {
@@ -53,7 +58,7 @@ export async function apiFetch<T>(
 
 // Rotas públicas (/geo, /waitlist): não têm Bearer. Mesmo contrato de validação.
 export async function apiFetchPublic<T>(
-  opts: { path: string; schema: ZodType<T> },
+  opts: { path: string; schema: ResponseSchema<T> },
   fetchImpl: typeof fetch = fetch
 ): Promise<T> {
   const res = await fetchImpl(`${apiBase()}${opts.path}`, { cache: "no-store" });

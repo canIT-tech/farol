@@ -58,7 +58,11 @@ function makeService(opts: {
   trip?: TripState;
   catalog?: CatalogEntry[];
   rank?: ReturnType<typeof vi.fn>;
-  cityDirections?: { offers: { destination: string; price: number }[]; stale: boolean; error: "unavailable" | null };
+  cityDirections?: {
+    offers: { destination: string; price: number; transfers: number }[];
+    stale: boolean;
+    error: "unavailable" | null;
+  };
 }) {
   const tx = {
     delete: () => ({ where: () => Promise.resolve() }),
@@ -168,8 +172,8 @@ describe("DiscoveryService.run — casos de borda", () => {
       ...threeDestinations,
       cityDirections: {
         offers: [
-          { destination: "AAA", price: 1234 },
-          { destination: "CCC", price: 999 }
+          { destination: "AAA", price: 1234, transfers: 0 },
+          { destination: "CCC", price: 999, transfers: 2 }
         ],
         stale: false,
         error: null
@@ -186,6 +190,27 @@ describe("DiscoveryService.run — casos de borda", () => {
     expect(candidates.find((c) => c.iata === "BBB")!.estCost.flight).toBe(catalogAverage);
   });
 
+  it("traz as escalas do voo mais barato — a única fonte de 'direto' no MVP", async () => {
+    const { service } = makeService({
+      ...threeDestinations,
+      cityDirections: {
+        offers: [
+          { destination: "AAA", price: 1234, transfers: 0 },
+          { destination: "CCC", price: 999, transfers: 2 }
+        ],
+        stale: false,
+        error: null
+      }
+    });
+
+    const candidates = await service.run("u-1", "t-1");
+
+    expect(candidates.find((c) => c.iata === "AAA")!.flightStops).toBe(0);
+    expect(candidates.find((c) => c.iata === "CCC")!.flightStops).toBe(2);
+    // Sem cobertura do provider não há escala — melhor nulo que palpite.
+    expect(candidates.find((c) => c.iata === "BBB")!.flightStops).toBeNull();
+  });
+
   it("cai na média do catálogo quando o provider de voo está fora do ar", async () => {
     const { service } = makeService({
       ...threeDestinations,
@@ -196,6 +221,7 @@ describe("DiscoveryService.run — casos de borda", () => {
     const catalogAverage = threeDestinations.catalog[0]!.avgFlightCostFromGru;
     for (const candidate of candidates) {
       expect(candidate.estCost.flight).toBe(catalogAverage);
+      expect(candidate.flightStops).toBeNull();
     }
   });
 });

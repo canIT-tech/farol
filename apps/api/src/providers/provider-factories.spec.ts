@@ -118,7 +118,7 @@ describe("createPlacesProvider", () => {
     const provider = createPlacesProvider(env);
     expect(isPlacesProvider(provider)).toBe(true);
 
-    await provider.textSearch({ query: "museus em Lisboa", maxResults: 5 });
+    await provider.textSearch({ query: "museus em Lisboa" });
 
     const sent = `${calls[0]!.url} ${JSON.stringify(calls[0]!.init ?? {})}`;
     expect(sent).toContain("gkey");

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button, Slider, Stepper, TextField } from "@farol/ui";
 import type { TripInput } from "@farol/shared";
@@ -16,7 +16,7 @@ import {
   type DiscoveryFormState
 } from "../../lib/discovery-form";
 import { SegmentedControl } from "../onboarding/SegmentedControl";
-import { whereami } from "../../lib/geo-api";
+import { OriginField } from "./OriginField";
 
 const MODE_OPTIONS = [
   { value: "month", label: "Mês aproximado" },
@@ -33,33 +33,14 @@ function brl(value: number): string {
 
 export function DiscoveryForm({
   onSubmit,
-  pending = false,
-  detectOrigin = whereami
+  pending = false
 }: {
   onSubmit: (input: TripInput) => void;
   pending?: boolean;
-  detectOrigin?: typeof whereami;
 }) {
   const [state, setState] = useState<DiscoveryFormState>(EMPTY_DISCOVERY_FORM);
-  const [suggestedOrigin, setSuggestedOrigin] = useState<string | null>(null);
   const patch = (next: Partial<DiscoveryFormState>) => setState((s) => ({ ...s, ...next }));
 
-  // Sugestão de origem pelo IP. Só preenche campo vazio — o que a pessoa
-  // digitou vale mais que o palpite —, e falhar aqui não muda nada na tela.
-  useEffect(() => {
-    let active = true;
-    detectOrigin()
-      .then((place) => {
-        if (active && place !== null) {
-          setSuggestedOrigin(`${place.name} (${place.iata})`);
-          setState((s) => (s.originIata === "" ? { ...s, originIata: place.iata } : s));
-        }
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [detectOrigin]);
 
   return (
     <form
@@ -71,18 +52,7 @@ export function DiscoveryForm({
         }
       }}
     >
-      <TextField
-        label="Saindo de"
-        value={state.originIata}
-        onChange={(originIata) => patch({ originIata })}
-        placeholder="GRU"
-        maxLength={3}
-        hint={
-          suggestedOrigin === null
-            ? "Código IATA do aeroporto de origem"
-            : `Sugeri ${suggestedOrigin} pela sua conexão. Troque se não for daí.`
-        }
-      />
+      <OriginField value={state.originIata} onChange={(originIata) => patch({ originIata })} />
 
       <SegmentedControl
         label="Quando"

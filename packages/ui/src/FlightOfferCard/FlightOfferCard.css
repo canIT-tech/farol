@@ -1,0 +1,121 @@
+/* Cartão de oferta de voo — hi-fi "5 · Voo & hotel" (docs/design/app/FlightsHotels.dc.html).
+   Grade: selo da companhia | horários e rota | duração e escalas | preço e ação. */
+.farol-flight {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  padding: var(--space-16) var(--space-20);
+  display: grid;
+  grid-template-columns: 44px 1.5fr 1.1fr auto;
+  gap: var(--space-20);
+  align-items: center;
+}
+
+/* O primeiro cartão é a recomendação — mesmo realce do destino em destaque. */
+.farol-flight--best {
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.farol-flight__airline {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-control);
+  background: var(--surface-sunk);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-text);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.farol-flight__times {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.farol-flight__sub {
+  font-family: var(--font-text);
+  font-size: 12.5px;
+  color: var(--text-faint);
+  margin: var(--space-2) 0 0;
+}
+
+.farol-flight__duration {
+  font-family: var(--font-text);
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.farol-flight__duration b {
+  display: block;
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+/* Verde só em indicador — aqui, "direto" (manual de marca). */
+.farol-flight__direct {
+  color: var(--positive-ink);
+  font-weight: 600;
+}
+
+.farol-flight__price {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.farol-flight__amount {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+
+.farol-flight__per {
+  font-family: var(--font-text);
+  font-size: 11.5px;
+  color: var(--text-faint);
+  margin: 0;
+}
+
+.farol-flight__action {
+  margin-top: var(--space-8);
+}
+
+.farol-flight__partner {
+  font-family: var(--font-text);
+  font-size: 11px;
+  color: var(--text-faint);
+  margin: var(--space-8) 0 0;
+}
+
+.farol-flight__partner a {
+  color: inherit;
+}
+
+@media (max-width: 720px) {
+  .farol-flight {
+    grid-template-columns: 44px 1fr;
+    row-gap: var(--space-12);
+  }
+
+  .farol-flight__duration,
+  .farol-flight__price {
+    grid-column: 2;
+    text-align: left;
+    align-items: flex-start;
+  }
+}

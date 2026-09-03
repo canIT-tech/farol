@@ -78,7 +78,7 @@ describe("HotelsService", () => {
     const userId = await makeUser();
     const tripId = await tripWithChosenDestination(userId);
 
-    await expect(service.search(userId, tripId)).resolves.toEqual({
+    await expect(service.search(userId, tripId)).resolves.toMatchObject({
       offers: FAKE_HOTEL_OFFERS,
       stale: false,
       error: null
@@ -93,11 +93,7 @@ describe("HotelsService", () => {
     const tripId = await tripWithChosenDestination(userId);
     const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
     try {
-      await expect(service.search(userId, tripId)).resolves.toEqual({
-        offers: [],
-        stale: false,
-        error: "unavailable"
-      });
+      await expect(service.search(userId, tripId)).resolves.toEqual({ offers: [], stale: false, fetchedAt: null, error: "unavailable" });
       expect(errSpy.mock.calls[0]![0]).toContain("hotel_search_failed");
     } finally {
       errSpy.mockRestore();

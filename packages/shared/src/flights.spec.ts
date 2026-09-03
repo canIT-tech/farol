@@ -14,6 +14,11 @@ const baseOffer = {
   price: 3200.5,
   currency: "BRL",
   carrier: "TP",
+  carrierName: "TAP Air Portugal",
+  originIata: "GRU",
+  originName: "Sao Paulo-Guarulhos International Airport",
+  destinationIata: "LIS",
+  destinationName: "Lisbon Airport",
   stops: 1,
   departAt: "2026-09-10T22:10:00",
   arriveAt: "2026-09-11T12:40:00",
@@ -98,5 +103,24 @@ describe("flightOfferSchema", () => {
 
   it("rejeita carrier vazio", () => {
     expect(() => flightOfferSchema.parse({ ...baseOffer, carrier: "" })).toThrow();
+  });
+
+  it("assume nulo nos nomes de companhia e aeroporto quando não vêm", () => {
+    const semNomes: Partial<typeof baseOffer> = { ...baseOffer };
+    delete semNomes.carrierName;
+    delete semNomes.originName;
+    delete semNomes.destinationName;
+    const parsed = flightOfferSchema.parse(semNomes);
+    expect(parsed.carrierName).toBeNull();
+    expect(parsed.originName).toBeNull();
+    expect(parsed.destinationName).toBeNull();
+  });
+
+  it("exige originIata e destinationIata com 3 letras", () => {
+    expect(() => flightOfferSchema.parse({ ...baseOffer, originIata: "GR" })).toThrow();
+    expect(() => flightOfferSchema.parse({ ...baseOffer, destinationIata: "LISB" })).toThrow();
+    const semOrigem: Partial<typeof baseOffer> = { ...baseOffer };
+    delete semOrigem.originIata;
+    expect(() => flightOfferSchema.parse(semOrigem)).toThrow();
   });
 });

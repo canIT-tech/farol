@@ -102,4 +102,19 @@ describe("providerSectionSchema", () => {
   it("rejeita stale que não é boolean", () => {
     expect(() => section.parse({ offers: [], stale: "no", error: null })).toThrow();
   });
+
+  it("guarda o fetchedAt e assume nulo quando não vem", () => {
+    const comData = section.parse({
+      offers: [],
+      stale: false,
+      fetchedAt: "2026-09-02T21:00:00.000Z",
+      error: null
+    });
+    expect(comData.fetchedAt).toBe("2026-09-02T21:00:00.000Z");
+    expect(section.parse({ offers: [], stale: false, error: null }).fetchedAt).toBeNull();
+  });
+
+  it("rejeita fetchedAt vazio", () => {
+    expect(() => section.parse({ offers: [], stale: false, fetchedAt: "", error: null })).toThrow();
+  });
 });

@@ -15,6 +15,7 @@ import { ProviderCacheRepository } from "../providers/provider-cache.repository"
 import { FLIGHT_PROVIDER } from "../providers/providers.module";
 import { buildFlightParams } from "../providers/trip-search";
 import { TripsService } from "../trips/trips.service";
+import { GeoService } from "../geo/geo.service";
 import { toFlightSelection, type FlightSelection } from "./flight-selection";
 
 const PROVIDER = "travelpayouts-flight";
@@ -35,8 +36,41 @@ export class FlightsService {
     @Inject(FLIGHT_PROVIDER) private readonly provider: FlightInsightsProvider,
     @Inject(ENV) private readonly env: Env,
     private readonly cache: ProviderCacheRepository,
-    private readonly trips: TripsService
+    private readonly trips: TripsService,
+    private readonly geo: GeoService
   ) {}
+
+  // O provider devolve só códigos ("AD", "GRU"). A tela mostra "Azul" e
+  // "São Paulo — Guarulhos", então os nomes são resolvidos aqui, no catálogo
+  // que já está em memória. Código fora do catálogo fica nulo e a UI cai no
+  // código cru — nunca em um nome inventado.
+  async enrich(offers: FlightOffer[]): Promise<FlightOffer[]> {
+    const airportNames = new Map<string, string | null>();
+    const airlineNames = new Map<string, string | null>();
+
+    const resolve = async <T extends { name: string }>(
+      cacheMap: Map<string, string | null>,
+      code: string,
+      load: (code: string) => Promise<T | null>
+    ): Promise<string | null> => {
+      if (!cacheMap.has(code)) {
+        const found = await load(code).catch(() => null);
+        cacheMap.set(code, found === null ? null : found.name);
+      }
+      return cacheMap.get(code) ?? null;
+    };
+
+    return Promise.all(
+      offers.map(async (offer) => ({
+        ...offer,
+        carrierName: await resolve(airlineNames, offer.carrier, (c) => this.geo.findAirline(c)),
+        originName: await resolve(airportNames, offer.originIata, (c) => this.geo.findAirport(c)),
+        destinationName: await resolve(airportNames, offer.destinationIata, (c) =>
+          this.geo.findAirport(c)
+        )
+      }))
+    );
+  }
 
   // Uma seção = uma chamada cacheada ao provider. Falha do provider degrada só
   // esta seção e devolve error "unavailable" (design §7.3) — a página segue de pé.
@@ -47,14 +81,14 @@ export class FlightsService {
     load: () => Promise<T[]>
   ): Promise<ProviderSection<T>> {
     try {
-      const { value } = await this.cache.getOrSet<T[]>({
+      const { value, fetchedAt } = await this.cache.getOrSet<T[]>({
         provider: PROVIDER,
         endpoint,
         params,
         ttlSeconds: this.env.FLIGHT_CACHE_TTL_SECONDS,
         load
       });
-      return { offers: value, stale: false, error: null };
+      return { offers: value, stale: false, fetchedAt: fetchedAt.toISOString(), error: null };
     } catch (err) {
       console.error(
         JSON.stringify({
@@ -64,7 +98,7 @@ export class FlightsService {
           message: (err as Error).message
         })
       );
-      return { offers: [], stale: false, error: "unavailable" };
+      return { offers: [], stale: false, fetchedAt: null, error: "unavailable" };
     }
   }
 
@@ -72,8 +106,8 @@ export class FlightsService {
   async search(userId: string, tripId: string): Promise<ProviderSection<FlightOffer>> {
     const trip = await this.trips.get(userId, tripId);
     const params = buildFlightParams(trip);
-    return this.section(tripId, FLIGHT_ENDPOINTS.search, { ...params }, () =>
-      this.provider.search(params)
+    return this.section(tripId, FLIGHT_ENDPOINTS.search, { ...params }, async () =>
+      this.enrich(await this.provider.search(params))
     );
   }
 
@@ -81,8 +115,8 @@ export class FlightsService {
   async nearbyOptions(userId: string, tripId: string): Promise<ProviderSection<FlightOffer>> {
     const trip = await this.trips.get(userId, tripId);
     const params = buildFlightParams(trip);
-    return this.section(tripId, FLIGHT_ENDPOINTS.nearby, { ...params }, () =>
-      this.provider.nearbyOptions(params)
+    return this.section(tripId, FLIGHT_ENDPOINTS.nearby, { ...params }, async () =>
+      this.enrich(await this.provider.nearbyOptions(params))
     );
   }
 

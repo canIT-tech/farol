@@ -29,21 +29,21 @@ export class HotelsService {
     const params = buildHotelParams(trip);
 
     try {
-      const { value } = await this.cache.getOrSet<HotelOffer[]>({
+      const { value, fetchedAt } = await this.cache.getOrSet<HotelOffer[]>({
         provider: PROVIDER,
         endpoint: ENDPOINT,
         params: { ...params },
         ttlSeconds: this.env.HOTEL_CACHE_TTL_SECONDS,
         load: () => this.provider.search(params)
       });
-      return { offers: value, stale: false, error: null };
+      return { offers: value, stale: false, fetchedAt: fetchedAt.toISOString(), error: null };
     } catch (err) {
       // §7.3: falha do provider degrada a seção sem derrubar a página.
       // no_destination_chosen é lançado por buildHotelParams (fora do try) e propaga.
       console.error(
         JSON.stringify({ event: "hotel_search_failed", tripId, message: (err as Error).message })
       );
-      return { offers: [], stale: false, error: "unavailable" };
+      return { offers: [], stale: false, fetchedAt: null, error: "unavailable" };
     }
   }
 

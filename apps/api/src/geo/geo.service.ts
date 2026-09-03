@@ -26,8 +26,18 @@ export class GeoService {
     return this.provider.searchAirports(term, limit);
   }
 
+  /** Igual a airport(), mas devolve null em vez de lançar — para enriquecimento. */
+  findAirport(iata: string): Promise<Airport | null> {
+    return this.provider.airport(iata);
+  }
+
+  /** Igual a airline(), mas devolve null em vez de lançar — para enriquecimento. */
+  findAirline(code: string): Promise<Airline | null> {
+    return this.provider.airline(code);
+  }
+
   async airport(iata: string): Promise<Airport> {
-    const found = await this.provider.airport(iata);
+    const found = await this.findAirport(iata);
     if (found === null) {
       throw new NotFoundError(`aeroporto ${iata} não encontrado`);
     }
@@ -35,7 +45,7 @@ export class GeoService {
   }
 
   async airline(code: string): Promise<Airline> {
-    const found = await this.provider.airline(code);
+    const found = await this.findAirline(code);
     if (found === null) {
       throw new NotFoundError(`companhia ${code} não encontrada`);
     }

@@ -14,6 +14,7 @@ function candidate(
     estCost: { flight: 3000, lodgingPerNight: 200, dailyLocal: 100, currency: "BRL" },
     climate: { expectedC: 22, summary: "ameno", bestMonths: [9] },
     flightTimeHours: null,
+    flightStops: null,
     ...over
   };
 }
@@ -61,7 +62,9 @@ describe("DestinationResults", () => {
   it("avisa quando o filtro nacional não deixa nada", async () => {
     render(<DestinationResults destinations={[lisboa, toquio]} onChoose={vi.fn()} />);
     await userEvent.click(screen.getByRole("button", { name: "Só nacional" }));
-    expect(screen.getByRole("status")).toHaveTextContent("Nenhum destino nacional");
+    expect(screen.getByRole("status")).toHaveTextContent(
+      "Nenhum destino combinou com os filtros escolhidos."
+    );
   });
 
   it("ver roteiro devolve o iata do cartão", async () => {
@@ -91,5 +94,61 @@ describe("DestinationResults", () => {
     expect(screen.getByText("Voo estimado")).toBeInTheDocument();
     expect(screen.queryByText(/22\s*°C/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Tempo de voo/)).not.toBeInTheDocument();
+  });
+
+  it("filtra por voo sem escala usando a escala que o provider confirmou", async () => {
+    const direto = candidate({ iata: "SDU", city: "Rio", flightStops: 0 });
+    const comEscala = candidate({ iata: "CDG", city: "Paris", flightStops: 2 });
+    const semDado = candidate({ iata: "LIS", city: "Lisboa", flightStops: null });
+    render(
+      <DestinationResults destinations={[direto, comEscala, semDado]} onChoose={vi.fn()} />
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Sem escala" }));
+
+    expect(screen.getByRole("heading", { name: "Rio" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Paris" })).not.toBeInTheDocument();
+    // Sem confirmação do provider o destino sai do filtro — não dá para
+    // prometer voo direto por falta de dado.
+    expect(screen.queryByRole("heading", { name: "Lisboa" })).not.toBeInTheDocument();
+  });
+
+  it("mostra a escala como estatística só quando o provider informou", () => {
+    const { rerender } = render(
+      <DestinationResults
+        destinations={[candidate({ iata: "SDU", city: "Rio", flightStops: 0 })]}
+        onChoose={vi.fn()}
+      />
+    );
+    expect(screen.getByText("direto")).toBeInTheDocument();
+
+    rerender(
+      <DestinationResults
+        destinations={[candidate({ iata: "CDG", city: "Paris", flightStops: 1 })]}
+        onChoose={vi.fn()}
+      />
+    );
+    expect(screen.getByText("1 escala")).toBeInTheDocument();
+
+    rerender(
+      <DestinationResults
+        destinations={[candidate({ iata: "LIS", city: "Lisboa", flightStops: null })]}
+        onChoose={vi.fn()}
+      />
+    );
+    // "Sem escala" é o rótulo do filtro; o que não pode aparecer é a
+    // estatística do cartão.
+    expect(screen.queryByText("direto")).not.toBeInTheDocument();
+    expect(screen.queryByText(/^\d+ escalas?$/)).not.toBeInTheDocument();
+  });
+
+  it("pluraliza as escalas", () => {
+    render(
+      <DestinationResults
+        destinations={[candidate({ iata: "CDG", city: "Paris", flightStops: 3 })]}
+        onChoose={vi.fn()}
+      />
+    );
+    expect(screen.getByText("3 escalas")).toBeInTheDocument();
   });
 });

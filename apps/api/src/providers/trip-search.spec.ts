@@ -29,7 +29,8 @@ function tripState(over: Partial<TripState> = {}): TripState {
       rationale: "Justificativa longa o suficiente para o schema.",
       estCost: { flight: 3000, lodgingPerNight: 200, dailyLocal: 150, currency: "BRL" },
       climate: { expectedC: 22, summary: "ameno", bestMonths: [9] },
-      flightTimeHours: null
+      flightTimeHours: null,
+    flightStops: null
     },
     ...over
   };

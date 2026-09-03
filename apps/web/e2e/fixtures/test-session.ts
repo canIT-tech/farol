@@ -133,6 +133,11 @@ export const flightOffer = {
   price: 3198,
   currency: "brl",
   carrier: "TP",
+  carrierName: "TAP Air Portugal",
+  originIata: "GRU",
+  originName: "São Paulo — Guarulhos",
+  destinationIata: "LIS",
+  destinationName: "Lisboa",
   stops: 0,
   departAt: "2026-11-04T18:05:00-03:00",
   arriveAt: "2026-11-05T07:15:00.000Z",
@@ -145,7 +150,13 @@ export const nearbyOffer = {
   ...flightOffer,
   id: "np:VCP:LIS:2026-11-04T20:00:00-03:00:2890",
   price: 2890,
-  carrier: "AD"
+  carrier: "AD",
+  carrierName: "Azul",
+  originIata: "VCP",
+  originName: "Campinas — Viracopos",
+  departAt: "2026-11-04T20:00:00-03:00",
+  arriveAt: "2026-11-05T09:30:00+00:00",
+  stops: 1
 };
 
 export const priceSample = (departDate: string, price: number) => ({
@@ -188,5 +199,5 @@ export const hotelOffer = {
 };
 
 export function section<T>(offers: T[], error: "unavailable" | null = null) {
-  return { offers, stale: false, error };
+  return { offers, stale: false, fetchedAt: new Date().toISOString(), error };
 }

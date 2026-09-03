@@ -192,6 +192,10 @@ describe("normalizeNearestPlaces", () => {
     };
     const offer = normalizeNearestPlaces(raw, ctx, "brl")[0]!;
     expect(offer.id).toBe("np:SAO:RIO:2027-05-02T10:10:00-03:00:164");
+    expect(offer.originIata).toBe("SAO");
+    expect(offer.destinationIata).toBe("RIO");
+    expect(offer.carrierName).toBeNull();
+    expect(offer.originName).toBeNull();
     expect(offer.stops).toBe(2);
     expect(offer.arriveAt).toBe("2027-05-02T14:10:00.000Z");
     expect(offer.deepLink).toBe(`${AVIASALES_BASE_URL}/search/SAO0205RIO1?t=abc&marker=555`);
@@ -231,6 +235,8 @@ describe("normalizeCheap", () => {
     const offer = offers[0]!;
     expect(() => flightOfferSchema.parse(offer)).not.toThrow();
     expect(offer.id).toBe("cheap:XAP:SAO:0");
+    expect(offer.originIata).toBe("XAP");
+    expect(offer.destinationIata).toBe("SAO");
     expect(offer.carrier).toBe("LA");
     expect(offer.stops).toBe(0);
     expect(offer.returnAt).toBe("2026-09-21T07:05:00-03:00");

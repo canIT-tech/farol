@@ -1,22 +1,44 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Button } from "@farol/ui";
+import { Button, FlightOfferCard } from "@farol/ui";
 import type { FlightOffer, HotelOffer, ProviderSection } from "@farol/shared";
 
+// Nome do parceiro que recebe o clique. O Travelpayouts leva a busca do
+// Aviasales, e o hi-fi exige dizer para onde a pessoa está indo antes do clique.
+export const FLIGHT_PARTNER = "Aviasales";
+
+// O Travelpayouts entrega preço cacheado, não busca ao vivo: o valor final é o
+// do parceiro. Dizer isso é a diferença entre assessor honesto e vitrine.
+export const APPROX_PRICE_NOTICE =
+  "Preço aproximado, do cache do parceiro. O valor final é confirmado no site do parceiro.";
+
 function money(value: number, currency: string): string {
-  return value.toLocaleString("pt-BR", { style: "currency", currency, maximumFractionDigits: 0 });
+  return value.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: currency.toUpperCase(),
+    maximumFractionDigits: 0
+  });
 }
 
-export function durationLabel(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m === 0 ? `${h}h` : `${h}h${String(m).padStart(2, "0")}`;
-}
-
-export function stopsLabel(stops: number): string {
-  if (stops === 0) return "direto";
-  return stops === 1 ? "1 parada" : `${stops} paradas`;
+// "há 8 min" — o hi-fi mostra a idade do preço junto das ofertas.
+export function freshnessLabel(fetchedAt: string | null, now: number = Date.now()): string | null {
+  if (fetchedAt === null) {
+    return null;
+  }
+  const parsed = Date.parse(fetchedAt);
+  if (Number.isNaN(parsed)) {
+    return null;
+  }
+  const minutes = Math.max(0, Math.floor((now - parsed) / 60_000));
+  if (minutes < 1) {
+    return "Preços consultados agora.";
+  }
+  if (minutes < 60) {
+    return `Preços de ${minutes} min atrás.`;
+  }
+  const hours = Math.floor(minutes / 60);
+  return hours === 1 ? "Preços de 1 hora atrás." : `Preços de ${hours} horas atrás.`;
 }
 
 // Degradação graciosa do design §7.3: provider fora do ar não derruba a tela,
@@ -40,19 +62,11 @@ function Section<T>({
       ) : section.offers.length === 0 ? (
         <p role="status">{empty}</p>
       ) : (
-        <>
-          {section.stale ? <p role="status">Preços de alguns minutos atrás.</p> : null}
-          {children}
-        </>
+        <>{children}</>
       )}
     </section>
   );
 }
-
-// O Travelpayouts entrega preço cacheado, não busca ao vivo: o valor final é o
-// do parceiro. Dizer isso é a diferença entre assessor honesto e vitrine.
-export const APPROX_PRICE_NOTICE =
-  "Preço aproximado, do cache do parceiro. O valor final é confirmado no site do parceiro.";
 
 export function FlightSection({
   section,
@@ -67,26 +81,38 @@ export function FlightSection({
   title?: string;
   empty?: string;
 }) {
+  const freshness = freshnessLabel(section.fetchedAt);
+
   return (
     <Section title={title} section={section} empty={empty}>
-      <p role="note">{APPROX_PRICE_NOTICE}</p>
       <ul>
-        {section.offers.map((offer) => (
+        {section.offers.map((offer, index) => (
           <li key={offer.id}>
-            <article aria-label={`${offer.carrier} por ${money(offer.price, offer.currency)}`}>
-              <h3>{offer.carrier}</h3>
-              <p>{money(offer.price, offer.currency)}</p>
-              <p>{`${durationLabel(offer.durationMinutes)} · ${stopsLabel(offer.stops)}`}</p>
-              <a href={offer.deepLink} target="_blank" rel="noreferrer">
-                Ver no site
-              </a>
-              <Button size="sm" disabled={busy} onClick={() => onSelect(offer.id)}>
-                Escolher
-              </Button>
-            </article>
+            <FlightOfferCard
+              carrier={offer.carrier}
+              carrierName={offer.carrierName}
+              departAt={offer.departAt}
+              arriveAt={offer.arriveAt}
+              originIata={offer.originIata}
+              originName={offer.originName}
+              destinationIata={offer.destinationIata}
+              destinationName={offer.destinationName}
+              durationMinutes={offer.durationMinutes}
+              stops={offer.stops}
+              price={money(offer.price, offer.currency)}
+              priceNote={offer.returnAt === null ? "só ida / pessoa" : "ida e volta / pessoa"}
+              deepLink={offer.deepLink}
+              partnerName={FLIGHT_PARTNER}
+              best={index === 0}
+              busy={busy}
+              onSelect={() => onSelect(offer.id)}
+            />
           </li>
         ))}
       </ul>
+      <p role="note">
+        {freshness === null ? APPROX_PRICE_NOTICE : `${freshness} ${APPROX_PRICE_NOTICE}`}
+      </p>
     </Section>
   );
 }

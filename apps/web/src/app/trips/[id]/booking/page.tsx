@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useCallback, useEffect, useState } from "react";
+import { Chip } from "@farol/ui";
 import type {
   FlightOffer,
   HotelOffer,
@@ -11,6 +12,7 @@ import type {
 import { FlightSection, HotelSection } from "../../../../components/booking/OfferSections";
 import { PriceContext } from "../../../../components/booking/PriceContext";
 import { useTrip } from "../../../../providers/TripProvider";
+import { bookingSubtitle } from "../../../../lib/booking-summary";
 import {
   getFlightCalendar,
   getFlightLatest,
@@ -22,11 +24,14 @@ import {
   selectHotel
 } from "../../../../lib/trip-api";
 
-const OFFLINE = { offers: [], stale: false, error: "unavailable" as const };
+const OFFLINE = { offers: [], stale: false, fetchedAt: null, error: "unavailable" as const };
+
+type Tab = "flights" | "hotels";
 
 export default function BookingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { token } = useTrip();
+  const { token, trip } = useTrip();
+  const [tab, setTab] = useState<Tab>("flights");
   const [flights, setFlights] = useState<ProviderSection<FlightOffer> | null>(null);
   const [hotels, setHotels] = useState<ProviderSection<HotelOffer> | null>(null);
   const [nearby, setNearby] = useState<ProviderSection<FlightOffer>>(OFFLINE);
@@ -66,25 +71,41 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
 
   return (
     <section>
-      <h1>Como chegar e onde ficar</h1>
-      <FlightSection
-        section={flights}
-        busy={busy}
-        onSelect={(offerId) => void choose(() => selectFlight(token, id, offerId))}
-      />
-      <FlightSection
-        section={nearby}
-        busy={busy}
-        title="Aeroportos vizinhos"
-        empty="Nenhuma alternativa de aeroporto vizinho para estas datas."
-        onSelect={(offerId) => void choose(() => selectFlight(token, id, offerId))}
-      />
-      <PriceContext months={months} calendar={calendar} latest={latest} />
-      <HotelSection
-        section={hotels}
-        busy={busy}
-        onSelect={(offerId) => void choose(() => selectHotel(token, id, offerId))}
-      />
+      <h1>Voo &amp; hotel</h1>
+      <p>{bookingSubtitle(trip)}</p>
+
+      <div role="tablist" aria-label="Voo ou hotel">
+        <Chip role="tab" selected={tab === "flights"} onClick={() => setTab("flights")}>
+          Voos
+        </Chip>
+        <Chip role="tab" selected={tab === "hotels"} onClick={() => setTab("hotels")}>
+          Hotéis
+        </Chip>
+      </div>
+
+      {tab === "flights" ? (
+        <>
+          <FlightSection
+            section={flights}
+            busy={busy}
+            onSelect={(offerId) => void choose(() => selectFlight(token, id, offerId))}
+          />
+          <FlightSection
+            section={nearby}
+            busy={busy}
+            title="Aeroportos vizinhos"
+            empty="Nenhuma alternativa de aeroporto vizinho para estas datas."
+            onSelect={(offerId) => void choose(() => selectFlight(token, id, offerId))}
+          />
+          <PriceContext months={months} calendar={calendar} latest={latest} />
+        </>
+      ) : (
+        <HotelSection
+          section={hotels}
+          busy={busy}
+          onSelect={(offerId) => void choose(() => selectHotel(token, id, offerId))}
+        />
+      )}
     </section>
   );
 }

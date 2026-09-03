@@ -32,7 +32,8 @@ const candidate = {
   rationale: "Justificativa longa o suficiente para passar no schema de candidato.",
   estCost: { flight: 3200, lodgingPerNight: 180, dailyLocal: 140, currency: "BRL" },
   climate: { expectedC: 24, summary: "ameno", bestMonths: [9] },
-  flightTimeHours: null
+  flightTimeHours: null,
+  flightStops: null
 };
 
 describe("tripSteps", () => {

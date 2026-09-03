@@ -37,8 +37,18 @@ const deal = (key: string, price: number): RouteDeal => ({
   deepLink: "https://www.aviasales.com/search/SAO0411LIS1?marker=555"
 });
 
-const ok = <T,>(offers: T[]): ProviderSection<T> => ({ offers, stale: false, error: null });
-const off = <T,>(): ProviderSection<T> => ({ offers: [], stale: false, error: "unavailable" });
+const ok = <T,>(offers: T[]): ProviderSection<T> => ({
+  offers,
+  stale: false,
+  fetchedAt: null,
+  error: null
+});
+const off = <T,>(): ProviderSection<T> => ({
+  offers: [],
+  stale: false,
+  fetchedAt: null,
+  error: "unavailable"
+});
 
 describe("helpers", () => {
   it("shortDate formata dia e mês em pt-BR", () => {
