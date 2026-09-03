@@ -129,4 +129,45 @@ describe("trips/:id/flights", () => {
       .send({ offerId: "nao-existe" });
     expect(res.status).toBe(404);
   });
+
+  it.each([
+    ["nearby", "offers"],
+    ["calendar", "offers"],
+    ["latest", "offers"],
+    ["months", "offers"],
+    ["directions", "offers"]
+  ])("GET /flights/%s devolve uma ProviderSection preenchida", async (rota) => {
+    const u = await newUser();
+    const tripId = await tripWithDestination(u.auth);
+
+    const res = await request(app.getHttpServer())
+      .get(`/trips/${tripId}/flights/${rota}`)
+      .set("Authorization", u.auth);
+
+    expect(res.status).toBe(200);
+    expect(res.body.error).toBeNull();
+    expect(res.body.offers.length).toBeGreaterThan(0);
+  });
+
+  it("GET /flights/directions funciona sem destino escolhido", async () => {
+    const u = await newUser();
+    const created = await request(app.getHttpServer())
+      .post("/trips")
+      .set("Authorization", u.auth)
+      .send(tripBody);
+
+    const res = await request(app.getHttpServer())
+      .get(`/trips/${created.body.id}/flights/directions`)
+      .set("Authorization", u.auth);
+
+    expect(res.status).toBe(200);
+    expect(res.body.offers.length).toBeGreaterThan(0);
+  });
+
+  it("os recortes de contexto também exigem auth", async () => {
+    for (const rota of ["nearby", "calendar", "latest", "months", "directions"]) {
+      const res = await request(app.getHttpServer()).get(`/trips/qualquer/flights/${rota}`);
+      expect(res.status).toBe(401);
+    }
+  });
 });

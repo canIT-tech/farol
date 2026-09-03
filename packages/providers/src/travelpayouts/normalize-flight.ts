@@ -99,6 +99,8 @@ export interface Route {
   returnDate: string | null;
 }
 
+// ddmm lê só as posições fixas da data ISO, então tanto faz receber "2026-10-22"
+// ou o timestamp completo — não é preciso cortar antes de chamar.
 export function buildDeepLink(ctx: DeepLinkContext, route: Route): string {
   return fillTemplate(ctx.template, {
     origin: route.origin,
@@ -154,7 +156,7 @@ export function normalizeMatrixSamples(
         origin: item.origin,
         destination: item.destination,
         departDate,
-        returnDate: returnDate === null ? null : returnDate.slice(0, 10)
+        returnDate
       })
     });
   });
@@ -209,8 +211,8 @@ export function normalizeCheap(
           deepLink: buildDeepLink(ctx, {
             origin,
             destination,
-            departDate: item.departure_at.slice(0, 10),
-            returnDate: returnAt === null ? null : returnAt.slice(0, 10)
+            departDate: item.departure_at,
+            returnDate: returnAt
           })
         })
       );
@@ -242,8 +244,8 @@ export function normalizeKeyedDeals(
       deepLink: buildDeepLink(ctx, {
         origin: item.origin,
         destination: item.destination,
-        departDate: item.departure_at.slice(0, 10),
-        returnDate: returnAt === null ? null : returnAt.slice(0, 10)
+        departDate: item.departure_at,
+        returnDate: returnAt
       })
     });
   });

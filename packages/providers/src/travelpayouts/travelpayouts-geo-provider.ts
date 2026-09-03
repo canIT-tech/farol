@@ -57,16 +57,20 @@ export interface TpAirline {
 // "useriata({...})" → objeto. O /whereami só fala JSONP; sem callback ele
 // devolve HTML, então a chamada sempre manda um e a resposta é desembrulhada aqui.
 export function parseJsonp(body: string): unknown {
-  const match = /^[^(]*\(([\s\S]*)\)\s*;?\s*$/.exec(body.trim());
-  if (match === null) {
+  const open = body.indexOf("(");
+  const close = body.lastIndexOf(")");
+  if (open === -1 || close <= open) {
     throw new Error("resposta JSONP inesperada do Travelpayouts");
   }
-  return JSON.parse(match[1]!) as unknown;
+  return JSON.parse(body.slice(open + 1, close)) as unknown;
 }
 
 // "-52.6157:-27.100935" → { lon, lat }. Coordenada ausente ou malformada vira null.
 export function parseCoordinates(raw: string | undefined): { lat: number; lon: number } | null {
-  const parts = (raw ?? "").split(":");
+  if (raw === undefined) {
+    return null;
+  }
+  const parts = raw.split(":");
   if (parts.length !== 2) {
     return null;
   }

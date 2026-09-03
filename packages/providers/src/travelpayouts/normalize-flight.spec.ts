@@ -278,6 +278,9 @@ describe("normalizeKeyedDeals", () => {
       expect(deal.key).toMatch(/^\d{4}-\d{2}$/);
       expect(deal.deepLink).toContain("marker=555");
     }
+    // Voo com número real vira string; só o 0 (ausente) vira null.
+    const comNumero = deals.find((d) => d.flightNumber !== null)!;
+    expect(comNumero.flightNumber).toMatch(/^\d+$/);
   });
 
   it("normaliza /v1/city-directions com o IATA do destino como chave", () => {

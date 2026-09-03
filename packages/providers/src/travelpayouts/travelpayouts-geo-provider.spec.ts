@@ -54,8 +54,10 @@ describe("parseJsonp", () => {
     expect(parseJsonp("  cb({\"a\":1}) ;  ")).toEqual({ a: 1 });
   });
 
-  it("rejeita corpo que não é JSONP", () => {
+  it("rejeita corpo sem parêntese de abertura ou com fecha antes de abre", () => {
     expect(() => parseJsonp("<html>404</html>")).toThrow("resposta JSONP inesperada");
+    expect(() => parseJsonp(")cb(")).toThrow("resposta JSONP inesperada");
+    expect(() => parseJsonp("cb()")).toThrow();
   });
 });
 
@@ -67,6 +69,7 @@ describe("parseCoordinates", () => {
   it("devolve null para ausente, formato errado ou número inválido", () => {
     expect(parseCoordinates(undefined)).toBeNull();
     expect(parseCoordinates("-52.6157")).toBeNull();
+    expect(parseCoordinates("1:2:3")).toBeNull();
     expect(parseCoordinates("a:b")).toBeNull();
     expect(parseCoordinates("-52.6157:b")).toBeNull();
   });
@@ -146,6 +149,11 @@ describe("TravelpayoutsGeoProvider", () => {
     return new TravelpayoutsGeoProvider({ token: "tok", http, now });
   }
 
+  it("bate no /whereami público, que é outro host e exige o callback useriata", () => {
+    expect(WHEREAMI_URL).toBe("https://www.travelpayouts.com/whereami");
+    expect(WHEREAMI_CALLBACK).toBe("useriata");
+  });
+
   it("whereami manda ip, locale e callback e devolve a localização", async () => {
     const { http, calls } = fakeHttp();
     await expect(provider(http).whereami("191.240.129.27")).resolves.toMatchObject({
@@ -191,6 +199,29 @@ describe("TravelpayoutsGeoProvider", () => {
     ]);
   });
 
+  it("cacheia mesmo sem relógio injetado — o default é Date.now", async () => {
+    const { http, calls } = fakeHttp();
+    const geo = new TravelpayoutsGeoProvider({ token: "t", http });
+    await geo.airports();
+    await geo.airports();
+    expect(calls).toHaveLength(1);
+  });
+
+  it("rebusca no instante exato em que o TTL vence", async () => {
+    const { http, calls } = fakeHttp();
+    let clock = 0;
+    const geo = new TravelpayoutsGeoProvider({
+      token: "t",
+      http,
+      dumpTtlMs: 1000,
+      now: () => clock
+    });
+    await geo.airports();
+    clock = 1000;
+    await geo.airports();
+    expect(calls).toHaveLength(2);
+  });
+
   it("rebusca os dumps depois do TTL", async () => {
     const { http, calls } = fakeHttp();
     let clock = 0;
@@ -227,6 +258,15 @@ describe("TravelpayoutsGeoProvider", () => {
     const geo = provider(http);
     expect((await geo.searchAirports("gru")).map((a) => a.iata)).toEqual(["GRU"]);
     expect((await geo.searchAirports("guarulhos")).map((a) => a.iata)).toEqual(["GRU"]);
+    // Prefixo, não sufixo: "bk" acha BKK; "kk" (fim do código) não — e o nome
+    // do BKK ("Suvarnabhumi") não contém nenhum dos dois, então isola o casamento.
+    expect((await geo.searchAirports("bk")).map((a) => a.iata)).toContain("BKK");
+    expect((await geo.searchAirports("kk")).map((a) => a.iata)).not.toContain("BKK");
+  });
+
+  it("searchAirports ignora espaços em volta do termo", async () => {
+    const { http } = fakeHttp();
+    expect((await provider(http).searchAirports("  gru  ")).map((a) => a.iata)).toEqual(["GRU"]);
   });
 
   it("searchAirports respeita o limite e devolve vazio para termo em branco", async () => {

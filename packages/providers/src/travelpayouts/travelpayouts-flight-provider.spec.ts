@@ -69,6 +69,17 @@ function provider(http: TravelpayoutsHttp): TravelpayoutsFlightProvider {
   return new TravelpayoutsFlightProvider({ token: "tok", marker: "555", http });
 }
 
+describe("caminhos dos endpoints", () => {
+  it("são os caminhos reais da Data API — o teste não pode espelhar a constante", () => {
+    expect(CHEAP_PATH).toBe("/v1/prices/cheap");
+    expect(MONTHLY_PATH).toBe("/v1/prices/monthly");
+    expect(CITY_DIRECTIONS_PATH).toBe("/v1/city-directions");
+    expect(LATEST_PATH).toBe("/v2/prices/latest");
+    expect(MONTH_MATRIX_PATH).toBe("/v2/prices/month-matrix");
+    expect(NEAREST_PLACES_PATH).toBe("/v2/prices/nearest-places-matrix");
+  });
+});
+
 describe("toMonth", () => {
   it("reduz uma data ISO ao mês", () => {
     expect(toMonth("2026-09-17")).toBe("2026-09");
@@ -103,11 +114,20 @@ describe("TravelpayoutsFlightProvider.search", () => {
     });
 
     const nearest = calls.find((c) => c.path === NEAREST_PLACES_PATH)!.query;
-    expect(nearest).toMatchObject({
+    expect(nearest).toEqual({
+      origin: "XAP",
+      destination: "GRU",
       depart_date: "2026-09-17",
       return_date: "2026-09-21",
+      currency: "brl",
       show_to_affiliates: true
     });
+  });
+
+  it("conta adultos e crianças como passageiros no deep link", async () => {
+    const { http } = fakeHttp({ [NEAREST_PLACES_PATH]: { prices: [] } });
+    const offers = await provider(http).search(params); // 2 adultos + 1 criança
+    expect(offers[0]!.deepLink).toContain("SAO21093?marker=555");
   });
 
   it("omite return_date quando a viagem é só de ida", async () => {
@@ -202,14 +222,66 @@ describe("TravelpayoutsFlightProvider — endpoints de contexto", () => {
     });
 
     expect(calls[0]!.query).toMatchObject({
+      origin: "GRU",
+      destination: "BKK",
+      currency: "brl",
       period_type: "year",
       page: 1,
       limit: 30,
+      show_to_affiliates: true,
       sorting: "price",
       trip_class: 0
     });
     const prices = samples.map((s) => s.price);
     expect(prices).toEqual([...prices].sort((a, b) => a - b));
+  });
+
+  it("latestPrices reordena por preço mesmo quando a API devolve fora de ordem", async () => {
+    const item = (value: number, day: string) => ({
+      depart_date: `2027-03-${day}`,
+      return_date: "",
+      origin: "SAO",
+      destination: "BKK",
+      gate: "Ubfly",
+      found_at: "2026-09-01T23:39:39",
+      trip_class: 0,
+      value,
+      number_of_changes: 2,
+      duration: 4880,
+      distance: 16404
+    });
+    const { http } = fakeHttp({
+      [LATEST_PATH]: { currency: "brl", data: [item(900, "16"), item(500, "24")] }
+    });
+    const samples = await provider(http).latestPrices({
+      originIata: "GRU",
+      destinationIata: "BKK"
+    });
+    expect(samples.map((s) => s.price)).toEqual([500, 900]);
+  });
+
+  it("priceCalendar reordena por data mesmo quando a API devolve fora de ordem", async () => {
+    const item = (day: string) => ({
+      depart_date: `2026-10-${day}`,
+      return_date: "",
+      origin: "SAO",
+      destination: "RIO",
+      gate: "Trip.com",
+      found_at: "2026-08-29T04:34:14Z",
+      trip_class: 0,
+      value: 337,
+      number_of_changes: 0,
+      duration: 65,
+      distance: 343
+    });
+    const { http } = fakeHttp({
+      [MONTH_MATRIX_PATH]: { currency: "brl", data: [item("22"), item("03")] }
+    });
+    const days = await provider(http).priceCalendar({
+      originIata: "GRU",
+      destinationIata: "SDU"
+    });
+    expect(days.map((d) => d.departDate)).toEqual(["2026-10-03", "2026-10-22"]);
   });
 
   it("latestPrices respeita periodType, page e limit informados", async () => {
@@ -232,9 +304,31 @@ describe("TravelpayoutsFlightProvider — endpoints de contexto", () => {
     });
 
     expect(calls[0]!.path).toBe(MONTHLY_PATH);
+    expect(calls[0]!.query).toEqual({ origin: "GRU", destination: "BSB", currency: "brl" });
     const keys = months.map((m) => m.key);
     expect(keys).toEqual([...keys].sort());
     expect(keys[0]).toMatch(/^\d{4}-\d{2}$/);
+  });
+
+  it("monthlyPrices reordena por mês mesmo quando a API devolve fora de ordem", async () => {
+    const deal = (destination: string) => ({
+      origin: "SAO",
+      destination,
+      airline: "G3",
+      departure_at: "2026-09-26T08:40:00-03:00",
+      return_at: "",
+      price: 760,
+      flight_number: 1456,
+      transfers: 0
+    });
+    const { http } = fakeHttp({
+      [MONTHLY_PATH]: { currency: "brl", data: { "2027-01": deal("BSB"), "2026-09": deal("BSB") } }
+    });
+    const months = await provider(http).monthlyPrices({
+      originIata: "GRU",
+      destinationIata: "BSB"
+    });
+    expect(months.map((m) => m.key)).toEqual(["2026-09", "2027-01"]);
   });
 
   it("cityDirections usa /v1/city-directions ordenado por preço", async () => {

@@ -9,6 +9,6 @@ if (process.env.DATABASE_URL_TEST) {
 // auth.e2e-spec.ts sobrescreve SUPABASE_JWKS_URL com a URL do JWKS fake antes de compilar o módulo.
 process.env.SUPABASE_JWKS_URL ??= "https://example.com/auth/v1/.well-known/jwks.json";
 process.env.JOBS_SCHEMA ??= "pgboss_e2e";
-process.env.AMADEUS_CLIENT_ID ??= "amadeus-e2e-id";
-process.env.AMADEUS_CLIENT_SECRET ??= "amadeus-e2e-secret";
+process.env.TRAVELPAYOUTS_TOKEN ??= "travelpayouts-e2e";
+process.env.TRAVELPAYOUTS_MARKER ??= "farol-e2e";
 process.env.GOOGLE_PLACES_KEY ??= "google-places-e2e";

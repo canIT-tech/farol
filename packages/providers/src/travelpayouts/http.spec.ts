@@ -88,6 +88,7 @@ describe("createTravelpayoutsHttp", () => {
     expect((err as TravelpayoutsHttpError).status).toBe(400);
     expect((err as TravelpayoutsHttpError).body).toBe("origin inválido");
     expect((err as Error).message).toBe("Travelpayouts respondeu 400");
+    expect((err as Error).name).toBe("TravelpayoutsHttpError");
     expect(calls).toHaveLength(1);
   });
 
@@ -103,6 +104,18 @@ describe("createTravelpayoutsHttp", () => {
     await expect(http.get("/x")).rejects.toBeInstanceOf(TravelpayoutsHttpError);
     await expect(http.get("/x")).rejects.toBeInstanceOf(TravelpayoutsHttpError);
     await expect(http.get("/x")).rejects.toBeInstanceOf(CircuitOpenError);
+  });
+
+  it("aponta para a Data API pública por padrão", () => {
+    expect(TRAVELPAYOUTS_BASE_URL).toBe("https://api.travelpayouts.com");
+  });
+
+  it("tenta 4 vezes por padrão (3 retries) antes de desistir", async () => {
+    const { impl, calls } = fetchSeq([{ body: "erro", status: 503 }]);
+    const http = createTravelpayoutsHttp({ token: "t", retryMinTimeoutMs: 0, fetchImpl: impl });
+
+    await expect(http.get("/x")).rejects.toBeInstanceOf(TravelpayoutsHttpError);
+    expect(calls).toHaveLength(4);
   });
 
   it("monta com os defaults quando só recebe o token", () => {
