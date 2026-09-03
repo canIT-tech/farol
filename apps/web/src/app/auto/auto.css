@@ -1,0 +1,140 @@
+/* Tela 「A1 · Entrada mínima」 do hi-fi (docs/design/app/AutoInput.dc.html).
+   Coluna única de 640px centrada sobre o fundo quente, com o cabeçalho da
+   marca acima. Os controles vêm do @farol/ui; aqui fica só o arranjo. */
+
+.auto-page {
+  min-height: 100vh;
+  background: var(--surface-sunk, #fbfaf8);
+  color: var(--ink, #1c1b19);
+  font-family: var(--font-text, "Instrument Sans", system-ui, sans-serif);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 72px;
+  box-sizing: border-box;
+}
+
+.auto-top {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 60px;
+}
+
+.auto-logo {
+  font-family: var(--font-display, "Bricolage Grotesque", system-ui, sans-serif);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auto-logo svg {
+  width: 22px;
+  height: 22px;
+  color: var(--accent, #c25a38);
+}
+
+.auto-mode {
+  font-size: 12px;
+  color: var(--text-faint, #9b9992);
+  border: 1px solid var(--line, #e6e3dc);
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+.auto-card {
+  width: 100%;
+  max-width: 640px;
+}
+
+.auto-title {
+  font-family: var(--font-display, "Bricolage Grotesque", system-ui, sans-serif);
+  font-weight: 600;
+  font-size: 38px;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin: 0 0 14px;
+}
+
+.auto-sub {
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--ink-muted, #57554f);
+  margin: 0 0 40px;
+}
+
+.auto-row {
+  border: 0;
+  margin: 0 0 22px;
+  padding: 0;
+  min-inline-size: 0;
+}
+
+.auto-row__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-muted, #57554f);
+  margin-bottom: 9px;
+  padding: 0;
+}
+
+.auto-row__label span {
+  font-weight: 400;
+  color: var(--text-faint, #a29f97);
+}
+
+.auto-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.auto-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.auto-hint {
+  font-size: 12px;
+  color: var(--text-faint, #a29f97);
+  margin: 8px 0 0;
+}
+
+.auto-cta {
+  margin-top: 34px;
+  width: 100%;
+}
+
+.auto-reassure {
+  margin: 18px 0 0;
+  font-size: 13px;
+  color: var(--text-muted, #78766f);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.auto-error {
+  margin: 18px 0 0;
+  font-size: 13.5px;
+  color: var(--accent-hover, #8f3f26);
+  text-align: center;
+}
+
+/* Coluna única quando não cabem os dois campos lado a lado. */
+@media (max-width: 560px) {
+  .auto-two {
+    grid-template-columns: 1fr;
+  }
+
+  .auto-title {
+    font-size: 30px;
+  }
+}
+

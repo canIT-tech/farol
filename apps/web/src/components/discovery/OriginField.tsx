@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { TextField } from "@farol/ui";
+import "./OriginField.css";
 import type { Airport } from "@farol/shared";
 import { searchAirports, whereami } from "../../lib/geo-api";
 
@@ -28,6 +29,7 @@ export function OriginField({
   const [options, setOptions] = useState<Airport[]>([]);
   const [chosen, setChosen] = useState<Airport | null>(null);
   const [suggested, setSuggested] = useState<string | null>(null);
+  const [focused, setFocused] = useState(false);
 
   // A detecção roda uma vez, no mount: é palpite inicial, não reage a
   // digitação. Os refs deixam o efeito ler o valor atual sem virar dependência.
@@ -100,14 +102,30 @@ export function OriginField({
         : `Sugeri ${suggested} pela sua conexão. Troque se não for daí.`;
 
   return (
-    <div>
+    <div
+      className="origin"
+      // O foco entra e sai por dentro do container (campo → opção), então o
+      // blur só fecha quando vai para fora dele.
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setFocused(false);
+        }
+      }}
+    >
       <TextField label="Saindo de" value={term} onChange={type} placeholder="GRU" hint={hint} />
-      {options.length > 0 ? (
-        <ul role="listbox" aria-label="Aeroportos encontrados">
+      {focused && options.length > 0 ? (
+        <ul className="origin__list" role="listbox" aria-label="Aeroportos encontrados">
           {options.map((airport) => (
             <li key={airport.iata}>
-              <button type="button" onClick={() => pick(airport)}>
-                {airportLabel(airport)}
+              <button
+                className="origin__option"
+                type="button"
+                onClick={() => pick(airport)}
+                aria-label={airportLabel(airport)}
+              >
+                <span className="origin__iata">{airport.iata}</span>
+                <span className="origin__name">{airport.name}</span>
               </button>
             </li>
           ))}

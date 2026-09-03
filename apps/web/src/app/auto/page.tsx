@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import "./auto.css";
 import { tasteProfileSchema } from "@farol/shared";
 import { AuthGate } from "../../components/AuthGate";
 import { AutoForm } from "../../components/auto/AutoForm";
@@ -43,11 +44,43 @@ function Auto({ token }: { token: string }) {
   }
 
   return (
-    <main>
-      <h1>Me diz o mínimo, eu monto o resto</h1>
-      <p>Origem, datas, quanto dá para gastar e três gostos. Devolvo um plano fechado.</p>
-      <AutoForm onSubmit={(state) => void submit(state)} pending={pending} />
-      {error !== null ? <p role="alert">{error}</p> : null}
+    <main className="auto-page">
+      <header className="auto-top">
+        <div className="auto-logo">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2.8"
+               strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M17 43h14" />
+            <path d="M19.5 43 L21.5 25 h5 l2 18" />
+            <path d="M20.5 25 h7" />
+            <rect x="20.5" y="18" width="7" height="7" rx="1.2" />
+            <path d="M22 18 h4 l-1 -3 h-2 z" />
+          </svg>
+          Farol
+        </div>
+        <span className="auto-mode">Modo autônomo</span>
+      </header>
+
+      <div className="auto-card">
+        <h1 className="auto-title">
+          Diga quando.
+          <br />
+          O resto é comigo.
+        </h1>
+        <p className="auto-sub">
+          Farol escolhe o destino, monta o roteiro dia a dia e acha voo e hotel. Você recebe um
+          plano fechado e ajusta o que quiser conversando — sem ficar comparando opções.
+        </p>
+        <AutoForm onSubmit={(state) => void submit(state)} pending={pending} />
+        {error !== null ? (
+          <p className="auto-error" role="alert">
+            {error}
+          </p>
+        ) : (
+          <p className="auto-reassure">
+            Nada é reservado agora. Você revisa o plano inteiro antes de qualquer compra.
+          </p>
+        )}
+      </div>
     </main>
   );
 }

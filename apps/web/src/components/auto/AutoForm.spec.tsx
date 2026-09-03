@@ -5,30 +5,40 @@ import { AutoForm } from "./AutoForm";
 
 async function preencher(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Saindo de"), "GRU");
-  await user.type(screen.getByLabelText("Ida"), "2026-09-10");
-  await user.type(screen.getByLabelText("Volta"), "2026-09-17");
+  await escolherDatas(user);
   for (const gosto of ["praia", "gastronomia", "natureza"]) {
     await user.click(screen.getByRole("button", { name: gosto }));
   }
 }
 
+// O calendário abre em janeiro de 2026; setembro fica 8 meses à frente.
+async function escolherDatas(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole("button", { name: /Quando/ }));
+  for (let i = 0; i < 8; i += 1) {
+    await user.click(screen.getByRole("button", { name: "Próximo mês" }));
+  }
+  // O calendário segue aberto entre ida e volta.
+  await user.click(screen.getByRole("gridcell", { name: "10" }));
+  await user.click(screen.getByRole("gridcell", { name: "17" }));
+}
+
 describe("AutoForm", () => {
   it("pede exatamente três gostos", () => {
     render(<AutoForm onSubmit={vi.fn()} />);
-    expect(screen.getByText("Escolha 3 gostos")).toBeInTheDocument();
-    expect(screen.getByText("0 de 3")).toBeInTheDocument();
+    expect(screen.getByText(/O que você curte/)).toBeInTheDocument();
+    expect(screen.getByText(/^0 de 3/)).toBeInTheDocument();
   });
 
   it("não deixa enviar incompleto", () => {
     render(<AutoForm onSubmit={vi.fn()} />);
-    expect(screen.getByRole("button", { name: /Montar meu plano/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Montar minha viagem/ })).toBeDisabled();
   });
 
   it("conta os gostos escolhidos", async () => {
     const user = userEvent.setup();
     render(<AutoForm onSubmit={vi.fn()} />);
     await user.click(screen.getByRole("button", { name: "praia" }));
-    expect(screen.getByText("1 de 3")).toBeInTheDocument();
+    expect(screen.getByText(/^1 de 3/)).toBeInTheDocument();
   });
 
   it("o quarto gosto substitui o mais antigo", async () => {
@@ -37,7 +47,7 @@ describe("AutoForm", () => {
     render(<AutoForm onSubmit={onSubmit} />);
     await preencher(user);
     await user.click(screen.getByRole("button", { name: "vinhos" }));
-    await user.click(screen.getByRole("button", { name: /Montar meu plano/ }));
+    await user.click(screen.getByRole("button", { name: /Montar minha viagem/ }));
     expect(onSubmit.mock.calls[0]![0]!.interests).toEqual([
       "gastronomia",
       "natureza",
@@ -51,7 +61,7 @@ describe("AutoForm", () => {
     render(<AutoForm onSubmit={onSubmit} />);
     await preencher(user);
     fireEvent.change(screen.getByLabelText("Orçamento total"), { target: { value: "20000" } });
-    await user.click(screen.getByRole("button", { name: /Montar meu plano/ }));
+    await user.click(screen.getByRole("button", { name: /Montar minha viagem/ }));
 
     expect(onSubmit.mock.calls[0]![0]).toEqual({
       originIata: "GRU",
@@ -73,7 +83,7 @@ describe("AutoForm", () => {
     const user = userEvent.setup();
     render(<AutoForm onSubmit={vi.fn()} pending />);
     await preencher(user);
-    expect(screen.getByRole("button", { name: /Montar meu plano/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Montar minha viagem/ })).toBeDisabled();
   });
 
   it("desmarcar um gosto tira da conta", async () => {
@@ -81,6 +91,6 @@ describe("AutoForm", () => {
     render(<AutoForm onSubmit={vi.fn()} />);
     await user.click(screen.getByRole("button", { name: "praia" }));
     await user.click(screen.getByRole("button", { name: "praia" }));
-    expect(screen.getByText("0 de 3")).toBeInTheDocument();
+    expect(screen.getByText(/^0 de 3/)).toBeInTheDocument();
   });
 });

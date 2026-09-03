@@ -158,4 +158,42 @@ describe("OriginField — busca no catálogo", () => {
     await userEvent.type(screen.getByLabelText("Saindo de"), "gua");
     await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument());
   });
+  it("a lista some quando o foco sai do campo e volta ao focar de novo", async () => {
+    render(
+      <OriginField
+        value=""
+        onChange={vi.fn()}
+        detectOrigin={noDetect}
+        findAirports={() => Promise.resolve([gru])}
+      />
+    );
+
+    const campo = screen.getByLabelText("Saindo de");
+    await userEvent.type(campo, "gua");
+    expect(await screen.findByRole("listbox")).toBeInTheDocument();
+
+    // Clicar fora: tab() iria para a primeira opção, que ainda é o container.
+    await userEvent.click(document.body);
+    await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument());
+
+    campo.focus();
+    expect(await screen.findByRole("listbox")).toBeInTheDocument();
+  });
+
+  it("clicar numa opção não fecha a lista antes de registrar a escolha", async () => {
+    const onChange = vi.fn();
+    render(
+      <OriginField
+        value=""
+        onChange={onChange}
+        detectOrigin={noDetect}
+        findAirports={() => Promise.resolve([gru])}
+      />
+    );
+
+    await userEvent.type(screen.getByLabelText("Saindo de"), "gua");
+    await userEvent.click(await screen.findByRole("button", { name: "São Paulo — Guarulhos (GRU)" }));
+
+    expect(onChange).toHaveBeenLastCalledWith("GRU");
+  });
 });
