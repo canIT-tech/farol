@@ -11,6 +11,7 @@ import {
   type TravelpayoutsHttp,
   type TravelpayoutsHttpConfig
 } from "./http.js";
+import type { GeoProvider } from "../geo-provider.js";
 
 export const WHEREAMI_URL = "https://www.travelpayouts.com/whereami";
 export const AIRPORTS_PATH = "/data/{locale}/airports.json";
@@ -127,7 +128,7 @@ const DEFAULT_DUMP_TTL_MS = 86_400_000;
 // Dados geográficos do Travelpayouts: origem pelo IP (/whereami) e os dumps
 // estáticos de aeroportos e companhias, que traduzem "GRU" em "Guarulhos" e
 // "LA" em "LATAM" na UI. Os dumps têm megabytes — ficam em cache na memória.
-export class TravelpayoutsGeoProvider {
+export class TravelpayoutsGeoProvider implements GeoProvider {
   private readonly http: TravelpayoutsHttp;
   private readonly locale: string;
   private readonly ttlMs: number;

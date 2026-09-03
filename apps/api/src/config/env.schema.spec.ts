@@ -4,8 +4,8 @@ import { parseEnv } from "./env.schema";
 const valid = {
   DATABASE_URL: "postgres://x",
   SUPABASE_JWKS_URL: "https://proj.supabase.co/auth/v1/.well-known/jwks.json",
-  AMADEUS_CLIENT_ID: "amadeus-id",
-  AMADEUS_CLIENT_SECRET: "amadeus-secret",
+  TRAVELPAYOUTS_TOKEN: "travelpayouts-token",
+  TRAVELPAYOUTS_MARKER: "farol-ci",
   GOOGLE_PLACES_KEY: "google-places-key"
 };
 
@@ -33,32 +33,62 @@ describe("parseEnv", () => {
     );
   });
 
-  it("lança quando as credenciais do Amadeus faltam", () => {
+  it("lança quando o token ou o marker do Travelpayouts faltam", () => {
     expect(() =>
       parseEnv({
         DATABASE_URL: "postgres://x",
-        SUPABASE_JWKS_URL: valid.SUPABASE_JWKS_URL,
+        SUPABASE_JWKS_URL: valid.SUPABASE_JWKS_URL
       })
-    ).toThrow(/AMADEUS_CLIENT_ID/);
+    ).toThrow(/TRAVELPAYOUTS_TOKEN/);
+    const semMarker: Record<string, string | undefined> = { ...valid };
+    delete semMarker.TRAVELPAYOUTS_MARKER;
+    expect(() => parseEnv(semMarker)).toThrow(/TRAVELPAYOUTS_MARKER/);
   });
 
-  it("aplica defaults de Amadeus (base url, templates de deep link, TTLs)", () => {
+  it("aplica os defaults do Travelpayouts", () => {
     const env = parseEnv({ ...valid });
-    expect(env.AMADEUS_BASE_URL).toBe("https://test.api.amadeus.com");
-    expect(env.FLIGHT_DEEPLINK_TEMPLATE).toContain("{origin}");
-    expect(env.HOTEL_DEEPLINK_TEMPLATE).toContain("{cityCode}");
-    expect(env.FLIGHT_CACHE_TTL_SECONDS).toBe(600);
-    expect(env.HOTEL_CACHE_TTL_SECONDS).toBe(3600);
+    expect(env.TRAVELPAYOUTS_BASE_URL).toBe("https://api.travelpayouts.com");
+    expect(env.TRAVELPAYOUTS_CURRENCY).toBe("brl");
+    expect(env.GEO_DUMP_TTL_SECONDS).toBe(86_400);
   });
 
-  it("respeita AMADEUS_BASE_URL e TTLs informados", () => {
+  it("respeita a base url, a moeda e o TTL de geo informados", () => {
     const env = parseEnv({
       ...valid,
-      AMADEUS_BASE_URL: "https://api.amadeus.com",
+      TRAVELPAYOUTS_BASE_URL: "https://tp.local",
+      TRAVELPAYOUTS_CURRENCY: "usd",
+      GEO_DUMP_TTL_SECONDS: "60"
+    });
+    expect(env.TRAVELPAYOUTS_BASE_URL).toBe("https://tp.local");
+    expect(env.TRAVELPAYOUTS_CURRENCY).toBe("usd");
+    expect(env.GEO_DUMP_TTL_SECONDS).toBe(60);
+  });
+
+  it("o deep link de voo cai no Aviasales com marker por padrão", () => {
+    const env = parseEnv({ ...valid });
+    expect(env.FLIGHT_DEEPLINK_TEMPLATE).toContain("aviasales.com");
+    expect(env.FLIGHT_DEEPLINK_TEMPLATE).toContain("{marker}");
+    expect(env.HOTEL_DEEPLINK_TEMPLATE).toContain("{cityCode}");
+  });
+
+  it("credencial da Amadeus é opcional — sem ela só a seção de hotel degrada", () => {
+    const env = parseEnv({ ...valid });
+    expect(env.AMADEUS_BASE_URL).toBe("https://test.api.amadeus.com");
+    expect(env.AMADEUS_CLIENT_ID).toBeUndefined();
+    expect(env.AMADEUS_CLIENT_SECRET).toBeUndefined();
+    expect(parseEnv({ ...valid, AMADEUS_CLIENT_ID: "id" }).AMADEUS_CLIENT_ID).toBe("id");
+  });
+
+  it("aplica e respeita os TTLs de cache de voo e hotel", () => {
+    const padrao = parseEnv({ ...valid });
+    expect(padrao.FLIGHT_CACHE_TTL_SECONDS).toBe(1800);
+    expect(padrao.HOTEL_CACHE_TTL_SECONDS).toBe(3600);
+
+    const env = parseEnv({
+      ...valid,
       FLIGHT_CACHE_TTL_SECONDS: "120",
       HOTEL_CACHE_TTL_SECONDS: "7200"
     });
-    expect(env.AMADEUS_BASE_URL).toBe("https://api.amadeus.com");
     expect(env.FLIGHT_CACHE_TTL_SECONDS).toBe(120);
     expect(env.HOTEL_CACHE_TTL_SECONDS).toBe(7200);
   });
@@ -88,7 +118,7 @@ describe("parseEnv", () => {
 
   it("lista os campos inválidos separados por vírgula", () => {
     expect(() => parseEnv({ API_PORT: "-1" })).toThrow(
-      "Env inválida: DATABASE_URL, API_PORT, SUPABASE_JWKS_URL, AMADEUS_CLIENT_ID, AMADEUS_CLIENT_SECRET, GOOGLE_PLACES_KEY"
+      "Env inválida: DATABASE_URL, API_PORT, SUPABASE_JWKS_URL, TRAVELPAYOUTS_TOKEN, TRAVELPAYOUTS_MARKER, GOOGLE_PLACES_KEY"
     );
   });
 });

@@ -1,4 +1,5 @@
 export * from "./flight-provider.js";
+export * from "./geo-provider.js";
 export * from "./hotel-provider.js";
 export * from "./places-provider.js";
 export * from "./template.js";

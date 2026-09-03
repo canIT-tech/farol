@@ -1,5 +1,12 @@
-import type { FlightProvider, HotelProvider, PlacesProvider } from "@farol/providers";
-import type { FlightOffer, HotelOffer, Place, PlaceDetails } from "@farol/shared";
+import type { FlightInsightsProvider, HotelProvider, PlacesProvider } from "@farol/providers";
+import type {
+  FlightOffer,
+  HotelOffer,
+  Place,
+  PlaceDetails,
+  RouteDeal,
+  RoutePriceSample
+} from "@farol/shared";
 
 export const FAKE_FLIGHT_OFFERS: FlightOffer[] = [
   {
@@ -63,13 +70,98 @@ export const FAKE_HOTEL_OFFERS: HotelOffer[] = [
   }
 ];
 
-export class FakeFlightProvider implements FlightProvider {
-  constructor(private readonly behaviour: { offers?: FlightOffer[]; fail?: boolean } = {}) {}
-  search(): Promise<FlightOffer[]> {
+export const FAKE_PRICE_SAMPLES: RoutePriceSample[] = [
+  {
+    origin: "SAO",
+    destination: "LIS",
+    departDate: "2026-09-10",
+    returnDate: "2026-09-17",
+    price: 3980,
+    currency: "brl",
+    transfers: 1,
+    durationMinutes: 880,
+    gate: "Trip.com",
+    foundAt: "2026-08-29T04:34:14Z",
+    deepLink: "https://www.aviasales.com/search/SAO1009LIS17092?marker=555"
+  },
+  {
+    origin: "SAO",
+    destination: "LIS",
+    departDate: "2026-09-14",
+    returnDate: null,
+    price: 4600,
+    currency: "brl",
+    transfers: 0,
+    durationMinutes: 615,
+    gate: null,
+    foundAt: null,
+    deepLink: "https://www.aviasales.com/search/SAO1409LIS2?marker=555"
+  }
+];
+
+export const FAKE_ROUTE_DEALS: RouteDeal[] = [
+  {
+    key: "2026-09",
+    origin: "SAO",
+    destination: "LIS",
+    airline: "TP",
+    departAt: "2026-09-10T18:30:00-03:00",
+    returnAt: "2026-09-17T09:20:00Z",
+    price: 3198,
+    currency: "brl",
+    flightNumber: "748",
+    transfers: 0,
+    deepLink: "https://www.aviasales.com/search/SAO1009LIS17092?marker=555"
+  },
+  {
+    key: "2026-10",
+    origin: "SAO",
+    destination: "LIS",
+    airline: "LA",
+    departAt: "2026-10-04T18:05:00-03:00",
+    returnAt: null,
+    price: 4210,
+    currency: "brl",
+    flightNumber: null,
+    transfers: 1,
+    deepLink: "https://www.aviasales.com/search/SAO0410LIS2?marker=555"
+  }
+];
+
+interface FakeFlightBehaviour {
+  offers?: FlightOffer[];
+  samples?: RoutePriceSample[];
+  deals?: RouteDeal[];
+  fail?: boolean;
+}
+
+export class FakeFlightProvider implements FlightInsightsProvider {
+  constructor(private readonly behaviour: FakeFlightBehaviour = {}) {}
+
+  private guard<T>(value: T): Promise<T> {
     if (this.behaviour.fail === true) {
-      return Promise.reject(new Error("amadeus indisponível"));
+      return Promise.reject(new Error("travelpayouts indisponível"));
     }
-    return Promise.resolve(this.behaviour.offers ?? FAKE_FLIGHT_OFFERS);
+    return Promise.resolve(value);
+  }
+
+  search(): Promise<FlightOffer[]> {
+    return this.guard(this.behaviour.offers ?? FAKE_FLIGHT_OFFERS);
+  }
+  nearbyOptions(): Promise<FlightOffer[]> {
+    return this.guard(this.behaviour.offers ?? FAKE_FLIGHT_OFFERS);
+  }
+  priceCalendar(): Promise<RoutePriceSample[]> {
+    return this.guard(this.behaviour.samples ?? FAKE_PRICE_SAMPLES);
+  }
+  latestPrices(): Promise<RoutePriceSample[]> {
+    return this.guard(this.behaviour.samples ?? FAKE_PRICE_SAMPLES);
+  }
+  monthlyPrices(): Promise<RouteDeal[]> {
+    return this.guard(this.behaviour.deals ?? FAKE_ROUTE_DEALS);
+  }
+  cityDirections(): Promise<RouteDeal[]> {
+    return this.guard(this.behaviour.deals ?? FAKE_ROUTE_DEALS);
   }
 }
 

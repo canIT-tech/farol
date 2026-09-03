@@ -1,7 +1,13 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { flightSelections, type Database } from "@farol/db";
-import type { FlightProvider } from "@farol/providers";
-import { NotFoundError, type FlightOffer, type ProviderSection } from "@farol/shared";
+import type { FlightInsightsProvider, RouteQuery } from "@farol/providers";
+import {
+  NotFoundError,
+  type FlightOffer,
+  type ProviderSection,
+  type RouteDeal,
+  type RoutePriceSample
+} from "@farol/shared";
 import { DB } from "../db/db.module";
 import { ENV } from "../config/config.module";
 import type { Env } from "../config/env.schema";
@@ -11,40 +17,124 @@ import { buildFlightParams } from "../providers/trip-search";
 import { TripsService } from "../trips/trips.service";
 import { toFlightSelection, type FlightSelection } from "./flight-selection";
 
-const PROVIDER = "amadeus-flight";
-const ENDPOINT = "flight-offers";
+const PROVIDER = "travelpayouts-flight";
+
+export const FLIGHT_ENDPOINTS = {
+  search: "search",
+  nearby: "nearest-places-matrix",
+  calendar: "month-matrix",
+  latest: "prices-latest",
+  monthly: "prices-monthly",
+  directions: "city-directions"
+} as const;
 
 @Injectable()
 export class FlightsService {
   constructor(
     @Inject(DB) private readonly db: Database,
-    @Inject(FLIGHT_PROVIDER) private readonly provider: FlightProvider,
+    @Inject(FLIGHT_PROVIDER) private readonly provider: FlightInsightsProvider,
     @Inject(ENV) private readonly env: Env,
     private readonly cache: ProviderCacheRepository,
     private readonly trips: TripsService
   ) {}
 
-  async search(userId: string, tripId: string): Promise<ProviderSection<FlightOffer>> {
-    const trip = await this.trips.get(userId, tripId);
-    const params = buildFlightParams(trip);
-
+  // Uma seção = uma chamada cacheada ao provider. Falha do provider degrada só
+  // esta seção e devolve error "unavailable" (design §7.3) — a página segue de pé.
+  private async section<T>(
+    tripId: string,
+    endpoint: string,
+    params: Record<string, unknown>,
+    load: () => Promise<T[]>
+  ): Promise<ProviderSection<T>> {
     try {
-      const { value } = await this.cache.getOrSet<FlightOffer[]>({
+      const { value } = await this.cache.getOrSet<T[]>({
         provider: PROVIDER,
-        endpoint: ENDPOINT,
-        params: { ...params },
+        endpoint,
+        params,
         ttlSeconds: this.env.FLIGHT_CACHE_TTL_SECONDS,
-        load: () => this.provider.search(params)
+        load
       });
       return { offers: value, stale: false, error: null };
     } catch (err) {
-      // §7.3: falha do provider degrada a seção sem derrubar a página.
-      // no_destination_chosen é lançado por buildFlightParams (fora do try) e propaga.
       console.error(
-        JSON.stringify({ event: "flight_search_failed", tripId, message: (err as Error).message })
+        JSON.stringify({
+          event: "flight_provider_failed",
+          endpoint,
+          tripId,
+          message: (err as Error).message
+        })
       );
       return { offers: [], stale: false, error: "unavailable" };
     }
+  }
+
+  /** Ofertas da rota escolhida — /v1/prices/cheap + /v2/prices/nearest-places-matrix. */
+  async search(userId: string, tripId: string): Promise<ProviderSection<FlightOffer>> {
+    const trip = await this.trips.get(userId, tripId);
+    const params = buildFlightParams(trip);
+    return this.section(tripId, FLIGHT_ENDPOINTS.search, { ...params }, () =>
+      this.provider.search(params)
+    );
+  }
+
+  /** Aeroportos vizinhos de origem e destino — "sair de VCP sai mais barato". */
+  async nearbyOptions(userId: string, tripId: string): Promise<ProviderSection<FlightOffer>> {
+    const trip = await this.trips.get(userId, tripId);
+    const params = buildFlightParams(trip);
+    return this.section(tripId, FLIGHT_ENDPOINTS.nearby, { ...params }, () =>
+      this.provider.nearbyOptions(params)
+    );
+  }
+
+  // Os três recortes de contexto de preço só variam no endpoint e na chamada
+  // ao provider — mesma rota, mesmos passageiros, mesma política de cache.
+  private async routeSection<T>(
+    userId: string,
+    tripId: string,
+    endpoint: string,
+    call: (query: RouteQuery, passengers: number) => Promise<T[]>
+  ): Promise<ProviderSection<T>> {
+    const trip = await this.trips.get(userId, tripId);
+    const params = buildFlightParams(trip);
+    const query = { originIata: params.originIata, destinationIata: params.destinationIata };
+    const passengers = params.adults + params.children;
+    return this.section(tripId, endpoint, { ...query, passengers }, () =>
+      call(query, passengers)
+    );
+  }
+
+  /** Preço por dia do mês — "melhor dia para sair". */
+  priceCalendar(userId: string, tripId: string): Promise<ProviderSection<RoutePriceSample>> {
+    return this.routeSection(userId, tripId, FLIGHT_ENDPOINTS.calendar, (q, n) =>
+      this.provider.priceCalendar(q, n)
+    );
+  }
+
+  /** Preços recentes da rota — a faixa que embasa o "está caro ou está barato". */
+  latestPrices(userId: string, tripId: string): Promise<ProviderSection<RoutePriceSample>> {
+    return this.routeSection(userId, tripId, FLIGHT_ENDPOINTS.latest, (q, n) =>
+      this.provider.latestPrices(q, n)
+    );
+  }
+
+  /** Melhor preço mês a mês — "quando ir". */
+  monthlyPrices(userId: string, tripId: string): Promise<ProviderSection<RouteDeal>> {
+    return this.routeSection(userId, tripId, FLIGHT_ENDPOINTS.monthly, (q, n) =>
+      this.provider.monthlyPrices(q, n)
+    );
+  }
+
+  /** Destinos mais baratos saindo da origem — sinal de preço para a descoberta.
+   *  Não exige destino escolhido: é justamente o que ajuda a escolher. */
+  async cityDirections(userId: string, tripId: string): Promise<ProviderSection<RouteDeal>> {
+    const trip = await this.trips.get(userId, tripId);
+    const passengers = trip.party.adults + trip.party.children;
+    return this.section(
+      tripId,
+      FLIGHT_ENDPOINTS.directions,
+      { originIata: trip.originIata, passengers },
+      () => this.provider.cityDirections(trip.originIata, passengers)
+    );
   }
 
   async select(userId: string, tripId: string, offerId: string): Promise<FlightSelection> {

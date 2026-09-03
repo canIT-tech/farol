@@ -13,7 +13,12 @@ import { FlightsService } from "./flights.service";
 import { ProviderCacheRepository, cacheKey } from "../providers/provider-cache.repository";
 import { buildFlightParams } from "../providers/trip-search";
 import { TripsService } from "../trips/trips.service";
-import { FakeFlightProvider, FAKE_FLIGHT_OFFERS } from "../../test/support/fake-providers";
+import {
+  FakeFlightProvider,
+  FAKE_FLIGHT_OFFERS,
+  FAKE_PRICE_SAMPLES,
+  FAKE_ROUTE_DEALS
+} from "../../test/support/fake-providers";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/api");
@@ -62,7 +67,7 @@ async function tripWithChosenDestination(userId: string): Promise<string> {
 beforeAll(() => runMigrations(url));
 afterEach(async () => {
   // só o cache deste provider — o spec de hotéis usa "amadeus-hotel", sem corrida
-  await db.delete(providerCache).where(eq(providerCache.provider, "amadeus-flight"));
+  await db.delete(providerCache).where(eq(providerCache.provider, "travelpayouts-flight"));
   if (userIds.length > 0) {
     await db.delete(users).where(inArray(users.id, userIds));
     userIds.length = 0;
@@ -87,9 +92,9 @@ describe("FlightsService", () => {
     expect(spy).toHaveBeenCalledOnce();
 
     const trip = await trips.get(userId, tripId);
-    const key = cacheKey("amadeus-flight", "flight-offers", { ...buildFlightParams(trip) });
+    const key = cacheKey("travelpayouts-flight", "search", { ...buildFlightParams(trip) });
     const cached = await db.select().from(providerCache).where(eq(providerCache.key, key));
-    expect(cached[0]?.provider).toBe("amadeus-flight");
+    expect(cached[0]?.provider).toBe("travelpayouts-flight");
   });
 
   it("search degrada para { offers: [], error: 'unavailable' } e loga o evento quando o provider falha", async () => {
@@ -105,7 +110,7 @@ describe("FlightsService", () => {
         error: "unavailable"
       });
       expect(errSpy).toHaveBeenCalledOnce();
-      expect(errSpy.mock.calls[0]![0]).toContain("flight_search_failed");
+      expect(errSpy.mock.calls[0]![0]).toContain("flight_provider_failed");
     } finally {
       errSpy.mockRestore();
     }
@@ -164,5 +169,107 @@ describe("FlightsService", () => {
       code: "not_found",
       message: "oferta de voo não encontrada"
     });
+  });
+
+  it("nearbyOptions devolve as alternativas de aeroporto vizinho", async () => {
+    const provider = new FakeFlightProvider();
+    const spy = vi.spyOn(provider, "nearbyOptions");
+    const service = new FlightsService(db, provider, env, cache, trips);
+    const userId = await makeUser();
+    const tripId = await tripWithChosenDestination(userId);
+
+    await expect(service.nearbyOptions(userId, tripId)).resolves.toEqual({
+      offers: FAKE_FLIGHT_OFFERS,
+      stale: false,
+      error: null
+    });
+    await service.nearbyOptions(userId, tripId);
+    expect(spy).toHaveBeenCalledOnce();
+  });
+
+  it("priceCalendar e latestPrices devolvem amostras de preço da rota", async () => {
+    const service = new FlightsService(db, new FakeFlightProvider(), env, cache, trips);
+    const userId = await makeUser();
+    const tripId = await tripWithChosenDestination(userId);
+
+    await expect(service.priceCalendar(userId, tripId)).resolves.toEqual({
+      offers: FAKE_PRICE_SAMPLES,
+      stale: false,
+      error: null
+    });
+    await expect(service.latestPrices(userId, tripId)).resolves.toEqual({
+      offers: FAKE_PRICE_SAMPLES,
+      stale: false,
+      error: null
+    });
+  });
+
+  it("monthlyPrices e cityDirections devolvem os melhores achados por chave", async () => {
+    const service = new FlightsService(db, new FakeFlightProvider(), env, cache, trips);
+    const userId = await makeUser();
+    const tripId = await tripWithChosenDestination(userId);
+
+    await expect(service.monthlyPrices(userId, tripId)).resolves.toEqual({
+      offers: FAKE_ROUTE_DEALS,
+      stale: false,
+      error: null
+    });
+    await expect(service.cityDirections(userId, tripId)).resolves.toEqual({
+      offers: FAKE_ROUTE_DEALS,
+      stale: false,
+      error: null
+    });
+  });
+
+  it("cityDirections funciona sem destino escolhido — é o que ajuda a escolher", async () => {
+    const provider = new FakeFlightProvider();
+    const spy = vi.spyOn(provider, "cityDirections");
+    const service = new FlightsService(db, provider, env, cache, trips);
+    const userId = await makeUser();
+    const trip = await trips.create(userId, tripInput); // sem trip_destinations
+
+    await expect(service.cityDirections(userId, trip.id)).resolves.toMatchObject({
+      offers: FAKE_ROUTE_DEALS,
+      error: null
+    });
+    expect(spy).toHaveBeenCalledWith("GRU", 2);
+  });
+
+  it("cada recorte degrada sozinho quando o provider falha", async () => {
+    const service = new FlightsService(db, new FakeFlightProvider({ fail: true }), env, cache, trips);
+    const userId = await makeUser();
+    const tripId = await tripWithChosenDestination(userId);
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    try {
+      const degraded = { offers: [], stale: false, error: "unavailable" };
+      await expect(service.nearbyOptions(userId, tripId)).resolves.toEqual(degraded);
+      await expect(service.priceCalendar(userId, tripId)).resolves.toEqual(degraded);
+      await expect(service.latestPrices(userId, tripId)).resolves.toEqual(degraded);
+      await expect(service.monthlyPrices(userId, tripId)).resolves.toEqual(degraded);
+      await expect(service.cityDirections(userId, tripId)).resolves.toEqual(degraded);
+      expect(errSpy).toHaveBeenCalledTimes(5);
+    } finally {
+      errSpy.mockRestore();
+    }
+  });
+
+  it("os recortes têm chaves de cache distintas — um não sobrepõe o outro", async () => {
+    const service = new FlightsService(db, new FakeFlightProvider(), env, cache, trips);
+    const userId = await makeUser();
+    const tripId = await tripWithChosenDestination(userId);
+
+    await service.search(userId, tripId);
+    await service.nearbyOptions(userId, tripId);
+    await service.priceCalendar(userId, tripId);
+    await service.latestPrices(userId, tripId);
+    await service.monthlyPrices(userId, tripId);
+    await service.cityDirections(userId, tripId);
+
+    const rows = await db
+      .select()
+      .from(providerCache)
+      .where(eq(providerCache.provider, "travelpayouts-flight"));
+    expect(new Set(rows.map((r) => r.key)).size).toBe(6);
   });
 });

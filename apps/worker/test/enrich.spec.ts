@@ -7,8 +7,8 @@ if (process.env.DATABASE_URL_TEST) {
 }
 
 process.env.SUPABASE_JWKS_URL ??= "https://example.com/jwks.json";
-process.env.AMADEUS_CLIENT_ID ??= "amadeus-worker-id";
-process.env.AMADEUS_CLIENT_SECRET ??= "amadeus-worker-secret";
+process.env.TRAVELPAYOUTS_TOKEN ??= "travelpayouts-worker-token";
+process.env.TRAVELPAYOUTS_MARKER ??= "farol-worker";
 process.env.GOOGLE_PLACES_KEY ??= "google-places-worker";
 process.env.JOBS_SCHEMA = `pgboss_enrich_${Math.random().toString(36).slice(2, 8)}`;
 

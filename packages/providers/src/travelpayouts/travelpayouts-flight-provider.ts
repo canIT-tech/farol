@@ -5,7 +5,11 @@ import {
   type RouteDeal,
   type RoutePriceSample
 } from "@farol/shared";
-import type { FlightProvider } from "../flight-provider.js";
+import type {
+  FlightInsightsProvider,
+  LatestPricesQuery,
+  RouteQuery
+} from "../flight-provider.js";
 import { AVIASALES_SEARCH_TEMPLATE } from "./deep-link.js";
 import {
   createTravelpayoutsHttp,
@@ -39,18 +43,6 @@ export const LATEST_PATH = "/v2/prices/latest";
 export const MONTH_MATRIX_PATH = "/v2/prices/month-matrix";
 export const NEAREST_PLACES_PATH = "/v2/prices/nearest-places-matrix";
 
-export interface RouteQuery {
-  originIata: string;
-  destinationIata: string;
-}
-
-export interface LatestPricesQuery extends RouteQuery {
-  /** "year" ou "month" — janela que o Travelpayouts varre. */
-  periodType?: "year" | "month";
-  page?: number;
-  limit?: number;
-}
-
 const DEFAULT_CURRENCY = "brl";
 const DEFAULT_LATEST_LIMIT = 30;
 
@@ -63,7 +55,7 @@ export function toMonth(isoDate: string): string {
 // Provider de voo sobre a Data API do Travelpayouts (Aviasales).
 // Sem OAuth: token no header, marker de afiliado em cada link (spec de migração).
 // O preço é cacheado/agregado, não busca live — a UI mostra "preço aproximado".
-export class TravelpayoutsFlightProvider implements FlightProvider {
+export class TravelpayoutsFlightProvider implements FlightInsightsProvider {
   private readonly http: TravelpayoutsHttp;
   private readonly currency: string;
   private readonly template: string;
