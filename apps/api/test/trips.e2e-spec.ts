@@ -104,4 +104,51 @@ describe("trips", () => {
       .send({ ...body, dateStart: "2026-09-10", dateEnd: "2026-09-17" });
     expect(res.status).toBe(400);
   });
+
+  it("DELETE /trips/:id apaga a viagem (204) e ela some da lista", async () => {
+    const token = await tokenForNewUser();
+    const created = await request(app.getHttpServer())
+      .post("/trips")
+      .set("Authorization", `Bearer ${token}`)
+      .send(body);
+
+    const removed = await request(app.getHttpServer())
+      .delete(`/trips/${created.body.id}`)
+      .set("Authorization", `Bearer ${token}`);
+    expect(removed.status).toBe(204);
+
+    const list = await request(app.getHttpServer())
+      .get("/trips")
+      .set("Authorization", `Bearer ${token}`);
+    expect(list.body.map((t: { id: string }) => t.id)).not.toContain(created.body.id);
+
+    const gone = await request(app.getHttpServer())
+      .get(`/trips/${created.body.id}`)
+      .set("Authorization", `Bearer ${token}`);
+    expect(gone.status).toBe(404);
+  });
+
+  it("DELETE /trips/:id sem auth responde 401", async () => {
+    const res = await request(app.getHttpServer()).delete(`/trips/${crypto.randomUUID()}`);
+    expect(res.status).toBe(401);
+  });
+
+  it("DELETE /trips/:id de outra pessoa responde 403 e não apaga", async () => {
+    const dono = await tokenForNewUser();
+    const intruso = await tokenForNewUser();
+    const created = await request(app.getHttpServer())
+      .post("/trips")
+      .set("Authorization", `Bearer ${dono}`)
+      .send(body);
+
+    const res = await request(app.getHttpServer())
+      .delete(`/trips/${created.body.id}`)
+      .set("Authorization", `Bearer ${intruso}`);
+    expect(res.status).toBe(403);
+
+    const ainda = await request(app.getHttpServer())
+      .get(`/trips/${created.body.id}`)
+      .set("Authorization", `Bearer ${dono}`);
+    expect(ainda.status).toBe(200);
+  });
 });

@@ -11,7 +11,7 @@ import { budgetLabel, partyLabel, periodLabel } from "../../components/TripSideb
 import { ApiError, apiFetch } from "../../lib/api-client";
 import { signOut } from "../../lib/session";
 import { tripCardTitle, tripResumeRoute } from "../../lib/trip-home";
-import { listTrips } from "../../lib/trip-api";
+import { deleteTrip, listTrips } from "../../lib/trip-api";
 
 const STATUS_LABEL: Record<Trip["status"], string> = {
   draft: "em montagem",
@@ -26,6 +26,24 @@ function Home({ token }: { token: string }) {
   const router = useRouter();
   const [trips, setTrips] = useState<Trip[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Remover é irreversível e leva o roteiro junto: o primeiro clique só arma a
+  // confirmação, no próprio cartão. Diálogo nativo bloquearia a página inteira.
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const [removing, setRemoving] = useState<string | null>(null);
+
+  async function remove(tripId: string) {
+    setRemoving(tripId);
+    setError(null);
+    try {
+      await deleteTrip(token, tripId);
+      setTrips((current) => (current ?? []).filter((trip) => trip.id !== tripId));
+      setConfirming(null);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "não consegui remover a viagem");
+    } finally {
+      setRemoving(null);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -128,13 +146,51 @@ function Home({ token }: { token: string }) {
                     <dt>Orçamento</dt>
                     <dd>{budgetLabel(trip)}</dd>
                   </dl>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => router.push(tripResumeRoute(trip))}
-                  >
-                    Continuar
-                  </Button>
+                  <div className="trips__actions">
+                    {confirming === trip.id ? (
+                      <>
+                        <span className="trips__confirm">Remover esta viagem?</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          disabled={removing === trip.id}
+                          loading={removing === trip.id}
+                          onClick={() => void remove(trip.id)}
+                        >
+                          Sim, remover
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="text"
+                          size="sm"
+                          onClick={() => setConfirming(null)}
+                        >
+                          Cancelar
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => router.push(tripResumeRoute(trip))}
+                        >
+                          Continuar
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="text"
+                          size="sm"
+                          className="trips__remove"
+                          aria-label={`Remover ${tripCardTitle(trip)}`}
+                          onClick={() => setConfirming(trip.id)}
+                        >
+                          Remover
+                        </Button>
+                      </>
+                    )}
+                  </div>
                 </article>
               </li>
             ))}

@@ -39,6 +39,23 @@ export class TripsService {
     return rows.map(toTrip);
   }
 
+  /** Apaga a viagem inteira. As tabelas penduradas (destinos, roteiro, dias,
+   *  itens, seleções de voo e hotel, chat) têm FK com ON DELETE CASCADE, então
+   *  saem junto — não há linha órfã a limpar aqui. */
+  async remove(userId: string, tripId: string): Promise<void> {
+    // Ler antes de apagar: sem isto, remover a viagem de outra pessoa
+    // devolveria sucesso silencioso em vez de 403.
+    const rows = await this.db.select().from(trips).where(eq(trips.id, tripId));
+    const tripRow = rows[0];
+    if (!tripRow) {
+      throw new NotFoundError("viagem não encontrada");
+    }
+    if (tripRow.userId !== userId) {
+      throw new ForbiddenError("essa viagem pertence a outro usuário");
+    }
+    await this.db.delete(trips).where(eq(trips.id, tripId));
+  }
+
   async get(userId: string, tripId: string): Promise<TripState> {
     const rows = await this.db.select().from(trips).where(eq(trips.id, tripId));
     const tripRow = rows[0];

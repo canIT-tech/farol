@@ -79,3 +79,44 @@ test("quem já tem sessão não vê o login", async ({ page }) => {
   await page.waitForURL("**/trips");
   await expect(page.getByText("Você ainda não tem viagem.", { exact: false })).toBeVisible();
 });
+
+// Remover é irreversível e leva o roteiro junto, então o primeiro clique só
+// arma a confirmação — um toque acidental não apaga nada.
+test("remover pede confirmação, dá para desistir, e o cartão some ao confirmar", async ({
+  page
+}) => {
+  await installSession(page);
+
+  let deleted: string | null = null;
+  await page.route(`${API}/**`, async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    if (url.pathname === "/api/me/profile") return route.fulfill(json(profile));
+    if (url.pathname === `/api/trips/${TRIP_ID}` && request.method() === "DELETE") {
+      deleted = TRIP_ID;
+      return route.fulfill({ status: 204, body: "" });
+    }
+    if (url.pathname === "/api/trips") {
+      return route.fulfill(json(deleted === null ? [trip] : []));
+    }
+    return route.continue();
+  });
+
+  await page.goto("/trips");
+  const cartao = page.getByRole("article").first();
+  await expect(cartao).toBeVisible();
+
+  await cartao.getByRole("button", { name: /^Remover/ }).click();
+  await expect(page.getByText("Remover esta viagem?")).toBeVisible();
+
+  // Desistir devolve o cartão ao estado normal, sem chamar a api.
+  await cartao.getByRole("button", { name: "Cancelar" }).click();
+  await expect(page.getByText("Remover esta viagem?")).toHaveCount(0);
+  await expect(cartao.getByRole("button", { name: "Continuar" })).toBeVisible();
+
+  await cartao.getByRole("button", { name: /^Remover/ }).click();
+  await cartao.getByRole("button", { name: "Sim, remover" }).click();
+
+  await expect(page.getByRole("article")).toHaveCount(0);
+  await expect(page.getByText(/ainda não tem viagem/)).toBeVisible();
+});

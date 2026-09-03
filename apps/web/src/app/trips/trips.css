@@ -75,9 +75,20 @@
   color: var(--ink-muted);
 }
 
-.trips__card .farol-btn {
+.trips__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
   margin-top: auto;
-  align-self: flex-start;
+}
+
+/* A pergunta ocupa a linha inteira: os botões descem e ficam longe de onde
+   estava o "Continuar", para o segundo clique ser deliberado. */
+.trips__confirm {
+  flex-basis: 100%;
+  font-size: 13px;
+  color: var(--accent-ink);
 }
 
 .trips__empty {
@@ -94,4 +105,15 @@
   .trips__list {
     grid-template-columns: 1fr;
   }
+}
+
+/* Remover não compete com Continuar: fica neutro e só ganha cor no hover, na
+   hora em que a pessoa já mirou nele. */
+.trips__remove.farol-btn--text {
+  color: var(--text-faint);
+  margin-left: auto;
+}
+
+.trips__remove.farol-btn--text:hover {
+  color: var(--accent-ink);
 }

@@ -37,6 +37,11 @@ export function listTrips(token: string, f?: typeof fetch): Promise<Trip[]> {
   return apiFetch({ path: "/trips", schema: z.array(tripSchema), token }, f);
 }
 
+/** Apaga a viagem e tudo que pendura nela. Sem corpo na resposta (204). */
+export function deleteTrip(token: string, tripId: string, f?: typeof fetch): Promise<void> {
+  return apiSend({ path: `/trips/${tripId}`, token, method: "DELETE" }, f);
+}
+
 export function createTrip(token: string, input: TripInput, f?: typeof fetch): Promise<Trip> {
   return apiFetch({ path: "/trips", schema: tripSchema, token, method: "POST", body: input }, f);
 }

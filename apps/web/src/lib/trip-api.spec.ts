@@ -11,6 +11,7 @@ import {
   getHotels,
   getItinerary,
   getTrip,
+  deleteTrip,
   listTrips,
   regenerateDay,
   runDiscovery,
@@ -162,6 +163,21 @@ describe("escrita", () => {
     const f = jsonFetch([candidate]);
     expect(await runDiscovery(TOKEN, TRIP_ID, f)).toHaveLength(1);
     expect(lastCall(f)[0]).toContain(`/trips/${TRIP_ID}/discovery`);
+  });
+
+  it("deleteTrip manda DELETE na viagem e não espera corpo", async () => {
+    // 204 não pode ter corpo, então não dá para usar o jsonFetch aqui.
+    const f = vi.fn(async () => new Response(null, { status: 204 })) as unknown as typeof fetch;
+    await expect(deleteTrip(TOKEN, TRIP_ID, f)).resolves.toBeUndefined();
+    expect(lastCall(f)[0]).toContain(`/trips/${TRIP_ID}`);
+    expect(lastCall(f)[1].method).toBe("DELETE");
+  });
+
+  it("deleteTrip propaga a recusa da api", async () => {
+    const f = jsonFetch({ message: "essa viagem pertence a outro usuário" }, 403);
+    await expect(deleteTrip(TOKEN, TRIP_ID, f)).rejects.toThrow(
+      "essa viagem pertence a outro usuário"
+    );
   });
 
   it("chooseDestination devolve o id do roteiro criado", async () => {
