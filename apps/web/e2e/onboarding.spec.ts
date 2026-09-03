@@ -76,7 +76,7 @@ test("login mockado → onboarding → salva o perfil e redireciona", async ({ p
   await expect(continuar).toBeEnabled();
   await continuar.click();
 
-  await page.waitForURL("http://localhost:3000/");
+  await page.waitForURL("**/trips");
   expect(putBody).toEqual({
     interests: ["praia", "gastronomia", "vinhos"],
     pace: "moderado",

@@ -15,8 +15,9 @@ const SESSION_OK = { data: { session: { access_token: "tok" } } };
 const SESSION_NONE = { data: { session: null } };
 let sessionResult: unknown = SESSION_OK;
 const getSession = vi.fn(async () => sessionResult);
+const authSignOut = vi.fn(async () => ({ error: null }));
 vi.mock("../lib/supabase", () => ({
-  getSupabaseBrowserClient: () => ({ auth: { getSession } })
+  getSupabaseBrowserClient: () => ({ auth: { getSession, signOut: authSignOut } })
 }));
 
 const state = {
@@ -73,25 +74,22 @@ describe("TripShell", () => {
   });
 
   it("clicar num passo concluído navega para ele", async () => {
+    const lisboa = {
+      iata: "LIS",
+      city: "Lisboa",
+      country: "Portugal",
+      score: 0.8,
+      rationale: "Justificativa longa o suficiente para passar no schema aqui.",
+      estCost: { flight: 3200, lodgingPerNight: 180, dailyLocal: 140, currency: "BRL" },
+      climate: { expectedC: 24, summary: "ameno", bestMonths: [9] },
+      flightTimeHours: null
+    };
     vi.stubGlobal(
       "fetch",
       vi.fn(async () =>
         new Response(
-          JSON.stringify({
-            ...state,
-            destinations: [
-              {
-                iata: "LIS",
-                city: "Lisboa",
-                country: "Portugal",
-                score: 0.8,
-                rationale: "Justificativa longa o suficiente para passar no schema aqui.",
-                estCost: { flight: 3200, lodgingPerNight: 180, dailyLocal: 140, currency: "BRL" },
-                climate: { expectedC: 24, summary: "ameno", bestMonths: [9] },
-                flightTimeHours: null
-              }
-            ]
-          }),
+          // destino escolhido: "Escolher destino" vira etapa concluída e clicável
+          JSON.stringify({ ...state, destinations: [lisboa], chosenDestination: lisboa }),
           { status: 200, headers: { "content-type": "application/json" } }
         )
       )
@@ -101,9 +99,33 @@ describe("TripShell", () => {
         <p>miolo</p>
       </TripShell>
     );
-    const link = await screen.findByRole("button", { name: "Descoberta" });
+    const link = await screen.findByRole("button", { name: "Escolher destino" });
     await userEvent.click(link);
     expect(push).toHaveBeenCalledWith(`/trips/${TRIP_ID}/discovery`);
+  });
+
+  it("a etapa de perfil sai do escopo da viagem e vai para o onboarding", async () => {
+    render(
+      <TripShell tripId={TRIP_ID}>
+        <p>miolo</p>
+      </TripShell>
+    );
+    await userEvent.click(await screen.findByRole("button", { name: "Perfil de gosto" }));
+    expect(push).toHaveBeenCalledWith("/onboarding");
+  });
+
+  it("a sidebar leva de volta para as viagens e permite sair", async () => {
+    render(
+      <TripShell tripId={TRIP_ID}>
+        <p>miolo</p>
+      </TripShell>
+    );
+    await screen.findByText("miolo");
+    expect(screen.getByRole("link", { name: "Minhas viagens" })).toHaveAttribute("href", "/trips");
+
+    await userEvent.click(screen.getByRole("button", { name: "Sair" }));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith("/"));
+    expect(authSignOut).toHaveBeenCalledTimes(1);
   });
 
   it("erro ao carregar mostra alerta com retry", async () => {

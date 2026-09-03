@@ -52,7 +52,7 @@ function OnboardingForm({ token }: { token: string }) {
         token,
         body: toTasteProfileInput(state)
       });
-      router.push("/");
+      router.push("/trips");
     } catch (err) {
       setError(err instanceof Error ? err.message : "erro ao salvar");
       setSaving(false);

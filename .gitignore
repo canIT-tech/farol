@@ -34,3 +34,6 @@ test-results/
 .worktrees/
 .claude/worktrees/
 
+# Claude Code — permissões pessoais desta máquina
+.claude/settings.local.json
+
