@@ -11,7 +11,13 @@ import { AuthGuard } from "./auth.guard";
     {
       provide: JwtVerifier,
       inject: [ENV],
-      useFactory: (env: Env) => new JwtVerifier(env.SUPABASE_JWKS_URL)
+      // Aud vazia desliga a checagem — escape para um emissor que não siga a
+      // convenção do Supabase.
+      useFactory: (env: Env) =>
+        new JwtVerifier(
+          env.SUPABASE_JWKS_URL,
+          env.SUPABASE_JWT_AUD === "" ? undefined : env.SUPABASE_JWT_AUD
+        )
     },
     UserUpsertService,
     AuthGuard

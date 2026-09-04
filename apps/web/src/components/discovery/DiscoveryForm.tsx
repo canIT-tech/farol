@@ -33,11 +33,14 @@ function brl(value: number): string {
 
 export function DiscoveryForm({
   onSubmit,
+  token,
   onStateChange,
   adults = EMPTY_DISCOVERY_FORM.adults,
   pending = false
 }: {
   onSubmit: (input: TripInput) => void;
+  /** Repassado ao OriginField: o /geo passou a exigir credencial. */
+  token: string;
   /** A sidebar espelha o que está sendo preenchido, como no hi-fi. */
   onStateChange?: (state: DiscoveryFormState) => void;
   /** Palpite inicial de adultos, vindo da companhia do perfil de gosto. */
@@ -63,7 +66,7 @@ export function DiscoveryForm({
       }}
     >
       <div className="screen__row">
-        <OriginField value={state.originIata} onChange={(originIata) => patch({ originIata })} />
+        <OriginField token={token} value={state.originIata} onChange={(originIata) => patch({ originIata })} />
       </div>
 
       <div className="screen__row">

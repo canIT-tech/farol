@@ -17,11 +17,14 @@ export function airportLabel(airport: Airport): string {
 export function OriginField({
   value,
   onChange,
+  token,
   detectOrigin = whereami,
   findAirports = searchAirports
 }: {
   value: string;
   onChange: (iata: string) => void;
+  /** O /geo passou a exigir credencial; o token vem do AuthGate, pela página. */
+  token: string;
   detectOrigin?: typeof whereami;
   findAirports?: typeof searchAirports;
 }) {
@@ -42,7 +45,7 @@ export function OriginField({
   // digitou vale mais que o palpite —, e falhar aqui não muda nada na tela.
   useEffect(() => {
     let active = true;
-    detectOrigin()
+    detectOrigin(token)
       .then((place) => {
         if (active && place !== null) {
           setSuggested(`${place.name} (${place.iata})`);
@@ -55,7 +58,7 @@ export function OriginField({
     return () => {
       active = false;
     };
-  }, [detectOrigin]);
+  }, [detectOrigin, token]);
 
   // Busca no catálogo a cada tecla. Termo curto não busca: o dump inteiro
   // casaria com quase tudo e a lista viraria ruído.
@@ -65,7 +68,7 @@ export function OriginField({
       return;
     }
     let active = true;
-    findAirports(term)
+    findAirports(token, term)
       .then((found) => {
         if (active) {
           setOptions(found);
@@ -79,7 +82,7 @@ export function OriginField({
     return () => {
       active = false;
     };
-  }, [term, chosen, findAirports]);
+  }, [term, chosen, findAirports, token]);
 
   function type(next: string) {
     setTerm(next);

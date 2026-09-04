@@ -4,6 +4,8 @@
   // processo. A lista espelha apps/api/src/config/env.schema.ts + os
   // NEXT_PUBLIC_* do web + DATABASE_URL_TEST.
   "globalEnv": [
+    "CORS_ORIGINS",
+    "SUPABASE_JWT_AUD",
     "API_PORT",
     "CI",
     "DATABASE_URL",

@@ -1,16 +1,25 @@
 import { z } from "zod";
 import { airportSchema, geoLocationSchema, type Airport, type GeoLocation } from "@farol/shared";
-import { apiFetchPublic } from "./api-client";
+import { apiFetch } from "./api-client";
 
-// O /whereami roda antes do login, na tela de nova viagem, só para sugerir a
-// origem. É público e o schema aceita null quando o IP não resolve.
-export function whereami(f?: typeof fetch): Promise<GeoLocation | null> {
-  return apiFetchPublic({ path: "/geo/whereami", schema: geoLocationSchema.nullable() }, f);
+// O /geo deixou de ser público: os dois consumidores (nova viagem e modo
+// autônomo) já rodam atrás do login, e aberto qualquer um gastava nossa cota do
+// Travelpayouts — o /whereami consulta o provider a cada chamada.
+export function whereami(token: string, f?: typeof fetch): Promise<GeoLocation | null> {
+  return apiFetch({ path: "/geo/whereami", token, schema: geoLocationSchema.nullable() }, f);
 }
 
-export function searchAirports(term: string, f?: typeof fetch): Promise<Airport[]> {
-  return apiFetchPublic(
-    { path: `/geo/airports?q=${encodeURIComponent(term)}`, schema: z.array(airportSchema) },
+export function searchAirports(
+  token: string,
+  term: string,
+  f?: typeof fetch
+): Promise<Airport[]> {
+  return apiFetch(
+    {
+      path: `/geo/airports?q=${encodeURIComponent(term)}`,
+      token,
+      schema: z.array(airportSchema)
+    },
     f
   );
 }

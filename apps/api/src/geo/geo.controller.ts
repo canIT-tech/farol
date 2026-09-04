@@ -10,8 +10,10 @@ export const airportQuerySchema = z.object({
 });
 export type AirportQuery = z.infer<typeof airportQuerySchema>;
 
-// Rotas públicas: são dados de referência e o /whereami roda antes do login,
-// no onboarding, para sugerir a cidade de origem.
+// Protegido pelo guard global. Já foi público, com a justificativa de que o
+// /whereami rodava antes do login — não roda: os dois consumidores (nova viagem
+// e modo autônomo) estão atrás do AuthGate. Aberto, qualquer um na internet
+// gastava nossa cota do Travelpayouts, que o /whereami consulta a cada chamada.
 @Controller("geo")
 export class GeoController {
   constructor(private readonly geo: GeoService) {}

@@ -1,13 +1,11 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, Param, Post } from "@nestjs/common";
 import { tripInputSchema, type CurrentUser as CurrentUserType, type TripInput } from "@farol/shared";
-import { AuthGuard } from "../auth/auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
 import { ZodValidationPipe } from "../common/zod.pipe";
 import { TripsService } from "./trips.service";
 import type { Trip, TripState } from "./trip-state";
 
 @Controller("trips")
-@UseGuards(AuthGuard)
 export class TripsController {
   constructor(private readonly trips: TripsService) {}
 

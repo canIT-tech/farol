@@ -64,7 +64,7 @@ function Auto({ token }: { token: string }) {
           Farol escolhe o destino, monta o roteiro dia a dia e acha voo e hotel. Você recebe um
           plano fechado e ajusta o que quiser conversando — sem ficar comparando opções.
         </p>
-        <AutoForm onSubmit={(state) => void submit(state)} pending={pending} />
+        <AutoForm onSubmit={(state) => void submit(state)} token={token} pending={pending} />
         {error !== null ? (
           <p className="screen__error" role="alert">
             {error}

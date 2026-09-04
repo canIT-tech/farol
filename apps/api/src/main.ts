@@ -4,6 +4,7 @@ import { NestFactory } from "@nestjs/core";
 import type { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module";
 import { parseEnv, type Env } from "./config/env.schema";
+import { corsOptions } from "./config/cors";
 import { registerHandlers } from "./jobs/register-handlers";
 
 // Prefixo de todas as rotas da api. Existe por causa do deploy de serviço
@@ -42,7 +43,7 @@ async function bootstrap(): Promise<void> {
   app.set("trust proxy", 1);
   // A landing pública chama /waitlist de outra origem quando web e api estão
   // separados. No serviço único a origem é a mesma e isto não custa nada.
-  app.enableCors();
+  app.enableCors(corsOptions(env.CORS_ORIGINS));
 
   if (env.SERVE_WEB === "true") {
     await serveWeb(app);

@@ -16,8 +16,16 @@ const SESSION_NONE = { data: { session: null } };
 let sessionResult: unknown = SESSION_OK;
 const getSession = vi.fn(async () => sessionResult);
 const authSignOut = vi.fn(async () => ({ error: null }));
+// O AuthGate agora assina onAuthStateChange, então o fake precisa devolver uma
+// inscrição — sem ela o componente quebra ao montar.
 vi.mock("../lib/supabase", () => ({
-  getSupabaseBrowserClient: () => ({ auth: { getSession, signOut: authSignOut } })
+  getSupabaseBrowserClient: () => ({
+    auth: {
+      getSession,
+      signOut: authSignOut,
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: vi.fn() } } })
+    }
+  })
 }));
 
 const state = {

@@ -1,6 +1,13 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { z } from "zod";
-import { ApiError, apiFetch, apiFetchPublic, apiSend, apiBase } from "./api-client";
+import {
+  ApiError,
+  UNAUTHORIZED_EVENT,
+  apiBase,
+  apiFetch,
+  apiFetchPublic,
+  apiSend
+} from "./api-client";
 
 const originalApiUrl = process.env.NEXT_PUBLIC_API_URL;
 afterEach(() => {
@@ -179,5 +186,64 @@ describe("mensagem de erro da api", () => {
       expect((err as ApiError).path).toBe("/me/profile");
     });
     expect.assertions(3);
+  });
+});
+
+describe("aviso de sessão morta", () => {
+  function ouvir(): { calls: number } {
+    const box = { calls: 0 };
+    const handler = () => {
+      box.calls += 1;
+    };
+    window.addEventListener(UNAUTHORIZED_EVENT, handler);
+    afterEachHandlers.push(() => window.removeEventListener(UNAUTHORIZED_EVENT, handler));
+    return box;
+  }
+  const afterEachHandlers: (() => void)[] = [];
+  afterEach(() => {
+    while (afterEachHandlers.length > 0) {
+      afterEachHandlers.pop()!();
+    }
+  });
+
+  // Com a renovação do Supabase funcionando, um 401 já não é token vencido: é
+  // sessão morta de verdade. Quem estiver ouvindo leva a pessoa de volta ao
+  // login em vez de deixar um texto de erro na tela.
+  it("avisa quando a api responde 401", async () => {
+    const visto = ouvir();
+    const f = vi.fn(async () => new Response("nope", { status: 401 }));
+    await expect(
+      apiFetch({ path: "/trips", token: "t", schema: z.array(z.unknown()) }, f as unknown as typeof fetch)
+    ).rejects.toBeInstanceOf(ApiError);
+    expect(visto.calls).toBe(1);
+  });
+
+  it("avisa também quando quem falha é um envio", async () => {
+    const visto = ouvir();
+    const f = vi.fn(async () => new Response("nope", { status: 401 }));
+    await expect(
+      apiSend({ path: "/trips/x", method: "DELETE", token: "t" }, f as unknown as typeof fetch)
+    ).rejects.toBeInstanceOf(ApiError);
+    expect(visto.calls).toBe(1);
+  });
+
+  // 403 é "essa viagem é de outra pessoa" e 500 é problema nosso: nenhum dos
+  // dois é motivo para derrubar a sessão de quem está logado.
+  it.each([403, 404, 422, 500])("não avisa em %i", async (status) => {
+    const visto = ouvir();
+    const f = vi.fn(async () => new Response("erro", { status }));
+    await expect(
+      apiFetch({ path: "/trips", token: "t", schema: z.array(z.unknown()) }, f as unknown as typeof fetch)
+    ).rejects.toBeInstanceOf(ApiError);
+    expect(visto.calls).toBe(0);
+  });
+
+  it("avisa quando uma rota pública responde 401", async () => {
+    const visto = ouvir();
+    const f = vi.fn(async () => new Response("nope", { status: 401 }));
+    await expect(
+      apiFetchPublic({ path: "/geo/whereami", schema: z.unknown() }, f as unknown as typeof fetch)
+    ).rejects.toBeInstanceOf(ApiError);
+    expect(visto.calls).toBe(1);
   });
 });

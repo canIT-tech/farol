@@ -41,7 +41,20 @@ export class ApiError extends Error {
 // A api devolve { statusCode, code, message } nos erros de domínio, e a
 // message é escrita para quem está lendo a tela. Sem isto, todo 4xx virava
 // "api /trips/x/discovery respondeu 422", que não diz o que fazer.
+/** Nome do evento de janela disparado quando a api recusa a credencial.
+ *  O AuthGate escuta e leva a pessoa de volta ao login. Evento de DOM em vez de
+ *  um handler global neste módulo: não deixa estado pendurado entre testes e
+ *  não amarra o api-client a quem reage. */
+export const UNAUTHORIZED_EVENT = "farol:unauthorized";
+
+const UNAUTHORIZED = 401;
+
 async function failure(res: Response, path: string): Promise<ApiError> {
+  // Só o 401 derruba a sessão. 403 é "essa viagem é de outra pessoa" e 5xx é
+  // problema nosso — nenhum dos dois é motivo para deslogar quem está dentro.
+  if (res.status === UNAUTHORIZED && typeof window !== "undefined") {
+    window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+  }
   try {
     const body: unknown = await res.json();
     const message = (body as { message?: unknown }).message;

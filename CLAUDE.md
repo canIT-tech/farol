@@ -19,6 +19,7 @@ monta o dia a dia e ajusta tudo por conversa.
 | Design técnico do MVP (arquitetura, módulos, dados) | `docs/superpowers/specs/2026-08-27-mvp-trip-design.md` |
 | Opções de provider de hotel (sem virar canal de reserva) | `docs/negocio/2026-09-03-opcoes-provider-hotel.md` |
 | Curadoria do catálogo de destinos (como levantar candidatos) | `docs/negocio/2026-09-03-curadoria-do-catalogo.md` |
+| Controle de sessão (guard global, CORS, inatividade, o que ficou de fora) | `docs/superpowers/specs/2026-09-04-controle-de-sessao-design.md` |
 | Google Flights como fonte primária de voo (scraping, riscos, fallback) | `docs/negocio/2026-09-03-google-flights-como-fonte-de-voo.md` |
 | Specs de produto (pagamento, plano grátis, migração de provider, custo de LLM, métricas) | `docs/negocio/2026-08-31-spec-pagamento.md` · `docs/negocio/2026-08-31-spec-plano-gratuito.md` · `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` · `docs/negocio/2026-08-31-custo-llm-por-roteiro.md` · `docs/negocio/2026-08-31-plano-de-metricas.md` |
 | Legal (Termos + Privacidade/LGPD — rascunhos, pré-jurídico) | `docs/legal/` |
@@ -62,6 +63,17 @@ Canvases publicados (Claude Artifacts):
   riscos em `docs/negocio/2026-09-03-google-flights-como-fonte-de-voo.md`.
 - LLM: **Claude**, roteamento de modelo por tarefa.
 - `api` stateless; autorização na camada de serviço (RLS desligada nas tabelas de app).
+- **Sessão: protegido por padrão** (2026-09-04). `AuthGuard` é `APP_GUARD` global —
+  rota nova nasce fechada, e abrir é um `@Public()` explícito. Abertos só
+  `health` e `waitlist`. O JWT é verificado com `audience` (`SUPABASE_JWT_AUD`,
+  default `authenticated`); `issuer` não, de propósito — o JWKS só tem a chave
+  deste projeto, então a checagem não somaria segurança. CORS por
+  `CORS_ORIGINS`, zerado em produção (api e web são a mesma origem lá). No web,
+  o `AuthGate` assina `onAuthStateChange` em vez de fotografar o token, e
+  encerra a sessão após 30 min de inatividade. **Revogação imediata de access
+  token ficou fora**: exigiria consulta a lista de revogados em toda rota. Quem
+  fecha essa janela é a validade curta do token no Supabase. Detalhe em
+  `docs/superpowers/specs/2026-09-04-controle-de-sessao-design.md`.
 - Hospedagem: agnóstica (container + Postgres + env).
 - **`apps/worker` reusa a `api`**: `apps/api/src/worker-exports.ts` é um barrel exposto pelo campo `exports` do `package.json` (path `@farol/api` no `tsconfig.base` aponta pro `dist/worker-exports.d.ts`). O `WorkerModule` importa `ConfigModule`/`DbModule`/`LlmModule`/`JobsModule` + declara `ItineraryRepository` e os handlers como providers — **sem** `ItineraryModule`/`TripsModule` (esses têm controllers com `AuthGuard`, que o worker não tem).
 - **Testes de integração compartilham um único Postgres.** `turbo.json` serializa `@farol/db#test → @farol/api#test → @farol/worker#test` (o `client.spec` do `db` dropa tabelas). pg-boss usa schema isolado por teste (`pgboss_*_<rnd>`, dropado no `afterAll`). Se o banco ficar sujo (run interrompido): `docker compose exec db psql -U postgres -d farol -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public; DROP SCHEMA IF EXISTS drizzle CASCADE"` + `db:migrate` + `db:seed`.
@@ -160,6 +172,9 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - **Ida e volta pelo Google traz só o trecho de ida** (`returnAt` nulo). O preço
   já é o total; o itinerário da volta só existe depois de escolher a ida no
   próprio Google. Buscar o segundo passo exigiria um token opaco de sessão.
+- **JWT expiry do Supabase ainda em 1h.** O design de sessão conta com 15min para
+  fechar a janela entre o logout e a expiração do access token — é ajuste de
+  painel (Authentication → Sessions), não de código, e segue pendente.
 - **`GOOGLE_PLACES_KEY` do `farol/dev` é um placeholder de 11 caracteres**, não uma
   chave real (`AIza…`, ~39). Toda busca do Places responde
   `400 API_KEY_INVALID`, então todo item de roteiro sai sem `placeId`,

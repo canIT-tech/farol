@@ -36,9 +36,12 @@ function ArrowRight() {
 
 export function AutoForm({
   onSubmit,
+  token,
   pending = false
 }: {
   onSubmit: (state: AutoFormState) => void;
+  /** Repassado ao OriginField: o /geo passou a exigir credencial. */
+  token: string;
   pending?: boolean;
 }) {
   const [state, setState] = useState<AutoFormState>(EMPTY_AUTO_FORM);
@@ -62,7 +65,7 @@ export function AutoForm({
             end={state.dateEnd}
             onChange={({ start, end }) => patch({ dateStart: start, dateEnd: end })}
           />
-          <OriginField value={state.originIata} onChange={(originIata) => patch({ originIata })} />
+          <OriginField token={token} value={state.originIata} onChange={(originIata) => patch({ originIata })} />
         </div>
       </div>
 

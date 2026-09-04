@@ -59,6 +59,7 @@ beforeAll(async () => {
     .compile();
   app = mod.createNestApplication();
   await app.init();
+  auth = `Bearer ${await jwks.sign({ sub: "00000000-0000-4000-8000-000000000001", email: "geo@farol.test" })}`;
 });
 
 afterAll(async () => {
@@ -66,44 +67,54 @@ afterAll(async () => {
   await jwks.stop();
 });
 
+let auth: string;
+
 describe("/geo", () => {
-  it("whereami é público e devolve a origem provável pelo IP", async () => {
-    const res = await request(app.getHttpServer()).get("/geo/whereami?ip=191.240.129.27");
+  // O /geo deixou de ser público. Este primeiro caso é o que prova o guard
+  // global: nenhuma rota do módulo declara @Public, e sem token nada passa.
+  it("recusa quem não está autenticado", async () => {
+    for (const path of ["/geo/whereami", "/geo/airports?q=gua", "/geo/airports/gru"]) {
+      expect((await request(app.getHttpServer()).get(path)).status).toBe(401);
+    }
+  });
+
+  it("whereami devolve a origem provável pelo IP", async () => {
+    const res = await request(app.getHttpServer()).get("/geo/whereami?ip=191.240.129.27").set("Authorization", auth);
     expect(res.status).toBe(200);
     expect(res.body.iata).toBe("XAP");
   });
 
   it("whereami devolve corpo vazio quando o IP não resolve", async () => {
-    const res = await request(app.getHttpServer()).get("/geo/whereami?ip=0.0.0.0");
+    const res = await request(app.getHttpServer()).get("/geo/whereami?ip=0.0.0.0").set("Authorization", auth);
     expect(res.status).toBe(200);
     expect(res.body).toEqual({});
   });
 
   it("busca de aeroporto devolve os candidatos e respeita o limite", async () => {
-    const res = await request(app.getHttpServer()).get("/geo/airports?q=gua&limit=1");
+    const res = await request(app.getHttpServer()).get("/geo/airports?q=gua&limit=1").set("Authorization", auth);
     expect(res.status).toBe(200);
     expect(res.body).toHaveLength(1);
     expect(res.body[0].iata).toBe("GRU");
   });
 
   it("busca de aeroporto sem termo responde 400", async () => {
-    const res = await request(app.getHttpServer()).get("/geo/airports");
+    const res = await request(app.getHttpServer()).get("/geo/airports").set("Authorization", auth);
     expect(res.status).toBe(400);
     expect(res.body.code).toBe("validation");
   });
 
   it("resolve aeroporto e companhia por código", async () => {
-    const airport = await request(app.getHttpServer()).get("/geo/airports/gru");
+    const airport = await request(app.getHttpServer()).get("/geo/airports/gru").set("Authorization", auth);
     expect(airport.status).toBe(200);
     expect(airport.body.cityCode).toBe("SAO");
 
-    const airline = await request(app.getHttpServer()).get("/geo/airlines/la");
+    const airline = await request(app.getHttpServer()).get("/geo/airlines/la").set("Authorization", auth);
     expect(airline.status).toBe(200);
     expect(airline.body.name).toContain("LATAM");
   });
 
   it("código desconhecido responde 404", async () => {
-    expect((await request(app.getHttpServer()).get("/geo/airports/ZZZ")).status).toBe(404);
-    expect((await request(app.getHttpServer()).get("/geo/airlines/ZZ")).status).toBe(404);
+    expect((await request(app.getHttpServer()).get("/geo/airports/ZZZ").set("Authorization", auth)).status).toBe(404);
+    expect((await request(app.getHttpServer()).get("/geo/airlines/ZZ").set("Authorization", auth)).status).toBe(404);
   });
 });

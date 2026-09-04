@@ -67,6 +67,7 @@ function NewTrip({ token }: { token: string }) {
         <div className="pane__form">
           {ready ? (
           <DiscoveryForm
+            token={token}
             adults={defaultAdults(party)}
             onSubmit={(input) => void submit(input)}
             onStateChange={setDraft}

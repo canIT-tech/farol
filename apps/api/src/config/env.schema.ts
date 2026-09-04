@@ -24,6 +24,15 @@ const baseEnvSchema = z.object({
   // catch-all. Em desenvolvimento os dois ficam desligados — worker e web sobem
   // separados. Enum em vez de coerce.boolean: coerce trata qualquer string não
   // vazia como true, inclusive "false".
+  // `aud` exigido no JWT. O Supabase emite "authenticated" para token de
+  // usuário. Vazio desliga a checagem.
+  SUPABASE_JWT_AUD: z.string().default("authenticated"),
+  // Origens liberadas no CORS, separadas por vírgula. Vazio = nenhuma.
+  // O default cobre o desenvolvimento (web em :3000, api em :3333, e :3100 do
+  // Playwright), onde a chamada é mesmo cross-origin. Em produção a api e o web
+  // são a mesma origem, então o render.yaml zera esta lista de propósito —
+  // nenhuma requisição cross-origin é legítima lá.
+  CORS_ORIGINS: z.string().default("http://localhost:3000,http://localhost:3100"),
   RUN_JOB_HANDLERS: z.enum(["true", "false"]).default("false"),
   SERVE_WEB: z.enum(["true", "false"]).default("false"),
   // Travelpayouts (Aviasales) — provider de voo do MVP. Sem OAuth: o token vai
