@@ -429,6 +429,22 @@ Não bloqueiam login, mas o Rafael vai "ver quebrado" e precisa saber o que é e
 - `climate.expectedC = null`, `flightTimeHours = null`. Sem fonte no MVP, já documentado
   em CLAUDE.md. Cards de destino não mostram. Esperado.
 
+### C6. Achados da revisão do Passo 10 ainda abertos (2026-09-04, menores)
+
+Revisão linha a linha da UI do PR #13. Os dois graves já saíram em PR próprio
+(`trust proxy` no `main.ts` — o `/geo/whereami` sugeria Londres para todo mundo em
+produção — e a data no cartão de voo). Ficam abertos, sem bloquear o QA:
+
+- **Hora de chegada no fuso de saída.** `arriveAt = departAt + duração` mantém o offset
+  da origem; em rota internacional (GRU→LIS) a chegada aparece 4 h adiantada. O dump de
+  aeroportos tem `time_zone`; converter no `enrich` da `FlightsService`.
+- **`OriginField` aceita qualquer 3 letras como IATA.** Digitar "Sao", "Rio", "Por" já
+  preenche a origem e libera "Buscar destinos" antes de escolher na lista. Só confirmar
+  quando o texto bate com o `iata` de uma opção (ou no clique).
+- **Hotel ignora crianças.** `occupancies: [{ adults }]` na LiteAPI — preço só de adultos.
+- **Possível "0.0 ★".** `toFiveScale(0)` devolve 0, não null; hotel sem avaliação na
+  LiteAPI pode sair com nota zero em vez de sem nota. Não confirmado (fixtures só têm 9+).
+
 ---
 
 ## Parte D — Roteiro de QA (ordem de um usuário real)

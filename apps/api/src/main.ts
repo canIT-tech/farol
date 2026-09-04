@@ -37,6 +37,9 @@ async function bootstrap(): Promise<void> {
   // A landing pública chama /waitlist de outra origem quando web e api estão
   // separados. No serviço único a origem é a mesma e isto não custa nada.
   app.enableCors();
+  // Atrás do proxy do Render, req.ip é o IP interno do balanceador; sem isto o
+  // /geo/whereami sugeria a mesma origem (Londres) para todo mundo.
+  app.set("trust proxy", true);
 
   if (env.SERVE_WEB === "true") {
     await serveWeb(app);

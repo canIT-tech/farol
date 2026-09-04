@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import {
   FlightOfferCard,
   durationLabel,
+  localDate,
   localTime,
   routeLabel,
   stopsLabel,
@@ -38,6 +39,13 @@ describe("localTime", () => {
 
   it("devolve vazio quando não há hora no valor", () => {
     expect(localTime("2026-05-10")).toBe("");
+  });
+});
+
+describe("localDate", () => {
+  it("lê a data local do próprio timestamp, sem converter de fuso", () => {
+    expect(localDate("2026-05-10T08:15:00-05:00")).toBe("10 de mai");
+    expect(localDate("2026-11-04T23:40:00Z")).toBe("4 de nov");
   });
 });
 
@@ -77,7 +85,9 @@ describe("FlightOfferCard", () => {
 
     expect(screen.getByText("AV")).toBeInTheDocument();
     expect(screen.getByText("08:15 → 13:40")).toBeInTheDocument();
-    expect(screen.getByText("Avianca · GRU São Paulo → CTG Cartagena")).toBeInTheDocument();
+    // A data entra no cartão: a oferta é cache do parceiro e pode cair fora das
+    // datas da viagem — sem ela, "08:15 → 13:40" não diz de que dia é.
+    expect(screen.getByText("Avianca · 10 de mai · GRU São Paulo → CTG Cartagena")).toBeInTheDocument();
     expect(screen.getByText("5h 25")).toBeInTheDocument();
     expect(screen.getByText("Direto")).toBeInTheDocument();
     expect(screen.getByText("R$ 2.140")).toBeInTheDocument();
@@ -93,7 +103,7 @@ describe("FlightOfferCard", () => {
 
   it("cai no código quando a companhia não está no catálogo", () => {
     render(<FlightOfferCard {...base} carrierName={null} />);
-    expect(screen.getByText("GRU São Paulo → CTG Cartagena")).toBeInTheDocument();
+    expect(screen.getByText("10 de mai · GRU São Paulo → CTG Cartagena")).toBeInTheDocument();
   });
 
   it("omite a duração quando o provider não informou", () => {
