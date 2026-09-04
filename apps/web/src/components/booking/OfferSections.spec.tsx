@@ -81,7 +81,7 @@ describe("FlightSection", () => {
     render(<FlightSection section={section([voo])} onSelect={vi.fn()} />);
 
     expect(screen.getByText("22:00 → 10:00")).toBeInTheDocument();
-    expect(screen.getByText("TAP Air Portugal · GRU São Paulo → LIS Lisboa")).toBeInTheDocument();
+    expect(screen.getByText("TAP Air Portugal · 10 de set · GRU São Paulo → LIS Lisboa")).toBeInTheDocument();
     expect(screen.getByText("10h 15")).toBeInTheDocument();
     expect(screen.getByText("Direto")).toBeInTheDocument();
     expect(screen.getByText("R$ 3.200")).toBeInTheDocument();

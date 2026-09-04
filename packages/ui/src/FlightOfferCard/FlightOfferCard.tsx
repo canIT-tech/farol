@@ -9,6 +9,15 @@ export function localTime(iso: string): string {
   return match === null ? "" : match[1]!;
 }
 
+const MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+// "2026-11-04T18:05:00-03:00" → "4 de nov". Mesma lógica do localTime: a data
+// é a do aeroporto, cortada da string. Ela entra no cartão porque a oferta vem
+// do cache do parceiro e pode cair fora das datas da viagem.
+export function localDate(iso: string): string {
+  return `${Number(iso.slice(8, 10))} de ${MONTHS[Number(iso.slice(5, 7)) - 1]}`;
+}
+
 export function durationLabel(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
@@ -90,7 +99,9 @@ export function FlightOfferCard({
 
       <div>
         <p className="farol-flight__times">{`${localTime(departAt)} → ${localTime(arriveAt)}`}</p>
-        <p className="farol-flight__sub">{carrierName === null ? route : `${carrierName} · ${route}`}</p>
+        <p className="farol-flight__sub">
+          {[carrierName, localDate(departAt), route].filter((part) => part !== null).join(" · ")}
+        </p>
       </div>
 
       <p className="farol-flight__duration">

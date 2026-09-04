@@ -66,7 +66,7 @@ test("mostra voo, aeroporto vizinho e quando sai mais barato", async ({ page }) 
   const voos = page.getByRole("region", { name: "Voos" });
   await expect(voos.getByText("18:05 → 07:15")).toBeVisible();
   await expect(
-    voos.getByText("TAP Air Portugal · GRU São Paulo — Guarulhos → LIS Lisboa")
+    voos.getByText("TAP Air Portugal · 4 de nov · GRU São Paulo — Guarulhos → LIS Lisboa")
   ).toBeVisible();
   await expect(voos.getByText("R$ 3.198")).toBeVisible();
   await expect(voos.getByText("só ida / pessoa")).toBeVisible();
