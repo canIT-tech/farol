@@ -131,4 +131,67 @@ describe("TripsService", () => {
       expect((err as Error).message).toBe("essa viagem pertence a outro usuário");
     }
   });
+
+  it("remove apaga a viagem e ela some da lista", async () => {
+    const userId = await makeUser();
+    const alvo = await service.create(userId, input);
+    const outra = await service.create(userId, input);
+
+    await service.remove(userId, alvo.id);
+
+    const restantes = await service.list(userId);
+    expect(restantes.map((t) => t.id)).toEqual([outra.id]);
+  });
+
+  it("remove leva junto o que pendurava na viagem", async () => {
+    const userId = await makeUser();
+    const trip = await service.create(userId, input);
+    await db.insert(tripDestinations).values({
+      id: crypto.randomUUID(),
+      tripId: trip.id,
+      city: "Lisboa",
+      country: "Portugal",
+      iata: "LIS",
+      score: "0.9",
+      rationale: "Justificativa longa o suficiente para o schema aqui.",
+      estCost: { flight: 4000, lodgingPerNight: 200, dailyLocal: 150, currency: "BRL" },
+      climate: { expectedC: 22, summary: "ameno", bestMonths: [9] },
+      flightTimeHours: null,
+      chosen: true
+    });
+
+    await service.remove(userId, trip.id);
+
+    const sobrou = await db
+      .select()
+      .from(tripDestinations)
+      .where(eq(tripDestinations.tripId, trip.id));
+    expect(sobrou).toEqual([]);
+  });
+
+  it("remove lança NotFoundError quando a viagem não existe", async () => {
+    const userId = await makeUser();
+    try {
+      await service.remove(userId, crypto.randomUUID());
+      expect.unreachable("deveria lançar");
+    } catch (err) {
+      expect(isDomainError(err)).toBe(true);
+      expect((err as { code: string }).code).toBe("not_found");
+    }
+  });
+
+  it("remove lança ForbiddenError, e não apaga, quando a viagem é de outro", async () => {
+    const dono = await makeUser();
+    const intruso = await makeUser();
+    const trip = await service.create(dono, input);
+
+    try {
+      await service.remove(intruso, trip.id);
+      expect.unreachable("deveria lançar");
+    } catch (err) {
+      expect((err as { code: string }).code).toBe("forbidden");
+    }
+
+    expect(await service.list(dono)).toHaveLength(1);
+  });
 });

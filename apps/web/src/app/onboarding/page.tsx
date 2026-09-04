@@ -1,13 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Button } from "@farol/ui";
+import "./onboarding.css";
 import { paceEnum, partyEnum, tasteProfileSchema, type TasteProfileInput } from "@farol/shared";
+import { BrandHeader } from "../../components/common/BrandHeader";
 import { AuthGate } from "../../components/AuthGate";
 import { apiFetch } from "../../lib/api-client";
 import {
   EMPTY_ONBOARDING,
   canSubmit,
+  fromTasteProfile,
   toTasteProfileInput,
   toggleInterest,
   type OnboardingState
@@ -37,6 +42,22 @@ function OnboardingForm({ token }: { token: string }) {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
+  // "Meu perfil" reabre esta tela: quem já respondeu vê as próprias escolhas,
+  // não um formulário em branco. Sem perfil ainda (404), segue vazio.
+  useEffect(() => {
+    let cancelled = false;
+    void apiFetch({ path: "/me/profile", schema: tasteProfileSchema, token })
+      .then((profile) => {
+        if (!cancelled) {
+          setState(fromTasteProfile(profile));
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
   function patch(next: Partial<OnboardingState>) {
     setState((current) => ({ ...current, ...next }));
   }
@@ -60,38 +81,67 @@ function OnboardingForm({ token }: { token: string }) {
   }
 
   return (
-    <main>
-      <h1>Seu perfil de viagem</h1>
+    <main className="screen screen--wide">
+      <BrandHeader href="/trips">
+        <Link className="screen__back" href="/trips">
+          ← Minhas viagens
+        </Link>
+      </BrandHeader>
 
-      <InterestGrid
-        selected={state.interests}
-        onToggle={(interest) => patch({ interests: toggleInterest(state.interests, interest) })}
-      />
+      <div className="screen__card">
+        <h1 className="screen__title">O que te move numa viagem?</h1>
+        <p className="screen__sub">
+          Isso ajusta todas as recomendações de destino e de roteiro. Dá para mudar depois.
+        </p>
 
-      <SegmentedControl
-        label="Ritmo"
-        options={paceOptions}
-        value={state.pace}
-        onChange={(value) => patch({ pace: value as TasteProfileInput["pace"] })}
-      />
+        <InterestGrid
+          selected={state.interests}
+          onToggle={(interest) => patch({ interests: toggleInterest(state.interests, interest) })}
+        />
 
-      <SegmentedControl
-        label="Companhia"
-        options={partyOptions}
-        value={state.partyType}
-        onChange={(value) => patch({ partyType: value as TasteProfileInput["partyType"] })}
-      />
+        <SegmentedControl
+          label="Ritmo da viagem"
+          options={paceOptions}
+          value={state.pace}
+          onChange={(value) => patch({ pace: value as TasteProfileInput["pace"] })}
+        />
 
-      <BudgetPills
-        value={state.budgetBand}
-        onChange={(value) => patch({ budgetBand: value as TasteProfileInput["budgetBand"] })}
-      />
+        <SegmentedControl
+          label="Companhia"
+          options={partyOptions}
+          value={state.partyType}
+          onChange={(value) => patch({ partyType: value as TasteProfileInput["partyType"] })}
+        />
 
-      <button type="button" disabled={!canSubmit(state) || saving} onClick={submit}>
-        {saving ? "Salvando…" : "Continuar"}
-      </button>
+        <BudgetPills
+          value={state.budgetBand}
+          onChange={(value) => patch({ budgetBand: value as TasteProfileInput["budgetBand"] })}
+        />
 
-      {error ? <p role="alert">{error}</p> : null}
+        <div className="screen__foot">
+          <Button
+            type="button"
+            size="lg"
+            disabled={!canSubmit(state) || saving}
+            loading={saving}
+            iconEnd={
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+                   strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            }
+            onClick={() => void submit()}
+          >
+            {saving ? "Salvando…" : "Continuar"}
+          </Button>
+        </div>
+
+        {error ? (
+          <p className="screen__error" role="alert">
+            {error}
+          </p>
+        ) : null}
+      </div>
     </main>
   );
 }

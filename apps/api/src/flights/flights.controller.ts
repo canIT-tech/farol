@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Param, Post } from "@nestjs/common";
 import { z } from "zod";
 import type {
   CurrentUser as CurrentUserType,
@@ -7,7 +7,6 @@ import type {
   RouteDeal,
   RoutePriceSample
 } from "@farol/shared";
-import { AuthGuard } from "../auth/auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
 import { ZodValidationPipe } from "../common/zod.pipe";
 import { FlightsService } from "./flights.service";
@@ -16,7 +15,6 @@ import type { FlightSelection } from "./flight-selection";
 export const flightSelectBodySchema = z.object({ offerId: z.string().min(1) });
 
 @Controller("trips/:id/flights")
-@UseGuards(AuthGuard)
 export class FlightsController {
   constructor(private readonly flights: FlightsService) {}
 

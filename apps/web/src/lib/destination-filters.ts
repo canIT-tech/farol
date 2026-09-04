@@ -33,3 +33,9 @@ export function arrangeDestinations(
     options.sort === "price" ? totalEstimate(a) - totalEstimate(b) : b.score - a.score
   );
 }
+
+/** O score do ranking vem em 0–1; MatchBadge e MatchBar falam em 0–100.
+ *  Sem esta conversão, 0,91 de aderência aparecia na tela como "1%". */
+export function matchPercent(score: number): number {
+  return Math.round(score * 100);
+}

@@ -80,15 +80,23 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
   }
 
   if (flights === null || hotels === null) {
-    return <p role="status">Consultando voos e hospedagem…</p>;
+    return (
+      <section className="pane">
+        <p className="pane__status" role="status">
+          Consultando voos e hospedagem…
+        </p>
+      </section>
+    );
   }
 
   return (
-    <section>
-      <h1>Voo &amp; hotel</h1>
-      <p>{bookingSubtitle(trip)}</p>
+    <section className="pane">
+      <div className="pane__head">
+        <h1 className="pane__title">Voo &amp; hotel</h1>
+      </div>
+      <p className="pane__sub">{bookingSubtitle(trip)}</p>
 
-      <div role="tablist" aria-label="Voo ou hotel">
+      <div className="bk-tabs" role="tablist" aria-label="Voo ou hotel">
         <Chip role="tab" selected={tab === "flights"} onClick={() => setTab("flights")}>
           Voos
         </Chip>
@@ -97,6 +105,9 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
         </Chip>
       </div>
 
+      {/* O hi-fi mostra voo e hotel na mesma tela: as abas são atalho para a
+          parte que interessa agora, não troca de página. Por isso a aba de voos
+          termina com a hospedagem, e a de hotéis mostra só ela. */}
       {tab === "flights" ? (
         <>
           <FlightSection
@@ -112,6 +123,13 @@ export default function BookingPage({ params }: { params: Promise<{ id: string }
             onSelect={(offerId) => void choose(() => selectFlight(token, id, offerId))}
           />
           <PriceContext months={months} calendar={calendar} latest={latest} />
+          <HotelSection
+            section={hotels}
+            busy={busy}
+            itineraryItems={items}
+            title="Hotéis bem posicionados para o seu roteiro"
+            onSelect={(offerId) => void choose(() => selectHotel(token, id, offerId))}
+          />
         </>
       ) : (
         <HotelSection

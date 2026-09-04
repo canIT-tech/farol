@@ -1,11 +1,9 @@
-import { Controller, HttpCode, Param, Post, UseGuards } from "@nestjs/common";
+import { Controller, HttpCode, Param, Post } from "@nestjs/common";
 import type { CurrentUser as CurrentUserType, DestinationCandidate } from "@farol/shared";
-import { AuthGuard } from "../auth/auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
 import { DiscoveryService } from "./discovery.service";
 
 @Controller("trips/:id/discovery")
-@UseGuards(AuthGuard)
 export class DiscoveryController {
   constructor(private readonly discovery: DiscoveryService) {}
 

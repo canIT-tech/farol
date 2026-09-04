@@ -1,0 +1,174 @@
+/* Campo de intervalo com calendário próprio. O input[type=date] nativo não faz
+   intervalo e seu calendário não aceita estilo — daí o popover desenhado aqui,
+   com a mesma anatomia do TextField (label acima, controle com ícone). */
+
+.farol-daterange {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.farol-daterange__label {
+  font-family: var(--font-text);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-8);
+}
+
+.farol-daterange__control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+  min-height: var(--control-h-md);
+  padding: 0 var(--space-16);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.farol-daterange__control:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--ring);
+}
+
+.farol-daterange__icon {
+  display: flex;
+  color: var(--text-faint);
+  flex: none;
+}
+
+.farol-daterange__value--empty {
+  color: var(--text-faint);
+}
+
+/* ── popover ─────────────────────────────────────────────────────────────── */
+
+.farol-daterange__pop {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 30;
+  width: 280px;
+  margin-top: var(--space-4);
+  padding: var(--space-16);
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--elev-2);
+}
+
+.farol-daterange__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-12);
+}
+
+.farol-daterange__month {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* `capitalize` subiria também o "de" de "janeiro de 2026". Só a inicial. */
+.farol-daterange__month::first-letter {
+  text-transform: uppercase;
+}
+
+.farol-daterange__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.farol-daterange__nav:hover,
+.farol-daterange__nav:focus-visible {
+  background: var(--surface-sunk);
+  outline: none;
+}
+
+.farol-daterange__weekdays,
+.farol-daterange__week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-2);
+}
+
+.farol-daterange__weekdays {
+  margin-bottom: var(--space-8);
+  padding: 0 var(--space-2);
+}
+
+.farol-daterange__weekdays span {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+}
+
+.farol-daterange__gap {
+  height: 32px;
+}
+
+.farol-daterange__day {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--ease);
+}
+
+.farol-daterange__day:hover,
+.farol-daterange__day:focus-visible {
+  background: var(--surface-sunk);
+  outline: none;
+}
+
+/* O miolo do intervalo é um lençol claro; as pontas são sólidas. Os cantos
+   internos ficam retos para as três peças lerem como uma faixa contínua. */
+.farol-daterange__day--inside {
+  background: var(--accent-wash);
+  border-radius: 0;
+  color: var(--accent-ink);
+}
+
+.farol-daterange__day--start,
+.farol-daterange__day--end {
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+}
+
+.farol-daterange__day--start:hover,
+.farol-daterange__day--end:hover {
+  background: var(--accent-hover);
+}
+
+.farol-daterange__day--start:not(.farol-daterange__day--end) {
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.farol-daterange__day--end:not(.farol-daterange__day--start) {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}

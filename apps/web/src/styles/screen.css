@@ -1,0 +1,154 @@
+/* Shell das telas de coluna única do app (/auto, /onboarding, /login,
+   /trips, /trips/new). O hi-fi repete a mesma moldura em todas: fundo quente,
+   cabeçalho da marca no topo e uma coluna centrada — só a largura muda.
+   As telas com sidebar + chat (roteiro, voo & hotel) usam o AppShell. */
+
+.screen {
+  --screen-w: 640px;
+  min-height: 100vh;
+  background: var(--surface-sunk);
+  color: var(--ink);
+  font-family: var(--font-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 72px;
+  box-sizing: border-box;
+}
+
+/* Miolo em grade (interesses, cartões de viagem) pede mais respiro. */
+.screen--wide {
+  --screen-w: 760px;
+  padding-top: 34px;
+}
+
+.screen__top {
+  width: 100%;
+  max-width: var(--screen-w);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 34px;
+}
+
+.screen__logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.screen__logo svg {
+  width: 22px;
+  height: 22px;
+  color: var(--accent);
+}
+
+/* Saída das telas de coluna única: sem isto, /onboarding e /auto não têm
+   caminho de volta nenhum além do botão do navegador. */
+.screen__back {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.screen__back:hover {
+  color: var(--accent-ink);
+}
+
+.screen__logo {
+  text-decoration: none;
+  color: inherit;
+}
+
+.screen__badge {
+  font-size: 12px;
+  color: var(--text-faint);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+.screen__card {
+  width: 100%;
+  max-width: var(--screen-w);
+}
+
+.screen__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+}
+
+.screen__sub {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0 0 32px;
+}
+
+/* Serve tanto para <fieldset> quanto para <div>: o reset do fieldset é o que
+   tira a borda nativa do browser, que o hi-fi nunca mostra. */
+.screen__row {
+  border: 0;
+  margin: 0 0 24px;
+  padding: 0;
+  min-inline-size: 0;
+}
+
+.screen__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  margin-bottom: 10px;
+  padding: 0;
+}
+
+.screen__label span {
+  font-weight: 400;
+  color: var(--text-faint);
+}
+
+.screen__hint {
+  font-size: 12px;
+  color: var(--text-faint);
+  margin: 10px 0 0;
+}
+
+.screen__foot {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.screen__error,
+.screen__status {
+  margin: 18px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.screen__error {
+  color: var(--accent-ink);
+}
+
+.screen__status {
+  color: var(--text-muted);
+}
+
+@media (max-width: 560px) {
+  .screen__title {
+    font-size: 28px;
+  }
+}

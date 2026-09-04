@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { TripShell } from "./TripShell";
+import { ShellFrame, TripShell } from "./TripShell";
 
 const TRIP_ID = "11111111-1111-4111-8111-111111111111";
 
@@ -16,8 +16,16 @@ const SESSION_NONE = { data: { session: null } };
 let sessionResult: unknown = SESSION_OK;
 const getSession = vi.fn(async () => sessionResult);
 const authSignOut = vi.fn(async () => ({ error: null }));
+// O AuthGate agora assina onAuthStateChange, então o fake precisa devolver uma
+// inscrição — sem ela o componente quebra ao montar.
 vi.mock("../lib/supabase", () => ({
-  getSupabaseBrowserClient: () => ({ auth: { getSession, signOut: authSignOut } })
+  getSupabaseBrowserClient: () => ({
+    auth: {
+      getSession,
+      signOut: authSignOut,
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: vi.fn() } } })
+    }
+  })
 }));
 
 const state = {
@@ -207,5 +215,34 @@ describe("TripShell", () => {
     );
     await waitFor(() => expect(replace).toHaveBeenCalledWith("/login"));
     expect(screen.queryByText("miolo")).not.toBeInTheDocument();
+  });
+
+});
+
+// /trips/new roda a mesma moldura sem viagem: o chat ainda não existe, então o
+// trilho explica em vez de fingir uma conversa.
+describe("ShellFrame sem viagem", () => {
+  it("mostra a sidebar pendente e o trilho de apoio, sem campo de conversa", () => {
+    render(
+      <ShellFrame tripId={null} trip={null} onNavigate={vi.fn()}>
+        <p>miolo</p>
+      </ShellFrame>
+    );
+
+    expect(screen.getByText("miolo")).toBeInTheDocument();
+    expect(screen.getAllByText("a definir")).toHaveLength(5);
+    expect(screen.getByText("Assessor")).toBeInTheDocument();
+    expect(screen.getByText(/A conversa abre assim que a viagem existir/)).toBeInTheDocument();
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+  });
+
+  it("sair encerra a sessão e volta para a landing", async () => {
+    render(
+      <ShellFrame tripId={null} trip={null} onNavigate={vi.fn()}>
+        <p>miolo</p>
+      </ShellFrame>
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Sair" }));
+    await waitFor(() => expect(replace).toHaveBeenCalledWith("/"));
   });
 });

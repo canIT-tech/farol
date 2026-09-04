@@ -18,6 +18,9 @@ monta o dia a dia e ajusta tudo por conversa.
 | PRD (visão, escopo faseado, personas, monetização) | `PRD.md` |
 | Design técnico do MVP (arquitetura, módulos, dados) | `docs/superpowers/specs/2026-08-27-mvp-trip-design.md` |
 | Opções de provider de hotel (sem virar canal de reserva) | `docs/negocio/2026-09-03-opcoes-provider-hotel.md` |
+| Curadoria do catálogo de destinos (como levantar candidatos) | `docs/negocio/2026-09-03-curadoria-do-catalogo.md` |
+| Controle de sessão (guard global, CORS, inatividade, o que ficou de fora) | `docs/superpowers/specs/2026-09-04-controle-de-sessao-design.md` |
+| Google Flights como fonte primária de voo (scraping, riscos, fallback) | `docs/negocio/2026-09-03-google-flights-como-fonte-de-voo.md` |
 | Specs de produto (pagamento, plano grátis, migração de provider, custo de LLM, métricas) | `docs/negocio/2026-08-31-spec-pagamento.md` · `docs/negocio/2026-08-31-spec-plano-gratuito.md` · `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` · `docs/negocio/2026-08-31-custo-llm-por-roteiro.md` · `docs/negocio/2026-08-31-plano-de-metricas.md` |
 | Legal (Termos + Privacidade/LGPD — rascunhos, pré-jurídico) | `docs/legal/` |
 | Design system (tokens + specs de componentes) | `docs/design-system.md` |
@@ -47,8 +50,30 @@ Canvases publicados (Claude Artifacts):
 - Providers reais: **Travelpayouts** (voo via Aviasales — data + deep-link com afiliado) + **LiteAPI/Nuitée** (hotel) + **Google Places** (POI/restaurantes). A Amadeus saiu do projeto: Self-Service descontinuado. O Hotellook também (encerrado em 20/10/2025).
 - **LiteAPI — provider de hotel.** `GET /v3.0/data/hotels` (conteúdo: nome, estrelas, nota, avaliações, foto, endereço, geo) + `POST /v3.0/hotels/min-rates` (preço para as datas). Os dois são **gratuitos**; a receita é por margem na reserva. Chave de sandbox é self-serve (`sand_*`); produção só exige cartão cadastrado, sem contrato. **Busca por coordenada, não por nome** — "Lisboa" acha 2 hotéis e "Lisbon" acha 6.748. A coordenada vem do dump `/data/{locale}/cities.json` do Travelpayouts, exposto pelo `TravelpayoutsGeoProvider.city()`, que resolve IATA de cidade direto e IATA de aeroporto pelo `city_code` (GRU → centro de São Paulo, não o terminal). Hotel sem tarifa para as datas sai da lista.
 - **Travelpayouts, 9 endpoints em uso** (`packages/providers/src/travelpayouts/`, fixtures gravadas da API real): `/v1/prices/cheap` (tarifa da rota no mês) · `/v1/prices/monthly` ("quando ir") · `/v1/city-directions` (destinos baratos saindo da origem) · `/v2/prices/latest` (faixa de preço recente) · `/v2/prices/month-matrix` (melhor dia do mês) · `/v2/prices/nearest-places-matrix` (aeroportos vizinhos, com link direto da tarifa) · `/whereami` (origem pelo IP, JSONP) · `/data/{locale}/airports.json` e `airlines.json` (dumps, cache de 24 h em memória). Preço é **cache do parceiro, não busca ao vivo** — a UI e o chat dizem "preço aproximado". Busca live (Aviasales Search API) exige 50 k MAU.
+- **Google Flights — fonte primária de oferta de voo** (2026-09-03). Lê a página
+  pública: a busca vai numa mensagem protobuf em base64 (`tfs`) e a resposta sai
+  de um `<script class="ds:1">`. Dá preço e horário **reais**, que o
+  Travelpayouts não dá (ele serve cache do parceiro). Sem chave, sem cadastro e
+  sem dependência nova — o protobuf é codificado à mão. Roda sempre atrás do
+  `FallbackFlightProvider`, que cai no Travelpayouts quando o layout muda; os
+  insights e o `marker` de afiliado seguem no Travelpayouts. Deep link da oferta
+  do Google aponta para o próprio Google: mandar a pessoa ao afiliado com um
+  preço vindo de outra fonte seria vender número que o destino pode não honrar.
+  `GOOGLE_FLIGHTS_ENABLED=false` volta ao comportamento anterior. Detalhe e
+  riscos em `docs/negocio/2026-09-03-google-flights-como-fonte-de-voo.md`.
 - LLM: **Claude**, roteamento de modelo por tarefa.
 - `api` stateless; autorização na camada de serviço (RLS desligada nas tabelas de app).
+- **Sessão: protegido por padrão** (2026-09-04). `AuthGuard` é `APP_GUARD` global —
+  rota nova nasce fechada, e abrir é um `@Public()` explícito. Abertos só
+  `health` e `waitlist`. O JWT é verificado com `audience` (`SUPABASE_JWT_AUD`,
+  default `authenticated`); `issuer` não, de propósito — o JWKS só tem a chave
+  deste projeto, então a checagem não somaria segurança. CORS por
+  `CORS_ORIGINS`, zerado em produção (api e web são a mesma origem lá). No web,
+  o `AuthGate` assina `onAuthStateChange` em vez de fotografar o token, e
+  encerra a sessão após 30 min de inatividade. **Revogação imediata de access
+  token ficou fora**: exigiria consulta a lista de revogados em toda rota. Quem
+  fecha essa janela é a validade curta do token no Supabase. Detalhe em
+  `docs/superpowers/specs/2026-09-04-controle-de-sessao-design.md`.
 - Hospedagem: agnóstica (container + Postgres + env).
 - **`apps/worker` reusa a `api`**: `apps/api/src/worker-exports.ts` é um barrel exposto pelo campo `exports` do `package.json` (path `@farol/api` no `tsconfig.base` aponta pro `dist/worker-exports.d.ts`). O `WorkerModule` importa `ConfigModule`/`DbModule`/`LlmModule`/`JobsModule` + declara `ItineraryRepository` e os handlers como providers — **sem** `ItineraryModule`/`TripsModule` (esses têm controllers com `AuthGuard`, que o worker não tem).
 - **Testes de integração compartilham um único Postgres.** `turbo.json` serializa `@farol/db#test → @farol/api#test → @farol/worker#test` (o `client.spec` do `db` dropa tabelas). pg-boss usa schema isolado por teste (`pgboss_*_<rnd>`, dropado no `afterAll`). Se o banco ficar sujo (run interrompido): `docker compose exec db psql -U postgres -d farol -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public; DROP SCHEMA IF EXISTS drizzle CASCADE"` + `db:migrate` + `db:seed`.
@@ -136,6 +161,33 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - ~~`.github/workflows/ci.yml` — trocar `AMADEUS_*` por `TRAVELPAYOUTS_*`~~ Resolvido no Passo 10 (`ci.yml`, `nightly-mutation.yml`, `.env.example`, `render.yaml`).
 - ~~Hotel sem provider~~ — resolvido com a **LiteAPI** (o Hotellook foi encerrado em 20/10/2025; `engine.hotellook.com` responde 404 até na raiz, é CloudFront sem origem — não adianta pedir liberação). **Aberto:** a chave em uso é de **sandbox**, que devolve conteúdo real mas tarifa de teste. Produção exige cadastrar um cartão no painel da Nuitée, e a reserva passaria a acontecer no Farol (somos o canal) — decisão comercial, não técnica. Alternativas sem essa amarra estão levantadas em `docs/negocio/2026-09-03-opcoes-provider-hotel.md`.
 - ~~**CI roda `db:migrate` mas não `db:seed`.**~~ Resolvido no Passo 6: `db:seed` entrou como step explícito.
+- **O provider do Google Flights é scraping.** Fere os ToS do Google, não tem SLA
+  e lê um payload posicional — mudança de layout quebra sem aviso. Mitigado pelo
+  `FallbackFlightProvider`, pelo circuit breaker e pelo
+  `.github/workflows/nightly-google-flights.yml`, que é a única coisa que prova
+  que a busca real ainda funciona (as fixtures congelam o layout do dia da
+  gravação). Falha no noturno = rodar
+  `pnpm --filter @farol/providers record:google-flights` e revisar
+  `normalize-flight`.
+- **Ida e volta pelo Google traz só o trecho de ida** (`returnAt` nulo). O preço
+  já é o total; o itinerário da volta só existe depois de escolher a ida no
+  próprio Google. Buscar o segundo passo exigiria um token opaco de sessão.
+- **JWT expiry do Supabase ainda em 1h.** O design de sessão conta com 15min para
+  fechar a janela entre o logout e a expiração do access token — é ajuste de
+  painel (Authentication → Sessions), não de código, e segue pendente.
+- **`GOOGLE_PLACES_KEY` do `farol/dev` é um placeholder de 11 caracteres**, não uma
+  chave real (`AIza…`, ~39). Toda busca do Places responde
+  `400 API_KEY_INVALID`, então todo item de roteiro sai sem `placeId`,
+  coordenada e nota, marcado `needsReview` — o roteiro fica pronto, mas sem
+  mapa. Degrada em silêncio: o `PlacesService` engole a falha por design
+  (§7.3) e só o log `places_search_failed` acusa.
+- **Worker morre em silêncio no `pnpm dev`.** O `tsx watch` observa
+  `apps/api/dist` (o worker importa `@farol/api` de lá), então um `pnpm build`
+  dispara vários reinícios em sequência; se um deles falha, o supervisor fica
+  sem filho e só volta com uma nova mudança de arquivo. O turbo segue verde e a
+  api e o web continuam de pé — o único sintoma é o roteiro parado em `pending`.
+  Diagnóstico: `pgrep -P <pid do tsx>` vazio, e `pgboss.job` com
+  `itinerary.generate` acumulando em `created`.
 - **`pnpm test:mutation` no CI roda tudo** (api grande + worker + db + pg-boss real dentro da mutação). Lento e potencialmente instável. Avaliar rodar mutação só nos pacotes tocados no PR, ou mover pra job separado/nightly.
 - **Testes de integração e o Postgres único.** A serialização no `turbo.json` resolve o CI (Postgres novo a cada run), mas localmente exige banco limpo. Opção definitiva: `DATABASE_URL_TEST` apontando pra um banco `farol_test` dedicado (docker-compose cria; specs já preferem `DATABASE_URL_TEST`).
 
@@ -143,6 +195,10 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - `discovery`: `climate.expectedC` nulo e `flightTimeHours = null` (sem fonte de clima/tempo de voo no MVP). **Segue aberto.**
 - ~~`estCost.flight` sempre da média `avgFlightCostFromGru` do catálogo~~ — resolvido no Passo 10: a descoberta consulta `/v1/city-directions` a partir da origem real da viagem e usa o preço do provider quando o destino aparece na lista; sem cobertura (ou provider fora do ar) cai na média do catálogo.
 - ~~`itinerary_items.placeId/lat/lng/rating = null`~~ — preenchidos pelo enrich do Passo 6; item sem match fica `needsReview = true` e é reprocessado pelo job `places.enrich`.
+- **Contexto de preço do Google não está exposto na API nem na tela.** O
+  `GoogleFlightsProvider.searchWithContext()` já devolve `FlightPriceContext`
+  (mais barato, típico, faixa e série histórica), mas o `FlightsService` só
+  consome `search()`. Falta rota e cartão de "está barato comprar agora".
 - `prefilterDestinations({ excludeIata })` existe mas não é usado (não há conceito de "destino rejeitado" no schema).
 
 **Qualidade / precisão**
@@ -155,7 +211,7 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 ## Pendências abertas (do PRD / design técnico)
 
 - Teto de custo de LLM por roteiro (`LLM_ROUTE_BUDGET_USD`) — planilha em `docs/negocio/2026-08-31-custo-llm-por-roteiro.md` (proposta: 0,60 pago / 0,15 grátis, chat no tier barato). Falta felippe cravar.
-- Catálogo de destinos: CSV curado em `packages/db/data/destinations.csv` (23 cidades no Passo 3; `pnpm --filter @farol/db db:seed`). Expandir para ~200 é curadoria contínua.
+- Catálogo de destinos: CSV curado em `packages/db/data/destinations.csv` (23 cidades no Passo 3; `pnpm --filter @farol/db db:seed`). Expandir para ~200 é curadoria contínua — o levantamento de candidatos é automatizado (`pnpm --filter @farol/db research:destinations` consulta o `/v1/city-directions` de 12 origens BR e escreve um rascunho); `tags`, `bestMonths` e os custos de hospedagem seguem sendo humanos, porque a API não os tem e deixar o LLM preencher seria inventar preço. Processo em `docs/negocio/2026-09-03-curadoria-do-catalogo.md`.
 - ~~Site parceiro para o deep-link de voo/hotel~~ — resolvido pela migração para Travelpayouts: o parceiro é Aviasales / Hotellook, o `marker` no deep-link já rende comissão.
 - Re-gravar as fixtures do **Google Places** (`packages/providers/src/google/__fixtures__/*.json`) a partir da API real — ainda escritas à mão. ~~Travelpayouts~~ ✅ gravadas da API real no Passo 10.
 - ~~Confirmar domínio~~ ✅ **`farolviagens.com`** (2026-08-31, sobre `faroltravel.com.br`). Falta: registrar (+ defensivos `farolviagens.com.br`, `faroltravel.com.br`), apontar DNS, geo-targeting BR no Search Console, e-mail transacional (SPF/DKIM/DMARC).

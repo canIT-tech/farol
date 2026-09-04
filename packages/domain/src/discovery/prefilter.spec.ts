@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import type { TasteProfileInput, TripInput } from "@farol/shared";
 import type { CatalogEntry } from "./types.js";
 import {
+  estimateTripCost,
   prefilterDestinations,
   nightsOf,
   targetMonthOf,
@@ -119,18 +120,28 @@ describe("prefilterDestinations", () => {
   });
 
   it("estoura o orçamento só pela hospedagem (lodging * nights)", () => {
-    // flight 0, daily 0, lodging 1500 * 7 = 10500 > 10000
-    const e = entry({ iata: "LDG", avgFlightCostFromGru: 0, avgLodgingNight: 1500, avgDailyLocal: 0 });
+    // lodging 3000 * 7 = 21000 > 20000. A diária é do quarto: entra uma vez,
+    // não uma por adulto.
+    const e = entry({ iata: "LDG", avgFlightCostFromGru: 0, avgLodgingNight: 3000, avgDailyLocal: 0 });
     expect(prefilterDestinations({ catalog: [e], trip, profile })).toEqual([]);
   });
 
-  it("estoura o orçamento só pelo gasto diário (dailyLocal * nights)", () => {
+  it("a diária do quarto não dobra com dois adultos", () => {
+    // 2900 * 7 = 20300 para o casal — passaria de 20000 se contasse por pessoa.
+    const e = entry({ iata: "ROOM", avgFlightCostFromGru: 0, avgLodgingNight: 2800, avgDailyLocal: 0 });
+    expect(prefilterDestinations({ catalog: [e], trip, profile }).map((x) => x.iata)).toEqual([
+      "ROOM"
+    ]);
+  });
+
+  it("estoura o orçamento só pelo gasto diário (dailyLocal * nights * adultos)", () => {
+    // 1500 * 7 * 2 = 21000 > 20000: o gasto no destino é de cada pessoa.
     const e = entry({ iata: "DLY", avgFlightCostFromGru: 0, avgLodgingNight: 0, avgDailyLocal: 1500 });
     expect(prefilterDestinations({ catalog: [e], trip, profile })).toEqual([]);
   });
 
   it("soma a passagem ao custo em vez de subtrair", () => {
-    // flight 8000 + lodging 1000*7 = 15000 > 10000 (com subtração daria 1000 e passaria)
+    // flight 8000 * 2 + lodging 1000 * 7 = 23000 > 20000 (subtraindo, passaria)
     const e = entry({ iata: "FLT", avgFlightCostFromGru: 8000, avgLodgingNight: 1000, avgDailyLocal: 0 });
     expect(prefilterDestinations({ catalog: [e], trip, profile })).toEqual([]);
   });
@@ -181,5 +192,26 @@ describe("prefilterDestinations", () => {
       entry({ iata: `D${String(i).padStart(2, "0")}`, avgFlightCostFromGru: 100 + i })
     );
     expect(prefilterDestinations({ catalog, trip, profile })).toHaveLength(20);
+  });
+});
+
+describe("estimateTripCost", () => {
+  const dest = { avgFlightCostFromGru: 1000, avgLodgingNight: 300, avgDailyLocal: 150 };
+
+  it("passagem e gasto diário multiplicam por pessoa; a diária, não", () => {
+    // 1000*2 + 300*7 + 150*7*2 = 2000 + 2100 + 2100
+    expect(estimateTripCost(dest, 7, 2)).toBe(6200);
+  });
+
+  it("sozinho paga uma passagem e o quarto inteiro", () => {
+    expect(estimateTripCost(dest, 7, 1)).toBe(1000 + 2100 + 1050);
+  });
+
+  it("o terceiro adulto acrescenta passagem e gasto, não outro quarto", () => {
+    expect(estimateTripCost(dest, 7, 3) - estimateTripCost(dest, 7, 2)).toBe(1000 + 150 * 7);
+  });
+
+  it("viagem sem noites custa só as passagens", () => {
+    expect(estimateTripCost(dest, 0, 2)).toBe(2000);
   });
 });

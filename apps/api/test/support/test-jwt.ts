@@ -9,6 +9,16 @@ export interface FakeJwks {
   stop: () => Promise<void>;
 }
 
+const DEFAULT_AUD = "authenticated";
+
+function withAudience(claims: Record<string, unknown>): Record<string, unknown> {
+  if ("aud" in claims) {
+    const { aud, ...rest } = claims;
+    return aud === undefined ? rest : claims;
+  }
+  return { aud: DEFAULT_AUD, ...claims };
+}
+
 export async function startFakeJwks(): Promise<FakeJwks> {
   const { publicKey, privateKey } = await generateKeyPair("RS256", { extractable: true });
   const jwk: JWK = { ...(await exportJWK(publicKey)), kid: "test-key", alg: "RS256", use: "sig" };
@@ -23,8 +33,12 @@ export async function startFakeJwks(): Promise<FakeJwks> {
 
   return {
     jwksUrl: `http://localhost:${port}/`,
+    // aud "authenticated" por padrão, como o Supabase emite para token de
+    // usuário — é o que o JwtVerifier exige. Passar `aud` nas claims
+    // sobrescreve, e `aud: undefined` assina sem audiência nenhuma: os dois
+    // casos existem para testar a recusa.
     sign: (claims, opts) =>
-      new SignJWT(claims)
+      new SignJWT(withAudience(claims))
         .setProtectedHeader({ alg: "RS256", kid: "test-key" })
         .setIssuedAt()
         .setExpirationTime(opts?.expiresIn ?? "5m")

@@ -54,13 +54,18 @@ test("entrada mínima → plano único, sem seletor de destino", async ({ page }
 
   await page.goto("/auto");
   await page.getByLabel("Saindo de").fill("GRU");
-  await page.getByLabel("Ida").fill("2026-09-10");
-  await page.getByLabel("Volta").fill("2026-09-17");
+  // Calendário abre em janeiro de 2026; setembro fica 8 meses à frente.
+  await page.getByRole("button", { name: /Quando/ }).click();
+  for (let i = 0; i < 8; i += 1) {
+    await page.getByRole("button", { name: "Próximo mês" }).click();
+  }
+  await page.getByRole("gridcell", { name: "10", exact: true }).click();
+  await page.getByRole("gridcell", { name: "17", exact: true }).click();
   for (const gosto of ["praia", "gastronomia", "natureza"]) {
     await page.getByRole("button", { name: gosto, exact: true }).click();
   }
 
-  await page.getByRole("button", { name: "Montar meu plano" }).click();
+  await page.getByRole("button", { name: "Montar minha viagem" }).click();
   await page.waitForURL(`**/trips/${TRIP_ID}/itinerary`);
 
   await expect(page.getByRole("heading", { name: "Caminhada pela Alfama" })).toBeVisible({

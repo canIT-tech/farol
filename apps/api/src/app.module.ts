@@ -1,7 +1,9 @@
 import { Module } from "@nestjs/common";
+import { APP_GUARD } from "@nestjs/core";
 import { ConfigModule } from "./config/config.module";
 import { DbModule } from "./db/db.module";
 import { HealthModule } from "./health/health.module";
+import { AuthGuard } from "./auth/auth.guard";
 import { AuthModule } from "./auth/auth.module";
 import { MeModule } from "./me/me.module";
 import { ProfileModule } from "./profile/profile.module";
@@ -38,7 +40,11 @@ import { EmailModule } from "./email/email.module";
     EmailModule,
     WaitlistModule,
     ChatModule
-  ]
+  ],
+  // Guard global: toda rota exige credencial, e abrir uma vira um @Public()
+  // explícito no controller. O arranjo anterior era o inverso — cada controller
+  // lembrava do @UseGuards, e esquecer publicava a rota sem que nada acusasse.
+  providers: [{ provide: APP_GUARD, useClass: AuthGuard }]
 })
 export class AppModule {}
 

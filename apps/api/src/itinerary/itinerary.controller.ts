@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Param, Post } from "@nestjs/common";
 import {
   chooseDestinationSchema,
   swapRestaurantSchema,
@@ -8,13 +8,11 @@ import {
   type ItineraryItem,
   type SwapRestaurantInput
 } from "@farol/shared";
-import { AuthGuard } from "../auth/auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
 import { ZodValidationPipe } from "../common/zod.pipe";
 import { ItineraryService } from "./itinerary.service";
 
 @Controller("trips/:id")
-@UseGuards(AuthGuard)
 export class ItineraryController {
   constructor(private readonly itinerary: ItineraryService) {}
 

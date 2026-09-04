@@ -70,7 +70,7 @@ export class DiscoveryService {
     if (shortlist.length < MIN_SHORTLIST) {
       throw new DomainError(
         "no_destinations_in_budget",
-        "nenhum destino do catálogo cabe no orçamento e nas datas informadas"
+        "nenhum destino do catálogo cabe nesse orçamento para essas datas — tente aumentar o orçamento ou encurtar a viagem"
       );
     }
 

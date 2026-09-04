@@ -114,14 +114,24 @@ describe("FlightsService", () => {
     expect(first.offers.map((o) => o.id)).toEqual(FAKE_FLIGHT_OFFERS.map((o) => o.id));
     expect(Date.parse(first.fetchedAt!)).toBeGreaterThan(0);
 
-    // Enrich: código no catálogo vira nome; fora do catálogo fica null e a UI
-    // cai no código cru — nunca em um nome inventado.
+    // Enrich: código no catálogo vira nome do catálogo; fora do catálogo, o
+    // nome que o provider trouxe é preservado. LIS não está neste catálogo de
+    // teste, e "Lisbon Airport" veio do provider — sobrescrever com nulo
+    // apagaria informação boa, que é o que acontecia antes.
     const tp = first.offers.find((o) => o.carrier === "TP")!;
     expect(tp.carrierName).toBe("TAP Air Portugal");
     expect(tp.originName).toBe("Sao Paulo-Guarulhos International Airport");
-    expect(tp.destinationName).toBeNull();
+    expect(tp.destinationName).toBe("Lisbon Airport");
     const af = first.offers.find((o) => o.carrier === "AF")!;
-    expect(af.carrierName).toBeNull();
+    expect(af.carrierName).toBe("Air France");
+
+    // Sem catálogo e sem provider, aí sim fica nulo: a UI cai no código cru,
+    // nunca em um nome inventado.
+    const semNome = await service.enrich([
+      { ...tp, carrier: "ZZ", carrierName: null, destinationIata: "ZZZ", destinationName: null }
+    ]);
+    expect(semNome[0]!.carrierName).toBeNull();
+    expect(semNome[0]!.destinationName).toBeNull();
 
     const second = await service.search(userId, tripId);
     expect(second.offers).toEqual(first.offers);

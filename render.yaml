@@ -32,6 +32,11 @@ services:
         value: /api
       - key: SERVE_WEB
         value: "true"
+      # Sem CORS: a api e o web são o mesmo processo e a mesma origem aqui, e o
+      # front chama por caminho relativo. Nenhuma requisição cross-origin é
+      # legítima — o default do schema serve só ao desenvolvimento.
+      - key: CORS_ORIGINS
+        value: ""
       - key: RUN_JOB_HANDLERS
         value: "true"
       - key: JOBS_SCHEMA

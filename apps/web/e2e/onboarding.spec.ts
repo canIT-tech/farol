@@ -63,7 +63,7 @@ test("login mockado → onboarding → salva o perfil e redireciona", async ({ p
 
   await page.goto("/onboarding");
 
-  await expect(page.getByRole("heading", { name: "Seu perfil de viagem" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "O que te move numa viagem?" })).toBeVisible();
 
   for (const interest of ["praia", "gastronomia", "vinhos"]) {
     await page.getByRole("button", { name: interest, exact: true }).click();

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { TextField } from "@farol/ui";
+import "./OriginField.css";
 import type { Airport } from "@farol/shared";
 import { searchAirports, whereami } from "../../lib/geo-api";
 
@@ -16,11 +17,14 @@ export function airportLabel(airport: Airport): string {
 export function OriginField({
   value,
   onChange,
+  token,
   detectOrigin = whereami,
   findAirports = searchAirports
 }: {
   value: string;
   onChange: (iata: string) => void;
+  /** O /geo passou a exigir credencial; o token vem do AuthGate, pela página. */
+  token: string;
   detectOrigin?: typeof whereami;
   findAirports?: typeof searchAirports;
 }) {
@@ -28,6 +32,7 @@ export function OriginField({
   const [options, setOptions] = useState<Airport[]>([]);
   const [chosen, setChosen] = useState<Airport | null>(null);
   const [suggested, setSuggested] = useState<string | null>(null);
+  const [focused, setFocused] = useState(false);
 
   // A detecção roda uma vez, no mount: é palpite inicial, não reage a
   // digitação. Os refs deixam o efeito ler o valor atual sem virar dependência.
@@ -40,7 +45,7 @@ export function OriginField({
   // digitou vale mais que o palpite —, e falhar aqui não muda nada na tela.
   useEffect(() => {
     let active = true;
-    detectOrigin()
+    detectOrigin(token)
       .then((place) => {
         if (active && place !== null) {
           setSuggested(`${place.name} (${place.iata})`);
@@ -53,7 +58,7 @@ export function OriginField({
     return () => {
       active = false;
     };
-  }, [detectOrigin]);
+  }, [detectOrigin, token]);
 
   // Busca no catálogo a cada tecla. Termo curto não busca: o dump inteiro
   // casaria com quase tudo e a lista viraria ruído.
@@ -63,7 +68,7 @@ export function OriginField({
       return;
     }
     let active = true;
-    findAirports(term)
+    findAirports(token, term)
       .then((found) => {
         if (active) {
           setOptions(found);
@@ -77,7 +82,7 @@ export function OriginField({
     return () => {
       active = false;
     };
-  }, [term, chosen, findAirports]);
+  }, [term, chosen, findAirports, token]);
 
   function type(next: string) {
     setTerm(next);
@@ -100,14 +105,30 @@ export function OriginField({
         : `Sugeri ${suggested} pela sua conexão. Troque se não for daí.`;
 
   return (
-    <div>
+    <div
+      className="origin"
+      // O foco entra e sai por dentro do container (campo → opção), então o
+      // blur só fecha quando vai para fora dele.
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) {
+          setFocused(false);
+        }
+      }}
+    >
       <TextField label="Saindo de" value={term} onChange={type} placeholder="GRU" hint={hint} />
-      {options.length > 0 ? (
-        <ul role="listbox" aria-label="Aeroportos encontrados">
+      {focused && options.length > 0 ? (
+        <ul className="origin__list" role="listbox" aria-label="Aeroportos encontrados">
           {options.map((airport) => (
             <li key={airport.iata}>
-              <button type="button" onClick={() => pick(airport)}>
-                {airportLabel(airport)}
+              <button
+                className="origin__option"
+                type="button"
+                onClick={() => pick(airport)}
+                aria-label={airportLabel(airport)}
+              >
+                <span className="origin__iata">{airport.iata}</span>
+                <span className="origin__name">{airport.name}</span>
               </button>
             </li>
           ))}

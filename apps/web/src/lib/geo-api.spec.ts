@@ -1,6 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { searchAirports, whereami } from "./geo-api";
 
+// O /geo deixou de ser público: as duas chamadas levam o Bearer.
+const TOKEN = "tok";
+
 function jsonFetch(payload: unknown, status = 200) {
   return vi.fn(async () =>
     new Response(JSON.stringify(payload), {
@@ -37,27 +40,27 @@ const gru = {
 describe("whereami", () => {
   it("devolve a localização do IP", async () => {
     const f = jsonFetch(chapeco);
-    await expect(whereami(f)).resolves.toEqual(chapeco);
+    await expect(whereami(TOKEN, f)).resolves.toEqual(chapeco);
     expect(lastUrl(f)).toContain("/geo/whereami");
   });
 
   it("aceita null quando o IP não resolve", async () => {
-    await expect(whereami(jsonFetch(null))).resolves.toBeNull();
+    await expect(whereami(TOKEN, jsonFetch(null))).resolves.toBeNull();
   });
 
   it("propaga erro HTTP", async () => {
-    await expect(whereami(jsonFetch({}, 503))).rejects.toThrow(/503/);
+    await expect(whereami(TOKEN, jsonFetch({}, 503))).rejects.toThrow(/503/);
   });
 });
 
 describe("searchAirports", () => {
   it("escapa o termo na query e devolve a lista", async () => {
     const f = jsonFetch([gru]);
-    await expect(searchAirports("são paulo", f)).resolves.toEqual([gru]);
+    await expect(searchAirports(TOKEN, "são paulo", f)).resolves.toEqual([gru]);
     expect(lastUrl(f)).toContain("/geo/airports?q=s%C3%A3o%20paulo");
   });
 
   it("rejeita payload fora do schema", async () => {
-    await expect(searchAirports("gru", jsonFetch([{ iata: "GRU" }]))).rejects.toThrow();
+    await expect(searchAirports(TOKEN, "gru", jsonFetch([{ iata: "GRU" }]))).rejects.toThrow();
   });
 });

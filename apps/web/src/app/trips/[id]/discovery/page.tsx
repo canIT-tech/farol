@@ -2,6 +2,8 @@
 
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@farol/ui";
+import { partyLabel } from "../../../../components/TripSidebar";
 import { DestinationResults } from "../../../../components/discovery/DestinationResults";
 import { useTrip } from "../../../../providers/TripProvider";
 import { chooseDestination, runDiscovery } from "../../../../lib/trip-api";
@@ -39,18 +41,36 @@ export default function DiscoveryPage({ params }: { params: Promise<{ id: string
   }
 
   if (loading || trip === null) {
-    return <p role="status">Procurando destinos…</p>;
+    return (
+      <section className="pane">
+        <p className="pane__status" role="status">
+          Procurando destinos…
+        </p>
+      </section>
+    );
   }
 
   return (
-    <section>
-      <h1>Achei estes destinos</h1>
+    <section className="pane">
+      <div className="pane__head">
+        <div>
+          <h1 className="pane__title">
+            {trip.destinations.length === 1
+              ? "1 destino pra você"
+              : `${trip.destinations.length} destinos pra você`}
+          </h1>
+          <p className="pane__sub pane__sub--tight">
+            Ordenados por aderência ao seu perfil. Custo = voo + hospedagem + gastos locais, para{" "}
+            {partyLabel(trip.party)}.
+          </p>
+        </div>
+      </div>
       {error !== null ? (
-        <div role="alert">
-          <p>{error}</p>
-          <button type="button" onClick={() => void retry()} disabled={busy}>
+        <div className="pane__error" role="alert">
+          <span>{error}</span>
+          <Button type="button" variant="ghost" onClick={() => void retry()} disabled={busy}>
             Tentar de novo
-          </button>
+          </Button>
         </div>
       ) : null}
       <DestinationResults

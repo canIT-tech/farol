@@ -50,9 +50,15 @@ function Block({
     return null;
   }
   return (
-    <section aria-label={title}>
-      <h3>{title}</h3>
-      {section.offers.length === 0 ? <p role="status">{empty}</p> : render()}
+    <section className="bk-block" aria-label={title}>
+      <h3 className="bk-block__title">{title}</h3>
+      {section.offers.length === 0 ? (
+        <p className="bk-block__lead" role="status">
+          {empty}
+        </p>
+      ) : (
+        render()
+      )}
     </section>
   );
 }
@@ -74,13 +80,14 @@ export function PriceContext({
   const range = priceRangeLabel(latest.offers);
 
   return (
-    <section aria-label="Contexto de preço">
-      <h2>Quando sai mais barato</h2>
+    <section className="bk-context" aria-label="Contexto de preço">
+      <h2 className="bk-section__title">Quando sai mais barato</h2>
+      <div className="bk-context__grid">
 
       <Block title="Melhor mês" section={months} empty="Sem histórico de preço por mês nesta rota." render={() => (
         <>
-          <p>{`${monthLabel(bestMonth!.key)} — ${money(bestMonth!.price, bestMonth!.currency)} com ${bestMonth!.airline}`}</p>
-          <ul>
+          <p className="bk-block__lead">{`${monthLabel(bestMonth!.key)} — ${money(bestMonth!.price, bestMonth!.currency)} com ${bestMonth!.airline}`}</p>
+          <ul className="bk-block__list">
             {months.offers.map((deal) => (
               <li key={deal.key}>{`${monthLabel(deal.key)}: ${money(deal.price, deal.currency)}`}</li>
             ))}
@@ -90,8 +97,8 @@ export function PriceContext({
 
       <Block title="Melhor dia do mês" section={calendar} empty="Sem calendário de preço nesta rota." render={() => (
         <>
-          <p>{`${shortDate(bestDay!.departDate)} — ${money(bestDay!.price, bestDay!.currency)}`}</p>
-          <ul>
+          <p className="bk-block__lead">{`${shortDate(bestDay!.departDate)} — ${money(bestDay!.price, bestDay!.currency)}`}</p>
+          <ul className="bk-block__list">
             {calendar.offers.map((day) => (
               <li key={day.departDate}>{`${shortDate(day.departDate)}: ${money(day.price, day.currency)}`}</li>
             ))}
@@ -100,8 +107,9 @@ export function PriceContext({
       )} />
 
       <Block title="Faixa recente" section={latest} empty="Sem preços recentes nesta rota." render={() => (
-        <p>{`Nos últimos meses esta rota saiu entre ${range}.`}</p>
+        <p className="bk-block__lead">{`Nos últimos meses esta rota saiu entre ${range}.`}</p>
       )} />
+      </div>
     </section>
   );
 }

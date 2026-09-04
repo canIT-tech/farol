@@ -5,6 +5,7 @@ import {
   EMPTY_ONBOARDING,
   toggleInterest,
   canSubmit,
+  fromTasteProfile,
   toTasteProfileInput,
   type OnboardingState
 } from "./onboarding";
@@ -100,5 +101,37 @@ describe("toTasteProfileInput", () => {
 
   it("lança quando o estado ainda está incompleto", () => {
     expect(() => toTasteProfileInput(EMPTY_ONBOARDING)).toThrow();
+  });
+});
+
+describe("fromTasteProfile", () => {
+  const saved = {
+    id: "11111111-1111-4111-8111-111111111111",
+    userId: "22222222-2222-4222-8222-222222222222",
+    interests: ["praia", "gastronomia", "vinhos"],
+    pace: "intenso" as const,
+    partyType: "amigos" as const,
+    budgetBand: "conforto" as const,
+    constraints: {},
+    updatedAt: "2026-09-01T00:00:00.000Z"
+  };
+
+  it("traz as escolhas do perfil salvo", () => {
+    expect(fromTasteProfile(saved)).toEqual({
+      interests: ["praia", "gastronomia", "vinhos"],
+      pace: "intenso",
+      partyType: "amigos",
+      budgetBand: "conforto"
+    });
+  });
+
+  it("copia a lista de interesses, sem compartilhar a referência", () => {
+    const state = fromTasteProfile(saved);
+    state.interests.push("praia");
+    expect(saved.interests).toHaveLength(3);
+  });
+
+  it("o estado devolvido já pode ser enviado de volta", () => {
+    expect(canSubmit(fromTasteProfile(saved))).toBe(true);
   });
 });

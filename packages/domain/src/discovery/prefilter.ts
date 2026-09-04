@@ -39,6 +39,27 @@ export function affinityScore(interests: string[], tags: string[]): number {
   return hits / interests.length;
 }
 
+/**
+ * Custo total estimado da viagem, para todo o grupo.
+ *
+ * A passagem e o gasto diário são por pessoa; a diária é do quarto, não de
+ * cada hóspede. O cálculo anterior tratava os três como per capita e comparava
+ * com `budgetTotal / adults`, o que cobrava a hospedagem uma vez por viajante
+ * — com dois adultos, uma viagem de 14 noites não cabia em orçamento nenhum e
+ * o catálogo inteiro era descartado.
+ */
+export function estimateTripCost(
+  entry: Pick<CatalogEntry, "avgFlightCostFromGru" | "avgLodgingNight" | "avgDailyLocal">,
+  nights: number,
+  adults: number
+): number {
+  return (
+    entry.avgFlightCostFromGru * adults +
+    entry.avgLodgingNight * nights +
+    entry.avgDailyLocal * nights * adults
+  );
+}
+
 export interface PrefilterArgs {
   catalog: CatalogEntry[];
   trip: TripCriteria;
@@ -54,7 +75,7 @@ export function prefilterDestinations(args: PrefilterArgs): CatalogEntry[] {
 
   const nights = nightsOf(trip);
   const month = targetMonthOf(trip);
-  const budgetPerPerson = trip.budgetTotal / trip.party.adults;
+  const adults = trip.party.adults;
 
   const eligible = catalog.filter((entry) => {
     if (entry.region !== BRAZIL_REGION && !entry.visaFreeBr) {
@@ -63,9 +84,7 @@ export function prefilterDestinations(args: PrefilterArgs): CatalogEntry[] {
     if (!entry.bestMonths.includes(month)) {
       return false;
     }
-    const estimate =
-      entry.avgFlightCostFromGru + entry.avgLodgingNight * nights + entry.avgDailyLocal * nights;
-    return estimate <= budgetPerPerson;
+    return estimateTripCost(entry, nights, adults) <= trip.budgetTotal;
   });
 
   return eligible

@@ -12,11 +12,11 @@ const steps: Step[] = [
 ];
 
 describe("StepNav", () => {
-  it("done é um botão que navega; todo e current não são botões", () => {
+  it("done e current navegam; todo não é botão", () => {
     const onNavigate = vi.fn();
     render(<StepNav steps={steps} onNavigate={onNavigate} />);
     expect(screen.getByRole("button", { name: "Perfil de gosto" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Escolher destino" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Escolher destino" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Roteiro" })).not.toBeInTheDocument();
   });
 
@@ -47,5 +47,37 @@ describe("StepNav", () => {
     expect(items[0].className).toContain("farol-stepnav__item--done");
     expect(items[1].className).toContain("farol-stepnav__item--current");
     expect(items[2].className).toContain("farol-stepnav__item--todo");
+  });
+
+  it("marca com visto só os passos concluídos", () => {
+    const { container } = render(
+      <StepNav
+        steps={[
+          { id: "a", label: "Perfil", state: "done" },
+          { id: "b", label: "Destino", state: "current" },
+          { id: "c", label: "Roteiro", state: "todo" }
+        ]}
+      />
+    );
+    expect(container.querySelectorAll(".farol-stepnav__marker")).toHaveLength(3);
+    expect(container.querySelectorAll(".farol-stepnav__marker svg")).toHaveLength(1);
+  });
+
+  it("a etapa atual também navega; a que ainda não existe, não", async () => {
+    const onNavigate = vi.fn();
+    render(
+      <StepNav
+        steps={[
+          { id: "a", label: "Perfil", state: "done" },
+          { id: "b", label: "Destino", state: "current" },
+          { id: "c", label: "Roteiro", state: "todo" }
+        ]}
+        onNavigate={onNavigate}
+      />
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: "Destino" }));
+    expect(onNavigate).toHaveBeenCalledWith("b");
+    expect(screen.queryByRole("button", { name: "Roteiro" })).not.toBeInTheDocument();
   });
 });

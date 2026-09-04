@@ -13,11 +13,14 @@ const input: TripInput = {
   targetMonth: "2026-09"
 };
 
-function controllerWith(over: Partial<Record<"create" | "list" | "get", ReturnType<typeof vi.fn>>>) {
+function controllerWith(
+  over: Partial<Record<"create" | "list" | "get" | "remove", ReturnType<typeof vi.fn>>>
+) {
   const service = {
     create: over.create ?? vi.fn(),
     list: over.list ?? vi.fn(),
-    get: over.get ?? vi.fn()
+    get: over.get ?? vi.fn(),
+    remove: over.remove ?? vi.fn()
   };
   return { controller: new TripsController(service as unknown as TripsService), service };
 }
@@ -39,5 +42,11 @@ describe("TripsController", () => {
     const { controller, service } = controllerWith({ get: vi.fn().mockResolvedValue({ id: "t-9" }) });
     await expect(controller.get(user, "t-9")).resolves.toEqual({ id: "t-9" });
     expect(service.get).toHaveBeenCalledWith("u-1", "t-9");
+  });
+
+  it("DELETE /:id delega para remove com o id do usuário e o id da viagem", async () => {
+    const { controller, service } = controllerWith({ remove: vi.fn().mockResolvedValue(undefined) });
+    await expect(controller.remove(user, "t-9")).resolves.toBeUndefined();
+    expect(service.remove).toHaveBeenCalledWith("u-1", "t-9");
   });
 });

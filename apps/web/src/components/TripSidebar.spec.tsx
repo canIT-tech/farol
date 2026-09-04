@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { TripState } from "@farol/shared";
-import { TripSidebar, tripSteps } from "./TripSidebar";
+import { TripSidebar, partyLabel, tripSteps } from "./TripSidebar";
 
 const base: TripState = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -48,7 +48,7 @@ describe("tripSteps", () => {
 
   it("sem destino escolhido: perfil feito, escolher destino é o passo atual", () => {
     expect(tripSteps(base).map((s) => s.state)).toEqual(["done", "current", "todo", "todo"]);
-    expect(tripSteps({ ...base, destinations: [candidate] }).map((s) => s.state)).toEqual([
+    expect(tripSteps({ ...base }).map((s) => s.state)).toEqual([
       "done",
       "current",
       "todo",
@@ -57,16 +57,24 @@ describe("tripSteps", () => {
   });
 
   it("com destino escolhido: roteiro liberado, voo & hotel é o passo atual", () => {
-    const steps = tripSteps({
-      ...base,
-      destinations: [candidate],
-      chosenDestination: candidate
-    });
+    const steps = tripSteps({ ...base, chosenDestination: candidate });
     expect(steps.map((s) => s.state)).toEqual(["done", "done", "done", "current"]);
   });
 
-  it("sem viagem devolve tudo a fazer", () => {
-    expect(tripSteps(null).every((s) => s.state === "todo")).toBe(true);
+  // /trips/new: a viagem ainda não existe, mas o perfil de gosto já ficou para
+  // trás — sem ele a descoberta nem roda.
+  it("sem viagem, o perfil está concluído e a etapa atual é escolher destino", () => {
+    expect(tripSteps(null).map((s) => s.state)).toEqual(["done", "current", "todo", "todo"]);
+  });
+});
+
+describe("partyLabel", () => {
+  it("sem viajantes definidos fica a definir", () => {
+    expect(partyLabel(null)).toBe("a definir");
+  });
+
+  it("conta adultos e crianças", () => {
+    expect(partyLabel({ adults: 2, children: 1 })).toBe("2 adultos · 1 criança");
   });
 });
 
@@ -74,7 +82,7 @@ describe("TripSidebar", () => {
   it("mostra origem, período, viajantes e orçamento", () => {
     render(<TripSidebar trip={base} />);
     expect(screen.getByText("GRU")).toBeInTheDocument();
-    expect(screen.getByText("2026-09 · 7 dias")).toBeInTheDocument();
+    expect(screen.getByText("set 2026 · 7 dias")).toBeInTheDocument();
     expect(screen.getByText("2 adultos · 1 criança")).toBeInTheDocument();
     expect(screen.getByText(/12\.000/)).toBeInTheDocument();
   });
@@ -85,7 +93,7 @@ describe("TripSidebar", () => {
         trip={{ ...base, dateStart: "2026-09-10", dateEnd: "2026-09-17", targetMonth: null, durationDays: null }}
       />
     );
-    expect(screen.getByText("2026-09-10 → 2026-09-17")).toBeInTheDocument();
+    expect(screen.getByText("10 set – 17 set 2026")).toBeInTheDocument();
   });
 
   it("singular de adulto e ausência de criança", () => {
@@ -100,7 +108,8 @@ describe("TripSidebar", () => {
 
   it("período indefinido quando não há data nem mês", () => {
     render(<TripSidebar trip={{ ...base, targetMonth: null, durationDays: null }} />);
-    expect(screen.getByText("a definir")).toBeInTheDocument();
+    // "Destino" também fica pendente nesta viagem: por isso getAllBy.
+    expect(screen.getAllByText("a definir").length).toBeGreaterThan(0);
   });
 
   it("orçamento a definir quando é nulo", () => {
@@ -113,16 +122,25 @@ describe("TripSidebar", () => {
     expect(screen.getByText("Lisboa, Portugal")).toBeInTheDocument();
   });
 
-  it("estado de carregando quando não há viagem", () => {
-    render(<TripSidebar trip={null} />);
-    expect(screen.getByRole("status")).toHaveTextContent("Carregando");
+  // Sem viagem ainda (/trips/new) a sidebar aparece assim mesmo, com tudo
+  // pendente — é o que o hi-fi 「2 · Descoberta」 mostra.
+  it("sem viagem, mostra o cartão inteiro pendente e nenhum passo concluído", () => {
+    const { container } = render(<TripSidebar trip={null} />);
+    expect(screen.getAllByText("a definir")).toHaveLength(5);
+    expect(container.querySelectorAll(".side__fact--pending")).toHaveLength(5);
+    // O perfil de gosto já ficou para trás; a etapa atual é escolher o destino.
+    expect(container.querySelectorAll(".farol-stepnav__item--done")).toHaveLength(1);
+    expect(screen.getByText("Escolher destino").closest("li")).toHaveAttribute(
+      "aria-current",
+      "step"
+    );
   });
 
   it("navega pelos passos já concluídos", async () => {
     const onNavigate = vi.fn();
     render(
       <TripSidebar
-        trip={{ ...base, destinations: [candidate], chosenDestination: candidate }}
+        trip={{ ...base, chosenDestination: candidate }}
         onNavigate={onNavigate}
       />
     );

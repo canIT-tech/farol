@@ -1,5 +1,5 @@
 # `doppler setup --no-interactive` lê isto e aponta o diretório para farol/dev.
-# Rodar a aplicação: `doppler run -- pnpm dev`. Sem arquivo .env.
+# Rodar a aplicação: `doppler run -- pnpm dev`. Sem arquivo .env.example.
 setup:
   project: farol
   config: dev

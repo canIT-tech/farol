@@ -1,8 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
+import type { TripSummary } from "../lib/discovery-form";
 import { useRouter } from "next/navigation";
-import { AdvisorChat, AppShell } from "@farol/ui";
+import { AdvisorChat, AppShell, Button } from "@farol/ui";
 import { AuthGate } from "./AuthGate";
 import { TripSidebar } from "./TripSidebar";
 import { TripProvider, useTrip } from "../providers/TripProvider";
@@ -21,25 +22,31 @@ function Rail({ tripId }: { tripId: string }) {
   return (
     <>
       <AdvisorChat messages={messages} pending={pending} onSend={(text) => void send(text)} />
-      {error !== null ? <p role="alert">{error}</p> : null}
+      {error !== null ? (
+        <p className="bk-note" role="alert">
+          {error}
+        </p>
+      ) : null}
     </>
   );
 }
 
-export function TripFrame({ tripId, children }: { tripId: string; children: ReactNode }) {
-  const { trip, error, refetch } = useTrip();
+/** Moldura das telas 2 a 5 do hi-fi: sidebar da viagem, miolo e trilho do
+ *  assessor. `tripId` nulo é a viagem que ainda não existe (/trips/new): a
+ *  sidebar aparece com tudo pendente e o trilho explica que o assessor entra
+ *  quando houver viagem — inventar uma conversa ali seria fingir. */
+export function ShellFrame({
+  tripId,
+  trip,
+  onNavigate,
+  children
+}: {
+  tripId: string | null;
+  trip: TripSummary | null;
+  onNavigate: (step: string) => void;
+  children: ReactNode;
+}) {
   const router = useRouter();
-
-  if (error !== null) {
-    return (
-      <div role="alert">
-        <p>Não consegui carregar a viagem: {error}</p>
-        <button type="button" onClick={() => void refetch()}>
-          Tentar de novo
-        </button>
-      </div>
-    );
-  }
 
   async function leave() {
     await signOut();
@@ -50,19 +57,65 @@ export function TripFrame({ tripId, children }: { tripId: string; children: Reac
     <AppShell
       sidebar={
         <>
-          <TripSidebar trip={trip} onNavigate={(step) => router.push(stepRoute(tripId, step))} />
-          <nav aria-label="Conta">
+          <TripSidebar trip={trip} onNavigate={onNavigate} />
+          <nav className="side__account" aria-label="Conta">
             <a href="/trips">Minhas viagens</a>
-            <button type="button" onClick={() => void leave()}>
+            <Button type="button" variant="text" size="sm" onClick={() => void leave()}>
               Sair
-            </button>
+            </Button>
           </nav>
         </>
       }
-      rail={<Rail tripId={tripId} />}
+      rail={tripId === null ? <RailPlaceholder /> : <Rail tripId={tripId} />}
     >
       {children}
     </AppShell>
+  );
+}
+
+/** Trilho antes de existir viagem: o assessor diz o que fazer, sem campo — o
+ *  chat só existe atrelado a uma viagem. */
+function RailPlaceholder() {
+  return (
+    <div className="rail-intro">
+      <p className="rail-intro__title">Assessor</p>
+      <p className="rail-intro__bubble">
+        Me diz de onde você sai, quando e quanto dá para gastar. Eu cruzo com o seu perfil e
+        ranqueio os destinos.
+      </p>
+      <p className="rail-intro__note">
+        A conversa abre assim que a viagem existir — daí dá para pedir ajuste em qualquer parte do
+        plano.
+      </p>
+    </div>
+  );
+}
+
+export function TripFrame({ tripId, children }: { tripId: string; children: ReactNode }) {
+  const { trip, error, refetch } = useTrip();
+  const router = useRouter();
+
+  if (error !== null) {
+    return (
+      <section className="pane">
+        <div className="pane__error" role="alert">
+          <span>Não consegui carregar a viagem: {error}</span>
+          <Button type="button" variant="ghost" onClick={() => void refetch()}>
+            Tentar de novo
+          </Button>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <ShellFrame
+      tripId={tripId}
+      trip={trip}
+      onNavigate={(step) => router.push(stepRoute(tripId, step))}
+    >
+      {children}
+    </ShellFrame>
   );
 }
 

@@ -44,3 +44,33 @@ describe("JwtVerifier", () => {
     await expect(verifier.verify(token)).rejects.toThrow("token inválido");
   });
 });
+
+describe("JwtVerifier e a audiência", () => {
+  // O Supabase emite aud "authenticated" para token de usuário. Sem a checagem,
+  // qualquer token assinado pela mesma chave do projeto passaria — inclusive um
+  // que não represente uma pessoa logada.
+  it("aceita o token com a audiência esperada", async () => {
+    const token = await jwks.sign({ sub: "u-1", email: "a@b.com", aud: "authenticated" });
+    const verifier = new JwtVerifier(jwks.jwksUrl, "authenticated");
+    await expect(verifier.verify(token)).resolves.toEqual({ sub: "u-1", email: "a@b.com" });
+  });
+
+  it("recusa o token com outra audiência", async () => {
+    const token = await jwks.sign({ sub: "u-1", email: "a@b.com", aud: "outra-coisa" });
+    const verifier = new JwtVerifier(jwks.jwksUrl, "authenticated");
+    await expect(verifier.verify(token)).rejects.toThrow(/token inválido/);
+  });
+
+  it("recusa o token sem audiência", async () => {
+    const token = await jwks.sign({ sub: "u-1", email: "a@b.com", aud: undefined });
+    const verifier = new JwtVerifier(jwks.jwksUrl, "authenticated");
+    await expect(verifier.verify(token)).rejects.toThrow(/token inválido/);
+  });
+
+  // Sem audiência configurada, não verifica — mantém o comportamento anterior
+  // para quem roda contra um emissor que não use a convenção do Supabase.
+  it("não verifica audiência quando não há uma configurada", async () => {
+    const token = await jwks.sign({ sub: "u-1", email: "a@b.com", aud: undefined });
+    await expect(new JwtVerifier(jwks.jwksUrl).verify(token)).resolves.toMatchObject({ sub: "u-1" });
+  });
+});

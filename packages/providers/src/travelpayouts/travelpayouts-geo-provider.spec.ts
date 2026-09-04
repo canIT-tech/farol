@@ -13,6 +13,7 @@ import {
   normalizeCities,
   normalizeWhereami,
   parseCoordinates,
+  isRoutableIp,
   parseJsonp,
   type TpAirline,
   type TpAirport,
@@ -358,5 +359,66 @@ describe("TravelpayoutsGeoProvider", () => {
     clock = 5000;
     await geo.cities();
     expect(calls).toHaveLength(2);
+  });
+
+});
+
+// A Travelpayouts não erra com IP que não sabe localizar: devolve Londres, o
+// default dela. Em desenvolvimento req.ip é "::1", e mandar esse valor fazia
+// toda origem sugerida virar Londres.
+describe("isRoutableIp", () => {
+  it("aceita IP público", () => {
+    expect(isRoutableIp("191.240.129.27")).toBe(true);
+    expect(isRoutableIp("2804:14d:5c81::1")).toBe(true);
+  });
+
+  it("recusa loopback", () => {
+    expect(isRoutableIp("::1")).toBe(false);
+    expect(isRoutableIp("127.0.0.1")).toBe(false);
+    expect(isRoutableIp("localhost")).toBe(false);
+  });
+
+  it("recusa redes privadas", () => {
+    for (const ip of ["10.0.0.4", "192.168.1.10", "172.16.0.1", "172.31.255.254"]) {
+      expect(isRoutableIp(ip)).toBe(false);
+    }
+  });
+
+  it("172.15 e 172.32 são públicos, ao contrário de 172.16–31", () => {
+    expect(isRoutableIp("172.15.0.1")).toBe(true);
+    expect(isRoutableIp("172.32.0.1")).toBe(true);
+  });
+
+  it("recusa link-local e ULA do IPv6", () => {
+    expect(isRoutableIp("fe80::1")).toBe(false);
+    expect(isRoutableIp("fd00::1")).toBe(false);
+    expect(isRoutableIp("fc00::1")).toBe(false);
+  });
+
+  it("enxerga através do prefixo IPv4-mapeado do Node", () => {
+    expect(isRoutableIp("::ffff:127.0.0.1")).toBe(false);
+    expect(isRoutableIp("::ffff:191.240.129.27")).toBe(true);
+  });
+
+  it("recusa string vazia e espaços", () => {
+    expect(isRoutableIp("")).toBe(false);
+    expect(isRoutableIp("  ")).toBe(false);
+  });
+});
+
+describe("whereami — escolha do IP", () => {
+  it("manda o ip quando ele é localizável", async () => {
+    const { http, calls } = fakeHttp();
+    await new TravelpayoutsGeoProvider({ token: "t", marker: "m", http }).whereami(
+      "191.240.129.27"
+    );
+    expect(calls[0]!.query.ip).toBe("191.240.129.27");
+  });
+
+  it("omite o ip de loopback, para a api usar o da conexão", async () => {
+    const { http, calls } = fakeHttp();
+    await new TravelpayoutsGeoProvider({ token: "t", marker: "m", http }).whereami("::1");
+    expect(calls[0]!.query.ip).toBeUndefined();
+    expect(calls[0]!.query.locale).toBe("br");
   });
 });

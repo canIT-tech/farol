@@ -1,0 +1,37 @@
+/* Entrada. Coluna estreita: o único trabalho da tela é um campo e dois botões. */
+
+.login .screen__card {
+  --screen-w: 400px;
+  text-align: center;
+}
+
+.login .screen__top {
+  --screen-w: 400px;
+  justify-content: center;
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  text-align: left;
+}
+
+/* "ou" com um fio de cada lado, sem imagem: os fios são pseudoelementos. */
+.login__or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 0;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.login__or::before,
+.login__or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}

@@ -41,10 +41,13 @@ export class FlightsService {
     private readonly geo: GeoService
   ) {}
 
-  // O provider devolve só códigos ("AD", "GRU"). A tela mostra "Azul" e
+  // O provider pode devolver só códigos ("AD", "GRU"). A tela mostra "Azul" e
   // "São Paulo — Guarulhos", então os nomes são resolvidos aqui, no catálogo
-  // que já está em memória. Código fora do catálogo fica nulo e a UI cai no
-  // código cru — nunca em um nome inventado.
+  // que já está em memória. Nome que o provider já trouxe é preservado quando o
+  // catálogo não conhece o código — o Google Flights nomeia companhias que não
+  // estão no dump do Travelpayouts, e sobrescrever com nulo seria perder
+  // informação boa. Sem catálogo e sem provider, fica nulo e a UI cai no código
+  // cru — nunca em um nome inventado.
   async enrich(offers: FlightOffer[]): Promise<FlightOffer[]> {
     const airportNames = new Map<string, string | null>();
     const airlineNames = new Map<string, string | null>();
@@ -64,11 +67,15 @@ export class FlightsService {
     return Promise.all(
       offers.map(async (offer) => ({
         ...offer,
-        carrierName: await resolve(airlineNames, offer.carrier, (c) => this.geo.findAirline(c)),
-        originName: await resolve(airportNames, offer.originIata, (c) => this.geo.findAirport(c)),
-        destinationName: await resolve(airportNames, offer.destinationIata, (c) =>
-          this.geo.findAirport(c)
-        )
+        carrierName:
+          (await resolve(airlineNames, offer.carrier, (c) => this.geo.findAirline(c))) ??
+          offer.carrierName,
+        originName:
+          (await resolve(airportNames, offer.originIata, (c) => this.geo.findAirport(c))) ??
+          offer.originName,
+        destinationName:
+          (await resolve(airportNames, offer.destinationIata, (c) => this.geo.findAirport(c))) ??
+          offer.destinationName
       }))
     );
   }

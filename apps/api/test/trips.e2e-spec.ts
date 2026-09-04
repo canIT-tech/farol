@@ -14,12 +14,22 @@ let jwks: FakeJwks;
 const { db, close } = createDbClient(dbUrl);
 const createdIds: string[] = [];
 
+// Datas relativas ao relógio: o tripInputSchema barra passado, e literal de
+// setembro de 2026 quebraria sozinho na virada do mês. Dois meses à frente.
+const MES = (() => {
+  const d = new Date();
+  d.setUTCMonth(d.getUTCMonth() + 2, 1);
+  return d.toISOString().slice(0, 7);
+})();
+const D10 = `${MES}-10`;
+const D17 = `${MES}-17`;
+
 const body = {
   originIata: "GRU",
   party: { adults: 2, children: 0 },
   budgetTotal: 15000,
   durationDays: 7,
-  targetMonth: "2026-09"
+  targetMonth: MES
 };
 
 async function tokenForNewUser(): Promise<string> {
@@ -101,7 +111,54 @@ describe("trips", () => {
     const res = await request(app.getHttpServer())
       .post("/trips")
       .set("Authorization", `Bearer ${token}`)
-      .send({ ...body, dateStart: "2026-09-10", dateEnd: "2026-09-17" });
+      .send({ ...body, dateStart: D10, dateEnd: D17 });
     expect(res.status).toBe(400);
+  });
+
+  it("DELETE /trips/:id apaga a viagem (204) e ela some da lista", async () => {
+    const token = await tokenForNewUser();
+    const created = await request(app.getHttpServer())
+      .post("/trips")
+      .set("Authorization", `Bearer ${token}`)
+      .send(body);
+
+    const removed = await request(app.getHttpServer())
+      .delete(`/trips/${created.body.id}`)
+      .set("Authorization", `Bearer ${token}`);
+    expect(removed.status).toBe(204);
+
+    const list = await request(app.getHttpServer())
+      .get("/trips")
+      .set("Authorization", `Bearer ${token}`);
+    expect(list.body.map((t: { id: string }) => t.id)).not.toContain(created.body.id);
+
+    const gone = await request(app.getHttpServer())
+      .get(`/trips/${created.body.id}`)
+      .set("Authorization", `Bearer ${token}`);
+    expect(gone.status).toBe(404);
+  });
+
+  it("DELETE /trips/:id sem auth responde 401", async () => {
+    const res = await request(app.getHttpServer()).delete(`/trips/${crypto.randomUUID()}`);
+    expect(res.status).toBe(401);
+  });
+
+  it("DELETE /trips/:id de outra pessoa responde 403 e não apaga", async () => {
+    const dono = await tokenForNewUser();
+    const intruso = await tokenForNewUser();
+    const created = await request(app.getHttpServer())
+      .post("/trips")
+      .set("Authorization", `Bearer ${dono}`)
+      .send(body);
+
+    const res = await request(app.getHttpServer())
+      .delete(`/trips/${created.body.id}`)
+      .set("Authorization", `Bearer ${intruso}`);
+    expect(res.status).toBe(403);
+
+    const ainda = await request(app.getHttpServer())
+      .get(`/trips/${created.body.id}`)
+      .set("Authorization", `Bearer ${dono}`);
+    expect(ainda.status).toBe(200);
   });
 });

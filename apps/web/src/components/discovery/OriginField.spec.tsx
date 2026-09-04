@@ -40,6 +40,7 @@ describe("OriginField — sugestão pelo IP", () => {
     const onChange = vi.fn();
     render(
       <OriginField
+        token="tok"
         value=""
         onChange={onChange}
         detectOrigin={() => Promise.resolve(chapeco)}
@@ -56,6 +57,7 @@ describe("OriginField — sugestão pelo IP", () => {
     const onChange = vi.fn();
     render(
       <OriginField
+        token="tok"
         value="GIG"
         onChange={onChange}
         detectOrigin={() => Promise.resolve(chapeco)}
@@ -70,6 +72,7 @@ describe("OriginField — sugestão pelo IP", () => {
   it("segue utilizável quando a detecção falha", async () => {
     render(
       <OriginField
+        token="tok"
         value=""
         onChange={vi.fn()}
         detectOrigin={() => Promise.reject(new Error("503"))}
@@ -85,7 +88,7 @@ describe("OriginField — sugestão pelo IP", () => {
 describe("OriginField — busca no catálogo", () => {
   it("não busca com termo de uma letra", async () => {
     const findAirports = vi.fn(() => Promise.resolve([gru]));
-    render(<OriginField value="" onChange={vi.fn()} detectOrigin={noDetect} findAirports={findAirports} />);
+    render(<OriginField token="tok" value="" onChange={vi.fn()} detectOrigin={noDetect} findAirports={findAirports} />);
 
     await userEvent.type(screen.getByLabelText("Saindo de"), "g");
     expect(findAirports).not.toHaveBeenCalled();
@@ -94,19 +97,19 @@ describe("OriginField — busca no catálogo", () => {
 
   it("lista os aeroportos encontrados a partir de duas letras", async () => {
     const findAirports = vi.fn(() => Promise.resolve([gru]));
-    render(<OriginField value="" onChange={vi.fn()} detectOrigin={noDetect} findAirports={findAirports} />);
+    render(<OriginField token="tok" value="" onChange={vi.fn()} detectOrigin={noDetect} findAirports={findAirports} />);
 
     await userEvent.type(screen.getByLabelText("Saindo de"), "gua");
 
     expect(await screen.findByRole("listbox", { name: "Aeroportos encontrados" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "São Paulo — Guarulhos (GRU)" })).toBeInTheDocument();
-    expect(findAirports).toHaveBeenCalledWith("gua");
+    expect(findAirports).toHaveBeenCalledWith("tok", "gua");
   });
 
   it("escolher um aeroporto fixa o código e mostra o nome completo", async () => {
     const onChange = vi.fn();
     render(
-      <OriginField value="" onChange={onChange} detectOrigin={noDetect} findAirports={() => Promise.resolve([gru])} />
+      <OriginField token="tok" value="" onChange={onChange} detectOrigin={noDetect} findAirports={() => Promise.resolve([gru])} />
     );
 
     await userEvent.type(screen.getByLabelText("Saindo de"), "gua");
@@ -120,7 +123,7 @@ describe("OriginField — busca no catálogo", () => {
 
   it("digitar de novo reabre a busca depois de uma escolha", async () => {
     const findAirports = vi.fn(() => Promise.resolve([gru]));
-    render(<OriginField value="" onChange={vi.fn()} detectOrigin={noDetect} findAirports={findAirports} />);
+    render(<OriginField token="tok" value="" onChange={vi.fn()} detectOrigin={noDetect} findAirports={findAirports} />);
 
     await userEvent.type(screen.getByLabelText("Saindo de"), "gua");
     await userEvent.click(await screen.findByRole("button", { name: "São Paulo — Guarulhos (GRU)" }));
@@ -131,7 +134,7 @@ describe("OriginField — busca no catálogo", () => {
 
   it("aceita um IATA digitado direto, sem passar pela lista", async () => {
     const onChange = vi.fn();
-    render(<OriginField value="" onChange={onChange} detectOrigin={noDetect} findAirports={noSearch} />);
+    render(<OriginField token="tok" value="" onChange={onChange} detectOrigin={noDetect} findAirports={noSearch} />);
 
     await userEvent.type(screen.getByLabelText("Saindo de"), "gig");
     expect(onChange).toHaveBeenLastCalledWith("GIG");
@@ -139,7 +142,7 @@ describe("OriginField — busca no catálogo", () => {
 
   it("termo com menos de 3 letras não vira origem válida", async () => {
     const onChange = vi.fn();
-    render(<OriginField value="" onChange={onChange} detectOrigin={noDetect} findAirports={noSearch} />);
+    render(<OriginField token="tok" value="" onChange={onChange} detectOrigin={noDetect} findAirports={noSearch} />);
 
     await userEvent.type(screen.getByLabelText("Saindo de"), "gi");
     expect(onChange).toHaveBeenLastCalledWith("");
@@ -148,6 +151,7 @@ describe("OriginField — busca no catálogo", () => {
   it("falha na busca deixa a lista vazia, sem quebrar o formulário", async () => {
     render(
       <OriginField
+        token="tok"
         value=""
         onChange={vi.fn()}
         detectOrigin={noDetect}
@@ -157,5 +161,45 @@ describe("OriginField — busca no catálogo", () => {
 
     await userEvent.type(screen.getByLabelText("Saindo de"), "gua");
     await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument());
+  });
+  it("a lista some quando o foco sai do campo e volta ao focar de novo", async () => {
+    render(
+      <OriginField
+        token="tok"
+        value=""
+        onChange={vi.fn()}
+        detectOrigin={noDetect}
+        findAirports={() => Promise.resolve([gru])}
+      />
+    );
+
+    const campo = screen.getByLabelText("Saindo de");
+    await userEvent.type(campo, "gua");
+    expect(await screen.findByRole("listbox")).toBeInTheDocument();
+
+    // Clicar fora: tab() iria para a primeira opção, que ainda é o container.
+    await userEvent.click(document.body);
+    await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument());
+
+    campo.focus();
+    expect(await screen.findByRole("listbox")).toBeInTheDocument();
+  });
+
+  it("clicar numa opção não fecha a lista antes de registrar a escolha", async () => {
+    const onChange = vi.fn();
+    render(
+      <OriginField
+        token="tok"
+        value=""
+        onChange={onChange}
+        detectOrigin={noDetect}
+        findAirports={() => Promise.resolve([gru])}
+      />
+    );
+
+    await userEvent.type(screen.getByLabelText("Saindo de"), "gua");
+    await userEvent.click(await screen.findByRole("button", { name: "São Paulo — Guarulhos (GRU)" }));
+
+    expect(onChange).toHaveBeenLastCalledWith("GRU");
   });
 });

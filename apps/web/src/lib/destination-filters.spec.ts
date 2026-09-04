@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { DestinationCandidate } from "@farol/shared";
-import { arrangeDestinations, isDomestic, totalEstimate } from "./destination-filters";
+import { arrangeDestinations, isDomestic, matchPercent, totalEstimate } from "./destination-filters";
 
 function candidate(
   over: Partial<DestinationCandidate> & Pick<DestinationCandidate, "iata">
@@ -71,5 +71,23 @@ describe("arrangeDestinations", () => {
 
   it("lista vazia continua vazia", () => {
     expect(arrangeDestinations([], { domesticOnly: true, sort: "price" })).toEqual([]);
+  });
+});
+
+describe("matchPercent", () => {
+  it("converte o score 0–1 para porcentagem", () => {
+    expect(matchPercent(0.91)).toBe(91);
+  });
+
+  it("arredonda para o inteiro mais próximo", () => {
+    expect(matchPercent(0.785)).toBe(79);
+  });
+
+  it("aderência total vira 100", () => {
+    expect(matchPercent(1)).toBe(100);
+  });
+
+  it("zero continua zero", () => {
+    expect(matchPercent(0)).toBe(0);
   });
 });

@@ -23,6 +23,27 @@ export const CITIES_PATH = "/data/{locale}/cities.json";
 /** Callback fixo do JSONP do /whereami — o endpoint exige um e ecoa este. */
 export const WHEREAMI_CALLBACK = "useriata";
 
+const PRIVATE_IPV4 =
+  /^(?:10\.|127\.|169\.254\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/;
+
+/**
+ * IP que a Travelpayouts consegue localizar. Endereço de loopback ou de rede
+ * privada ela não resolve — e não erra: devolve Londres, o default dela. Em
+ * desenvolvimento `req.ip` é sempre "::1", então mandar esse valor faria toda
+ * origem sugerida virar Londres. Sem o parâmetro, ela usa o IP da conexão.
+ */
+export function isRoutableIp(ip: string): boolean {
+  const clean = ip.trim().replace(/^::ffff:/i, "").toLowerCase();
+  if (clean === "" || clean === "::1" || clean === "localhost") {
+    return false;
+  }
+  if (PRIVATE_IPV4.test(clean)) {
+    return false;
+  }
+  // fc00::/7 (ULA) e fe80::/10 (link-local) do IPv6.
+  return !/^(?:f[cd]|fe[89ab])/.test(clean);
+}
+
 export interface TravelpayoutsGeoProviderConfig extends TravelpayoutsHttpConfig {
   /** Locale dos dumps estáticos. Default "en" (é o único completo). */
   locale?: string;
@@ -190,7 +211,7 @@ export class TravelpayoutsGeoProvider implements GeoProvider {
   /** Origem provável do usuário a partir do IP. null quando o IP é desconhecido. */
   async whereami(ip: string, locale = "br"): Promise<GeoLocation | null> {
     const body = await this.http.getText(WHEREAMI_URL, {
-      ip,
+      ip: isRoutableIp(ip) ? ip : undefined,
       locale,
       callback: WHEREAMI_CALLBACK
     });

@@ -1,17 +1,15 @@
-import { Body, Controller, Get, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Put } from "@nestjs/common";
 import {
   tasteProfileInputSchema,
   type CurrentUser as CurrentUserType,
   type TasteProfile,
   type TasteProfileInput
 } from "@farol/shared";
-import { AuthGuard } from "../auth/auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
 import { ZodValidationPipe } from "../common/zod.pipe";
 import { ProfileService } from "./profile.service";
 
 @Controller("me/profile")
-@UseGuards(AuthGuard)
 export class ProfileController {
   constructor(private readonly profile: ProfileService) {}
 

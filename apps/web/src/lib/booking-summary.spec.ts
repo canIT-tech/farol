@@ -1,6 +1,13 @@
 import { describe, it, expect } from "vitest";
 import type { TripState } from "@farol/shared";
-import { bookingSubtitle, dateRangeLabel } from "./booking-summary";
+import {
+  bookingSubtitle,
+  dateRangeLabel,
+  dayPillDate,
+  itinerarySubtitle,
+  itineraryTitle,
+  monthShort
+} from "./booking-summary";
 
 const CLOSING = "A reserva é concluída no site do parceiro.";
 
@@ -82,5 +89,63 @@ describe("bookingSubtitle", () => {
         chosenDestination: null
       })
     ).toBe(CLOSING);
+  });
+});
+
+describe("itineraryTitle", () => {
+  it("junta destino e duração", () => {
+    expect(itineraryTitle({ ...trip, chosenDestination: { city: "Cartagena" } } as never, 7)).toBe(
+      "Cartagena · 7 dias"
+    );
+  });
+
+  it("usa singular com um dia só", () => {
+    expect(itineraryTitle({ ...trip, chosenDestination: { city: "Lisboa" } } as never, 1)).toBe(
+      "Lisboa · 1 dia"
+    );
+  });
+
+  it("sem destino, mostra só a duração", () => {
+    expect(itineraryTitle(trip as never, 3)).toBe("3 dias");
+  });
+
+  it("sem nada, cai no genérico", () => {
+    expect(itineraryTitle(null, 0)).toBe("Seu roteiro");
+  });
+});
+
+describe("itinerarySubtitle", () => {
+  it("junta datas e viajantes", () => {
+    expect(itinerarySubtitle(trip as never, "2 adultos")).toBe("10 – 17 de maio · 2 adultos");
+  });
+
+  it("sem viagem não há subtítulo", () => {
+    expect(itinerarySubtitle(null, "2 adultos")).toBeNull();
+  });
+
+  it("sem datas nem viajantes, não há subtítulo", () => {
+    expect(
+      itinerarySubtitle({ ...trip, dateStart: null, dateEnd: null, targetMonth: null } as never, null)
+    ).toBeNull();
+  });
+});
+
+describe("dayPillDate", () => {
+  it("abrevia o mês", () => {
+    expect(dayPillDate("2026-05-10")).toBe("10 mai");
+  });
+
+  it("dia sem data não mostra nada", () => {
+    expect(dayPillDate(null)).toBeNull();
+  });
+});
+
+describe("monthShort", () => {
+  it("abrevia o mês e mantém o ano", () => {
+    expect(monthShort("2026-09")).toBe("set 2026");
+  });
+
+  it("funciona em janeiro", () => {
+    expect(monthShort("2027-01")).toBe("jan 2027");
   });
 });

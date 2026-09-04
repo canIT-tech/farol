@@ -1,0 +1,59 @@
+/* Dropdown de aeroportos: popover ancorado no campo, não lista de documento.
+   Fica sobre o conteúdo seguinte para não empurrar o formulário a cada tecla. */
+
+.origin {
+  position: relative;
+}
+
+.origin__list {
+  position: absolute;
+  top: calc(100% - 18px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin: 6px 0 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 264px;
+  overflow-y: auto;
+  background: var(--surface, #fff);
+  border: 1.5px solid var(--line, #e9e7e1);
+  border-radius: var(--radius-md, 12px);
+  box-shadow: var(--elev-2, 0 12px 32px -16px rgba(28, 27, 25, 0.12));
+}
+
+.origin__option {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--ink, #1c1b19);
+  text-align: left;
+  cursor: pointer;
+}
+
+.origin__option:hover,
+.origin__option:focus-visible {
+  background: var(--surface-sunk, #f7f5f0);
+  outline: none;
+}
+
+.origin__iata {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-ink, #8f3f26);
+  flex: none;
+}
+
+.origin__name {
+  color: var(--text-muted, #78766f);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

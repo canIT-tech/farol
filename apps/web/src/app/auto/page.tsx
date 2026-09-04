@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import "./auto.css";
 import { tasteProfileSchema } from "@farol/shared";
+import { BrandHeader } from "../../components/common/BrandHeader";
 import { AuthGate } from "../../components/AuthGate";
 import { AutoForm } from "../../components/auto/AutoForm";
 import { apiFetch } from "../../lib/api-client";
@@ -43,11 +46,35 @@ function Auto({ token }: { token: string }) {
   }
 
   return (
-    <main>
-      <h1>Me diz o mínimo, eu monto o resto</h1>
-      <p>Origem, datas, quanto dá para gastar e três gostos. Devolvo um plano fechado.</p>
-      <AutoForm onSubmit={(state) => void submit(state)} pending={pending} />
-      {error !== null ? <p role="alert">{error}</p> : null}
+    <main className="screen">
+      <BrandHeader href="/trips">
+        <span className="screen__badge">Modo autônomo</span>
+        <Link className="screen__back" href="/trips">
+          ← Minhas viagens
+        </Link>
+      </BrandHeader>
+
+      <div className="screen__card">
+        <h1 className="screen__title">
+          Diga quando.
+          <br />
+          O resto é comigo.
+        </h1>
+        <p className="screen__sub">
+          Farol escolhe o destino, monta o roteiro dia a dia e acha voo e hotel. Você recebe um
+          plano fechado e ajusta o que quiser conversando — sem ficar comparando opções.
+        </p>
+        <AutoForm onSubmit={(state) => void submit(state)} token={token} pending={pending} />
+        {error !== null ? (
+          <p className="screen__error" role="alert">
+            {error}
+          </p>
+        ) : (
+          <p className="auto-reassure">
+            Nada é reservado agora. Você revisa o plano inteiro antes de qualquer compra.
+          </p>
+        )}
+      </div>
     </main>
   );
 }

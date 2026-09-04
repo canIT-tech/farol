@@ -69,7 +69,7 @@ describe("scaffold do monorepo", () => {
     expect(ts.compilerOptions.paths["@farol/db"]).toEqual(["packages/db/src"]);
   });
 
-  it("nao versiona .env", () => {
+  it("nao versiona .env.example", () => {
     const ig = readFileSync(".gitignore", "utf8");
     expect(ig).toMatch(/^\.env$/m);
     expect(existsSync(".env.example")).toBe(true);

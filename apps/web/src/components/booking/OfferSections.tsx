@@ -9,6 +9,7 @@ import type {
   ProviderSection
 } from "@farol/shared";
 import { walkingNote } from "../../lib/walking-distance";
+import "./booking.css";
 import { money } from "../../lib/money";
 
 // Nome do parceiro que recebe o clique. O Travelpayouts leva a busca do
@@ -54,12 +55,16 @@ function Section<T>({
   children: ReactNode;
 }) {
   return (
-    <section aria-label={title}>
-      <h2>{title}</h2>
+    <section className="bk-section" aria-label={title}>
+      <h2 className="bk-section__title">{title}</h2>
       {section.error !== null ? (
-        <p role="status">Não consegui consultar agora. Tente de novo em alguns minutos.</p>
+        <p className="bk-empty" role="status">
+          Não consegui consultar agora. Tente de novo em alguns minutos.
+        </p>
       ) : section.offers.length === 0 ? (
-        <p role="status">{empty}</p>
+        <p className="bk-empty" role="status">
+          {empty}
+        </p>
       ) : (
         <>{children}</>
       )}
@@ -84,7 +89,7 @@ export function FlightSection({
 
   return (
     <Section title={title} section={section} empty={empty}>
-      <ul>
+      <ul className="bk-list">
         {section.offers.map((offer, index) => (
           <li key={offer.id}>
             <FlightOfferCard
@@ -109,7 +114,7 @@ export function FlightSection({
           </li>
         ))}
       </ul>
-      <p role="note">
+      <p className="bk-note" role="note">
         {freshness === null ? APPROX_PRICE_NOTICE : `${freshness} ${APPROX_PRICE_NOTICE}`}
       </p>
     </Section>
@@ -120,21 +125,23 @@ export function HotelSection({
   section,
   onSelect,
   busy = false,
-  itineraryItems = []
+  itineraryItems = [],
+  title = "Hospedagem"
 }: {
   section: ProviderSection<HotelOffer>;
   onSelect: (offerId: string) => void;
   busy?: boolean;
   /** Paradas do roteiro, para dizer quantas ficam a pé de cada hotel. */
   itineraryItems?: ItineraryItem[];
+  title?: string;
 }) {
   return (
     <Section
-      title="Hospedagem"
+      title={title}
       section={section}
       empty="Nenhuma hospedagem encontrada para estas datas."
     >
-      <ul>
+      <ul className="bk-hotels">
         {section.offers.map((offer) => (
           <li key={offer.id}>
             <HotelOfferCard
@@ -151,7 +158,7 @@ export function HotelSection({
           </li>
         ))}
       </ul>
-      <p role="note">{APPROX_PRICE_NOTICE}</p>
+      <p className="bk-note" role="note">{APPROX_PRICE_NOTICE}</p>
     </Section>
   );
 }

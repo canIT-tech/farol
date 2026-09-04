@@ -1,0 +1,125 @@
+/* Sidebar da viagem, telas 2 a 5 do hi-fi: marca, cartão com o que já está
+   fechado, e as etapas. O AppShell dá a coluna; isto é o conteúdo dela. */
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  height: 100%;
+  padding: 26px 20px;
+  box-sizing: border-box;
+}
+
+.side .screen__logo {
+  font-size: 19px;
+  letter-spacing: -0.02em;
+}
+
+.side__heading {
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 600;
+  margin: 0 0 12px;
+}
+
+.side__card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  padding: 4px 14px;
+}
+
+.side__fact {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.side__fact:last-child {
+  border-bottom: 0;
+}
+
+.side__fact b {
+  display: block;
+  color: var(--ink);
+  font-weight: 500;
+  font-size: 13.5px;
+  margin-top: 3px;
+}
+
+/* O que ainda não foi decidido não compete com o que já está fechado. */
+.side__fact--pending b {
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+.side__account {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.side__account a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.side__account a:hover {
+  color: var(--accent-ink);
+}
+
+/* Estado de carregamento em tela cheia, antes de qualquer shell existir. */
+.boot {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-sunk);
+  color: var(--text-muted);
+  font-family: var(--font-text);
+  font-size: 14px;
+}
+
+/* Trilho do assessor antes de existir viagem. Espelha o AdvisorChat, mas sem
+   campo: não há conversa para ter ainda. */
+.rail-intro {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.rail-intro__title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0 0 4px;
+}
+
+.rail-intro__bubble {
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 11px 13px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.rail-intro__note {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-faint);
+  margin: 0;
+}

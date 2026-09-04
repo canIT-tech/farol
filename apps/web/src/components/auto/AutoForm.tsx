@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Chip, Slider, TextField } from "@farol/ui";
+import { Button, Chip, DateRangeField, Slider } from "@farol/ui";
 import { OriginField } from "../discovery/OriginField";
 import {
   BUDGET_MAX,
@@ -25,11 +25,23 @@ function brl(value: number): string {
   });
 }
 
+function ArrowRight() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+         strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+
 export function AutoForm({
   onSubmit,
+  token,
   pending = false
 }: {
   onSubmit: (state: AutoFormState) => void;
+  /** Repassado ao OriginField: o /geo passou a exigir credencial. */
+  token: string;
   pending?: boolean;
 }) {
   const [state, setState] = useState<AutoFormState>(EMPTY_AUTO_FORM);
@@ -44,32 +56,40 @@ export function AutoForm({
         }
       }}
     >
-      <OriginField value={state.originIata} onChange={(originIata) => patch({ originIata })} />
-      <TextField
-        label="Ida"
-        type="date"
-        value={state.dateStart}
-        onChange={(dateStart) => patch({ dateStart })}
-      />
-      <TextField
-        label="Volta"
-        type="date"
-        value={state.dateEnd}
-        onChange={(dateEnd) => patch({ dateEnd })}
-      />
-      <Slider
-        label="Orçamento total"
-        value={state.budgetTotal}
-        min={BUDGET_MIN}
-        max={BUDGET_MAX}
-        step={BUDGET_STEP}
-        onChange={(budgetTotal) => patch({ budgetTotal })}
-        formatValue={brl}
-      />
+      <div className="screen__row">
+        <div className="screen__label">Quando &amp; de onde</div>
+        <div className="auto-two">
+          <DateRangeField
+            label="Quando"
+            start={state.dateStart}
+            end={state.dateEnd}
+            onChange={({ start, end }) => patch({ dateStart: start, dateEnd: end })}
+          />
+          <OriginField token={token} value={state.originIata} onChange={(originIata) => patch({ originIata })} />
+        </div>
+      </div>
 
-      <fieldset>
-        <legend>{`Escolha ${MAX_AUTO_INTERESTS} gostos`}</legend>
-        <div role="group" aria-label="Gostos">
+      <div className="screen__row">
+        <Slider
+          label="Orçamento total"
+          value={state.budgetTotal}
+          min={BUDGET_MIN}
+          max={BUDGET_MAX}
+          step={BUDGET_STEP}
+          onChange={(budgetTotal) => patch({ budgetTotal })}
+          formatValue={brl}
+        />
+        <div className="auto-scale">
+          <span>{brl(BUDGET_MIN)}</span>
+          <span>{`${brl(BUDGET_MAX)}+`}</span>
+        </div>
+      </div>
+
+      <fieldset className="screen__row">
+        <legend className="screen__label">
+          O que você curte <span>— até {MAX_AUTO_INTERESTS}</span>
+        </legend>
+        <div className="auto-chips" role="group" aria-label="Gostos">
           {INTEREST_OPTIONS.map((interest) => (
             <Chip
               key={interest}
@@ -81,11 +101,20 @@ export function AutoForm({
             </Chip>
           ))}
         </div>
-        <p aria-live="polite">{`${state.interests.length} de ${MAX_AUTO_INTERESTS}`}</p>
+        <p className="screen__hint" aria-live="polite">
+          {`${state.interests.length} de ${MAX_AUTO_INTERESTS} — é só um empurrão inicial. O plano se ajusta depois conforme você reage a ele.`}
+        </p>
       </fieldset>
 
-      <Button type="submit" disabled={!canSubmitAuto(state) || pending} loading={pending}>
-        Montar meu plano
+      <Button
+        type="submit"
+        size="lg"
+        className="auto-cta"
+        iconEnd={<ArrowRight />}
+        disabled={!canSubmitAuto(state) || pending}
+        loading={pending}
+      >
+        Montar minha viagem
       </Button>
     </form>
   );

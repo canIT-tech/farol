@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { Chip, DestinationCard } from "@farol/ui";
 import type { DestinationCandidate } from "@farol/shared";
-import { arrangeDestinations, type DestinationSort } from "../../lib/destination-filters";
+import {
+  arrangeDestinations,
+  matchPercent,
+  type DestinationSort
+} from "../../lib/destination-filters";
 import { money } from "../../lib/money";
 
 export function stopsLabel(stops: number): string {
@@ -44,12 +48,25 @@ export function DestinationResults({
   const arranged = arrangeDestinations(destinations, { domesticOnly, nonStopOnly, sort });
 
   if (destinations.length === 0) {
-    return <p role="status">Nenhum destino combinou com o que você pediu.</p>;
+    return (
+      <p className="pane__status" role="status">
+        Nenhum destino combinou com o que você pediu.
+      </p>
+    );
   }
 
   return (
     <div>
-      <div role="group" aria-label="Filtros">
+      <div className="pane__filters" role="group" aria-label="Filtros">
+        <Chip
+          selected={!domesticOnly && !nonStopOnly}
+          onClick={() => {
+            setDomesticOnly(false);
+            setNonStopOnly(false);
+          }}
+        >
+          Todos
+        </Chip>
         <Chip selected={domesticOnly} onClick={() => setDomesticOnly((v) => !v)}>
           Só nacional
         </Chip>
@@ -65,15 +82,17 @@ export function DestinationResults({
       </div>
 
       {arranged.length === 0 ? (
-        <p role="status">Nenhum destino combinou com os filtros escolhidos.</p>
+        <p className="pane__status" role="status">
+          Nenhum destino combinou com os filtros escolhidos.
+        </p>
       ) : (
-        <ul>
+        <ul className="pane__grid">
           {arranged.map((candidate, index) => (
             <li key={candidate.iata}>
               <DestinationCard
                 city={candidate.city}
                 country={candidate.country}
-                matchValue={candidate.score}
+                matchValue={matchPercent(candidate.score)}
                 rationale={candidate.rationale}
                 stats={stats(candidate)}
                 featured={index === 0}

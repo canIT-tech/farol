@@ -1,0 +1,39 @@
+name: Nightly Google Flights
+
+# O provider do Google Flights não é uma API: lê a página pública e depende do
+# formato de um <script> que ninguém nos garante. As fixtures em __fixtures__
+# mantêm o CI de PR offline e rápido, mas congelam o layout do dia em que foram
+# gravadas — um teste verde não prova que a busca real ainda funciona.
+#
+# Este job é a única coisa que prova. Falhar aqui não quebra nada em produção
+# (o FallbackFlightProvider já caiu para o Travelpayouts sozinho), mas avisa
+# que o parser precisa de revisão e que as ofertas voltaram a ser preço de
+# cache do parceiro.
+#
+# Para consertar: `pnpm --filter @farol/providers record:google-flights`
+# regrava as fixtures, e os specs de normalize-flight apontam o que mudou.
+on:
+  schedule:
+    - cron: "30 6 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @farol/shared build
+      - run: pnpm --filter @farol/providers build
+      # Uma tentativa e mais uma: o Google às vezes devolve uma página vazia
+      # para um IP de datacenter. Duas falhas seguidas já não são acaso.
+      - name: Busca real no Google Flights
+        run: |
+          pnpm --filter @farol/providers smoke:google-flights \
+            || (sleep 30 && pnpm --filter @farol/providers smoke:google-flights)

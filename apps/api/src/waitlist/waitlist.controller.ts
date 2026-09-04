@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Public } from "../auth/public.decorator";
 import {
   waitlistSignupSchema,
   type WaitlistCount,
@@ -8,7 +9,8 @@ import {
 import { ZodValidationPipe } from "../common/zod.pipe";
 import { WaitlistService } from "./waitlist.service";
 
-// Rotas públicas — sem AuthGuard. Alimentam a landing pré-lançamento.
+// Rotas públicas: alimentam a landing pré-lançamento, antes de existir conta.
+@Public()
 @Controller("waitlist")
 export class WaitlistController {
   constructor(private readonly waitlist: WaitlistService) {}

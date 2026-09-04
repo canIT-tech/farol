@@ -160,7 +160,9 @@ p {
 }
 
 /* ---- section rhythm ---- */
-section {
+/* Escopado à landing: `section` cru pegava também as telas do app, que usam
+   <section> como bloco de conteúdo e ganhavam 96px de respiro fantasma. */
+.landing section {
   padding-block: clamp(3.25rem, 2rem + 5vw, 6rem);
 }
 
@@ -1216,7 +1218,7 @@ section {
   margin-bottom: 15px;
 }
 
-.ob-tile {
+.landing .ob-tile {
   font-family: inherit;
   border: 1.5px solid var(--line);
   border-radius: 10px;
@@ -1231,11 +1233,11 @@ section {
     background 120ms var(--ease);
 }
 
-.ob-tile:hover {
+.landing .ob-tile:hover {
   border-color: var(--ink-faint);
 }
 
-.ob-tile.on {
+.landing .ob-tile.on {
   border-color: var(--sun);
   background: var(--sun-wash);
   color: var(--sun-strong);
@@ -1249,7 +1251,7 @@ section {
   margin-bottom: 7px;
 }
 
-.ob-seg {
+.landing .ob-seg {
   display: inline-flex;
   border: 1.5px solid var(--line);
   border-radius: 9px;
@@ -1257,7 +1259,7 @@ section {
   margin-bottom: 14px;
 }
 
-.ob-seg button {
+.landing .ob-seg button {
   font-family: inherit;
   background: var(--surface);
   border: 0;
@@ -1268,11 +1270,11 @@ section {
   cursor: pointer;
 }
 
-.ob-seg button:last-child {
+.landing .ob-seg button:last-child {
   border-right: 0;
 }
 
-.ob-seg button.on {
+.landing .ob-seg button.on {
   background: var(--ink);
   color: var(--surface);
 }

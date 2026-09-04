@@ -1,0 +1,99 @@
+/* Miolo das telas com shell (descoberta, roteiro, voo & hotel). O AppShell já
+   desenha sidebar e trilho; isto é só o conteúdo entre os dois, seguindo o
+   hi-fi 「3 · Descoberta」 e 「4 · Roteiro」. */
+
+.pane {
+  padding: 34px 40px 56px;
+  max-width: 980px;
+}
+
+/* Migalha acima do título, como nas telas 2 a 5 do hi-fi. */
+.pane__eyebrow {
+  font-size: 13px;
+  color: var(--text-faint);
+  margin: 0 0 14px;
+}
+
+/* Formulário não acompanha a largura do painel: linha longa demais cansa. */
+.pane__form {
+  max-width: 620px;
+}
+
+.pane__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.pane__title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0;
+}
+
+.pane__sub {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0 0 24px;
+}
+
+/* Quando o subtítulo mora dentro do head-row, o espaço de baixo é do head. */
+.pane__sub--tight {
+  margin: 6px 0 0;
+}
+
+.pane__filters {
+  display: flex;
+  gap: 9px;
+  margin-bottom: 26px;
+  flex-wrap: wrap;
+}
+
+.pane__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pane__status,
+.pane__error {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0 0 20px;
+}
+
+.pane__status {
+  color: var(--text-muted);
+}
+
+/* Erro com ação de refazer: caixa, não parágrafo solto. */
+.pane__error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--accent-border);
+  border-radius: var(--radius-md);
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+
+@media (max-width: 900px) {
+  .pane {
+    padding: 24px 20px 40px;
+  }
+
+  .pane__grid {
+    grid-template-columns: 1fr;
+  }
+}

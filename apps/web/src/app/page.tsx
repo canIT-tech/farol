@@ -81,7 +81,7 @@ function WaitlistForm({ source }: { source: string }) {
 
 export default function HomePage() {
   return (
-    <>
+    <div className="landing">
       <nav className="nav">
         <div className="wrap nav-inner">
           <span className="brand">Farol</span>
@@ -187,6 +187,6 @@ export default function HomePage() {
       </main>
 
       <footer className="wrap">Farol · assessor de viagem · nome de trabalho</footer>
-    </>
+    </div>
   );
 }
