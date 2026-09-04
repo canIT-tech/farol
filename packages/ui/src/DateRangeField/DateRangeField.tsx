@@ -3,13 +3,17 @@ import "./DateRangeField.css";
 import {
   WEEKDAYS,
   addMonths,
+  currentMonth,
   formatRange,
+  isBefore,
   isInside,
+  isPastMonth,
   monthLabel,
   monthMatrix,
   monthOf,
   nextRange,
   parseIso,
+  todayIso,
   type YearMonth
 } from "./calendar";
 
@@ -19,8 +23,8 @@ export type DateRangeFieldProps = {
   end: string;
   onChange: (range: { start: string; end: string }) => void;
   placeholder?: string;
-  /** Mês aberto quando ainda não há data escolhida. */
-  initialMonth?: YearMonth;
+  /** Hoje. Existe para o teste fixar o relógio; em produção fica no padrão. */
+  today?: Date;
 };
 
 function CalendarIcon() {
@@ -42,19 +46,21 @@ function Chevron({ dir }: { dir: "left" | "right" }) {
   );
 }
 
-const TODAY: YearMonth = { year: 2026, month: 1 };
-
 export function DateRangeField({
   label,
   start,
   end,
   onChange,
   placeholder = "Escolha as datas",
-  initialMonth = TODAY
+  today = new Date()
 }: DateRangeFieldProps) {
   const id = useId();
   const [open, setOpen] = useState(false);
-  const [month, setMonth] = useState<YearMonth>(start === "" ? initialMonth : monthOf(start));
+  // Sem mês cravado no código: o anterior era `{ year: 2026, month: 1 }` com o
+  // nome de TODAY, e abria o calendário oito meses no passado.
+  const nowMonth = currentMonth(today);
+  const nowIso = todayIso(today);
+  const [month, setMonth] = useState<YearMonth>(start === "" ? nowMonth : monthOf(start));
 
   const weeks = monthMatrix(month);
   const shown = formatRange(start, end);
@@ -108,6 +114,7 @@ export function DateRangeField({
               type="button"
               className="farol-daterange__nav"
               aria-label="Mês anterior"
+              disabled={isPastMonth(addMonths(month, -1), nowMonth)}
               onClick={() => setMonth(addMonths(month, -1))}
             >
               <Chevron dir="left" />
@@ -151,6 +158,9 @@ export function DateRangeField({
                         .filter(Boolean)
                         .join(" ")}
                       aria-pressed={iso === start || iso === end}
+                      // Dia que já passou não vira viagem: voo e hotel voltam
+                      // vazios e a tela não tem como explicar o porquê.
+                      disabled={isBefore(iso, nowIso)}
                       onClick={() => pick(iso)}
                     >
                       {parseIso(iso).day}

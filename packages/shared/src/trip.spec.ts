@@ -182,3 +182,61 @@ describe("tripInputSchema", () => {
     );
   });
 });
+
+describe("tripInputSchema — viagem no passado", () => {
+  const base = {
+    originIata: "GRU",
+    party: { adults: 2, children: 0 },
+    budgetTotal: 12000
+  };
+
+  // Foi assim que uma viagem inteira nasceu inútil: mês alvo maio/2026 escolhido
+  // em setembro/2026. Voo e hotel voltaram zero, sem nada na tela explicando.
+  it("recusa um mês alvo que já passou", () => {
+    const r = tripInputSchema.safeParse({
+      ...base,
+      durationDays: 7,
+      targetMonth: "2026-05",
+      today: undefined
+    });
+    expect(r.success).toBe(false);
+  });
+
+  it("aceita o mês corrente", () => {
+    const agora = new Date();
+    const mes = `${agora.getUTCFullYear()}-${String(agora.getUTCMonth() + 1).padStart(2, "0")}`;
+    expect(tripInputSchema.safeParse({ ...base, durationDays: 7, targetMonth: mes }).success).toBe(
+      true
+    );
+  });
+
+  it("aceita um mês futuro", () => {
+    expect(
+      tripInputSchema.safeParse({ ...base, durationDays: 7, targetMonth: "2099-01" }).success
+    ).toBe(true);
+  });
+
+  it("recusa uma ida que já passou", () => {
+    const r = tripInputSchema.safeParse({
+      ...base,
+      dateStart: "2020-01-10",
+      dateEnd: "2020-01-20"
+    });
+    expect(r.success).toBe(false);
+    expect(r.error!.issues.some((i) => i.path.includes("dateStart"))).toBe(true);
+  });
+
+  it("aceita datas futuras", () => {
+    expect(
+      tripInputSchema.safeParse({ ...base, dateStart: "2099-01-10", dateEnd: "2099-01-20" }).success
+    ).toBe(true);
+  });
+
+  // A regra do fim posterior ao início continua valendo, e é a que responde
+  // primeiro quando as duas estão erradas.
+  it("segue exigindo fim depois do início", () => {
+    expect(
+      tripInputSchema.safeParse({ ...base, dateStart: "2099-01-20", dateEnd: "2099-01-10" }).success
+    ).toBe(false);
+  });
+});

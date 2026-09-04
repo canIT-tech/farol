@@ -1,15 +1,18 @@
 import { describe, it, expect } from "vitest";
 import {
   addMonths,
+  currentMonth,
   daysInMonth,
   firstWeekday,
   formatRange,
   isBefore,
   isInside,
+  isPastMonth,
   monthLabel,
   monthMatrix,
   monthOf,
   nextRange,
+  todayIso,
   parseIso,
   parseMonthKey,
   toMonthKey,
@@ -196,5 +199,60 @@ describe("parseMonthKey / toMonthKey", () => {
 
   it("ida e volta preserva o valor", () => {
     expect(toMonthKey(parseMonthKey("2027-11"))).toBe("2027-11");
+  });
+});
+
+describe("todayIso", () => {
+  it("devolve a data de hoje em ISO curto, em UTC", () => {
+    expect(todayIso(new Date("2026-09-04T23:30:00Z"))).toBe("2026-09-04");
+  });
+
+  it("usa o relógio quando não recebe data", () => {
+    expect(todayIso()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe("currentMonth", () => {
+  it("devolve ano e mês de hoje", () => {
+    expect(currentMonth(new Date("2026-09-04T12:00:00Z"))).toEqual({ year: 2026, month: 9 });
+  });
+
+  it("usa o relógio quando não recebe data", () => {
+    const now = currentMonth();
+    expect(now.month).toBeGreaterThanOrEqual(1);
+    expect(now.month).toBeLessThanOrEqual(12);
+  });
+});
+
+describe("isPastMonth", () => {
+  const hoje = { year: 2026, month: 9 };
+
+  // O mês corrente não é passado: quem viaja dia 20 escolhe setembro em
+  // setembro. Barrá-lo tiraria a opção mais provável de quem decide em cima da
+  // hora.
+  it("aceita o mês corrente", () => {
+    expect(isPastMonth({ year: 2026, month: 9 }, hoje)).toBe(false);
+  });
+
+  it("recusa o mês anterior", () => {
+    expect(isPastMonth({ year: 2026, month: 8 }, hoje)).toBe(true);
+  });
+
+  it("aceita o mês seguinte", () => {
+    expect(isPastMonth({ year: 2026, month: 10 }, hoje)).toBe(false);
+  });
+
+  // Foi exatamente este caso que criou a viagem quebrada: maio, com 2026 na
+  // tela, em setembro de 2026.
+  it("recusa um mês anterior do mesmo ano", () => {
+    expect(isPastMonth({ year: 2026, month: 5 }, hoje)).toBe(true);
+  });
+
+  it("recusa qualquer mês de um ano anterior", () => {
+    expect(isPastMonth({ year: 2025, month: 12 }, hoje)).toBe(true);
+  });
+
+  it("aceita qualquer mês de um ano seguinte", () => {
+    expect(isPastMonth({ year: 2027, month: 1 }, hoje)).toBe(false);
   });
 });

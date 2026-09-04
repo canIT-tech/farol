@@ -116,3 +116,20 @@ export function parseMonthKey(key: string): YearMonth {
 export function toMonthKey({ year, month }: YearMonth): string {
   return `${year}-${String(month).padStart(2, "0")}`;
 }
+
+/** Hoje em ISO curto. Recebe a data para o teste poder fixar o relógio. */
+export function todayIso(now: Date = new Date()): string {
+  return now.toISOString().slice(0, 10);
+}
+
+/** Ano e mês de hoje. Substitui qualquer ano cravado no código, que envelhece
+ *  em silêncio e passa a oferecer meses que já passaram. */
+export function currentMonth(now: Date = new Date()): YearMonth {
+  return { year: now.getUTCFullYear(), month: now.getUTCMonth() + 1 };
+}
+
+/** O mês já passou? O mês corrente não conta como passado — quem viaja dia 20
+ *  escolhe setembro estando em setembro. */
+export function isPastMonth(ym: YearMonth, today: YearMonth = currentMonth()): boolean {
+  return ym.year < today.year || (ym.year === today.year && ym.month < today.month);
+}

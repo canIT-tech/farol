@@ -44,5 +44,27 @@ export const tripInputSchema = z
         message: "dateEnd deve ser posterior a dateStart"
       });
     }
+
+    // Não se planeja viagem para trás. A UI já barra a escolha, mas a regra
+    // mora aqui porque é aqui que está o contrato: uma viagem com data vencida
+    // atravessa o sistema inteira e só falha no fim, com voo e hotel devolvendo
+    // zero resultado e nenhuma tela capaz de dizer por quê.
+    // Comparação em texto: as duas pontas são ISO, que ordena igual em string.
+    const hoje = new Date().toISOString().slice(0, 10);
+    if (hasDates && value.dateStart! < hoje) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["dateStart"],
+        message: "a ida não pode ser em uma data que já passou"
+      });
+    }
+    // Mês corrente vale: quem decide dia 20 escolhe o mês em que está.
+    if (hasDuration && value.targetMonth! < hoje.slice(0, 7)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["targetMonth"],
+        message: "o mês da viagem não pode ser um mês que já passou"
+      });
+    }
   });
 export type TripInput = z.infer<typeof tripInputSchema>;

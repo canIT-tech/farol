@@ -16,11 +16,27 @@ vi.mock("next/link", () => ({
   )
 }));
 
+// Os seletores abrem no mês corrente e barram o passado, então as datas destes
+// testes saem do relógio em vez de literais. A versão antiga cravava "2026-09"
+// e "set", e quebraria sozinha na virada do mês.
+const ANO_QUE_VEM = new Date().getUTCFullYear() + 1;
+const JANEIRO_QUE_VEM = `${ANO_QUE_VEM}-01`;
+
+const PROXIMO_MES = (() => {
+  const agora = new Date();
+  const ym = new Date(Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth() + 1, 1))
+    .toISOString()
+    .slice(0, 7);
+  return { ida: `${ym}-10`, volta: `${ym}-17` };
+})();
+
 async function preencherPorMes(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText("Saindo de"), "gru");
-  // O seletor de mês abre em 2026; setembro está na grade do ano.
+  // Avança um ano: a grade inteira fica disponível, sem depender de qual mês é
+  // hoje.
   await user.click(screen.getByRole("button", { name: /^Mês/ }));
-  await user.click(screen.getByRole("button", { name: "set" }));
+  await user.click(screen.getByRole("button", { name: "Próximo ano" }));
+  await user.click(screen.getByRole("button", { name: "jan" }));
 }
 
 describe("DiscoveryForm", () => {
@@ -54,7 +70,7 @@ describe("DiscoveryForm", () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit.mock.calls[0]![0]).toMatchObject({
       originIata: "GRU",
-      targetMonth: "2026-09",
+      targetMonth: JANEIRO_QUE_VEM,
       durationDays: 7,
       party: { adults: 2, children: 0 }
     });
@@ -66,18 +82,16 @@ describe("DiscoveryForm", () => {
     render(<DiscoveryForm onSubmit={onSubmit} />);
     await user.type(screen.getByLabelText("Saindo de"), "GRU");
     await user.click(screen.getByRole("radio", { name: "Datas exatas" }));
-    // O calendário abre em janeiro de 2026; setembro fica 8 meses à frente.
+    // Um mês à frente: o mês inteiro disponível, sem depender do dia de hoje.
     await user.click(screen.getByRole("button", { name: /Datas/ }));
-    for (let i = 0; i < 8; i += 1) {
-      await user.click(screen.getByRole("button", { name: "Próximo mês" }));
-    }
+    await user.click(screen.getByRole("button", { name: "Próximo mês" }));
     await user.click(screen.getByRole("gridcell", { name: "10" }));
     await user.click(screen.getByRole("gridcell", { name: "17" }));
     await user.click(screen.getByRole("button", { name: /Buscar destinos/ }));
 
     expect(onSubmit.mock.calls[0]![0]).toMatchObject({
-      dateStart: "2026-09-10",
-      dateEnd: "2026-09-17"
+      dateStart: PROXIMO_MES.ida,
+      dateEnd: PROXIMO_MES.volta
     });
   });
 

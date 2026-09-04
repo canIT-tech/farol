@@ -11,12 +11,20 @@ async function preencher(user: ReturnType<typeof userEvent.setup>) {
   }
 }
 
-// O calendário abre em janeiro de 2026; setembro fica 8 meses à frente.
+// O calendário abre no mês corrente e não deixa escolher dia que já passou.
+// Avançar um mês garante o mês inteiro disponível, e as datas esperadas saem
+// da mesma conta — a versão antiga cravava "2026-09-10" e quebraria sozinha na
+// virada do mês.
+const PROXIMO_MES = (() => {
+  const agora = new Date();
+  const d = new Date(Date.UTC(agora.getUTCFullYear(), agora.getUTCMonth() + 1, 1));
+  const ym = d.toISOString().slice(0, 7);
+  return { ida: `${ym}-10`, volta: `${ym}-17` };
+})();
+
 async function escolherDatas(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole("button", { name: /Quando/ }));
-  for (let i = 0; i < 8; i += 1) {
-    await user.click(screen.getByRole("button", { name: "Próximo mês" }));
-  }
+  await user.click(screen.getByRole("button", { name: "Próximo mês" }));
   // O calendário segue aberto entre ida e volta.
   await user.click(screen.getByRole("gridcell", { name: "10" }));
   await user.click(screen.getByRole("gridcell", { name: "17" }));
@@ -65,8 +73,8 @@ describe("AutoForm", () => {
 
     expect(onSubmit.mock.calls[0]![0]).toEqual({
       originIata: "GRU",
-      dateStart: "2026-09-10",
-      dateEnd: "2026-09-17",
+      dateStart: PROXIMO_MES.ida,
+      dateEnd: PROXIMO_MES.volta,
       budgetTotal: 20_000,
       interests: ["praia", "gastronomia", "natureza"]
     });
