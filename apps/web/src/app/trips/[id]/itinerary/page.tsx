@@ -14,7 +14,7 @@ export default function ItineraryPage({ params }: { params: Promise<{ id: string
   const { id } = use(params);
   const router = useRouter();
   const { token, trip } = useTrip();
-  const { itinerary, loading, error, refetch } = useItineraryPolling(token, id);
+  const { itinerary, loading, error, stalled, refetch } = useItineraryPolling(token, id);
   const [activeIndex, setActiveIndex] = useState(1);
   const [busy, setBusy] = useState(false);
 
@@ -33,6 +33,26 @@ export default function ItineraryPage({ params }: { params: Promise<{ id: string
       <section className="pane">
         <div className="pane__error" role="alert">
           <span>Não consegui carregar o roteiro: {error}</span>
+          <Button type="button" variant="ghost" onClick={() => void refetch()}>
+            Tentar de novo
+          </Button>
+        </div>
+      </section>
+    );
+  }
+
+  // Pendente demais quase sempre quer dizer que ninguém consumiu o job. Não dá
+  // para saber daqui se o worker caiu ou se a fila travou, então a mensagem diz
+  // o que é verdade — está demorando — em vez de repetir a promessa de um
+  // minuto que já não se cumpriu.
+  if (stalled) {
+    return (
+      <section className="pane">
+        <div className="pane__error" role="alert">
+          <span>
+            O roteiro está demorando mais que o esperado. A geração roda em segundo plano; se
+            acabou de sair, tentar de novo já mostra.
+          </span>
           <Button type="button" variant="ghost" onClick={() => void refetch()}>
             Tentar de novo
           </Button>

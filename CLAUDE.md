@@ -160,6 +160,19 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - **Ida e volta pelo Google traz só o trecho de ida** (`returnAt` nulo). O preço
   já é o total; o itinerário da volta só existe depois de escolher a ida no
   próprio Google. Buscar o segundo passo exigiria um token opaco de sessão.
+- **`GOOGLE_PLACES_KEY` do `farol/dev` é um placeholder de 11 caracteres**, não uma
+  chave real (`AIza…`, ~39). Toda busca do Places responde
+  `400 API_KEY_INVALID`, então todo item de roteiro sai sem `placeId`,
+  coordenada e nota, marcado `needsReview` — o roteiro fica pronto, mas sem
+  mapa. Degrada em silêncio: o `PlacesService` engole a falha por design
+  (§7.3) e só o log `places_search_failed` acusa.
+- **Worker morre em silêncio no `pnpm dev`.** O `tsx watch` observa
+  `apps/api/dist` (o worker importa `@farol/api` de lá), então um `pnpm build`
+  dispara vários reinícios em sequência; se um deles falha, o supervisor fica
+  sem filho e só volta com uma nova mudança de arquivo. O turbo segue verde e a
+  api e o web continuam de pé — o único sintoma é o roteiro parado em `pending`.
+  Diagnóstico: `pgrep -P <pid do tsx>` vazio, e `pgboss.job` com
+  `itinerary.generate` acumulando em `created`.
 - **`pnpm test:mutation` no CI roda tudo** (api grande + worker + db + pg-boss real dentro da mutação). Lento e potencialmente instável. Avaliar rodar mutação só nos pacotes tocados no PR, ou mover pra job separado/nightly.
 - **Testes de integração e o Postgres único.** A serialização no `turbo.json` resolve o CI (Postgres novo a cada run), mas localmente exige banco limpo. Opção definitiva: `DATABASE_URL_TEST` apontando pra um banco `farol_test` dedicado (docker-compose cria; specs já preferem `DATABASE_URL_TEST`).
 
