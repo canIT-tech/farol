@@ -41,7 +41,7 @@ async function preencherPorMes(user: ReturnType<typeof userEvent.setup>) {
 
 describe("DiscoveryForm", () => {
   it("começa no modo mês, com dias de viagem", () => {
-    render(<DiscoveryForm onSubmit={vi.fn()} />);
+    render(<DiscoveryForm token="t" onSubmit={vi.fn()} />);
     expect(screen.getByRole("button", { name: /^Mês/ })).toBeInTheDocument();
     expect(screen.getByLabelText("Dias de viagem")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Datas/ })).not.toBeInTheDocument();
@@ -49,21 +49,21 @@ describe("DiscoveryForm", () => {
 
   it("o toggle troca para datas exatas", async () => {
     const user = userEvent.setup();
-    render(<DiscoveryForm onSubmit={vi.fn()} />);
+    render(<DiscoveryForm token="t" onSubmit={vi.fn()} />);
     await user.click(screen.getByRole("radio", { name: "Datas exatas" }));
     expect(screen.getByRole("button", { name: /Datas/ })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /^Mês/ })).not.toBeInTheDocument();
   });
 
   it("submit fica bloqueado enquanto o input não é válido", () => {
-    render(<DiscoveryForm onSubmit={vi.fn()} />);
+    render(<DiscoveryForm token="t" onSubmit={vi.fn()} />);
     expect(screen.getByRole("button", { name: /Buscar destinos/ })).toBeDisabled();
   });
 
   it("submit válido no modo mês manda o body do tripInputSchema", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<DiscoveryForm onSubmit={onSubmit} />);
+    render(<DiscoveryForm token="t" onSubmit={onSubmit} />);
     await preencherPorMes(user);
     await user.click(screen.getByRole("button", { name: /Buscar destinos/ }));
 
@@ -79,7 +79,7 @@ describe("DiscoveryForm", () => {
   it("submit válido no modo datas manda as datas", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<DiscoveryForm onSubmit={onSubmit} />);
+    render(<DiscoveryForm token="t" onSubmit={onSubmit} />);
     await user.type(screen.getByLabelText("Saindo de"), "GRU");
     await user.click(screen.getByRole("radio", { name: "Datas exatas" }));
     // Um mês à frente: o mês inteiro disponível, sem depender do dia de hoje.
@@ -98,7 +98,7 @@ describe("DiscoveryForm", () => {
   it("o orçamento do slider chega no body", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<DiscoveryForm onSubmit={onSubmit} />);
+    render(<DiscoveryForm token="t" onSubmit={onSubmit} />);
     await preencherPorMes(user);
     // input[type=range] não aceita type(); o evento de mudança é o caminho.
     fireEvent.change(screen.getByLabelText(/Orçamento total/), { target: { value: "20000" } });
@@ -109,7 +109,7 @@ describe("DiscoveryForm", () => {
   it("os viajantes do stepper chegam no body", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<DiscoveryForm onSubmit={onSubmit} />);
+    render(<DiscoveryForm token="t" onSubmit={onSubmit} />);
     await preencherPorMes(user);
     await user.click(screen.getByRole("button", { name: "Aumentar Crianças" }));
     await user.click(screen.getByRole("button", { name: /Buscar destinos/ }));
@@ -119,7 +119,7 @@ describe("DiscoveryForm", () => {
   it("dias de viagem e adultos chegam no body", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<DiscoveryForm onSubmit={onSubmit} />);
+    render(<DiscoveryForm token="t" onSubmit={onSubmit} />);
     await preencherPorMes(user);
     await user.click(screen.getByRole("button", { name: "Aumentar Dias de viagem" }));
     await user.click(screen.getByRole("button", { name: "Diminuir Adultos" }));
@@ -132,20 +132,20 @@ describe("DiscoveryForm", () => {
 
   it("não chama onSubmit quando o formulário é enviado inválido", async () => {
     const onSubmit = vi.fn();
-    const { container } = render(<DiscoveryForm onSubmit={onSubmit} />);
+    const { container } = render(<DiscoveryForm token="t" onSubmit={onSubmit} />);
     container.querySelector("form")!.requestSubmit();
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
   it("pending desabilita o envio", async () => {
     const user = userEvent.setup();
-    render(<DiscoveryForm onSubmit={vi.fn()} pending />);
+    render(<DiscoveryForm token="t" onSubmit={vi.fn()} pending />);
     await preencherPorMes(user);
     expect(screen.getByRole("button", { name: /Buscar destinos/ })).toBeDisabled();
   });
 
   it("oferece o atalho para ajustar os gostos", () => {
-    render(<DiscoveryForm onSubmit={vi.fn()} />);
+    render(<DiscoveryForm token="t" onSubmit={vi.fn()} />);
     expect(screen.getByRole("link", { name: "Ajustar gostos" })).toHaveAttribute(
       "href",
       "/onboarding"
@@ -158,7 +158,7 @@ describe("DiscoveryForm", () => {
   it("avisa a cada mudança quem estiver ouvindo", async () => {
     const user = userEvent.setup();
     const onStateChange = vi.fn();
-    render(<DiscoveryForm onSubmit={vi.fn()} onStateChange={onStateChange} />);
+    render(<DiscoveryForm token="t" onSubmit={vi.fn()} onStateChange={onStateChange} />);
 
     await user.type(screen.getByLabelText("Saindo de"), "GRU");
 
