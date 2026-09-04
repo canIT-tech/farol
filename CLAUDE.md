@@ -19,6 +19,7 @@ monta o dia a dia e ajusta tudo por conversa.
 | Design técnico do MVP (arquitetura, módulos, dados) | `docs/superpowers/specs/2026-08-27-mvp-trip-design.md` |
 | Opções de provider de hotel (sem virar canal de reserva) | `docs/negocio/2026-09-03-opcoes-provider-hotel.md` |
 | Curadoria do catálogo de destinos (como levantar candidatos) | `docs/negocio/2026-09-03-curadoria-do-catalogo.md` |
+| Google Flights como fonte primária de voo (scraping, riscos, fallback) | `docs/negocio/2026-09-03-google-flights-como-fonte-de-voo.md` |
 | Specs de produto (pagamento, plano grátis, migração de provider, custo de LLM, métricas) | `docs/negocio/2026-08-31-spec-pagamento.md` · `docs/negocio/2026-08-31-spec-plano-gratuito.md` · `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` · `docs/negocio/2026-08-31-custo-llm-por-roteiro.md` · `docs/negocio/2026-08-31-plano-de-metricas.md` |
 | Legal (Termos + Privacidade/LGPD — rascunhos, pré-jurídico) | `docs/legal/` |
 | Design system (tokens + specs de componentes) | `docs/design-system.md` |
@@ -48,6 +49,17 @@ Canvases publicados (Claude Artifacts):
 - Providers reais: **Travelpayouts** (voo via Aviasales — data + deep-link com afiliado) + **LiteAPI/Nuitée** (hotel) + **Google Places** (POI/restaurantes). A Amadeus saiu do projeto: Self-Service descontinuado. O Hotellook também (encerrado em 20/10/2025).
 - **LiteAPI — provider de hotel.** `GET /v3.0/data/hotels` (conteúdo: nome, estrelas, nota, avaliações, foto, endereço, geo) + `POST /v3.0/hotels/min-rates` (preço para as datas). Os dois são **gratuitos**; a receita é por margem na reserva. Chave de sandbox é self-serve (`sand_*`); produção só exige cartão cadastrado, sem contrato. **Busca por coordenada, não por nome** — "Lisboa" acha 2 hotéis e "Lisbon" acha 6.748. A coordenada vem do dump `/data/{locale}/cities.json` do Travelpayouts, exposto pelo `TravelpayoutsGeoProvider.city()`, que resolve IATA de cidade direto e IATA de aeroporto pelo `city_code` (GRU → centro de São Paulo, não o terminal). Hotel sem tarifa para as datas sai da lista.
 - **Travelpayouts, 9 endpoints em uso** (`packages/providers/src/travelpayouts/`, fixtures gravadas da API real): `/v1/prices/cheap` (tarifa da rota no mês) · `/v1/prices/monthly` ("quando ir") · `/v1/city-directions` (destinos baratos saindo da origem) · `/v2/prices/latest` (faixa de preço recente) · `/v2/prices/month-matrix` (melhor dia do mês) · `/v2/prices/nearest-places-matrix` (aeroportos vizinhos, com link direto da tarifa) · `/whereami` (origem pelo IP, JSONP) · `/data/{locale}/airports.json` e `airlines.json` (dumps, cache de 24 h em memória). Preço é **cache do parceiro, não busca ao vivo** — a UI e o chat dizem "preço aproximado". Busca live (Aviasales Search API) exige 50 k MAU.
+- **Google Flights — fonte primária de oferta de voo** (2026-09-03). Lê a página
+  pública: a busca vai numa mensagem protobuf em base64 (`tfs`) e a resposta sai
+  de um `<script class="ds:1">`. Dá preço e horário **reais**, que o
+  Travelpayouts não dá (ele serve cache do parceiro). Sem chave, sem cadastro e
+  sem dependência nova — o protobuf é codificado à mão. Roda sempre atrás do
+  `FallbackFlightProvider`, que cai no Travelpayouts quando o layout muda; os
+  insights e o `marker` de afiliado seguem no Travelpayouts. Deep link da oferta
+  do Google aponta para o próprio Google: mandar a pessoa ao afiliado com um
+  preço vindo de outra fonte seria vender número que o destino pode não honrar.
+  `GOOGLE_FLIGHTS_ENABLED=false` volta ao comportamento anterior. Detalhe e
+  riscos em `docs/negocio/2026-09-03-google-flights-como-fonte-de-voo.md`.
 - LLM: **Claude**, roteamento de modelo por tarefa.
 - `api` stateless; autorização na camada de serviço (RLS desligada nas tabelas de app).
 - Hospedagem: agnóstica (container + Postgres + env).
@@ -137,6 +149,17 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - ~~`.github/workflows/ci.yml` — trocar `AMADEUS_*` por `TRAVELPAYOUTS_*`~~ Resolvido no Passo 10 (`ci.yml`, `nightly-mutation.yml`, `.env.example`, `render.yaml`).
 - ~~Hotel sem provider~~ — resolvido com a **LiteAPI** (o Hotellook foi encerrado em 20/10/2025; `engine.hotellook.com` responde 404 até na raiz, é CloudFront sem origem — não adianta pedir liberação). **Aberto:** a chave em uso é de **sandbox**, que devolve conteúdo real mas tarifa de teste. Produção exige cadastrar um cartão no painel da Nuitée, e a reserva passaria a acontecer no Farol (somos o canal) — decisão comercial, não técnica. Alternativas sem essa amarra estão levantadas em `docs/negocio/2026-09-03-opcoes-provider-hotel.md`.
 - ~~**CI roda `db:migrate` mas não `db:seed`.**~~ Resolvido no Passo 6: `db:seed` entrou como step explícito.
+- **O provider do Google Flights é scraping.** Fere os ToS do Google, não tem SLA
+  e lê um payload posicional — mudança de layout quebra sem aviso. Mitigado pelo
+  `FallbackFlightProvider`, pelo circuit breaker e pelo
+  `.github/workflows/nightly-google-flights.yml`, que é a única coisa que prova
+  que a busca real ainda funciona (as fixtures congelam o layout do dia da
+  gravação). Falha no noturno = rodar
+  `pnpm --filter @farol/providers record:google-flights` e revisar
+  `normalize-flight`.
+- **Ida e volta pelo Google traz só o trecho de ida** (`returnAt` nulo). O preço
+  já é o total; o itinerário da volta só existe depois de escolher a ida no
+  próprio Google. Buscar o segundo passo exigiria um token opaco de sessão.
 - **`pnpm test:mutation` no CI roda tudo** (api grande + worker + db + pg-boss real dentro da mutação). Lento e potencialmente instável. Avaliar rodar mutação só nos pacotes tocados no PR, ou mover pra job separado/nightly.
 - **Testes de integração e o Postgres único.** A serialização no `turbo.json` resolve o CI (Postgres novo a cada run), mas localmente exige banco limpo. Opção definitiva: `DATABASE_URL_TEST` apontando pra um banco `farol_test` dedicado (docker-compose cria; specs já preferem `DATABASE_URL_TEST`).
 
@@ -144,6 +167,10 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - `discovery`: `climate.expectedC` nulo e `flightTimeHours = null` (sem fonte de clima/tempo de voo no MVP). **Segue aberto.**
 - ~~`estCost.flight` sempre da média `avgFlightCostFromGru` do catálogo~~ — resolvido no Passo 10: a descoberta consulta `/v1/city-directions` a partir da origem real da viagem e usa o preço do provider quando o destino aparece na lista; sem cobertura (ou provider fora do ar) cai na média do catálogo.
 - ~~`itinerary_items.placeId/lat/lng/rating = null`~~ — preenchidos pelo enrich do Passo 6; item sem match fica `needsReview = true` e é reprocessado pelo job `places.enrich`.
+- **Contexto de preço do Google não está exposto na API nem na tela.** O
+  `GoogleFlightsProvider.searchWithContext()` já devolve `FlightPriceContext`
+  (mais barato, típico, faixa e série histórica), mas o `FlightsService` só
+  consome `search()`. Falta rota e cartão de "está barato comprar agora".
 - `prefilterDestinations({ excludeIata })` existe mas não é usado (não há conceito de "destino rejeitado" no schema).
 
 **Qualidade / precisão**

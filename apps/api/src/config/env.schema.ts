@@ -60,6 +60,17 @@ const baseEnvSchema = z.object({
   // Preço do Travelpayouts é cacheado na origem e muda devagar (spec §6).
   FLIGHT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(1800),
   HOTEL_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(3600),
+  // Google Flights — fonte primária de oferta de voo. Não é uma API: a busca
+  // vai num parâmetro protobuf e a resposta é lida de um <script> da página
+  // pública. Dá preço e horário reais, que o cache do Travelpayouts não dá, mas
+  // não tem SLA nem contrato — por isso roda sempre atrás do
+  // FallbackFlightProvider, que cai no Travelpayouts se o layout mudar.
+  // Sem credencial: não há chave nem afiliado envolvidos.
+  GOOGLE_FLIGHTS_ENABLED: z.enum(["true", "false"]).default("true"),
+  GOOGLE_FLIGHTS_BASE_URL: z.string().url().default("https://www.google.com/travel/flights"),
+  /** Idioma da página: muda os nomes de aeroporto e companhia devolvidos. */
+  GOOGLE_FLIGHTS_LOCALE: z.string().min(1).default("pt-BR"),
+  GOOGLE_FLIGHTS_CURRENCY: z.string().min(1).default("BRL"),
   // Google Places (Passo 6). Cache de 24 h: lugar não muda de lugar.
   GOOGLE_PLACES_KEY: z.string().min(1),
   PLACES_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(86_400)

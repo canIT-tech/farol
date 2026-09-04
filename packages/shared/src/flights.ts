@@ -37,3 +37,26 @@ export const flightOfferSchema = z.object({
   deepLink: z.string().url()
 });
 export type FlightOffer = z.infer<typeof flightOfferSchema>;
+
+// Contexto de preço da rota: "está caro ou barato comprar hoje?".
+// Vem do Google Flights, que publica o preço mais baixo do momento, o típico da
+// rota e a série do que ela custou nas últimas semanas. Não confundir com o
+// calendário por data de partida (RoutePriceSample, do Travelpayouts): aqui a
+// data que varia é a da *compra*, não a do voo.
+export const flightPriceContextSchema = z.object({
+  cheapest: z.number().positive(),
+  typical: z.number().positive(),
+  /** Quanto o mais barato está acima (+) ou abaixo (−) do típico da rota. */
+  delta: z.number(),
+  bandLow: z.number().positive(),
+  bandHigh: z.number().positive(),
+  currency: z.string().min(1),
+  history: z.array(
+    z.object({
+      /** Data da consulta, em ISO curto. */
+      at: z.string().min(1),
+      price: z.number().positive()
+    })
+  )
+});
+export type FlightPriceContext = z.infer<typeof flightPriceContextSchema>;

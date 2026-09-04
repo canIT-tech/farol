@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { flightSearchParamsSchema, flightOfferSchema } from "./flights.js";
+import {
+  flightSearchParamsSchema,
+  flightOfferSchema,
+  flightPriceContextSchema
+} from "./flights.js";
 
 const baseParams = {
   originIata: "GRU",
@@ -122,5 +126,41 @@ describe("flightOfferSchema", () => {
     const semOrigem: Partial<typeof baseOffer> = { ...baseOffer };
     delete semOrigem.originIata;
     expect(() => flightOfferSchema.parse(semOrigem)).toThrow();
+  });
+});
+
+describe("flightPriceContextSchema", () => {
+  const base = {
+    cheapest: 1997,
+    typical: 1954,
+    delta: -44,
+    bandLow: 1900,
+    bandHigh: 2100,
+    currency: "BRL",
+    history: [{ at: "2026-07-05", price: 2134 }]
+  };
+
+  it("aceita um contexto completo", () => {
+    expect(flightPriceContextSchema.parse(base)).toEqual(base);
+  });
+
+  // Estar abaixo do típico é a informação mais útil que o contexto carrega —
+  // um schema que exigisse positivo apagaria justamente o "compre agora".
+  it("aceita delta negativo", () => {
+    expect(flightPriceContextSchema.parse({ ...base, delta: -300 }).delta).toBe(-300);
+  });
+
+  it("aceita histórico vazio", () => {
+    expect(flightPriceContextSchema.parse({ ...base, history: [] }).history).toEqual([]);
+  });
+
+  it("recusa preço não positivo", () => {
+    expect(() => flightPriceContextSchema.parse({ ...base, cheapest: 0 })).toThrow();
+  });
+
+  it("recusa ponto de histórico sem data", () => {
+    expect(() =>
+      flightPriceContextSchema.parse({ ...base, history: [{ at: "", price: 10 }] })
+    ).toThrow();
   });
 });

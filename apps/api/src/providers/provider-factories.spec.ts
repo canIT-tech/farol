@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
-import { TravelpayoutsFlightProvider, TravelpayoutsGeoProvider, isPlacesProvider } from "@farol/providers";
+import {
+  FallbackFlightProvider,
+  TravelpayoutsFlightProvider,
+  TravelpayoutsGeoProvider,
+  isPlacesProvider
+} from "@farol/providers";
 import {
   createFlightProvider,
   createGeoProvider,
@@ -21,7 +26,11 @@ const env = {
   HOTEL_SEARCH_RADIUS_METERS: 5000,
   FLIGHT_DEEPLINK_TEMPLATE: "https://voo.local/{origin}-{destination}?p={passengers}&m={marker}",
   HOTEL_DEEPLINK_TEMPLATE: "https://hotel.local/{cityName}?q={hotelName}",
-  GOOGLE_PLACES_KEY: "gkey"
+  GOOGLE_PLACES_KEY: "gkey",
+  GOOGLE_FLIGHTS_ENABLED: "true",
+  GOOGLE_FLIGHTS_BASE_URL: "https://gf.local/travel/flights",
+  GOOGLE_FLIGHTS_LOCALE: "pt-BR",
+  GOOGLE_FLIGHTS_CURRENCY: "BRL"
 } as unknown as Env;
 
 // As factories só montam objetos; o que prova que a env chegou é a requisição
@@ -51,8 +60,73 @@ afterEach(() => {
 });
 
 describe("createFlightProvider", () => {
-  it("monta o provider do Travelpayouts", () => {
-    expect(createFlightProvider(env)).toBeInstanceOf(TravelpayoutsFlightProvider);
+  it("põe o Google Flights na frente do Travelpayouts", () => {
+    expect(createFlightProvider(env)).toBeInstanceOf(FallbackFlightProvider);
+  });
+
+  // A saída de emergência: com a env em "false" o comportamento volta a ser o
+  // de antes, com o Travelpayouts sozinho e nenhuma requisição ao Google.
+  it("usa só o Travelpayouts quando o Google Flights está desligado", () => {
+    expect(createFlightProvider({ ...env, GOOGLE_FLIGHTS_ENABLED: "false" } as Env)).toBeInstanceOf(
+      TravelpayoutsFlightProvider
+    );
+  });
+
+  it("leva base url, idioma e moeda da env para a busca no Google", async () => {
+    const calls = stubFetch({});
+    await createFlightProvider(env)
+      .search({
+        originIata: "GRU",
+        destinationIata: "LIS",
+        departDate: "2026-11-15",
+        adults: 1,
+        children: 0
+      })
+      .catch(() => undefined);
+
+    const url = new URL(calls[0]!.url);
+    expect(url.origin + url.pathname).toBe("https://gf.local/travel/flights");
+    expect(url.searchParams.get("hl")).toBe("pt-BR");
+    expect(url.searchParams.get("curr")).toBe("BRL");
+  });
+
+  // O stub devolve JSON, não a página do Google: a busca falha e o composto
+  // tem que cair no Travelpayouts em vez de propagar o erro para a tela.
+  it("cai no Travelpayouts quando o Google não devolve a página esperada", async () => {
+    const calls = stubFetch({ prices: [] });
+    const offers = await createFlightProvider(env).search({
+      originIata: "GRU",
+      destinationIata: "LIS",
+      departDate: "2026-11-15",
+      adults: 1,
+      children: 0
+    });
+
+    expect(offers).toEqual([]);
+    expect(calls.some((c) => c.url.startsWith("https://gf.local"))).toBe(true);
+    expect(calls.some((c) => c.url.startsWith("https://tp.local"))).toBe(true);
+  });
+
+  // A queda é silenciosa para o usuário e precisa não ser silenciosa para nós:
+  // o nome do evento é a chave de qualquer alerta, e a classe do erro é o que
+  // separa "mudaram o layout" de "fomos bloqueados".
+  it("registra a queda com o evento e a classe do erro", async () => {
+    stubFetch({ prices: [] });
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    try {
+      await createFlightProvider(env).search({
+        originIata: "GRU",
+        destinationIata: "LIS",
+        departDate: "2026-11-15",
+        adults: 1,
+        children: 0
+      });
+      const logged = JSON.parse(warn.mock.calls[0]![0] as string) as Record<string, string>;
+      expect(logged.event).toBe("google_flights_fallback");
+      expect(logged.message).toContain("GoogleFlightsParseError");
+    } finally {
+      warn.mockRestore();
+    }
   });
 
   it("leva base url, token, moeda e template de deep link da env para a chamada", async () => {

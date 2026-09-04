@@ -1,4 +1,5 @@
 export * from "./flight-provider.js";
+export * from "./fallback-flight-provider.js";
 export * from "./geo-provider.js";
 export * from "./hotel-provider.js";
 export * from "./places-provider.js";
@@ -17,3 +18,9 @@ export * from "./liteapi/normalize-hotel.js";
 export * from "./liteapi/liteapi-hotel-provider.js";
 export * from "./google/normalize-place.js";
 export * from "./google/google-places-provider.js";
+export * from "./googleflights/tfs.js";
+export * from "./googleflights/query.js";
+export * from "./googleflights/http.js";
+export * from "./googleflights/payload.js";
+export * from "./googleflights/normalize-flight.js";
+export * from "./googleflights/google-flights-provider.js";

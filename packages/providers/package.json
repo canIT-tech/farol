@@ -11,7 +11,9 @@
     "lint": "eslint src",
     "test": "vitest run --coverage",
     "test:mutation": "stryker run",
-    "smoke:travelpayouts": "node scripts/smoke-travelpayouts.mjs"
+    "smoke:travelpayouts": "node scripts/smoke-travelpayouts.mjs",
+    "smoke:google-flights": "node scripts/smoke-google-flights.mjs",
+    "record:google-flights": "node scripts/record-google-flights.mjs"
   },
   "devDependencies": {
     "@stryker-mutator/core": "^8.6.0",
