@@ -7,19 +7,31 @@ import {
   yearMonthSchema
 } from "./trip.js";
 
+// Datas relativas ao relógio: o tripInputSchema barra passado, e literal de
+// setembro de 2026 quebraria sozinho na virada do mês. Dois meses à frente.
+const MES = (() => {
+  const d = new Date();
+  d.setUTCMonth(d.getUTCMonth() + 2, 1);
+  return d.toISOString().slice(0, 7);
+})();
+const D01 = `${MES}-01`;
+const D10 = `${MES}-10`;
+const D11 = `${MES}-11`;
+const D17 = `${MES}-17`;
+
 const withDates = {
   originIata: "GRU",
   party: { adults: 2, children: 0 },
   budgetTotal: 12000,
-  dateStart: "2026-09-10",
-  dateEnd: "2026-09-17"
+  dateStart: D10,
+  dateEnd: D17
 };
 const withDuration = {
   originIata: "GRU",
   party: { adults: 1, children: 0 },
   budgetTotal: 8000,
   durationDays: 7,
-  targetMonth: "2026-09"
+  targetMonth: MES
 };
 
 describe("isoDateSchema", () => {
@@ -89,13 +101,13 @@ describe("tripInputSchema", () => {
   it("aceita datas exatas e aplica currency default BRL", () => {
     const parsed = tripInputSchema.parse(withDates);
     expect(parsed.currency).toBe("BRL");
-    expect(parsed.dateStart).toBe("2026-09-10");
+    expect(parsed.dateStart).toBe(D10);
   });
 
   it("aceita duração + mês alvo", () => {
     const parsed = tripInputSchema.parse(withDuration);
     expect(parsed.durationDays).toBe(7);
-    expect(parsed.targetMonth).toBe("2026-09");
+    expect(parsed.targetMonth).toBe(MES);
   });
 
   it("respeita currency informado", () => {
@@ -104,7 +116,7 @@ describe("tripInputSchema", () => {
 
   it("rejeita datas e duração juntas", () => {
     expect(() =>
-      tripInputSchema.parse({ ...withDates, durationDays: 7, targetMonth: "2026-09" })
+      tripInputSchema.parse({ ...withDates, durationDays: 7, targetMonth: MES })
     ).toThrow(/exatamente um/);
   });
 
@@ -115,13 +127,13 @@ describe("tripInputSchema", () => {
   });
 
   it.each([
-    ["só dateStart", { dateStart: "2026-09-10" }],
-    ["só dateEnd", { dateEnd: "2026-09-17" }],
+    ["só dateStart", { dateStart: D10 }],
+    ["só dateEnd", { dateEnd: D17 }],
     ["só durationDays", { durationDays: 7 }],
-    ["só targetMonth", { targetMonth: "2026-09" }],
-    ["dateStart + durationDays", { dateStart: "2026-09-10", durationDays: 7 }],
-    ["dateEnd + targetMonth", { dateEnd: "2026-09-17", targetMonth: "2026-09" }],
-    ["dateStart + targetMonth", { dateStart: "2026-09-10", targetMonth: "2026-09" }]
+    ["só targetMonth", { targetMonth: MES }],
+    ["dateStart + durationDays", { dateStart: D10, durationDays: 7 }],
+    ["dateEnd + targetMonth", { dateEnd: D17, targetMonth: MES }],
+    ["dateStart + targetMonth", { dateStart: D10, targetMonth: MES }]
   ])("rejeita combinação incompleta/ambígua: %s", (_label, extra) => {
     expect(() =>
       tripInputSchema.parse({
@@ -134,8 +146,8 @@ describe("tripInputSchema", () => {
   });
 
   it("rejeita dateEnd anterior ou igual a dateStart, apontando o campo dateEnd", () => {
-    expect(() => tripInputSchema.parse({ ...withDates, dateEnd: "2026-09-01" })).toThrow(/posterior/);
-    const res = tripInputSchema.safeParse({ ...withDates, dateEnd: "2026-09-10" });
+    expect(() => tripInputSchema.parse({ ...withDates, dateEnd: D01 })).toThrow(/posterior/);
+    const res = tripInputSchema.safeParse({ ...withDates, dateEnd: D10 });
     expect(res.success).toBe(false);
     expect(res.error!.issues[0]!.path).toEqual(["dateEnd"]);
     expect(res.error!.issues[0]!.message).toBe("dateEnd deve ser posterior a dateStart");
@@ -143,8 +155,8 @@ describe("tripInputSchema", () => {
 
   it("aceita dateEnd um dia após dateStart (limite)", () => {
     expect(
-      tripInputSchema.parse({ ...withDates, dateStart: "2026-09-10", dateEnd: "2026-09-11" }).dateEnd
-    ).toBe("2026-09-11");
+      tripInputSchema.parse({ ...withDates, dateStart: D10, dateEnd: D11 }).dateEnd
+    ).toBe(D11);
   });
 
   it("rejeita originIata que não tem 3 letras", () => {

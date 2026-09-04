@@ -11,10 +11,20 @@ import {
   type AutoFormState
 } from "./auto-plan";
 
+// Datas relativas ao relógio: o tripInputSchema barra passado, e literal de
+// setembro de 2026 quebraria sozinho na virada do mês. Dois meses à frente.
+const MES = (() => {
+  const d = new Date();
+  d.setUTCMonth(d.getUTCMonth() + 2, 1);
+  return d.toISOString().slice(0, 7);
+})();
+const D10 = `${MES}-10`;
+const D17 = `${MES}-17`;
+
 const valido: AutoFormState = {
   originIata: "GRU",
-  dateStart: "2026-09-10",
-  dateEnd: "2026-09-17",
+  dateStart: D10,
+  dateEnd: D17,
   budgetTotal: 12000,
   interests: ["praia", "gastronomia", "natureza"]
 };
@@ -49,7 +59,7 @@ describe("toggleAutoInterest", () => {
 describe("toAutoTripInput", () => {
   it("monta a viagem com datas exatas", () => {
     const input = toAutoTripInput(valido)!;
-    expect(input.dateStart).toBe("2026-09-10");
+    expect(input.dateStart).toBe(D10);
     expect(input.originIata).toBe("GRU");
     expect(input.targetMonth).toBeUndefined();
   });
