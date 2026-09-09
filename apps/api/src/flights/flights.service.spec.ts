@@ -318,3 +318,92 @@ describe("FlightsService", () => {
     expect(new Set(rows.map((r) => r.key)).size).toBe(6);
   });
 });
+
+// Busca por rota livre: origem e destino quaisquer, sem viagem, sem catálogo e
+// sem destino escolhido. É a única porta para um destino que o catálogo não tem.
+describe("FlightsService — busca por rota", () => {
+  const route = { originIata: "FLN", destinationIata: "SYD" };
+
+  it("monthsByRoute pergunta ao provider sem resolver viagem nenhuma", async () => {
+    const provider = new FakeFlightProvider();
+    const monthly = vi.spyOn(provider, "monthlyPrices");
+    const tripGet = vi.spyOn(trips, "get");
+    const service = new FlightsService(db, provider, env, cache, trips, geo);
+
+    const section = await service.monthsByRoute(route, 2);
+
+    expect(section.error).toBeNull();
+    expect(section.offers.map((d) => d.key)).toEqual(FAKE_ROUTE_DEALS.map((d) => d.key));
+    expect(monthly).toHaveBeenCalledWith(route, 2);
+    expect(tripGet).not.toHaveBeenCalled();
+    tripGet.mockRestore();
+  });
+
+  it("offersByRoute busca a data pedida e enriquece os nomes", async () => {
+    const provider = new FakeFlightProvider();
+    const search = vi.spyOn(provider, "search");
+    const tripGet = vi.spyOn(trips, "get");
+    const service = new FlightsService(db, provider, env, cache, trips, geo);
+    const params = { ...route, departDate: "2027-02-11", adults: 1, children: 0 };
+
+    const section = await service.offersByRoute(params);
+
+    expect(search).toHaveBeenCalledWith(params);
+    expect(section.offers.find((o) => o.carrier === "TP")!.carrierName).toBe("TAP Air Portugal");
+    expect(tripGet).not.toHaveBeenCalled();
+    tripGet.mockRestore();
+  });
+
+  // Sem `returnDate` o codificador do protobuf do Google não acrescenta a perna
+  // de volta — é assim que ida só chega ao provider.
+  it("offersByRoute sem returnDate é ida só", async () => {
+    const provider = new FakeFlightProvider();
+    const search = vi.spyOn(provider, "search");
+    const service = new FlightsService(db, provider, env, cache, trips, geo);
+
+    await service.offersByRoute({ ...route, departDate: "2027-02-11", adults: 1, children: 0 });
+
+    expect(search.mock.calls[0]![0].returnDate).toBeUndefined();
+  });
+
+  it("provider fora do ar degrada a seção em vez de derrubar", async () => {
+    const service = new FlightsService(
+      db,
+      new FakeFlightProvider({ fail: true }),
+      env,
+      cache,
+      trips,
+      geo
+    );
+    const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    try {
+      await expect(service.monthsByRoute(route, 1)).resolves.toEqual({
+        offers: [],
+        stale: false,
+        fetchedAt: null,
+        error: "unavailable"
+      });
+      await expect(
+        service.offersByRoute({ ...route, departDate: "2027-02-11", adults: 1, children: 0 })
+      ).resolves.toMatchObject({ offers: [], error: "unavailable" });
+    } finally {
+      errSpy.mockRestore();
+    }
+  });
+
+  // Rota diferente é chave diferente: sem isso, FLN→SYD devolveria o cache de
+  // GRU→LIS e o preço na tela seria de outra rota.
+  it("rota e passageiros entram na chave de cache", async () => {
+    const service = new FlightsService(db, new FakeFlightProvider(), env, cache, trips, geo);
+
+    await service.monthsByRoute(route, 1);
+    await service.monthsByRoute(route, 2);
+    await service.monthsByRoute({ originIata: "GRU", destinationIata: "SYD" }, 1);
+
+    const rows = await db
+      .select()
+      .from(providerCache)
+      .where(eq(providerCache.provider, "travelpayouts-flight"));
+    expect(new Set(rows.map((r) => r.key)).size).toBe(3);
+  });
+});

@@ -4,6 +4,7 @@ import type { FlightInsightsProvider, RouteQuery } from "@farol/providers";
 import {
   NotFoundError,
   type FlightOffer,
+  type FlightSearchParams,
   type ProviderSection,
   type RouteDeal,
   type RoutePriceSample
@@ -83,7 +84,7 @@ export class FlightsService {
   // Uma seção = uma chamada cacheada ao provider. Falha do provider degrada só
   // esta seção e devolve error "unavailable" (design §7.3) — a página segue de pé.
   private section<T>(
-    tripId: string,
+    tripId: string | null,
     endpoint: string,
     params: Record<string, unknown>,
     load: () => Promise<T[]>
@@ -118,40 +119,74 @@ export class FlightsService {
   }
 
   // Os três recortes de contexto de preço só variam no endpoint e na chamada
-  // ao provider — mesma rota, mesmos passageiros, mesma política de cache.
-  private async routeSection<T>(
-    userId: string,
-    tripId: string,
+  // ao provider — mesma rota, mesmos passageiros, mesma política de cache. E o
+  // que eles precisam é a rota, não a viagem: `RouteQuery` não sabe o que é uma
+  // viagem. Manter isto separado de quem resolve a viagem é o que deixa a busca
+  // por rota livre reusar o mesmo caminho e o mesmo cache. `tripId` só alimenta
+  // o log — nulo é a leitura honesta de "esta busca não pertence a viagem
+  // nenhuma", e não muda a chave de cache (que nunca teve tripId).
+  private routeSection<T>(
+    tripId: string | null,
+    query: RouteQuery,
+    passengers: number,
     endpoint: string,
     call: (query: RouteQuery, passengers: number) => Promise<T[]>
   ): Promise<ProviderSection<T>> {
-    const trip = await this.trips.get(userId, tripId);
-    const params = buildFlightParams(trip);
-    const query = { originIata: params.originIata, destinationIata: params.destinationIata };
-    const passengers = params.adults + params.children;
     return this.section(tripId, endpoint, { ...query, passengers }, () =>
       call(query, passengers)
     );
   }
 
+  // Viagem → rota. Fica fora do degradeSection de propósito: viagem inexistente
+  // é 404 e destino não escolhido é 422, não uma seção vazia.
+  private async routeOf(
+    userId: string,
+    tripId: string
+  ): Promise<{ query: RouteQuery; passengers: number }> {
+    const trip = await this.trips.get(userId, tripId);
+    const params = buildFlightParams(trip);
+    return {
+      query: { originIata: params.originIata, destinationIata: params.destinationIata },
+      passengers: params.adults + params.children
+    };
+  }
+
   /** Preço por dia do mês — "melhor dia para sair". */
-  priceCalendar(userId: string, tripId: string): Promise<ProviderSection<RoutePriceSample>> {
-    return this.routeSection(userId, tripId, FLIGHT_ENDPOINTS.calendar, (q, n) =>
+  async priceCalendar(userId: string, tripId: string): Promise<ProviderSection<RoutePriceSample>> {
+    const { query, passengers } = await this.routeOf(userId, tripId);
+    return this.routeSection(tripId, query, passengers, FLIGHT_ENDPOINTS.calendar, (q, n) =>
       this.provider.priceCalendar(q, n)
     );
   }
 
   /** Preços recentes da rota — a faixa que embasa o "está caro ou está barato". */
-  latestPrices(userId: string, tripId: string): Promise<ProviderSection<RoutePriceSample>> {
-    return this.routeSection(userId, tripId, FLIGHT_ENDPOINTS.latest, (q, n) =>
+  async latestPrices(userId: string, tripId: string): Promise<ProviderSection<RoutePriceSample>> {
+    const { query, passengers } = await this.routeOf(userId, tripId);
+    return this.routeSection(tripId, query, passengers, FLIGHT_ENDPOINTS.latest, (q, n) =>
       this.provider.latestPrices(q, n)
     );
   }
 
   /** Melhor preço mês a mês — "quando ir". */
-  monthlyPrices(userId: string, tripId: string): Promise<ProviderSection<RouteDeal>> {
-    return this.routeSection(userId, tripId, FLIGHT_ENDPOINTS.monthly, (q, n) =>
+  async monthlyPrices(userId: string, tripId: string): Promise<ProviderSection<RouteDeal>> {
+    const { query, passengers } = await this.routeOf(userId, tripId);
+    return this.routeSection(tripId, query, passengers, FLIGHT_ENDPOINTS.monthly, (q, n) =>
       this.provider.monthlyPrices(q, n)
+    );
+  }
+
+  /** Melhor preço mês a mês de uma rota qualquer — responde "quando ir" sem
+   *  exigir viagem, catálogo ou destino escolhido. */
+  monthsByRoute(query: RouteQuery, passengers: number): Promise<ProviderSection<RouteDeal>> {
+    return this.routeSection(null, query, passengers, FLIGHT_ENDPOINTS.monthly, (q, n) =>
+      this.provider.monthlyPrices(q, n)
+    );
+  }
+
+  /** Ofertas reais de uma rota e data quaisquer. `returnDate` ausente = ida só. */
+  offersByRoute(params: FlightSearchParams): Promise<ProviderSection<FlightOffer>> {
+    return this.section(null, FLIGHT_ENDPOINTS.search, { ...params }, async () =>
+      this.enrich(await this.provider.search(params))
     );
   }
 
