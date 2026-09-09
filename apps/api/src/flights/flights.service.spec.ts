@@ -391,6 +391,55 @@ describe("FlightsService — busca por rota", () => {
     }
   });
 
+  // A viagem tem duas contagens (adultos e crianças) e o provider tem uma. Com
+  // `children: 0` em toda parte, somar e subtrair dão o mesmo número e o erro
+  // passaria batido — é preciso uma viagem com criança para provar a soma.
+  it("passageiros da viagem são adultos mais crianças", async () => {
+    const provider = new FakeFlightProvider();
+    const monthly = vi.spyOn(provider, "monthlyPrices");
+    const service = new FlightsService(db, provider, env, cache, trips, geo);
+
+    const userId = await makeUser();
+    const trip = await trips.create(userId, {
+      ...tripInput,
+      party: { adults: 2, children: 3 }
+    });
+    await db.insert(tripDestinations).values({
+      id: crypto.randomUUID(),
+      tripId: trip.id,
+      city: "Lisboa",
+      country: "Portugal",
+      iata: "LIS",
+      score: "0.8",
+      rationale: "Justificativa longa o suficiente para o schema aqui.",
+      estCost: { flight: 4000, lodgingPerNight: 200, dailyLocal: 150, currency: "BRL" },
+      climate: { expectedC: 22, summary: "ameno", bestMonths: [9] },
+      flightTimeHours: null,
+      chosen: true
+    });
+
+    await service.monthlyPrices(userId, trip.id);
+
+    expect(monthly).toHaveBeenCalledWith({ originIata: "GRU", destinationIata: "LIS" }, 5);
+  });
+
+  // Data diferente é oferta diferente: sem os params na chave, a busca de
+  // fevereiro devolveria o cache de janeiro.
+  it("data e volta entram na chave de cache das ofertas", async () => {
+    const service = new FlightsService(db, new FakeFlightProvider(), env, cache, trips, geo);
+    const base = { ...route, adults: 1, children: 0 };
+
+    await service.offersByRoute({ ...base, departDate: "2027-02-11" });
+    await service.offersByRoute({ ...base, departDate: "2027-03-11" });
+    await service.offersByRoute({ ...base, departDate: "2027-02-11", returnDate: "2027-02-25" });
+
+    const rows = await db
+      .select()
+      .from(providerCache)
+      .where(eq(providerCache.provider, "travelpayouts-flight"));
+    expect(new Set(rows.map((r) => r.key)).size).toBe(3);
+  });
+
   // Rota diferente é chave diferente: sem isso, FLN→SYD devolveria o cache de
   // GRU→LIS e o preço na tela seria de outra rota.
   it("rota e passageiros entram na chave de cache", async () => {
