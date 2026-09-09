@@ -183,6 +183,19 @@ function readOffer(raw: unknown, ctx: GoogleOfferContext): FlightOffer {
     destinationIata: last.toCode,
     destinationName: last.toName,
     stops: legs.length - 1,
+    // Os trechos já estão parseados aqui; publicá-los é o que deixa a tela
+    // distinguir "via Santiago" de "via Doha". Antes eram descartados, e a
+    // contagem de escalas era tudo que sobrevivia do caminho.
+    segments: legs.map((leg) => ({
+      fromIata: leg.fromCode,
+      fromName: leg.fromName,
+      toIata: leg.toCode,
+      toName: leg.toName,
+      departAt: leg.depart.iso,
+      arriveAt: leg.arrive.iso,
+      durationMinutes: leg.durationMinutes,
+      flightNumber: leg.flightNumber
+    })),
     departAt: first.depart.iso,
     arriveAt: last.arrive.iso,
     // Na ida e volta esta resposta traz só o trecho de ida — o preço já é o

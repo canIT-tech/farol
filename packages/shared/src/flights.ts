@@ -15,6 +15,21 @@ export const flightSearchParamsSchema = z.object({
 });
 export type FlightSearchParams = z.infer<typeof flightSearchParamsSchema>;
 
+// Um trecho do voo: cada pouso entre a origem e o destino final. O Google
+// Flights entrega isso em toda oferta; o Travelpayouts não entrega nenhum, só a
+// contagem de escalas. Por isso a lista pode ser vazia — ver `segments`.
+export const flightSegmentSchema = z.object({
+  fromIata: iata,
+  fromName: z.string().min(1).nullable().default(null),
+  toIata: iata,
+  toName: z.string().min(1).nullable().default(null),
+  departAt: z.string().min(1),
+  arriveAt: z.string().min(1),
+  durationMinutes: z.number().int().min(0),
+  flightNumber: z.string().min(1).nullable().default(null)
+});
+export type FlightSegment = z.infer<typeof flightSegmentSchema>;
+
 // Oferta de voo normalizada devolvida ao web.
 // carrier/originIata/destinationIata saem do provider; os três campos *Name são
 // preenchidos depois, pelo catálogo de aeroportos e companhias — ficam nulos
@@ -30,6 +45,12 @@ export const flightOfferSchema = z.object({
   destinationIata: z.string().length(3),
   destinationName: z.string().min(1).nullable().default(null),
   stops: z.number().int().min(0),
+  // Por onde o voo passa. Numa rota longa isto é metade da decisão: quatro
+  // horas em Santiago e quarenta e uma horas via Doha não são a mesma viagem
+  // pelo mesmo preço. Vazio = o provider não informa o caminho, e a tela cai em
+  // `stops` — mesmo acordo de `carrierName: null`, que mostra o código cru em
+  // vez de um nome inventado.
+  segments: z.array(flightSegmentSchema).default([]),
   departAt: z.string().min(1),
   arriveAt: z.string().min(1),
   returnAt: z.string().min(1).nullable(),

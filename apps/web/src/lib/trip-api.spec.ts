@@ -242,6 +242,8 @@ const flightOffer = {
   destinationIata: "LIS",
   destinationName: "Lisboa",
   stops: 0,
+  // O Travelpayouts não informa trecho; o schema assume lista vazia.
+  segments: [],
   departAt: "2026-11-04T18:05:00-03:00",
   arriveAt: "2026-11-05T07:15:00.000Z",
   returnAt: null,
