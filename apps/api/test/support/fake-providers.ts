@@ -1,6 +1,7 @@
 import type { FlightInsightsProvider, HotelProvider, PlacesProvider } from "@farol/providers";
 import type {
   FlightOffer,
+  FlightSearchParams,
   HotelOffer,
   HotelSearchParams,
   Place,
@@ -201,7 +202,14 @@ export class FakeFlightProvider implements FlightInsightsProvider {
     return Promise.resolve(value);
   }
 
-  search(): Promise<FlightOffer[]> {
+  /** Guarda o último params recebido: é o que prova, no teste, o que chegou ao
+   *  provider — o `returnDate` ausente de uma ida só, por exemplo. Sem a
+   *  assinatura, `mock.calls[0]` é uma tupla vazia para o TypeScript. Mesmo
+   *  desenho do `lastParams` do FakeHotelProvider. */
+  lastSearch: FlightSearchParams | null = null;
+
+  search(params: FlightSearchParams): Promise<FlightOffer[]> {
+    this.lastSearch = params;
     return this.guard(this.behaviour.offers ?? FAKE_FLIGHT_OFFERS);
   }
   nearbyOptions(): Promise<FlightOffer[]> {
