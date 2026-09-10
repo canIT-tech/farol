@@ -1,6 +1,7 @@
 import type { FlightInsightsProvider, HotelProvider, PlacesProvider } from "@farol/providers";
 import type {
   FlightOffer,
+  FlightSearchParams,
   HotelOffer,
   HotelSearchParams,
   Place,
@@ -21,6 +22,30 @@ export const FAKE_FLIGHT_OFFERS: FlightOffer[] = [
     destinationIata: "LIS",
     destinationName: "Lisbon Airport",
     stops: 1,
+    // A única oferta falsa com caminho: é o que prova, nos testes, que o hub
+    // intermediário chega até a tela.
+    segments: [
+      {
+        fromIata: "GRU",
+        fromName: "Sao Paulo-Guarulhos International Airport",
+        toIata: "CDG",
+        toName: "Paris Charles de Gaulle",
+        departAt: "2026-09-10T18:30:00",
+        arriveAt: "2026-09-11T09:50:00",
+        durationMinutes: 680,
+        flightNumber: "AF459"
+      },
+      {
+        fromIata: "CDG",
+        fromName: "Paris Charles de Gaulle",
+        toIata: "LIS",
+        toName: "Lisbon Airport",
+        departAt: "2026-09-11T11:55:00",
+        arriveAt: "2026-09-11T14:10:00",
+        durationMinutes: 135,
+        flightNumber: "AF1024"
+      }
+    ],
     departAt: "2026-09-10T18:30:00",
     arriveAt: "2026-09-11T14:10:00",
     returnAt: "2026-09-20T08:00:00",
@@ -37,6 +62,9 @@ export const FAKE_FLIGHT_OFFERS: FlightOffer[] = [
     originName: "Sao Paulo-Guarulhos International Airport",
     destinationIata: "LIS",
     destinationName: "Lisbon Airport",
+    // Sem caminho: é o provider que não informa trecho (Travelpayouts), e a
+    // tela precisa continuar legível assim.
+    segments: [],
     stops: 0,
     departAt: "2026-09-10T23:05:00",
     arriveAt: "2026-09-11T13:20:00",
@@ -54,6 +82,7 @@ export const FAKE_FLIGHT_OFFERS: FlightOffer[] = [
     originName: null,
     destinationIata: "LIS",
     destinationName: "Lisbon Airport",
+    segments: [],
     stops: 0,
     departAt: "2026-09-10T09:00:00",
     arriveAt: "2026-09-10T21:00:00",
@@ -173,7 +202,14 @@ export class FakeFlightProvider implements FlightInsightsProvider {
     return Promise.resolve(value);
   }
 
-  search(): Promise<FlightOffer[]> {
+  /** Guarda o último params recebido: é o que prova, no teste, o que chegou ao
+   *  provider — o `returnDate` ausente de uma ida só, por exemplo. Sem a
+   *  assinatura, `mock.calls[0]` é uma tupla vazia para o TypeScript. Mesmo
+   *  desenho do `lastParams` do FakeHotelProvider. */
+  lastSearch: FlightSearchParams | null = null;
+
+  search(params: FlightSearchParams): Promise<FlightOffer[]> {
+    this.lastSearch = params;
     return this.guard(this.behaviour.offers ?? FAKE_FLIGHT_OFFERS);
   }
   nearbyOptions(): Promise<FlightOffer[]> {

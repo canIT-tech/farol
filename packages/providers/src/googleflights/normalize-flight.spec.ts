@@ -47,6 +47,28 @@ describe("normalizeOffers", () => {
     expect(comEscala!.stops).toBe(1);
   });
 
+  it("publica os trechos, um a mais que as escalas", () => {
+    const comEscala = normalizeOffers(ONE_WAY, ctx).find((o) => o.stops > 0)!;
+    expect(comEscala.segments).toHaveLength(comEscala.stops + 1);
+    expect(comEscala.segments[0]!.fromIata).toBe(comEscala.originIata);
+    expect(comEscala.segments.at(-1)!.toIata).toBe(comEscala.destinationIata);
+  });
+
+  // O hub é a informação que o `stops` apaga: "via Casablanca" e "via Doha"
+  // são a mesma contagem e viagens completamente diferentes.
+  it("o hub intermediário não é a origem nem o destino", () => {
+    const comEscala = normalizeOffers(ONE_WAY, ctx).find((o) => o.stops > 0)!;
+    const hub = comEscala.segments[0]!.toIata;
+    expect(hub).not.toBe(comEscala.originIata);
+    expect(hub).not.toBe(comEscala.destinationIata);
+  });
+
+  it("o voo direto tem um trecho só", () => {
+    const direto = normalizeOffers(ONE_WAY, ctx).find((o) => o.stops === 0)!;
+    expect(direto.segments).toHaveLength(1);
+    expect(direto.segments[0]!.flightNumber).not.toBeUndefined();
+  });
+
   // A soma ingênua chegada − partida daria 16h30 nesta rota: são horários
   // locais de fusos diferentes. A conta certa é a soma dos trechos mais as
   // conexões, que acontecem sempre dentro de um mesmo aeroporto.

@@ -2,7 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   flightSearchParamsSchema,
   flightOfferSchema,
-  flightPriceContextSchema
+  flightPriceContextSchema,
+  flightSegmentSchema
 } from "./flights.js";
 
 const baseParams = {
@@ -162,5 +163,74 @@ describe("flightPriceContextSchema", () => {
     expect(() =>
       flightPriceContextSchema.parse({ ...base, history: [{ at: "", price: 10 }] })
     ).toThrow();
+  });
+});
+
+describe("flightSegmentSchema", () => {
+  const segment = {
+    fromIata: "FLN",
+    fromName: "Florianópolis",
+    toIata: "SCL",
+    toName: "Santiago",
+    departAt: "2027-02-11T06:15:00",
+    arriveAt: "2027-02-11T10:40:00",
+    durationMinutes: 265,
+    flightNumber: "LA755"
+  };
+
+  it("aceita um trecho completo", () => {
+    expect(flightSegmentSchema.parse(segment)).toEqual(segment);
+  });
+
+  // O Travelpayouts não nomeia aeroporto nem numera voo. Sem os defaults, um
+  // trecho vindo de lá reprovaria no parse.
+  it("deixa nome e número de voo nulos quando o provider não informa", () => {
+    const parsed = flightSegmentSchema.parse({
+      fromIata: "FLN",
+      toIata: "SCL",
+      departAt: "2027-02-11T06:15:00",
+      arriveAt: "2027-02-11T10:40:00",
+      durationMinutes: 265
+    });
+    expect(parsed.fromName).toBeNull();
+    expect(parsed.toName).toBeNull();
+    expect(parsed.flightNumber).toBeNull();
+  });
+
+  it("recusa IATA que não tem três letras", () => {
+    expect(() => flightSegmentSchema.parse({ ...segment, fromIata: "FL" })).toThrow();
+  });
+
+  it("recusa duração negativa", () => {
+    expect(() => flightSegmentSchema.parse({ ...segment, durationMinutes: -1 })).toThrow();
+  });
+});
+
+describe("flightOfferSchema com segments", () => {
+  it("assume lista vazia quando o provider não informa o caminho", () => {
+    expect(flightOfferSchema.parse(baseOffer).segments).toEqual([]);
+  });
+
+  it("guarda os trechos quando o provider informa", () => {
+    const parsed = flightOfferSchema.parse({
+      ...baseOffer,
+      segments: [
+        {
+          fromIata: "GRU",
+          toIata: "CDG",
+          departAt: "2026-09-10T22:10:00",
+          arriveAt: "2026-09-11T09:50:00",
+          durationMinutes: 680
+        },
+        {
+          fromIata: "CDG",
+          toIata: "LIS",
+          departAt: "2026-09-11T11:55:00",
+          arriveAt: "2026-09-11T12:40:00",
+          durationMinutes: 135
+        }
+      ]
+    });
+    expect(parsed.segments.map((s) => s.toIata)).toEqual(["CDG", "LIS"]);
   });
 });

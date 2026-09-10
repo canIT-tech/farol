@@ -23,6 +23,7 @@ const voo: FlightOffer = {
   destinationIata: "LIS",
   destinationName: "Lisboa",
   stops: 0,
+  segments: [],
   departAt: "2026-09-10T22:00:00-03:00",
   arriveAt: "2026-09-11T10:00:00+01:00",
   returnAt: "2026-09-17T12:00:00+01:00",
