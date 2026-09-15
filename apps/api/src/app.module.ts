@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { ConfigModule } from "./config/config.module";
 import { DbModule } from "./db/db.module";
+import { CreditsModule } from "./credits/credits.module";
 import { HealthModule } from "./health/health.module";
 import { AuthGuard } from "./auth/auth.guard";
 import { AuthModule } from "./auth/auth.module";
@@ -24,6 +25,7 @@ import { EmailModule } from "./email/email.module";
   imports: [
     ConfigModule,
     DbModule,
+    CreditsModule,
     HealthModule,
     AuthModule,
     MeModule,
