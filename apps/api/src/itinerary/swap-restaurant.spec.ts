@@ -14,6 +14,7 @@ import { ItineraryRepository } from "./itinerary.repository";
 import { TripsService } from "../trips/trips.service";
 import type { PlacesService } from "../places/places.service";
 import type { JobQueue } from "../jobs/job-queue";
+import { CreditsService } from "../credits/credits.service";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/api");
@@ -44,7 +45,13 @@ const TASCA: Place = {
 };
 
 function serviceWith(findFirst: PlacesService["findFirst"]): ItineraryService {
-  return new ItineraryService(repo, queue, trips, { findFirst } as unknown as PlacesService);
+  return new ItineraryService(
+    repo,
+    queue,
+    trips,
+    { findFirst } as unknown as PlacesService,
+    new CreditsService(db)
+  );
 }
 
 interface Seeded {

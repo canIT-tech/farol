@@ -175,4 +175,21 @@ describe("PgBossQueue (pg-boss real)", () => {
     expect(entry!.data).toEqual({ boom: true });
     expect(typeof entry!.jobId).toBe("string");
   });
+
+  it("esgotados os retries, onDeadLetter recebe o payload original", { timeout: 30000 }, async () => {
+    const released: unknown[] = [];
+    await queue.work(
+      "t.release",
+      async () => {
+        throw new Error("sempre falha");
+      },
+      async (data) => {
+        released.push(data);
+      }
+    );
+    await queue.publish("t.release", { tripId: "t-1" });
+
+    await waitFor(() => released.length > 0, 20000);
+    expect(released).toEqual([{ tripId: "t-1" }]);
+  });
 });

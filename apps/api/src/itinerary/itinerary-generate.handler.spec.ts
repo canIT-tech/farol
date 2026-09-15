@@ -17,6 +17,7 @@ import { TripsService } from "../trips/trips.service";
 import { FakeLlmService } from "../llm/fake-llm.service";
 import type { LlmPort } from "../llm/llm.types";
 import type { PlacesService } from "../places/places.service";
+import { CreditsService } from "../credits/credits.service";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/api");
@@ -28,7 +29,8 @@ const tripsService = new TripsService(db);
 // O enrich do Places é exercido em enrich-itinerary.spec.ts; aqui um fake que
 // nunca acha lugar mantém o foco do spec na geração em si.
 const places = { findFirst: () => Promise.resolve(null) } as unknown as PlacesService;
-const handler = new ItineraryGenerateHandler(repo, new FakeLlmService(), db, places);
+const credits = new CreditsService(db);
+const handler = new ItineraryGenerateHandler(repo, new FakeLlmService(), db, places, credits);
 
 const userIds: string[] = [];
 
@@ -145,7 +147,7 @@ describe("ItineraryGenerateHandler.handle", () => {
       rankDestinations: () => Promise.reject(new Error("x")),
       buildItinerary: () => Promise.reject(new Error("modelo fora do ar"))
     } as unknown as LlmPort;
-    const failing = new ItineraryGenerateHandler(repo, boom, db, places);
+    const failing = new ItineraryGenerateHandler(repo, boom, db, places, credits);
 
     await expect(failing.handle({ itineraryId })).rejects.toThrow("modelo fora do ar");
     const [it] = await db.select().from(itineraries).where(eq(itineraries.id, itineraryId));
@@ -159,7 +161,7 @@ describe("ItineraryGenerateHandler.handle", () => {
       rankDestinations: () => Promise.reject(new Error("x")),
       buildItinerary: () => Promise.reject("string crua")
     } as unknown as LlmPort;
-    const failing = new ItineraryGenerateHandler(repo, boom, db, places);
+    const failing = new ItineraryGenerateHandler(repo, boom, db, places, credits);
     await expect(failing.handle({ itineraryId })).rejects.toBe("string crua");
     const [it] = await db.select().from(itineraries).where(eq(itineraries.id, itineraryId));
     expect(it!.status).toBe("failed");
@@ -173,9 +175,13 @@ describe("ItineraryGenerateHandler.handle", () => {
   it("enriquece os itens usando cidade e país do destino escolhido", async () => {
     const { itineraryId } = await scenario();
     const findFirst = vi.fn<PlacesService["findFirst"]>(() => Promise.resolve(null));
-    const enriching = new ItineraryGenerateHandler(repo, new FakeLlmService(), db, {
-      findFirst
-    } as unknown as PlacesService);
+    const enriching = new ItineraryGenerateHandler(
+      repo,
+      new FakeLlmService(),
+      db,
+      { findFirst } as unknown as PlacesService,
+      credits
+    );
 
     await enriching.handle({ itineraryId });
 
@@ -195,7 +201,7 @@ describe("ItineraryGenerateHandler.handle", () => {
         throw new Error("db fora do ar");
       }
     } as never;
-    const resilient = new ItineraryGenerateHandler(repo, new FakeLlmService(), brokenDb, places);
+    const resilient = new ItineraryGenerateHandler(repo, new FakeLlmService(), brokenDb, places, credits);
     const errSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     try {
@@ -208,5 +214,28 @@ describe("ItineraryGenerateHandler.handle", () => {
     const [it] = await db.select().from(itineraries).where(eq(itineraries.id, itineraryId));
     expect(it!.status).toBe("ready");
   });
-});
 
+  // O dead-letter chama release: a viagem devolve o que reservou na escolha do
+  // destino. Aqui o CreditsService é um stub — a devolução em si tem spec próprio.
+  it("release devolve o que a viagem consumiu", async () => {
+    const release = vi.fn().mockResolvedValue(undefined);
+    const stubRepo = {
+      getById: vi.fn().mockResolvedValue({ id: "it-1", tripId: "trip-1", version: 1 })
+    } as unknown as ItineraryRepository;
+    const h = new ItineraryGenerateHandler(stubRepo, new FakeLlmService(), db, places, {
+      release
+    } as unknown as CreditsService);
+    await h.release({ itineraryId: "it-1" });
+    expect(release).toHaveBeenCalledWith("trip-1");
+  });
+
+  it("release de itinerary inexistente é no-op", async () => {
+    const release = vi.fn();
+    const stubRepo = { getById: vi.fn().mockResolvedValue(null) } as unknown as ItineraryRepository;
+    const h = new ItineraryGenerateHandler(stubRepo, new FakeLlmService(), db, places, {
+      release
+    } as unknown as CreditsService);
+    await h.release({ itineraryId: "nope" });
+    expect(release).not.toHaveBeenCalled();
+  });
+});

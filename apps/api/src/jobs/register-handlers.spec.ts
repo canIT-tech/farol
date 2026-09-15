@@ -9,10 +9,14 @@ import { registerHandlers } from "./register-handlers";
 
 function contextWith() {
   // Assinatura explicita para o mock.calls vir tipado e handlerFor nao precisar de cast.
-  type Work = (name: string, handler: (data: unknown) => Promise<void>) => Promise<void>;
+  type Work = (
+    name: string,
+    handler: (data: unknown) => Promise<void>,
+    onDeadLetter?: (data: unknown) => Promise<void>
+  ) => Promise<void>;
   const work = vi.fn<Work>(async () => {});
   const queue = { publish: vi.fn(), work };
-  const generate = { handle: vi.fn(async () => {}) };
+  const generate = { handle: vi.fn(async () => {}), release: vi.fn(async () => {}) };
   const regenerateDay = { handle: vi.fn(async () => {}) };
   const placesEnrich = { handle: vi.fn(async () => {}) };
 
@@ -58,5 +62,17 @@ describe("registerHandlers", () => {
     expect(placesEnrich.handle).toHaveBeenCalledWith({ itineraryId: "i-1" });
 
     expect(generate.handle).toHaveBeenCalledTimes(1);
+  });
+
+  // Só o generate devolve crédito no dead-letter: as outras filas não reservam nada.
+  it("o dead-letter do generate chama release; as outras filas não registram nada", async () => {
+    const { app, work, generate } = contextWith();
+    await registerHandlers(app);
+
+    const onDeadLetterFor = (name: string) => work.mock.calls.find((c) => c[0] === name)![2];
+    await onDeadLetterFor(JOB_NAMES.itineraryGenerate)!({ itineraryId: "i-9" });
+    expect(generate.release).toHaveBeenCalledWith({ itineraryId: "i-9" });
+    expect(onDeadLetterFor(JOB_NAMES.itineraryRegenerateDay)).toBeUndefined();
+    expect(onDeadLetterFor(JOB_NAMES.placesEnrich)).toBeUndefined();
   });
 });
