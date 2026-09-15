@@ -33,7 +33,9 @@ async function serveWeb(app: NestExpressApplication): Promise<void> {
 
 async function bootstrap(): Promise<void> {
   const env: Env = parseEnv(process.env);
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // rawBody: o webhook de pagamento verifica a assinatura sobre o corpo cru;
+  // o JSON já parseado não serve.
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, { rawBody: true });
   app.setGlobalPrefix(API_PREFIX);
   // Atrás do proxy do Render, req.ip é o IP do próprio proxy — e o /whereami
   // sugeriria a cidade do datacenter para todo mundo. Com um salto de

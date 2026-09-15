@@ -15,6 +15,8 @@ export {
   flightSelections,
   hotelSelections,
   waitlist,
-  chatMessages
+  chatMessages,
+  orders,
+  webhookEvents
 } from "./schema.js";
 

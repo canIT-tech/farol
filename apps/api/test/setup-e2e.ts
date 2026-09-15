@@ -13,3 +13,4 @@ process.env.TRAVELPAYOUTS_TOKEN ??= "travelpayouts-e2e";
 process.env.TRAVELPAYOUTS_MARKER ??= "farol-e2e";
 process.env.LITEAPI_KEY ??= "sand_e2e";
 process.env.GOOGLE_PLACES_KEY ??= "google-places-e2e";
+process.env.PAYMENT_PROVIDER ??= "fake";
