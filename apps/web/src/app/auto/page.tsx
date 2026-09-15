@@ -11,6 +11,7 @@ import { AutoForm } from "../../components/auto/AutoForm";
 import { apiFetch } from "../../lib/api-client";
 import { bestCandidate, toAutoTasteProfile, toAutoTripInput, type AutoFormState } from "../../lib/auto-plan";
 import { chooseDestination, createTrip, runDiscovery } from "../../lib/trip-api";
+import { creditsRoute, isPaymentRequired } from "../../lib/payment-required";
 
 function Auto({ token }: { token: string }) {
   const router = useRouter();
@@ -40,6 +41,12 @@ function Auto({ token }: { token: string }) {
       await chooseDestination(token, trip.id, best.iata);
       router.push(`/trips/${trip.id}/itinerary`);
     } catch (cause) {
+      // Sem crédito: a viagem e o destino já existem; a compra volta para a
+      // tela de escolha, que só confirma o destino de novo.
+      if (isPaymentRequired(cause)) {
+        router.push(creditsRoute("/trips"));
+        return;
+      }
       setError(cause instanceof Error ? cause.message : "não consegui montar o plano");
       setPending(false);
     }
