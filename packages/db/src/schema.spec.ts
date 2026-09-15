@@ -14,7 +14,9 @@ import {
   itineraryDays,
   itineraryItems,
   waitlist,
-  chatMessages
+  chatMessages,
+  orders,
+  webhookEvents
 } from "./schema.js";
 
 
@@ -63,7 +65,9 @@ describe("schema.users", () => {
     id: { name: "id", sqlType: "uuid", notNull: true },
     email: { name: "email", sqlType: "text", notNull: true },
     displayName: { name: "display_name", sqlType: "text", notNull: false },
-    createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true }
+    createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true },
+    credits: { name: "credits", sqlType: "integer", notNull: true, hasDefault: true, default: 0 },
+    freeItineraryUsedAt: { name: "free_itinerary_used_at", sqlType: TS, notNull: false }
   });
 
   it("id é primary key", () => {
@@ -123,6 +127,8 @@ describe("schema.trips", () => {
     budgetTotal: { name: "budget_total", sqlType: "numeric", notNull: false },
     currency: { name: "currency", sqlType: "text", notNull: true, hasDefault: true, default: "BRL" },
     chosenDestinationId: { name: "chosen_destination_id", sqlType: "uuid", notNull: false },
+    unlockedAt: { name: "unlocked_at", sqlType: TS, notNull: false },
+    unlockedVia: { name: "unlocked_via", sqlType: "text", notNull: false },
     createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true },
     updatedAt: { name: "updated_at", sqlType: TS, notNull: true, hasDefault: true }
   });
@@ -405,3 +411,45 @@ describe("schema.chatMessages", () => {
   });
 });
 
+
+describe("schema.orders", () => {
+  checkColumns(orders, "orders", {
+    id: { name: "id", sqlType: "uuid", notNull: true },
+    userId: { name: "user_id", sqlType: "uuid", notNull: true },
+    providerSessionId: { name: "provider_session_id", sqlType: "text", notNull: true },
+    providerPaymentIntent: { name: "provider_payment_intent", sqlType: "text", notNull: false },
+    product: { name: "product", sqlType: "text", notNull: true },
+    credits: { name: "credits", sqlType: "integer", notNull: true },
+    amountCents: { name: "amount_cents", sqlType: "integer", notNull: true },
+    status: { name: "status", sqlType: "text", notNull: true, hasDefault: true, default: "pending" },
+    createdAt: { name: "created_at", sqlType: TS, notNull: true, hasDefault: true },
+    paidAt: { name: "paid_at", sqlType: TS, notNull: false }
+  });
+
+  it("id é primary key e provider_session_id é unique", () => {
+    expect(getTableColumns(orders).id.primary).toBe(true);
+    expect(getTableColumns(orders).providerSessionId.isUnique).toBe(true);
+  });
+
+  it("referencia users.id com ON DELETE cascade", () => {
+    const fk = getTableConfig(orders).foreignKeys[0]!;
+    expect(fk.reference().foreignTable).toBe(users);
+    expect(fk.onDelete).toBe("cascade");
+  });
+
+  it("indexa (userId, createdAt)", () => {
+    expect(indexColumnNames(orders, "orders_user_created_idx")).toEqual(["user_id", "created_at"]);
+  });
+});
+
+describe("schema.webhookEvents", () => {
+  checkColumns(webhookEvents, "webhook_events", {
+    id: { name: "id", sqlType: "text", notNull: true },
+    type: { name: "type", sqlType: "text", notNull: true },
+    processedAt: { name: "processed_at", sqlType: TS, notNull: true, hasDefault: true }
+  });
+
+  it("id (event.id da Stripe) é primary key", () => {
+    expect(getTableColumns(webhookEvents).id.primary).toBe(true);
+  });
+});

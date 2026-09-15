@@ -64,6 +64,13 @@
       "when": 1788391815512,
       "tag": "0008_high_anthem",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1789516034895,
+      "tag": "0009_public_wilson_fisk",
+      "breakpoints": true
     }
   ]
 }
