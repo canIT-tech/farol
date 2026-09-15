@@ -13,7 +13,11 @@ const STATUS_BY_CODE: Record<string, number> = {
   itinerary_not_ready: HttpStatus.CONFLICT,
   item_not_swappable: HttpStatus.UNPROCESSABLE_ENTITY,
   // Indisponibilidade de configuração, não erro do cliente (design §D4.1).
-  llm_not_configured: HttpStatus.SERVICE_UNAVAILABLE
+  llm_not_configured: HttpStatus.SERVICE_UNAVAILABLE,
+  // Pagamento (spec 2026-09-15): sem crédito é 402; sem provider é a mesma
+  // indisponibilidade de configuração do LLM.
+  payment_required: HttpStatus.PAYMENT_REQUIRED,
+  payment_not_configured: HttpStatus.SERVICE_UNAVAILABLE
 };
 
 interface ResponseLike {

@@ -18,6 +18,16 @@ const baseEnvSchema = z.object({
   EMAIL_PROVIDER: z.enum(["resend", "fake"]).optional(),
   EMAIL_API_KEY: z.string().min(1).optional(),
   EMAIL_FROM: z.string().min(1).optional(),
+  // Pagamento (spec 2026-09-15). Mesmo desenho: opcional; com "stripe" as
+  // quatro STRIPE_* viram obrigatórias. Sem provider o gate do roteiro segue
+  // (1º grátis, depois 402) e só a compra responde payment_not_configured.
+  PAYMENT_PROVIDER: z.enum(["stripe", "fake"]).optional(),
+  STRIPE_SECRET_KEY: z.string().min(1).optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
+  STRIPE_PRICE_SINGLE: z.string().min(1).optional(),
+  STRIPE_PRICE_PACK3: z.string().min(1).optional(),
+  // Origem pública do web: monta success_url/cancel_url do checkout.
+  APP_URL: z.string().url().default("http://localhost:3000"),
   JOBS_SCHEMA: z.string().min(1).default("pgboss"),
   // Deploy de serviço único (Render free não tem Background Worker): a api
   // registra os handlers do pg-boss no próprio processo e serve o apps/web como
@@ -92,7 +102,7 @@ type BaseEnv = z.infer<typeof baseEnvSchema>;
 function requireWithProvider(
   env: BaseEnv,
   ctx: z.RefinementCtx,
-  providerField: "LLM_PROVIDER" | "EMAIL_PROVIDER",
+  providerField: "LLM_PROVIDER" | "EMAIL_PROVIDER" | "PAYMENT_PROVIDER",
   fields: readonly (keyof BaseEnv)[]
 ): void {
   const provider = env[providerField];
@@ -113,6 +123,12 @@ function requireWithProvider(
 export const envSchema = baseEnvSchema.superRefine((env, ctx) => {
   requireWithProvider(env, ctx, "LLM_PROVIDER", ["LLM_API_KEY", "LLM_MODEL_CAPABLE", "LLM_MODEL_CHEAP"]);
   requireWithProvider(env, ctx, "EMAIL_PROVIDER", ["EMAIL_API_KEY", "EMAIL_FROM"]);
+  requireWithProvider(env, ctx, "PAYMENT_PROVIDER", [
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_PRICE_SINGLE",
+    "STRIPE_PRICE_PACK3"
+  ]);
 });
 
 export type Env = z.infer<typeof envSchema>;
