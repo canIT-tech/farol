@@ -201,9 +201,26 @@ com a lista completa — tratar como pendência até lá, ou apagar no dashboard
 | `TRAVELPAYOUTS_TOKEN` / `_MARKER` | app.travelpayouts.com → perfil → API token; marker no topo | Felipe |
 | `LITEAPI_KEY` | liteapi.travel → API Keys → **Sandbox** (`sand_*`) | Felipe |
 | `EMAIL_API_KEY` (Resend, só prd) | resend.com → API Keys | Rafael |
+| `STRIPE_SECRET_KEY` (`sk_test_…` do sandbox; `sk_live_…` só no lançamento) | dashboard.stripe.com → Developers → API keys (ou uma *restricted key* só com Checkout Sessions) | Rafael |
+| `STRIPE_WEBHOOK_SECRET` (`whsec_…`) | prd: Developers → Webhooks → endpoint `https://farol-ekk3.onrender.com/api/payments/webhook`, eventos `checkout.session.completed`, `checkout.session.expired`, `charge.refunded`. dev: o que o `stripe listen` imprime | Rafael |
+| `STRIPE_PRICE_SINGLE` / `STRIPE_PRICE_PACK3` | criados pelo Claude via MCP no sandbox (`price_…` dos produtos "Farol · 1 viagem" R$ 39 e "Farol · 3 viagens" R$ 89); não são segredo | ✅ dev e prd |
+| `APP_URL` (só prd; dev usa o default) | origem pública do web, monta as urls de retorno do checkout | ✅ prd |
 | `SUPABASE_ACCESS_TOKEN` (só prd, uso operacional) | supabase.com/dashboard/account/tokens — deixa o Claude ler/alterar Auth config pela Management API | Rafael |
 
 ---
+
+## 7.5 Pagamento em desenvolvimento (Stripe sandbox — sempre)
+
+Sem `PAYMENT_PROVIDER` a aplicação sobe, o 1º roteiro é grátis e o 2º responde 402;
+só a compra fica fechada (503). Para testar a compra de ponta a ponta:
+
+1. `PAYMENT_PROVIDER=stripe` + as quatro `STRIPE_*` no Doppler `dev` (chave **de teste**).
+2. Webhook local: `stripe listen --forward-to localhost:3333/api/payments/webhook`
+   (Stripe CLI, `brew install stripe/stripe-cli/stripe`); o `whsec_…` que ele imprime é
+   o `STRIPE_WEBHOOK_SECRET` do `dev`.
+3. Cartão de teste `4242 4242 4242 4242`, qualquer validade futura e CVC. Estorno pelo
+   painel da Stripe → o webhook `charge.refunded` desconta o crédito.
+4. Nos testes automatizados o provider é sempre `fake` (`ci.yml`, `setup-e2e.ts`).
 
 ## 8. Produção (Render) — o que você precisa saber
 
