@@ -1,7 +1,7 @@
 # Termos de Uso — Farol
 
-> **Rascunho — pendente de revisão jurídica. Não publicar como está.**
-> Substitua todo `[ENTRE COLCHETES]` pelos dados reais (ver `docs/legal/README.md`).
+> **Texto em revisão jurídica.** Publicado em `/terms` para o período de teste; os campos
+> `[ENTRE COLCHETES]` são preenchidos antes do lançamento comercial (ver `docs/legal/README.md`).
 
 **Vigência a partir de:** [DATA DE PUBLICAÇÃO]
 **Última atualização:** [DATA]
@@ -13,7 +13,7 @@ operados por **[RAZÃO SOCIAL], CNPJ [00.000.000/0000-00]**, com sede em
 
 Ao criar uma conta, entrar na lista de espera ou usar o Farol de qualquer forma,
 você ("usuário", "você") declara que leu, entendeu e concorda com estes Termos e
-com a **Política de Privacidade** (`/privacidade`). Se não concordar, não use o serviço.
+com a **Política de Privacidade** (`/privacy`). Se não concordar, não use o serviço.
 
 ---
 
@@ -77,23 +77,25 @@ do responsável legal, que responde pelo uso.
 ## 5. Planos, créditos e pagamento
 
 ### 5.1 Plano gratuito
-Permite **uma (1) viagem**, no modo autônomo (uma entrada mínima gera um único plano
-fechado), sem seletor de destino e sem chat de ajuste. Uso único por conta.
+O **primeiro roteiro da sua conta é por nossa conta**, em qualquer modo (assessor ou
+autônomo), com tudo incluído: destino, roteiro dia a dia, ajustes por conversa e
+indicações de voo e hospedagem. Uso único por conta.
 
 ### 5.2 Planos pagos
 - **Viagem avulsa:** R$ [39,00] — **1 crédito**.
 - **Pacote:** R$ [89,00] — **3 créditos**.
-- Os créditos **não expiram**. Cada crédito destrava um roteiro completo (modo assessor:
-  descoberta com seleção de destino, roteiro dia a dia, chat de ajuste ilimitado naquela
+- Os créditos **não expiram**. Cada crédito destrava o roteiro completo de **uma viagem**
+  (descoberta com seleção de destino, roteiro dia a dia, chat de ajuste ilimitado naquela
   viagem e indicações de voo e hospedagem).
 - Ajustes por chat dentro de uma viagem já iniciada **não consomem** crédito novo.
 - Preços em reais (BRL), com tributos aplicáveis. Podemos alterar preços a qualquer
   tempo; a alteração não afeta créditos já comprados.
 
 ### 5.3 Processamento do pagamento
-O pagamento é processado pela **[Stripe]**, em ambiente próprio da processadora. **O Farol
+O pagamento é processado pela **Stripe**, em ambiente próprio da processadora. **O Farol
 não coleta nem armazena dados do seu cartão** — recebe apenas a confirmação e os
-metadados da transação necessários para liberar os créditos.
+metadados da transação necessários para liberar os créditos. O aceite destes Termos é
+registrado pela Stripe no momento do pagamento (data e endereço IP).
 
 ### 5.4 Falha na geração do roteiro
 Se, por falha técnica nossa, um roteiro não for gerado, o crédito correspondente é
@@ -112,6 +114,8 @@ compra em até **7 (sete) dias corridos** contados da confirmação do pagamento
 - **Após 7 dias, ou com todos os créditos da compra utilizados:** não há reembolso em
   dinheiro, salvo falha comprovada do serviço, caso em que se aplica a devolução de
   crédito da seção 5.4.
+- Créditos já utilizados **não são reembolsados**: o estorno devolve apenas os créditos
+  não usados daquela compra, e eles saem da sua conta no momento do estorno.
 
 Solicite o reembolso por `[E-MAIL DE CONTATO]`. O estorno é feito pelo mesmo meio de
 pagamento, no prazo da processadora.

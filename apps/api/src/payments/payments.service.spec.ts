@@ -66,7 +66,7 @@ describe("checkout", () => {
     const user = await makeUser();
     const result = await service.checkout(user, "pack3");
 
-    expect(result).toEqual({ url: "http://app.test/pagamento/sucesso" });
+    expect(result).toEqual({ url: "http://app.test/payment/success" });
     const order = await orderOf(user.id);
     expect(order).toMatchObject({
       product: "pack3",

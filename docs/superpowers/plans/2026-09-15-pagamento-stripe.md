@@ -4,7 +4,7 @@
 
 **Goal:** 1º roteiro da conta grátis; do 2º em diante 1 crédito por viagem, comprado via Stripe Checkout; saldo em `users.credits`, webhook idempotente, telas de compra/retorno, Termos e Privacidade publicados.
 
-**Architecture:** `CreditsModule` (saldo, grátis, gate, devolução) é o núcleo e não depende da Stripe. `PaymentsModule` (checkout, webhook, `/payments/me`) fala com a porta `PaymentProvider` (`stripe` | `fake`), no mesmo desenho de LLM/E-mail. O gate mora em `ItineraryService.chooseDestination`; a devolução no dead-letter do pg-boss. Front: selo, `/creditos`, `/pagamento/{sucesso,cancelado}`, 402 → `/creditos`.
+**Architecture:** `CreditsModule` (saldo, grátis, gate, devolução) é o núcleo e não depende da Stripe. `PaymentsModule` (checkout, webhook, `/payments/me`) fala com a porta `PaymentProvider` (`stripe` | `fake`), no mesmo desenho de LLM/E-mail. O gate mora em `ItineraryService.chooseDestination`; a devolução no dead-letter do pg-boss. Front: selo, `/credits`, `/pagamento/{sucesso,cancelado}`, 402 → `/credits`.
 
 **Tech Stack:** NestJS 10, Drizzle + Postgres, pg-boss, zod, `stripe` 22.x (lib oficial), Next.js 15, Vitest, Supertest, Playwright, Stryker.
 
@@ -46,9 +46,9 @@
 | `apps/api/test/payments.e2e-spec.ts` | fluxo inteiro |
 | `apps/web/src/lib/payments-api.ts` | `getPaymentMe`, `startCheckout` |
 | `apps/web/src/components/common/CreditsBadge.tsx` | selo do header |
-| `apps/web/src/app/creditos/page.tsx`, `pagamento/sucesso/page.tsx`, `pagamento/cancelado/page.tsx` | telas |
+| `apps/web/src/app/credits/page.tsx`, `pagamento/sucesso/page.tsx`, `pagamento/cancelado/page.tsx` | telas |
 | `apps/web/src/lib/payment-required.ts` | `creditsRoute(returnTo)` + `isPaymentRequired(err)` |
-| `apps/web/src/app/termos/page.tsx`, `privacidade/page.tsx`, `next.config.mjs`, `md.d.ts` | páginas legais |
+| `apps/web/src/app/terms/page.tsx`, `privacidade/page.tsx`, `next.config.mjs`, `md.d.ts` | páginas legais |
 | `docs/legal/termos-de-uso.md`, `politica-de-privacidade.md` | texto atualizado |
 | `.github/workflows/ci.yml`, `.env.example`, `apps/api/test/setup-e2e.ts` | envs |
 
@@ -952,8 +952,8 @@ export class PaymentsService {
     await this.db.insert(orders).values({ id: orderId, userId: user.id, providerSessionId: orderId, product, credits, amountCents, status: "pending" });
     const { url, sessionId } = await this.provider.createCheckout({
       orderId, userId: user.id, email: user.email, product,
-      successUrl: `${this.env.APP_URL}/pagamento/sucesso`,
-      cancelUrl: `${this.env.APP_URL}/pagamento/cancelado`
+      successUrl: `${this.env.APP_URL}/payment/success`,
+      cancelUrl: `${this.env.APP_URL}/payment/cancelled`
     });
     await this.db.update(orders).set({ providerSessionId: sessionId }).where(eq(orders.id, orderId));
     return { url };
@@ -1050,7 +1050,7 @@ it("fluxo inteiro: 1ª viagem grátis → 2ª 402 → checkout → webhook → 2
 
   const co = await request(app.getHttpServer()).post("/payments/checkout").set("Authorization", u.auth).send({ product: "single" });
   expect(co.status).toBe(201);
-  expect(co.body.url).toContain("/pagamento/sucesso");
+  expect(co.body.url).toContain("/payment/success");
   const me1 = await request(app.getHttpServer()).get("/payments/me").set("Authorization", u.auth);
   const sessionId = `fake_cs_${me1.body.orders[0].id}`;
 
@@ -1083,14 +1083,14 @@ Conferir o status real de `POST /trips/:id/destination` em `itinerary.controller
 
 **Files:**
 - Create: `apps/web/src/lib/payments-api.ts` (+ `.spec.ts`), `apps/web/src/lib/payment-required.ts` (+ `.spec.ts`), `apps/web/src/components/common/CreditsBadge.tsx` (+ `.spec.tsx`), `apps/web/src/components/common/credits-badge.css`
-- Modify: `apps/web/src/app/trips/page.tsx` (selo no header), `apps/web/src/components/TripShell.tsx` (selo no `side__account`), `apps/web/src/app/trips/[id]/discovery/page.tsx` e `apps/web/src/app/auto/page.tsx` (402 → `/creditos`)
+- Modify: `apps/web/src/app/trips/page.tsx` (selo no header), `apps/web/src/components/TripShell.tsx` (selo no `side__account`), `apps/web/src/app/trips/[id]/discovery/page.tsx` e `apps/web/src/app/auto/page.tsx` (402 → `/credits`)
 
 **Interfaces:**
-- Produces: `getPaymentMe(token): Promise<PaymentMe>`, `startCheckout(token, product): Promise<CheckoutResult>`, `isPaymentRequired(err: unknown): boolean` (ApiError 402), `creditsRoute(returnTo: string): string` (`/creditos?returnTo=<encoded>`), `<CreditsBadge token />`.
+- Produces: `getPaymentMe(token): Promise<PaymentMe>`, `startCheckout(token, product): Promise<CheckoutResult>`, `isPaymentRequired(err: unknown): boolean` (ApiError 402), `creditsRoute(returnTo: string): string` (`/credits?returnTo=<encoded>`), `<CreditsBadge token />`.
 
-- [ ] **Step 1: Testes** — `payments-api.spec.ts` no molde de `route-api.spec.ts` (fetch fake, confere path/método/body e parse); `payment-required.spec.ts` (`isPaymentRequired(new ApiError("x", 402, "/p"))` true, 404 false, `Error` false; `creditsRoute("/trips/1/discovery")` → `/creditos?returnTo=%2Ftrips%2F1%2Fdiscovery`); `CreditsBadge.spec.tsx` (RTL): com `freeItineraryUsed=false` mostra "1ª viagem por nossa conta"; com `credits=2` mostra "2 créditos"; `credits=1` → "1 crédito"; `0` → "0 créditos" com classe `--empty`; erro de rede → não renderiza nada (sem quebrar a tela).
+- [ ] **Step 1: Testes** — `payments-api.spec.ts` no molde de `route-api.spec.ts` (fetch fake, confere path/método/body e parse); `payment-required.spec.ts` (`isPaymentRequired(new ApiError("x", 402, "/p"))` true, 404 false, `Error` false; `creditsRoute("/trips/1/discovery")` → `/credits?returnTo=%2Ftrips%2F1%2Fdiscovery`); `CreditsBadge.spec.tsx` (RTL): com `freeItineraryUsed=false` mostra "1ª viagem por nossa conta"; com `credits=2` mostra "2 créditos"; `credits=1` → "1 crédito"; `0` → "0 créditos" com classe `--empty`; erro de rede → não renderiza nada (sem quebrar a tela).
 
-- [ ] **Step 2: Falhar.** - [ ] **Step 3: Implementar** (`CreditsBadge` é um `<Link href="/creditos">` com o texto; busca `/payments/me` num `useEffect`, estado `PaymentMe | null`). Nos dois pontos de `chooseDestination` no web:
+- [ ] **Step 2: Falhar.** - [ ] **Step 3: Implementar** (`CreditsBadge` é um `<Link href="/credits">` com o texto; busca `/payments/me` num `useEffect`, estado `PaymentMe | null`). Nos dois pontos de `chooseDestination` no web:
 
 ```ts
 } catch (cause) {
@@ -1102,14 +1102,14 @@ Conferir o status real de `POST /trips/:id/destination` em `itinerary.controller
 }
 ```
 
-- [ ] **Step 4: Verde** (`pnpm --filter @farol/web test`, `lint`, `typecheck`). - [ ] **Step 5: Commit** — `feat(web): selo de créditos e 402 → /creditos`
+- [ ] **Step 4: Verde** (`pnpm --filter @farol/web test`, `lint`, `typecheck`). - [ ] **Step 5: Commit** — `feat(web): selo de créditos e 402 → /credits`
 
 ---
 
-### Task 9: web — `/creditos`, `/pagamento/sucesso`, `/pagamento/cancelado`, landing
+### Task 9: web — `/credits`, `/payment/success`, `/payment/cancelled`, landing
 
 **Files:**
-- Create: `apps/web/src/app/creditos/page.tsx`, `creditos.css`, `apps/web/src/app/pagamento/sucesso/page.tsx`, `apps/web/src/app/pagamento/cancelado/page.tsx`, `apps/web/src/lib/return-to.ts` (+ `.spec.ts`), `apps/web/src/hooks/useCreditsPolling.ts` (+ `.spec.ts`), `apps/web/e2e/payments.spec.ts`
+- Create: `apps/web/src/app/credits/page.tsx`, `creditos.css`, `apps/web/src/app/payment/success/page.tsx`, `apps/web/src/app/payment/cancelled/page.tsx`, `apps/web/src/lib/return-to.ts` (+ `.spec.ts`), `apps/web/src/hooks/useCreditsPolling.ts` (+ `.spec.ts`), `apps/web/e2e/payments.spec.ts`
 - Modify: `apps/web/src/app/page.tsx` (coluna Grátis)
 
 **Interfaces:**
@@ -1119,33 +1119,33 @@ Conferir o status real de `POST /trips/:id/destination` em `itinerary.controller
 
 - [ ] **Step 2: Falhar.** - [ ] **Step 3: Implementar**
 
-`/creditos` (client, dentro de `AuthGate`, `BrandHeader href="/trips"`):
+`/credits` (client, dentro de `AuthGate`, `BrandHeader href="/trips"`):
 - lê `returnTo` da query e chama `saveReturnTo`;
 - título "Sua primeira viagem foi por nossa conta." / sub "As próximas custam menos que um café por dia de roteiro — e você só paga pela viagem que montar.";
 - dois cards `<article>`: **1 viagem · R$ 39** e **3 viagens · R$ 89** ("sem prazo para usar"), cada um listando "destino com o porquê", "roteiro dia a dia", "ajustes por conversa", "voo e hotel"; botão "Comprar" → `startCheckout` → `window.location.assign(url)`; erro `payment_not_configured` (503) → "A compra ainda não está aberta — te avisamos por e-mail." sem botão de retry;
-- rodapé: "Arrependeu? Reembolso integral em até 7 dias, se o crédito não foi usado." + links `/termos` e `/privacidade`.
+- rodapé: "Arrependeu? Reembolso integral em até 7 dias, se o crédito não foi usado." + links `/terms` e `/privacy`.
 
-`/pagamento/sucesso`: `AuthGate`; guarda o `credits` do primeiro `/payments/me` como baseline… **não** — o baseline tem que vir de antes do checkout. Simplificar: `saveReturnTo` já guarda; em `/creditos`, antes de redirecionar para a Stripe, guardar `sessionStorage.farol_credits_before = credits`. Em sucesso: `useCreditsPolling(token, before)`; `done` → `router.replace(takeReturnTo())`; `timeout` → texto "O pagamento foi aprovado e o crédito aparece em instantes." + botão para `/trips`.
+`/payment/success`: `AuthGate`; guarda o `credits` do primeiro `/payments/me` como baseline… **não** — o baseline tem que vir de antes do checkout. Simplificar: `saveReturnTo` já guarda; em `/credits`, antes de redirecionar para a Stripe, guardar `sessionStorage.farol_credits_before = credits`. Em sucesso: `useCreditsPolling(token, before)`; `done` → `router.replace(takeReturnTo())`; `timeout` → texto "O pagamento foi aprovado e o crédito aparece em instantes." + botão para `/trips`.
 
-`/pagamento/cancelado`: uma frase + `router.replace(takeReturnTo())` no clique.
+`/payment/cancelled`: uma frase + `router.replace(takeReturnTo())` no clique.
 
 Landing: `<small>Sua primeira viagem, completa: destino, roteiro e ajustes por conversa.</small>` no lugar de "Uma viagem, um destino, modo autônomo. Sem chat."
 
 - [ ] **Step 4: Playwright** — `apps/web/e2e/payments.spec.ts` com `installSession` e `page.route`:
   - `/trips` mostra "1ª viagem por nossa conta" quando `/payments/me` devolve `freeItineraryUsed:false`; mostra "2 créditos" quando `credits:2`;
-  - discovery: `POST /trips/:id/destination` mockado com 402 `{code:"payment_required"}` → URL vira `/creditos?returnTo=…`;
-  - `/creditos`: clicar "Comprar" no card de 3 viagens chama `POST /payments/checkout` com `{product:"pack3"}` e navega para a `url` devolvida (mockar para `/pagamento/sucesso`);
-  - `/pagamento/sucesso`: `/payments/me` devolve `credits:3` → redireciona para o `returnTo`.
+  - discovery: `POST /trips/:id/destination` mockado com 402 `{code:"payment_required"}` → URL vira `/credits?returnTo=…`;
+  - `/credits`: clicar "Comprar" no card de 3 viagens chama `POST /payments/checkout` com `{product:"pack3"}` e navega para a `url` devolvida (mockar para `/payment/success`);
+  - `/payment/success`: `/payments/me` devolve `credits:3` → redireciona para o `returnTo`.
 
 - [ ] **Step 5: Verde** (`pnpm --filter @farol/web test`, `test:e2e`). - [ ] **Step 6: Commit** — `feat(web): telas de créditos e retorno do checkout`
 
 ---
 
-### Task 10: legal — textos e páginas `/termos` e `/privacidade`
+### Task 10: legal — textos e páginas `/terms` e `/privacy`
 
 **Files:**
 - Modify: `docs/legal/termos-de-uso.md` (§5.1, §5.2, §5.3, §6), `docs/legal/politica-de-privacidade.md` (Stripe sem colchetes; controladora), `docs/legal/README.md` (onde publica → feito)
-- Create: `apps/web/src/app/termos/page.tsx`, `apps/web/src/app/privacidade/page.tsx`, `apps/web/src/app/legal.css`, `apps/web/src/types/md.d.ts`, `apps/web/e2e/legal.spec.ts`
+- Create: `apps/web/src/app/terms/page.tsx`, `apps/web/src/app/privacy/page.tsx`, `apps/web/src/app/legal.css`, `apps/web/src/types/md.d.ts`, `apps/web/e2e/legal.spec.ts`
 - Modify: `apps/web/next.config.mjs` (regra webpack `{ test: /\.md$/, type: "asset/source" }`), `apps/web/package.json` (`marked`), `apps/web/src/app/page.tsx` (rodapé com os links), `apps/web/src/app/login/page.tsx` (linha "Ao entrar você concorda com os Termos")
 
 - [ ] **Step 1: Textos** — §5.1 vira: "**Plano gratuito.** O primeiro roteiro da sua conta é por nossa conta, em qualquer modo (assessor ou autônomo), com tudo incluído. Uso único por conta." §5.2: tirar "(modo assessor: …)"; "Cada crédito destrava o roteiro completo de uma viagem". §6: acrescentar "Créditos já utilizados não são reembolsados; o estorno devolve apenas os créditos não usados daquela compra." e "O aceite destes Termos é registrado pela Stripe no momento do pagamento." Trocar `[Stripe]` → Stripe nos dois documentos. Cabeçalho dos dois: operador = **isTech** (razão social/CNPJ/endereço seguem `[ENTRE COLCHETES]` até o Rafael preencher — não inventar).
@@ -1158,7 +1158,7 @@ declare module "*.md" { const content: string; export default content; }
 
 // next.config.mjs — dentro de webpack(config) { config.module.rules.push({ test: /\.md$/, type: "asset/source" }); return config; }
 
-// apps/web/src/app/termos/page.tsx (server component)
+// apps/web/src/app/terms/page.tsx (server component)
 import { marked } from "marked";
 import termos from "../../../../../docs/legal/termos-de-uso.md";
 import "../legal.css";
@@ -1170,7 +1170,7 @@ export default function TermosPage() {
 
 Idem `privacidade`. O markdown é nosso (repo), não entrada de usuário — o `dangerouslySetInnerHTML` é aceitável e comentado.
 
-- [ ] **Step 3: Playwright** — `legal.spec.ts`: `/termos` responde 200 e contém "Termos de Uso" e "7 (sete) dias"; `/privacidade` contém "Política de Privacidade"; a landing tem links para os dois no rodapé.
+- [ ] **Step 3: Playwright** — `legal.spec.ts`: `/terms` responde 200 e contém "Termos de Uso" e "7 (sete) dias"; `/privacy` contém "Política de Privacidade"; a landing tem links para os dois no rodapé.
 
 - [ ] **Step 4: Verde.** - [ ] **Step 5: Commit** — `feat(web): Termos e Privacidade publicados; textos alinhados ao pagamento`
 
@@ -1198,7 +1198,7 @@ Idem `privacidade`. O markdown é nosso (repo), não entrada de usuário — o `
 - [ ] `pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm --filter @farol/api test:e2e && pnpm --filter @farol/web test:e2e` — tudo verde.
 - [ ] `pnpm test:mutation` nos pacotes tocados (`shared`, `api`, `web`); ≥ 90.
 - [ ] Push + PR para `main` com o resumo da spec e os prints do checkout no sandbox.
-- [ ] Depois do deploy: com o usuário de QA, 1ª viagem grátis → 2ª leva a `/creditos` → cartão `4242…` no Checkout da Stripe → `/pagamento/sucesso` → saldo 1 → 2ª viagem gera. Estorno pelo painel → webhook → saldo volta a 0 (se não usado).
+- [ ] Depois do deploy: com o usuário de QA, 1ª viagem grátis → 2ª leva a `/credits` → cartão `4242…` no Checkout da Stripe → `/payment/success` → saldo 1 → 2ª viagem gera. Estorno pelo painel → webhook → saldo volta a 0 (se não usado).
 - [ ] `CLAUDE.md`: Passo 11 → ✅ concluído.
 
 ---

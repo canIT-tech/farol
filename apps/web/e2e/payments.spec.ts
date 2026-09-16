@@ -37,10 +37,10 @@ test.describe("créditos", () => {
     current = me(2, true);
     await page.reload();
     await expect(page.getByTestId("credits-badge")).toHaveText("2 créditos");
-    await expect(page.getByTestId("credits-badge")).toHaveAttribute("href", "/creditos");
+    await expect(page.getByTestId("credits-badge")).toHaveAttribute("href", "/credits");
   });
 
-  test("402 na escolha do destino leva para /creditos com o caminho de volta", async ({ page }) => {
+  test("402 na escolha do destino leva para /credits com o caminho de volta", async ({ page }) => {
     await installSession(page);
     await page.route(`${API}/payments/me`, (route) => route.fulfill(json(me(0, true))));
     await page.route(`${API}/trips/${TRIP_ID}`, (route) =>
@@ -64,7 +64,7 @@ test.describe("créditos", () => {
     await page.goto(`/trips/${TRIP_ID}/discovery`);
     await page.getByRole("button", { name: "Ver roteiro" }).first().click();
 
-    await expect(page).toHaveURL(/\/creditos\?returnTo=%2Ftrips%2F.*discovery/);
+    await expect(page).toHaveURL(/\/credits\?returnTo=%2Ftrips%2F.*discovery/);
     await expect(page.getByRole("heading", { name: /primeira viagem foi por nossa conta/ })).toBeVisible();
   });
 
@@ -77,7 +77,7 @@ test.describe("créditos", () => {
     );
     await page.route(`${API}/payments/checkout`, (route) => {
       checkoutBody = route.request().postDataJSON();
-      return route.fulfill(json({ url: "http://localhost:3100/pagamento/sucesso" }, 201));
+      return route.fulfill(json({ url: "http://localhost:3100/payment/success" }, 201));
     });
     await page.route(`${API}/trips/${TRIP_ID}`, (route) =>
       route.fulfill(json({ ...trip, destinations: [lisboa], chosenDestination: null }))
@@ -86,8 +86,8 @@ test.describe("créditos", () => {
       route.fulfill(json([lisboa]))
     );
 
-    await page.goto(`/creditos?returnTo=%2Ftrips%2F${TRIP_ID}%2Fdiscovery`);
-    await page.getByTestId("plano-pack3").getByRole("button", { name: "Comprar" }).click();
+    await page.goto(`/credits?returnTo=%2Ftrips%2F${TRIP_ID}%2Fdiscovery`);
+    await page.getByTestId("plan-pack3").getByRole("button", { name: "Comprar" }).click();
 
     await expect(page).toHaveURL(/\/trips\/.*\/discovery/);
     expect(checkoutBody).toEqual({ product: "pack3" });
@@ -104,15 +104,15 @@ test.describe("créditos", () => {
       })
     );
 
-    await page.goto("/creditos");
-    await page.getByTestId("plano-single").getByRole("button", { name: "Comprar" }).click();
+    await page.goto("/credits");
+    await page.getByTestId("plan-single").getByRole("button", { name: "Comprar" }).click();
 
     await expect(page.getByRole("status")).toContainText("ainda não está aberta");
   });
 
   test("cancelado não cobra e volta", async ({ page }) => {
     await installSession(page);
-    await page.goto("/pagamento/cancelado");
+    await page.goto("/payment/cancelled");
     await expect(page.getByRole("heading", { name: /nada foi cobrado/ })).toBeVisible();
     await page.getByRole("button", { name: "Voltar" }).click();
     await expect(page).toHaveURL(/\/trips$/);

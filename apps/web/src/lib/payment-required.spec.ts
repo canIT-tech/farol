@@ -12,7 +12,7 @@ describe("isPaymentRequired", () => {
 });
 
 describe("creditsRoute", () => {
-  it("leva para /creditos guardando o caminho de volta codificado", () => {
-    expect(creditsRoute("/trips/abc/discovery")).toBe("/creditos?returnTo=%2Ftrips%2Fabc%2Fdiscovery");
+  it("leva para /credits guardando o caminho de volta codificado", () => {
+    expect(creditsRoute("/trips/abc/discovery")).toBe("/credits?returnTo=%2Ftrips%2Fabc%2Fdiscovery");
   });
 });

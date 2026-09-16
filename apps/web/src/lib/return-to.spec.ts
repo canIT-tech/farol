@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   safeReturnTo,
   saveReturnTo,
@@ -52,3 +52,20 @@ describe("saveCreditsBefore / takeCreditsBefore", () => {
     expect(takeCreditsBefore()).toBe(0);
   });
 });
+
+describe("sem sessionStorage", () => {
+  it("quando o storage lança, tudo devolve o default sem quebrar", () => {
+    const spy = vi.spyOn(window, "sessionStorage", "get").mockImplementation(() => {
+      throw new Error("bloqueado");
+    });
+    try {
+      expect(() => saveReturnTo("/x")).not.toThrow();
+      expect(takeReturnTo()).toBe("/trips");
+      expect(() => saveCreditsBefore(2)).not.toThrow();
+      expect(takeCreditsBefore()).toBe(0);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+});
+

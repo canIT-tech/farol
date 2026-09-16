@@ -11,9 +11,11 @@ export function safeReturnTo(value: string | null | undefined): string {
   return value;
 }
 
+// sessionStorage pode não existir ou lançar (navegação privada, iframe sem
+// permissão); sem ele, o fluxo segue com os defaults.
 function storage(): Storage | null {
   try {
-    return typeof window === "undefined" ? null : window.sessionStorage;
+    return window.sessionStorage;
   } catch {
     return null;
   }
@@ -32,7 +34,7 @@ export function takeReturnTo(): string {
   return value;
 }
 
-/** Saldo antes de ir para a Stripe: é o que /pagamento/sucesso compara. */
+/** Saldo antes de ir para a Stripe: é o que /payment/success compara. */
 export function saveCreditsBefore(credits: number): void {
   storage()?.setItem(CREDITS_BEFORE_KEY, String(credits));
 }

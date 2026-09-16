@@ -63,4 +63,16 @@ describe("useCreditsPolling", () => {
     await advance(POLL_EVERY_MS * 3);
     expect(getPaymentMe).toHaveBeenCalledTimes(1);
   });
+
+  it("resposta que chega depois do unmount não muda nada nem agenda outra consulta", async () => {
+    let resolve: (value: unknown) => void = () => {};
+    getPaymentMe.mockReturnValue(new Promise((r) => (resolve = r)));
+    const { result, unmount } = renderHook(() => useCreditsPolling("tok", 0));
+    await advance(0);
+    unmount();
+    resolve(me(5));
+    await advance(POLL_EVERY_MS * 2);
+    expect(result.current).toBe("waiting");
+    expect(getPaymentMe).toHaveBeenCalledTimes(1);
+  });
 });

@@ -10,7 +10,7 @@ import { BrandHeader } from "../../components/common/BrandHeader";
 import { ApiError } from "../../lib/api-client";
 import { getPaymentMe, startCheckout } from "../../lib/payments-api";
 import { saveCreditsBefore, saveReturnTo } from "../../lib/return-to";
-import "./creditos.css";
+import "./credits.css";
 
 const INCLUDED = [
   "destino escolhido com o porquê",
@@ -75,22 +75,22 @@ function Creditos({ token }: { token: string }) {
             A compra ainda não está aberta. Te avisamos por e-mail assim que abrir.
           </p>
         ) : (
-          <div className="creditos__grid">
+          <div className="credits__grid">
             {(Object.keys(PRODUCTS) as ProductId[]).map((id) => {
               const product = PRODUCTS[id];
               return (
                 <article
                   key={id}
-                  className={id === "pack3" ? "creditos__card creditos__card--destaque" : "creditos__card"}
+                  className={id === "pack3" ? "credits__card credits__card--featured" : "credits__card"}
                   aria-label={product.label}
-                  data-testid={`plano-${id}`}
+                  data-testid={`plan-${id}`}
                 >
-                  <div className="creditos__nome">{product.label}</div>
-                  <div className="creditos__preco">
+                  <div className="credits__name">{product.label}</div>
+                  <div className="credits__price">
                     {money(product.amountCents)}
                     {id === "pack3" ? <small>sem prazo para usar</small> : null}
                   </div>
-                  <ul className="creditos__lista">
+                  <ul className="credits__list">
                     {INCLUDED.map((item) => (
                       <li key={item}>{item}</li>
                     ))}
@@ -116,10 +116,10 @@ function Creditos({ token }: { token: string }) {
           </p>
         ) : null}
 
-        <p className="creditos__rodape">
+        <p className="credits__footer">
           Arrependeu? Reembolso integral em até 7 dias, se o crédito não foi usado. O pagamento é
-          feito na Stripe; não guardamos dados do cartão. <Link href="/termos">Termos</Link> ·{" "}
-          <Link href="/privacidade">Privacidade</Link>
+          feito na Stripe; não guardamos dados do cartão. <Link href="/terms">Termos</Link> ·{" "}
+          <Link href="/privacy">Privacidade</Link>
         </p>
       </div>
     </main>

@@ -23,12 +23,12 @@ describe("creditsLabel", () => {
 });
 
 describe("CreditsBadge", () => {
-  it("mostra o selo como link para /creditos", async () => {
+  it("mostra o selo como link para /credits", async () => {
     getPaymentMe.mockResolvedValue({ credits: 2, freeItineraryUsed: true, orders: [] });
     render(<CreditsBadge token="tok" />);
     const badge = await screen.findByTestId("credits-badge");
     expect(badge).toHaveTextContent("2 créditos");
-    expect(badge).toHaveAttribute("href", "/creditos");
+    expect(badge).toHaveAttribute("href", "/credits");
     expect(badge).not.toHaveClass("credits-badge--empty");
     expect(getPaymentMe).toHaveBeenCalledWith("tok");
   });

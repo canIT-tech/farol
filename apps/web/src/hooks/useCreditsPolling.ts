@@ -18,8 +18,10 @@ export function useCreditsPolling(token: string, baseline: number): PollingState
     let cancelled = false;
     const started = Date.now();
 
+    // O timer é limpo no cleanup, então tick nunca começa depois do unmount;
+    // o que pode acontecer é o unmount durante a consulta — por isso o
+    // `cancelled` é checado depois do await.
     async function tick() {
-      if (cancelled) return;
       try {
         const me = await getPaymentMe(token);
         if (cancelled) return;

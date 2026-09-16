@@ -1,7 +1,7 @@
 # Política de Privacidade — Farol
 
-> **Rascunho — pendente de revisão jurídica. Não publicar como está.**
-> Substitua todo `[ENTRE COLCHETES]` pelos dados reais (ver `docs/legal/README.md`).
+> **Texto em revisão jurídica.** Publicado em `/privacy` para o período de teste; os campos
+> `[ENTRE COLCHETES]` são preenchidos antes do lançamento comercial (ver `docs/legal/README.md`).
 
 **Vigência a partir de:** [DATA DE PUBLICAÇÃO]
 **Última atualização:** [DATA]
@@ -34,7 +34,7 @@ Esta Política explica como o **Farol** (`farolviagens.com`), operado por
 | Perfil de gosto | interesses de viagem, ritmo, preferências |
 | Dados da viagem | origem, datas, orçamento, número de viajantes, destino escolhido |
 | Chat de ajuste | o texto das mensagens que você envia ao assistente |
-| Pagamento | os dados de cartão são inseridos **diretamente na [Stripe]**; nós recebemos apenas status da transação, valor, data, bandeira e os últimos dígitos |
+| Pagamento | os dados de cartão são inseridos **diretamente na Stripe**; nós recebemos apenas status da transação, valor, data, bandeira e os últimos dígitos |
 | Suporte | o conteúdo das mensagens que você nos manda |
 
 ### 2.2 Coletados automaticamente
@@ -77,7 +77,7 @@ indicado:
 | **Anthropic (Claude)** | preferências e dados da viagem, mensagens do chat (sem seu e-mail) | gerar e ajustar o roteiro por IA |
 | **Google Places** | nome da cidade/região e termos de busca de pontos de interesse | trazer restaurantes e POIs para o roteiro |
 | **Travelpayouts / Aviasales / Hotellook** | parâmetros de busca (origem, destino, datas) ao montar os links; identificador de afiliado (`marker`) no clique | indicações de voo e hospedagem e mensuração de comissão — **controlador independente** quanto à navegação no site do parceiro |
-| **[Stripe]** (pagamento) | dados que você insere no checkout; e-mail; valor | processar o pagamento — **controlador independente** dos dados do cartão |
+| **Stripe** (pagamento) | dados que você insere no checkout; e-mail; valor | processar o pagamento — **controlador independente** dos dados do cartão |
 | **[PROVEDOR DE E-MAIL]** | seu e-mail e o conteúdo da mensagem transacional | entregar os e-mails do serviço |
 
 > **Analytics não faz parte do MVP** (decisão 2026-08-31: instrumentação de produto
@@ -93,7 +93,7 @@ Política.
 
 ## 5. Transferência internacional
 
-Alguns operadores acima (por exemplo, **Anthropic**, **[Stripe]**, **Supabase**,
+Alguns operadores acima (por exemplo, **Anthropic**, **Stripe**, **Supabase**,
 **Google**) podem tratar dados **fora do Brasil**. Nesses casos, adotamos as
 salvaguardas do art. 33 da LGPD — cláusulas contratuais padrão e compromissos de
 segurança equivalentes ao padrão brasileiro.

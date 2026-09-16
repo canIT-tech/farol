@@ -113,7 +113,7 @@ describe("pagamento por viagem", () => {
         .set("Authorization", u.auth)
         .send({ product: "single" });
       expect(co.status).toBe(201);
-      expect(co.body.url).toContain("/pagamento/sucesso");
+      expect(co.body.url).toContain("/payment/success");
 
       const before = await me(u.auth);
       expect(before.body).toMatchObject({ credits: 0, freeItineraryUsed: true });

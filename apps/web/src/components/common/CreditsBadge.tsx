@@ -42,7 +42,7 @@ export function CreditsBadge({ token }: { token: string }) {
   return (
     <Link
       className={empty ? "credits-badge credits-badge--empty" : "credits-badge"}
-      href="/creditos"
+      href="/credits"
       data-testid="credits-badge"
     >
       {creditsLabel(me)}

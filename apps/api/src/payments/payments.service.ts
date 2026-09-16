@@ -51,8 +51,8 @@ export class PaymentsService {
       userId: user.id,
       email: user.email,
       product,
-      successUrl: `${this.env.APP_URL}/pagamento/sucesso`,
-      cancelUrl: `${this.env.APP_URL}/pagamento/cancelado`
+      successUrl: `${this.env.APP_URL}/payment/success`,
+      cancelUrl: `${this.env.APP_URL}/payment/cancelled`
     });
     await this.db.update(orders).set({ providerSessionId: sessionId }).where(eq(orders.id, orderId));
     return { url };

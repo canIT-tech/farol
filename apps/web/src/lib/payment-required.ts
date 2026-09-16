@@ -10,5 +10,5 @@ export function isPaymentRequired(cause: unknown): boolean {
 
 /** Caminho da tela de compra, lembrando para onde voltar depois. */
 export function creditsRoute(returnTo: string): string {
-  return `/creditos?returnTo=${encodeURIComponent(returnTo)}`;
+  return `/credits?returnTo=${encodeURIComponent(returnTo)}`;
 }

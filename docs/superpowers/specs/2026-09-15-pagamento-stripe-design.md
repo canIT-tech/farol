@@ -118,7 +118,7 @@ type PaymentEvent =
   `checkout.session.expired` → `expired`; `charge.refunded` → `refunded` (o
   `sessionId` vem de `charges.list`/`payment_intent` → metadata; se não achar, `ignored`
   com log). Tudo mais → `ignored`.
-- `FakePaymentProvider`: `createCheckout` devolve `url = <APP_URL>/pagamento/sucesso?fake=1`
+- `FakePaymentProvider`: `createCheckout` devolve `url = <APP_URL>/payment/success?fake=1`
   e um `sessionId` previsível; `parseWebhook` aceita JSON puro assinado com
   `"fake"` no header. É o que a suíte e o Playwright usam.
 
@@ -196,19 +196,19 @@ O "só se estava X" torna cada handler seguro fora de ordem.
 - **Header logado** (`/trips` e `TripShell`): selo `1ª viagem por nossa conta` enquanto
   `freeItineraryUsed === false`; depois `N créditos` (`0 créditos` em cinza). Fonte:
   `GET /payments/me`, cacheado no provider de sessão.
-- **`/creditos`**: título na voz do assessor ("Sua primeira viagem foi por nossa conta.
+- **`/credits`**: título na voz do assessor ("Sua primeira viagem foi por nossa conta.
   As próximas custam o preço de um café por dia de roteiro."), dois cards — *1 viagem,
   R$ 39* e *3 viagens, R$ 89, sem prazo para usar* — cada um com "Incluído: destino,
   roteiro dia a dia, ajustes por conversa, voo e hotel". Rodapé: reembolso em 7 dias,
-  link para `/termos`. CTA → `POST /payments/checkout` → `window.location = url`.
+  link para `/terms`. CTA → `POST /payments/checkout` → `window.location = url`.
   Query `returnTo` guardada em `sessionStorage`.
-- **`/pagamento/sucesso`**: "Confirmando com a operadora…", polling em `/payments/me`
+- **`/payment/success`**: "Confirmando com a operadora…", polling em `/payments/me`
   a cada 2 s por até 60 s até `credits` subir; então `router.replace(returnTo ?? "/trips")`.
   Estourou o tempo: "O pagamento foi aprovado e o crédito aparece em instantes" + botão
   para `/trips` (o webhook pode atrasar; o saldo chega de qualquer jeito).
-- **`/pagamento/cancelado`**: uma linha, volta para `returnTo`.
+- **`/payment/cancelled`**: uma linha, volta para `returnTo`.
 - **402 no cliente** (`lib/api-client.ts`): erro `payment_required` →
-  `router.push("/creditos?returnTo=" + pathname)`. A tela de escolher destino é a que
+  `router.push("/credits?returnTo=" + pathname)`. A tela de escolher destino é a que
   dispara; ela mostra o aviso inline antes de redirecionar.
 - **Landing** (`/`): a coluna "Grátis" passa a dizer "Sua primeira viagem, completa" e
   remove "Sem chat".
@@ -224,12 +224,12 @@ Os rascunhos já cobrem créditos, Stripe e arrependimento. O que muda com esta 
 2. **`politica-de-privacidade.md`:** trocar `[Stripe]` por Stripe sem colchete; a
    controladora dos dados é a **isTech** (dona da conta Stripe), Farol é o produto — nome,
    CNPJ e e-mail de contato entram no cabeçalho dos dois documentos.
-3. **Publicar:** `apps/web/src/app/termos/page.tsx` e `privacidade/page.tsx` renderizam
+3. **Publicar:** `apps/web/src/app/terms/page.tsx` e `privacidade/page.tsx` renderizam
    os dois `.md` (import estático em build; sem CMS). Link no rodapé da landing, no
-   `/creditos` e no `/login`. Sem essas páginas a Stripe não ativa a conta live, e sem a
+   `/credits` e no `/login`. Sem essas páginas a Stripe não ativa a conta live, e sem a
    URL cadastrada em *Settings → Public details* o `consent_collection` do checkout não
    aparece.
-4. **Política de reembolso visível** em `/creditos` (uma linha) e nos Termos (§6) —
+4. **Política de reembolso visível** em `/credits` (uma linha) e nos Termos (§6) —
    exigência da ativação da conta.
 5. Os textos seguem pré-jurídicos; o aviso do `README.md` de `docs/legal/` continua.
 
@@ -263,8 +263,8 @@ Baseline do projeto: 100% cobertura, unidade + integração + e2e + mutação �
   ciclo `pending → paid → refunded`.
 - **E2E API** — fluxo inteiro: 1ª viagem gera sem crédito; 2ª → 402; checkout fake +
   webhook fake → 2ª gera e debita.
-- **Playwright** — selo do header, `/creditos` → checkout fake → `/pagamento/sucesso`
-  → volta; 402 na escolha de destino leva ao `/creditos`.
+- **Playwright** — selo do header, `/credits` → checkout fake → `/payment/success`
+  → volta; 402 na escolha de destino leva ao `/credits`.
 
 ## 11. Ordem de implementação
 
@@ -274,7 +274,7 @@ Baseline do projeto: 100% cobertura, unidade + integração + e2e + mutação �
 3. `PaymentProvider` + `fake` + `stripe`; env.
 4. `PaymentModule`: `/checkout`, `/me`.
 5. `/webhook` + `webhook_events` + fixtures assinadas + `rawBody` no `main.ts`.
-6. Front: selo, `/creditos`, sucesso/cancelado, 402 no cliente, landing.
+6. Front: selo, `/credits`, sucesso/cancelado, 402 no cliente, landing.
 7. Legal: §8 (textos + páginas + links).
 8. Stripe sandbox pelo MCP; Doppler `dev`/`prd`; Render; `ci.yml`.
 

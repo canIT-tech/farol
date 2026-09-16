@@ -186,7 +186,10 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer className="wrap">Farol · assessor de viagem · nome de trabalho</footer>
+      <footer className="wrap">
+        Farol · assessor de viagem · nome de trabalho · <a href="/terms">Termos</a> ·{" "}
+        <a href="/privacy">Privacidade</a>
+      </footer>
     </div>
   );
 }

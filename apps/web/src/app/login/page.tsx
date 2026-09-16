@@ -76,6 +76,11 @@ export default function LoginPage() {
           </Button>
         </form>
 
+        <p className="screen__hint">
+          Ao entrar você concorda com os <a href="/terms">Termos</a> e a{" "}
+          <a href="/privacy">Política de Privacidade</a>.
+        </p>
+
         {sent ? (
           <p className="screen__status" role="status">
             Link enviado. Confira seu e-mail.
