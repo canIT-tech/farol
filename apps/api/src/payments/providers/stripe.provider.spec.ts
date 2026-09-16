@@ -96,6 +96,33 @@ describe("StripePaymentProvider.parseWebhook", () => {
     await expect(provider.parseWebhook(body, sig)).resolves.toEqual({ id: "evt_2", type: "ignored" });
   });
 
+  it("async_payment_succeeded (Pix/boleto pago depois) vira paid", async () => {
+    const { body, sig } = signed({
+      id: "evt_2b",
+      type: "checkout.session.async_payment_succeeded",
+      data: { object: { id: "cs_1", payment_status: "paid", payment_intent: "pi_1" } }
+    });
+    await expect(provider.parseWebhook(body, sig)).resolves.toEqual({
+      id: "evt_2b",
+      type: "paid",
+      sessionId: "cs_1",
+      paymentIntent: "pi_1"
+    });
+  });
+
+  it("async_payment_failed (boleto vencido) vira expired", async () => {
+    const { body, sig } = signed({
+      id: "evt_2c",
+      type: "checkout.session.async_payment_failed",
+      data: { object: { id: "cs_1", payment_status: "unpaid" } }
+    });
+    await expect(provider.parseWebhook(body, sig)).resolves.toEqual({
+      id: "evt_2c",
+      type: "expired",
+      sessionId: "cs_1"
+    });
+  });
+
   it("checkout.session.expired vira expired", async () => {
     const { body, sig } = signed({
       id: "evt_3",

@@ -114,8 +114,9 @@ type PaymentEvent =
   consent_collection: { terms_of_service: "required" },
   payment_intent_data: { statement_descriptor_suffix: "FAROL" } })`.
   `parseWebhook` = `webhooks.constructEvent`. Mapeia
-  `checkout.session.completed` com `payment_status === "paid"` → `paid`;
-  `checkout.session.expired` → `expired`; `charge.refunded` → `refunded` (o
+  `checkout.session.completed` e `checkout.session.async_payment_succeeded` com
+  `payment_status === "paid"` → `paid` (Pix/boleto confirmam no segundo);
+  `checkout.session.expired` e `checkout.session.async_payment_failed` → `expired`; `charge.refunded` → `refunded` (o
   `sessionId` vem de `charges.list`/`payment_intent` → metadata; se não achar, `ignored`
   com log). Tudo mais → `ignored`.
 - `FakePaymentProvider`: `createCheckout` devolve `url = <APP_URL>/payment/success?fake=1`
@@ -243,7 +244,7 @@ Sandbox `acct_1Ro8TSGKqrFCwn62` hoje; live com o CNPJ da isTech quando for lanç
 - Produtos: **Farol · 1 viagem** (`price` BRL 3900) e **Farol · 3 viagens** (BRL 8900).
   Os três produtos de demo (Produto PRO, Plus, Base) são arquivados.
 - Webhook endpoint: `https://farol-ekk3.onrender.com/api/payments/webhook`, eventos
-  `checkout.session.completed`, `checkout.session.expired`, `charge.refunded`.
+  `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`.
 - *Settings → Public details*: nome, URL dos Termos e da Privacidade, e-mail de suporte.
 - Criação pelo MCP da Stripe; `price_…` e o signing secret vão para o Doppler.
 - Local: `stripe listen --forward-to localhost:3333/api/payments/webhook` (Stripe CLI).

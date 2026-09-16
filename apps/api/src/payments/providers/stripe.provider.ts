@@ -30,9 +30,11 @@ function intentId(pi: string | Stripe.PaymentIntent | null | undefined): string 
 // registrado em webhook_events, para o replay ser no-op.
 export function normalizeStripeEvent(event: Stripe.Event): PaymentEvent {
   switch (event.type) {
-    case "checkout.session.completed": {
+    case "checkout.session.completed":
+    case "checkout.session.async_payment_succeeded": {
       const session = event.data.object;
-      // Boleto/Pix confirmam depois: completed sem paid não credita nada.
+      // Pix/boleto confirmam depois: o `completed` chega sem `paid` e não
+      // credita nada; o crédito entra no `async_payment_succeeded`.
       return session.payment_status === "paid"
         ? {
             id: event.id,
@@ -42,7 +44,9 @@ export function normalizeStripeEvent(event: Stripe.Event): PaymentEvent {
           }
         : { id: event.id, type: "ignored" };
     }
+    // Pix/boleto que venceu sem pagar: o pedido encerra como expirado.
     case "checkout.session.expired":
+    case "checkout.session.async_payment_failed":
       return { id: event.id, type: "expired", sessionId: event.data.object.id };
     case "charge.refunded": {
       const paymentIntent = intentId(event.data.object.payment_intent);
