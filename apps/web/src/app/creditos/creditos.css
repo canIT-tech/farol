@@ -1,0 +1,56 @@
+.creditos__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.creditos__card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.creditos__card--destaque {
+  border-color: var(--accent);
+}
+
+.creditos__nome {
+  font-family: var(--font-display, inherit);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.creditos__preco {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.creditos__preco small {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+.creditos__lista {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.creditos__rodape {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.creditos__rodape a {
+  color: inherit;
+}

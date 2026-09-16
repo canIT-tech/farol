@@ -152,7 +152,7 @@ export default function HomePage() {
             <div>
               <h3>Grátis</h3>
               <p className="price">R$ 0</p>
-              <small>Uma viagem, um destino, modo autônomo. Sem chat.</small>
+              <small>Sua primeira viagem, completa: destino, roteiro e ajustes por conversa.</small>
             </div>
             <div className="feature">
               <h3>Viagem</h3>
