@@ -6,6 +6,7 @@ import { tasteProfileSchema, type Trip } from "@farol/shared";
 import { Button } from "@farol/ui";
 import { AuthGate } from "../../components/AuthGate";
 import { BrandHeader } from "../../components/common/BrandHeader";
+import { CreditsBadge } from "../../components/common/CreditsBadge";
 import "./trips.css";
 import { budgetLabel, partyLabel, periodLabel } from "../../components/TripSidebar";
 import { ApiError, apiFetch } from "../../lib/api-client";
@@ -79,6 +80,7 @@ function Home({ token }: { token: string }) {
     <main className="screen screen--wide">
       <BrandHeader>
         <nav className="trips__nav" aria-label="Ações">
+          <CreditsBadge token={token} />
           <Button type="button" variant="text" onClick={() => router.push("/onboarding")}>
             Meu perfil
           </Button>

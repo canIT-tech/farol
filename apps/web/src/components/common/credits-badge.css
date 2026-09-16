@@ -1,0 +1,21 @@
+.credits-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-2, transparent);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.credits-badge:hover {
+  border-color: var(--accent);
+}
+
+.credits-badge--empty {
+  color: var(--text-muted);
+}

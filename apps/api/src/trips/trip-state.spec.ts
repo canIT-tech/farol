@@ -19,6 +19,8 @@ const tripRow: TripRow = {
   budgetTotal: "15000.00",
   currency: "BRL",
   chosenDestinationId: null,
+  unlockedAt: null,
+  unlockedVia: null,
   createdAt: new Date("2026-08-29T10:00:00.000Z"),
   updatedAt: new Date("2026-08-29T11:00:00.000Z")
 };

@@ -253,6 +253,35 @@ describe("env de e-mail", () => {
     expect(() => parseEnv({ ...valid, EMAIL_PROVIDER: "sendgrid" })).toThrow(/EMAIL_PROVIDER/);
   });
 
+  it("sem PAYMENT_PROVIDER a env passa e APP_URL tem default", () => {
+    const env = parseEnv({ ...valid });
+    expect(env.PAYMENT_PROVIDER).toBeUndefined();
+    expect(env.APP_URL).toBe("http://localhost:3000");
+  });
+
+  it("PAYMENT_PROVIDER=stripe exige as quatro STRIPE_*", () => {
+    expect(() => parseEnv({ ...valid, PAYMENT_PROVIDER: "stripe" })).toThrow(
+      /STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_SINGLE, STRIPE_PRICE_PACK3/
+    );
+    const env = parseEnv({
+      ...valid,
+      PAYMENT_PROVIDER: "stripe",
+      STRIPE_SECRET_KEY: "sk_test_x",
+      STRIPE_WEBHOOK_SECRET: "whsec_x",
+      STRIPE_PRICE_SINGLE: "price_s",
+      STRIPE_PRICE_PACK3: "price_p",
+      APP_URL: "https://farol.example"
+    });
+    expect(env.PAYMENT_PROVIDER).toBe("stripe");
+    expect(env.APP_URL).toBe("https://farol.example");
+  });
+
+  it("PAYMENT_PROVIDER=fake não exige nada; valor desconhecido é recusado", () => {
+    expect(parseEnv({ ...valid, PAYMENT_PROVIDER: "fake" }).PAYMENT_PROVIDER).toBe("fake");
+    expect(() => parseEnv({ ...valid, PAYMENT_PROVIDER: "paypal" })).toThrow(/PAYMENT_PROVIDER/);
+    expect(() => parseEnv({ ...valid, APP_URL: "nao-e-url" })).toThrow(/APP_URL/);
+  });
+
   it("resend sem chave é erro de boot", () => {
     expect(() => parseEnv({ ...valid, EMAIL_PROVIDER: "resend", EMAIL_FROM: "oi@farol.app" })).toThrow(
       "Env inválida: EMAIL_API_KEY"

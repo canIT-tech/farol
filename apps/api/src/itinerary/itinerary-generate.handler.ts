@@ -1,5 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import type { Database } from "@farol/db";
+import { CreditsService } from "../credits/credits.service";
 import { DB } from "../db/db.module";
 import { LLM, type LlmPort } from "../llm/llm.types";
 import { PlacesService } from "../places/places.service";
@@ -21,8 +22,18 @@ export class ItineraryGenerateHandler {
     private readonly repo: ItineraryRepository,
     @Inject(LLM) private readonly llm: LlmPort,
     @Inject(DB) private readonly db: Database,
-    private readonly places: PlacesService
+    private readonly places: PlacesService,
+    private readonly credits: CreditsService
   ) {}
+
+  // Chamado pelo dead-letter: as retentativas acabaram e o roteiro não vai
+  // sair. Devolve o crédito (ou o grátis) que chooseDestination reservou.
+  async release(data: ItineraryGenerateData): Promise<void> {
+    const itinerary = await this.repo.getById(data.itineraryId);
+    if (itinerary) {
+      await this.credits.release(itinerary.tripId);
+    }
+  }
 
   async handle(data: ItineraryGenerateData): Promise<void> {
     const itinerary = await this.repo.getById(data.itineraryId);

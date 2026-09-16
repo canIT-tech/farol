@@ -9,6 +9,8 @@ export { ProvidersModule, PLACES_PROVIDER } from "./providers/providers.module";
 export { PlacesModule } from "./places/places.module";
 export { PlacesService } from "./places/places.service";
 export { ItineraryRepository } from "./itinerary/itinerary.repository";
+// O handler do roteiro devolve o crédito no dead-letter (Passo 11).
+export { CreditsService } from "./credits/credits.service";
 export { JOB_QUEUE, type JobQueue } from "./jobs/job-queue";
 export { JOB_NAMES } from "./jobs/job-names";
 export { LLM, type LlmPort } from "./llm/llm.types";

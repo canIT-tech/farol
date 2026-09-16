@@ -12,4 +12,4 @@ export * from "./hotels.js";
 export * from "./places.js";
 export * from "./waitlist.js";
 export * from "./chat.js";
-
+export * from "./payments.js";

@@ -9,6 +9,7 @@ import { TripSidebar } from "./TripSidebar";
 import { TripProvider, useTrip } from "../providers/TripProvider";
 import { useChat } from "../hooks/useChat";
 import { signOut } from "../lib/session";
+import { CreditsBadge } from "./common/CreditsBadge";
 
 // "profile" é a única etapa fora de /trips/:id — mora em /onboarding.
 export function stepRoute(tripId: string, step: string): string {
@@ -60,6 +61,7 @@ export function ShellFrame({
           <TripSidebar trip={trip} onNavigate={onNavigate} />
           <nav className="side__account" aria-label="Conta">
             <a href="/trips">Minhas viagens</a>
+            {tripId === null ? null : <AccountBadge />}
             <Button type="button" variant="text" size="sm" onClick={() => void leave()}>
               Sair
             </Button>
@@ -71,6 +73,13 @@ export function ShellFrame({
       {children}
     </AppShell>
   );
+}
+
+/** Selo de créditos dentro da moldura: só existe com viagem (é aí que há
+ *  TripProvider e, portanto, token). */
+function AccountBadge() {
+  const { token } = useTrip();
+  return <CreditsBadge token={token} />;
 }
 
 /** Trilho antes de existir viagem: o assessor diz o que fazer, sem campo — o

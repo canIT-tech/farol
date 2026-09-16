@@ -6,6 +6,7 @@ import {
   type ItineraryItem,
   type SwapRestaurantInput
 } from "@farol/shared";
+import { CreditsService } from "../credits/credits.service";
 import { JOB_NAMES } from "../jobs/job-names";
 import { JOB_QUEUE, type JobQueue } from "../jobs/job-queue";
 import { PlacesService } from "../places/places.service";
@@ -20,7 +21,8 @@ export class ItineraryService {
     private readonly repo: ItineraryRepository,
     @Inject(JOB_QUEUE) private readonly queue: JobQueue,
     private readonly trips: TripsService,
-    private readonly places: PlacesService
+    private readonly places: PlacesService,
+    private readonly credits: CreditsService
   ) {}
 
   // Escolhe o destino, cria a próxima versão pendente e enfileira a geração.
@@ -33,6 +35,11 @@ export class ItineraryService {
     if (!trip.destinations.some((destination) => destination.iata === iata)) {
       throw new NotFoundError("destino não está entre os candidatos da viagem");
     }
+
+    // Gate de crédito (spec pagamento 2026-09-15 §5): 1º roteiro da conta é
+    // grátis, depois 1 crédito por viagem. Antes de qualquer escrita — um 402
+    // aqui não deixa rastro. Trocar o destino da mesma viagem não recobra.
+    await this.credits.unlock(userId, tripId);
 
     await this.repo.markChosen(tripId, iata);
     const version = (await this.repo.maxVersion(tripId)) + 1;

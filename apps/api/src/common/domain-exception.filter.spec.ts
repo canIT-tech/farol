@@ -1,6 +1,13 @@
 import { describe, it, expect, vi } from "vitest";
 import type { ArgumentsHost } from "@nestjs/common";
-import { DomainError, NotFoundError, ForbiddenError, ValidationError } from "@farol/shared";
+import {
+  DomainError,
+  NotFoundError,
+  ForbiddenError,
+  ValidationError,
+  PaymentRequiredError,
+  PaymentNotConfiguredError
+} from "@farol/shared";
 import { DomainExceptionFilter } from "./domain-exception.filter";
 
 function makeHost() {
@@ -76,5 +83,20 @@ describe("DomainExceptionFilter", () => {
     new DomainExceptionFilter().catch(new DomainError("outro", "estranho"), host);
     expect(status).toHaveBeenCalledWith(400);
     expect(json).toHaveBeenCalledWith({ statusCode: 400, code: "outro", message: "estranho" });
+  });
+
+  it("mapeia payment_required para 402", () => {
+    const { host, status, json } = makeHost();
+    new DomainExceptionFilter().catch(new PaymentRequiredError(), host);
+    expect(status).toHaveBeenCalledWith(402);
+    expect(json).toHaveBeenCalledWith(
+      expect.objectContaining({ statusCode: 402, code: "payment_required" })
+    );
+  });
+
+  it("mapeia payment_not_configured para 503", () => {
+    const { host, status } = makeHost();
+    new DomainExceptionFilter().catch(new PaymentNotConfiguredError(), host);
+    expect(status).toHaveBeenCalledWith(503);
   });
 });

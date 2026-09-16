@@ -1,0 +1,56 @@
+.credits__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.credits__card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.credits__card--featured {
+  border-color: var(--accent);
+}
+
+.credits__name {
+  font-family: var(--font-display, inherit);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.credits__price {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.credits__price small {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 6px;
+}
+
+.credits__list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.credits__footer {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.credits__footer a {
+  color: inherit;
+}

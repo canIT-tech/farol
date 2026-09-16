@@ -17,6 +17,7 @@ import { TripsService } from "../trips/trips.service";
 import { FakeLlmService } from "../llm/fake-llm.service";
 import type { LlmPort } from "../llm/llm.types";
 import type { PlacesService } from "../places/places.service";
+import { CreditsService } from "../credits/credits.service";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/api");
@@ -27,7 +28,7 @@ const tripsService = new TripsService(db);
 const fake = new FakeLlmService();
 // Este spec é sobre a regeneração de um dia; o enrich do Places não entra aqui.
 const places = { findFirst: () => Promise.resolve(null) } as unknown as PlacesService;
-const generate = new ItineraryGenerateHandler(repo, fake, db, places);
+const generate = new ItineraryGenerateHandler(repo, fake, db, places, new CreditsService(db));
 const handler = new ItineraryRegenerateDayHandler(repo, fake);
 const userIds: string[] = [];
 

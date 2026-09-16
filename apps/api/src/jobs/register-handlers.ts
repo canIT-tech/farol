@@ -17,8 +17,12 @@ export async function registerHandlers(app: INestApplicationContext): Promise<vo
   const regenerateDay = app.get(ItineraryRegenerateDayHandler);
   const placesEnrich = app.get(PlacesEnrichHandler);
 
-  await queue.work<ItineraryGenerateData>(JOB_NAMES.itineraryGenerate, (data) =>
-    generate.handle(data)
+  // O terceiro argumento roda quando o job esgota as retentativas: devolve o
+  // crédito que a escolha do destino reservou (spec pagamento 2026-09-15 §5).
+  await queue.work<ItineraryGenerateData>(
+    JOB_NAMES.itineraryGenerate,
+    (data) => generate.handle(data),
+    (data) => generate.release(data)
   );
   await queue.work<ItineraryRegenerateDayData>(JOB_NAMES.itineraryRegenerateDay, (data) =>
     regenerateDay.handle(data)

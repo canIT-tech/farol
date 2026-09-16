@@ -16,12 +16,20 @@ let jwks: FakeJwks;
 const { db, close } = createDbClient(dbUrl);
 const createdIds: string[] = [];
 
+// Datas relativas ao relógio: fixas em setembro de 2026 passaram a ser passado
+// e o POST /trips respondia 400 antes de qualquer voo entrar em cena.
+const MES = (() => {
+  const d = new Date();
+  d.setUTCMonth(d.getUTCMonth() + 2, 1);
+  return d.toISOString().slice(0, 7);
+})();
+
 const tripBody = {
   originIata: "GRU",
   party: { adults: 2, children: 0 },
   budgetTotal: 20000,
-  dateStart: "2026-09-10",
-  dateEnd: "2026-09-17"
+  dateStart: `${MES}-10`,
+  dateEnd: `${MES}-17`
 };
 
 async function newUser() {

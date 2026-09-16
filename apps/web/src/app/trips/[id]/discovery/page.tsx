@@ -7,6 +7,7 @@ import { partyLabel } from "../../../../components/TripSidebar";
 import { DestinationResults } from "../../../../components/discovery/DestinationResults";
 import { useTrip } from "../../../../providers/TripProvider";
 import { chooseDestination, runDiscovery } from "../../../../lib/trip-api";
+import { creditsRoute, isPaymentRequired } from "../../../../lib/payment-required";
 
 export default function DiscoveryPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -35,6 +36,11 @@ export default function DiscoveryPage({ params }: { params: Promise<{ id: string
       await chooseDestination(token, id, iata);
       router.push(`/trips/${id}/itinerary`);
     } catch (cause) {
+      // Sem crédito não é erro: é a tela de compra, que volta para cá depois.
+      if (isPaymentRequired(cause)) {
+        router.push(creditsRoute(`/trips/${id}/discovery`));
+        return;
+      }
       setError(cause instanceof Error ? cause.message : "não consegui escolher o destino");
       setBusy(false);
     }

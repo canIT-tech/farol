@@ -20,6 +20,7 @@ monta o dia a dia e ajusta tudo por conversa.
 | Opções de provider de hotel (sem virar canal de reserva) | `docs/negocio/2026-09-03-opcoes-provider-hotel.md` |
 | Curadoria do catálogo de destinos (como levantar candidatos) | `docs/negocio/2026-09-03-curadoria-do-catalogo.md` |
 | Controle de sessão (guard global, CORS, inatividade, o que ficou de fora) | `docs/superpowers/specs/2026-09-04-controle-de-sessao-design.md` |
+| Pagamento por viagem — Stripe "modo Levels" (saldo no usuário, 1º roteiro grátis, webhook, telas, legal) | `docs/superpowers/specs/2026-09-15-pagamento-stripe-design.md` · plano `docs/superpowers/plans/2026-09-15-pagamento-stripe.md` |
 | Google Flights como fonte primária de voo (scraping, riscos, fallback) | `docs/negocio/2026-09-03-google-flights-como-fonte-de-voo.md` |
 | Specs de produto (pagamento, plano grátis, migração de provider, custo de LLM, métricas) | `docs/negocio/2026-08-31-spec-pagamento.md` · `docs/negocio/2026-08-31-spec-plano-gratuito.md` · `docs/negocio/2026-08-31-spec-migracao-travelpayouts.md` · `docs/negocio/2026-08-31-custo-llm-por-roteiro.md` · `docs/negocio/2026-08-31-plano-de-metricas.md` |
 | Legal (Termos + Privacidade/LGPD — rascunhos, pré-jurídico) | `docs/legal/` |
@@ -41,6 +42,7 @@ Canvases publicados (Claude Artifacts):
 - Escopo é produto completo, mas execução **faseada**: MVP (gosto → roteiro) → v1 (milhas + alertas + premium) → v2 (consultoria, grupo, reserva, mobile, B2B) → v3 (gerenciador de viagem: salvar, avaliar, editar ao vivo, notas aos lugares — PRD §4/§5.11).
 - Motor de milhas fica no **v1** — é o diferencial, mas tem o maior risco de viabilidade (sem API oficial dos programas BR).
 - Monetização: **pagamento por viagem** (R$ 39 avulso / R$ 89 pacote de 3; spec `docs/negocio/2026-08-31-spec-pagamento.md`) + afiliado de voo/hotel via `marker` do Travelpayouts (deep-link) + assinatura premium (v1) + consultoria/B2B (v2).
+- **Freemium (2026-09-15): o 1º roteiro da conta é grátis, em qualquer modo** (`users.free_itinerary_used_at`); do 2º em diante, 1 crédito por viagem (`users.credits`). A API não distingue "modo autônomo" — é só o front encadeando as mesmas rotas — então a regra é por conta, não por modo. Regenerar, chat e trocar restaurante numa viagem já destravada (`trips.unlocked_at`) nunca recobram.
 
 **Arquitetura (do design técnico)**
 - Monorepo **Turborepo**: `apps/web` (Next.js, só frontend) · `apps/api` (**NestJS**) · `apps/worker` (2º processo NestJS, jobs).
@@ -74,6 +76,20 @@ Canvases publicados (Claude Artifacts):
   token ficou fora**: exigiria consulta a lista de revogados em toda rota. Quem
   fecha essa janela é a validade curta do token no Supabase. Detalhe em
   `docs/superpowers/specs/2026-09-04-controle-de-sessao-design.md`.
+- **Pagamento: Stripe Checkout hospedado, "modo Levels"** (2026-09-15). Uma conta
+  Stripe (da isTech) com o Farol como produto; saldo é `users.credits` — **sem ledger**,
+  o histórico fino mora no painel da Stripe. `PaymentsModule`: `POST /payments/checkout`
+  (cria `orders` pending + Session), `POST /payments/webhook` (`@Public`, corpo cru via
+  `rawBody: true`, idempotente por `webhook_events.id`, cada transição "só se estava no
+  estado anterior"), `GET /payments/me`. Gate em `ItineraryService.chooseDestination`
+  (`CreditsService.unlock`: `UPDATE … WHERE credits >= 1` é o lock); devolução no
+  dead-letter do pg-boss (`queue.work(name, handler, onDeadLetter)`). Porta
+  `PAYMENT_PROVIDER=stripe|fake`, opcional — sem ela a compra responde 503 e o gate segue.
+  **Sandbox sempre em dev/teste**; conta live só no lançamento. Web: `/credits`,
+  `/payment/success` (polling em `/payments/me`), `/payment/cancelled`, selo no header,
+  402 → `/credits?returnTo=`. Termos e Privacidade publicados em `/terms` e `/privacy`
+  (markdown de `docs/legal` importado em build). Rotas novas em **inglês**; `/rotas` é
+  legado a renomear.
 - Hospedagem: agnóstica (container + Postgres + env).
 - **`apps/worker` reusa a `api`**: `apps/api/src/worker-exports.ts` é um barrel exposto pelo campo `exports` do `package.json` (path `@farol/api` no `tsconfig.base` aponta pro `dist/worker-exports.d.ts`). O `WorkerModule` importa `ConfigModule`/`DbModule`/`LlmModule`/`JobsModule` + declara `ItineraryRepository` e os handlers como providers — **sem** `ItineraryModule`/`TripsModule` (esses têm controllers com `AuthGuard`, que o worker não tem).
 - **Testes de integração compartilham um único Postgres.** `turbo.json` serializa `@farol/db#test → @farol/api#test → @farol/worker#test` (o `client.spec` do `db` dropa tabelas). pg-boss usa schema isolado por teste (`pgboss_*_<rnd>`, dropado no `afterAll`). Se o banco ficar sujo (run interrompido): `docker compose exec db psql -U postgres -d farol -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public; DROP SCHEMA IF EXISTS drizzle CASCADE"` + `db:migrate` + `db:seed`.
@@ -216,7 +232,7 @@ Ordenado por risco. Detalhe e plano em `docs/superpowers/plans/2026-08-29-correc
 - Re-gravar as fixtures do **Google Places** (`packages/providers/src/google/__fixtures__/*.json`) a partir da API real — ainda escritas à mão. ~~Travelpayouts~~ ✅ gravadas da API real no Passo 10.
 - ~~Confirmar domínio~~ ✅ **`farolviagens.com`** (2026-08-31, sobre `faroltravel.com.br`). Falta: registrar (+ defensivos `farolviagens.com.br`, `faroltravel.com.br`), apontar DNS, geo-targeting BR no Search Console, e-mail transacional (SPF/DKIM/DMARC).
 - Escolher lib base de componentes (recomendação: Radix para overlays).
-- **Gateway de pagamento** para a viagem avulsa (R$ 39 / pacote R$ 89) — Stripe (fallback Mercado Pago / Pagar.me). Spec pronta: `docs/negocio/2026-08-31-spec-pagamento.md` (modelo de crédito, `PaymentModule`, webhook, gate no roteiro). Falta cadastro Stripe + implementação.
+- ~~Gateway de pagamento~~ — implementado no Passo 11 (Stripe, sandbox). **Falta:** ativar a conta live da isTech (CNPJ, banco, site com Termos/Privacidade/reembolso), trocar as chaves no Doppler `prd`, preencher os `[ENTRE COLCHETES]` de `docs/legal/`, e a revisão jurídica dos textos.
 
 ## Landing / waitlist (fora do backlog numerado)
 

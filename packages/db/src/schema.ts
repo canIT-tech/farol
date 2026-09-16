@@ -15,7 +15,13 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey(),
   email: text("email").notNull(),
   displayName: text("display_name"),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow()
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  // Saldo de créditos (spec pagamento 2026-09-15 §3). Nunca negativo: o débito
+  // é `WHERE credits >= 1` e o estorno usa greatest(0, …). Sem ledger de
+  // propósito — o histórico fino mora na Stripe.
+  credits: integer("credits").notNull().default(0),
+  // Nulo = o roteiro grátis da conta ainda não foi usado.
+  freeItineraryUsedAt: timestamp("free_itinerary_used_at", { withTimezone: true })
 });
 
 export const tasteProfiles = pgTable("taste_profiles", {
@@ -54,6 +60,11 @@ export const trips = pgTable(
     budgetTotal: numeric("budget_total"),
     currency: text("currency").notNull().default("BRL"),
     chosenDestinationId: uuid("chosen_destination_id"),
+    // A viagem já destravou o roteiro (grátis ou 1 crédito). Regenerar, chat e
+    // trocar restaurante nunca recobram. unlockedVia diz o que devolver se o
+    // job falhar em definitivo: 'free' | 'credit'.
+    unlockedAt: timestamp("unlocked_at", { withTimezone: true }),
+    unlockedVia: text("unlocked_via"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow()
   },
@@ -207,6 +218,38 @@ export const waitlist = pgTable("waitlist", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   // Quando o e-mail de boas-vindas saiu. Nulo = ainda não (falhou ou provider desligado).
   welcomeSentAt: timestamp("welcome_sent_at", { withTimezone: true })
+});
+
+// Uma linha por tentativa de compra (spec pagamento 2026-09-15 §3). O histórico
+// fino (recibo, estorno, disputa) mora na Stripe; aqui só o que liga a Session
+// ao usuário e diz quantos créditos entregar.
+export const orders = pgTable(
+  "orders",
+  {
+    id: uuid("id").primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    providerSessionId: text("provider_session_id").notNull().unique(),
+    // Preenchido no pago; é a chave que liga charge.refunded à order.
+    providerPaymentIntent: text("provider_payment_intent"),
+    product: text("product").notNull(),
+    credits: integer("credits").notNull(),
+    amountCents: integer("amount_cents").notNull(),
+    status: text("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    paidAt: timestamp("paid_at", { withTimezone: true })
+  },
+  (t) => ({
+    userCreatedIdx: index("orders_user_created_idx").on(t.userId, t.createdAt)
+  })
+);
+
+// Só existe para o replay de webhook ser no-op: id = event.id da Stripe.
+export const webhookEvents = pgTable("webhook_events", {
+  id: text("id").primaryKey(),
+  type: text("type").notNull(),
+  processedAt: timestamp("processed_at", { withTimezone: true }).notNull().defaultNow()
 });
 
 // Catálogo curado de destinos (design §6.1). Base determinística da descoberta.

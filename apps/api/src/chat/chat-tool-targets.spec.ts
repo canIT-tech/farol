@@ -20,6 +20,7 @@ import { ItineraryService } from "../itinerary/itinerary.service";
 import { ItineraryRepository } from "../itinerary/itinerary.repository";
 import type { PlacesService } from "../places/places.service";
 import type { JobQueue } from "../jobs/job-queue";
+import { CreditsService } from "../credits/credits.service";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/api");
@@ -33,7 +34,7 @@ const queue = {
   work: () => Promise.resolve()
 } as unknown as JobQueue;
 const places = { findFirst: () => Promise.resolve(null) } as unknown as PlacesService;
-const itineraryService = new ItineraryService(repo, queue, tripsService, places);
+const itineraryService = new ItineraryService(repo, queue, tripsService, places, new CreditsService(db));
 
 const userIds: string[] = [];
 

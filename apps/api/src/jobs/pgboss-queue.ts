@@ -98,7 +98,11 @@ export class PgBossQueue implements JobQueue, OnModuleInit, OnModuleDestroy {
     return assertJobId(await this.boss.send(name, data), name);
   }
 
-  async work<T>(name: string, handler: (data: T) => Promise<void>): Promise<void> {
+  async work<T>(
+    name: string,
+    handler: (data: T) => Promise<void>,
+    onDeadLetter?: (data: T) => Promise<void>
+  ): Promise<void> {
     await this.ensureQueue(name);
     const options = { pollingIntervalSeconds: pollingSeconds(this.config) };
     await this.boss.work<T>(name, options, async (jobs) => {
@@ -109,6 +113,7 @@ export class PgBossQueue implements JobQueue, OnModuleInit, OnModuleDestroy {
     await this.boss.work<T>(deadLetterName(name), options, async (jobs) => {
       for (const job of jobs) {
         this.deadLetterLogger.warn({ name, jobId: job.id, data: job.data });
+        await onDeadLetter?.(job.data);
       }
     });
   }

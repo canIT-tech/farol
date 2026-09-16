@@ -1,6 +1,8 @@
 # Documentos legais — Farol
 
-- **Status:** rascunho para revisão jurídica. **Não publicar sem revisão de um(a) advogado(a).**
+- **Status:** rascunho para revisão jurídica, **publicado** em `/terms` e `/privacy` desde
+  2026-09-15 (Passo 11 — a Stripe exige as páginas para ativar a conta e registrar o aceite no
+  checkout). Revisão de advogado(a) segue pendente; o banner no topo de cada texto diz isso.
 - **Data:** 2026-08-31
 - **Dono (produto):** felippe
 
@@ -8,8 +10,8 @@
 
 | Documento | Arquivo | Onde publica |
 |---|---|---|
-| Termos de Uso | `termos-de-uso.md` | `apps/web` rota `/termos` |
-| Política de Privacidade (inclui Cookies) | `politica-de-privacidade.md` | `apps/web` rota `/privacidade` |
+| Termos de Uso | `termos-de-uso.md` | `apps/web` rota `/terms` |
+| Política de Privacidade (inclui Cookies) | `politica-de-privacidade.md` | `apps/web` rota `/privacy` |
 
 Ambos linkados no rodapé da landing e no formulário da waitlist (checkbox de aceite +
 link), e no fluxo de cadastro/checkout do app.
@@ -26,7 +28,7 @@ Todo `[ENTRE COLCHETES]` nos dois documentos é fato que só o time tem. Lista:
 - **Provedor de e-mail transacional** (Resend / SendGrid / Amazon SES / …) — entra na lista de operadores.
 - ~~Ferramenta de analytics~~ — **fora do MVP** (decisão 2026-08-31: instrumentação de produto é pós-milhas). Quando entrar, será **PostHog** e volta à lista de operadores + seção de cookies.
 - **Data de vigência** de cada documento (data da publicação).
-- **Gateway de pagamento** — os textos assumem **Stripe**; se cair pra Mercado Pago / Pagar.me, trocar o nome.
+- ~~Gateway de pagamento~~ — **Stripe**, decidido no Passo 11 (spec `docs/superpowers/specs/2026-09-15-pagamento-stripe-design.md`). Operadora da conta = isTech.
 
 ## Pendência de conformidade — script do Travelpayouts
 

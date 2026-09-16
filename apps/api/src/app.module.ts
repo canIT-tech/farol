@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { APP_GUARD } from "@nestjs/core";
 import { ConfigModule } from "./config/config.module";
 import { DbModule } from "./db/db.module";
+import { CreditsModule } from "./credits/credits.module";
 import { HealthModule } from "./health/health.module";
 import { AuthGuard } from "./auth/auth.guard";
 import { AuthModule } from "./auth/auth.module";
@@ -19,11 +20,13 @@ import { HotelsModule } from "./hotels/hotels.module";
 import { WaitlistModule } from "./waitlist/waitlist.module";
 import { ChatModule } from "./chat/chat.module";
 import { EmailModule } from "./email/email.module";
+import { PaymentsModule } from "./payments/payments.module";
 
 @Module({
   imports: [
     ConfigModule,
     DbModule,
+    CreditsModule,
     HealthModule,
     AuthModule,
     MeModule,
@@ -39,7 +42,8 @@ import { EmailModule } from "./email/email.module";
     HotelsModule,
     EmailModule,
     WaitlistModule,
-    ChatModule
+    ChatModule,
+    PaymentsModule
   ],
   // Guard global: toda rota exige credencial, e abrir uma vira um @Public()
   // explícito no controller. O arranjo anterior era o inverso — cada controller

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from "vitest";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import {
   createDbClient,
   runMigrations,
@@ -16,6 +16,7 @@ import { TripsService } from "../trips/trips.service";
 import { JOB_NAMES } from "../jobs/job-names";
 import type { JobQueue } from "../jobs/job-queue";
 import type { PlacesService } from "../places/places.service";
+import { CreditsService } from "../credits/credits.service";
 
 const url = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL ausente para os testes de @farol/api");
@@ -27,7 +28,8 @@ const publish = vi.fn((): Promise<string> => Promise.resolve("job-1"));
 const queue = { publish, work: vi.fn() } as unknown as JobQueue;
 // swapRestaurant tem spec próprio (swap-restaurant.spec.ts); aqui o Places não é usado.
 const places = { findFirst: () => Promise.resolve(null) } as unknown as PlacesService;
-const service = new ItineraryService(repo, queue, tripsService, places);
+const credits = new CreditsService(db);
+const service = new ItineraryService(repo, queue, tripsService, places, credits);
 
 const userIds: string[] = [];
 
@@ -233,3 +235,40 @@ describe("ItineraryService.requestEnrich", () => {
     });
   });
 });
+
+describe("chooseDestination — gate de crédito", () => {
+  it("a 1ª viagem passa de graça; a 2ª sem saldo responde payment_required e não enfileira", async () => {
+    const userId = await makeUser();
+    const first = await tripWithCandidate(userId);
+    await service.chooseDestination(userId, first, "LIS");
+
+    const second = await tripWithCandidate(userId);
+    publish.mockClear();
+    await expect(service.chooseDestination(userId, second, "LIS")).rejects.toMatchObject({
+      code: "payment_required"
+    });
+    expect(publish).not.toHaveBeenCalled();
+  });
+
+  it("com saldo, a 2ª viagem debita 1 crédito e enfileira", async () => {
+    const userId = await makeUser();
+    await db.update(users).set({ credits: 1 }).where(eq(users.id, userId));
+    await service.chooseDestination(userId, await tripWithCandidate(userId), "LIS");
+
+    publish.mockClear();
+    await service.chooseDestination(userId, await tripWithCandidate(userId), "LIS");
+    expect(publish).toHaveBeenCalledTimes(1);
+    const [row] = await db.select({ credits: users.credits }).from(users).where(eq(users.id, userId));
+    expect(row!.credits).toBe(0);
+  });
+
+  it("trocar o destino da mesma viagem não cobra de novo", async () => {
+    const userId = await makeUser();
+    const tripId = await tripWithCandidate(userId);
+    await service.chooseDestination(userId, tripId, "LIS");
+    await expect(service.chooseDestination(userId, tripId, "LIS")).resolves.toHaveProperty(
+      "itineraryId"
+    );
+  });
+});
+

@@ -1,0 +1,49 @@
+.legal {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+.legal h1 {
+  font-family: var(--font-display, inherit);
+  font-size: 32px;
+  margin: 0 0 8px;
+}
+
+.legal h2 {
+  font-size: 20px;
+  margin: 32px 0 8px;
+}
+
+.legal h3 {
+  font-size: 16px;
+  margin: 20px 0 6px;
+}
+
+.legal table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+  margin: 12px 0;
+}
+
+.legal th,
+.legal td {
+  border: 1px solid var(--line);
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.legal a {
+  color: var(--accent);
+}
+
+.legal__voltar {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: var(--text-muted);
+  text-decoration: none;
+}

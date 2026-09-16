@@ -69,3 +69,16 @@ services:
         value: openai/gpt-oss-20b
       - key: LLM_API_KEY
         sync: false
+      # Pagamento (Passo 11) — Stripe. Sandbox até a conta live da isTech existir.
+      - key: PAYMENT_PROVIDER
+        value: stripe
+      - key: APP_URL
+        value: https://farol-ekk3.onrender.com
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_SINGLE
+        sync: false
+      - key: STRIPE_PRICE_PACK3
+        sync: false
