@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # bin/release [X.Y.Z] — cut a release of the SHA verified live. Never pushes.
+# Run on a fresh `release/*` branch off main: main only takes PRs, so the release
+# commit goes in by PR (merge commit, never squash) and the tag is pushed after the merge.
 # Adapted from akitaonrails/ai-memory bin/release; see ~/.claude/skills/ship/references/release.md
 set -euo pipefail
 
 cl=CHANGELOG.md
-[ -z "$(git status --porcelain)" ] || { echo "dirty tree"; exit 1; }
-[ "$(git branch --show-current)" = main ] || { echo "not on main"; exit 1; }
+[ -z "$(git status --porcelain --untracked-files=no)" ] || { echo "dirty tree"; exit 1; }
+case "$(git branch --show-current)" in release/*) ;; *) echo "run on a release/* branch cut from main"; exit 1;; esac
 
 unreleased=$(awk '/^## \[Unreleased\]/{f=1;next} /^## \[/{f=0} f' "$cl")
 echo "$unreleased" | grep -q '[^[:space:]]' || { echo "Unreleased is empty, nothing to release"; exit 1; }
@@ -33,4 +35,5 @@ git commit -q -m "release: $tag"
 printf 'Release %s\n\n%s\n' "$tag" "$unreleased" | git tag -a --cleanup=verbatim "$tag" -F -
 
 echo "$tag created on $(git rev-parse --short HEAD). Next:"
-echo "  git push origin main && git push origin $tag"
+echo "  git push -u origin HEAD && gh pr create --fill   # merge with --merge, then:"
+echo "  git push origin $tag"

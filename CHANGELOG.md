@@ -7,6 +7,8 @@ BREAKING → major. `bin/release` faz o corte; o processo está no skill `ship`.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-23
+
 ### Added
 - MVP do Farol no ar: perfil de gosto, descoberta de destino, roteiro dia a dia gerado em
   background, ajuste por chat, voos (Google Flights com fallback Travelpayouts), hotéis

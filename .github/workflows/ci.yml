@@ -97,7 +97,9 @@ jobs:
           git cat-file -e "$base:CHANGELOG.md" 2>/dev/null || exit 0
           old=$(git show "$base:CHANGELOG.md" | sed -n '/^## \[[0-9]/,$p')
           new=$(sed -n '/^## \[[0-9]/,$p' CHANGELOG.md)
-          [ "$old" = "$new" ] || { echo "uma seção já lançada do CHANGELOG foi editada"; exit 1; }
+          # Uma release nova entra acima; as já lançadas têm que continuar
+          # idênticas no fim do arquivo.
+          case "$new" in *"$old") ;; *) echo "uma seção já lançada do CHANGELOG foi editada"; exit 1;; esac
 
   # Varredura de segredo em todo o histórico alcançável do push/PR.
   secrets:
