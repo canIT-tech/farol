@@ -143,9 +143,11 @@ Desenvolvimento: Superpowers. Do teste verde até produção: skill **`ship`**.
 - Todo fix/mudança de comportamento vem com teste de regressão que falha no código antigo.
 - Mudança visível ao usuário → entrada em `## [Unreleased]` do `CHANGELOG.md`, no mesmo PR.
 
-**Deploy:** merge na `main` → Render deploya depois do CI verde (`autoDeployTrigger: checksPass`). A `main` não tem proteção de branch (repo privado de org no plano free); o gatilho do Render é a trava.
+**`main` só por PR** — inclusive o commit de release —, sem revisor obrigatório. A proteção de branch não pode ser ligada hoje: repo privado de org no plano free do GitHub (403 em branch protection e rulesets). Até virar GitHub Team ou repo público, a regra vale por convenção.
 
-**Pronto** = merge → deploy → `/api/health` mostra o SHA → Sentry recebeu evento → `bin/release` (tag anotada no SHA verificado).
+**Deploy:** merge na `main` → Render deploya. `autoDeployTrigger: checksPass` está no `render.yaml`, mas o serviço foi criado pelo dashboard e ainda não lê o arquivo (ver `docs/SETUP.md`/skill `ship`).
+
+**Pronto** = merge → deploy → `/api/health` mostra o SHA → Sentry recebeu evento → `bin/release` numa branch `release/vX.Y.Z`, PR com merge commit, e só então `git push origin vX.Y.Z`.
 <!-- ship:end -->
 
 ## Baseline de testes
