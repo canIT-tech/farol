@@ -44,8 +44,8 @@
   "devDependencies": {
     "@nestjs/cli": "^11.0.24",
     "@nestjs/testing": "^11.2.6",
-    "@stryker-mutator/core": "^8.6.0",
-    "@stryker-mutator/vitest-runner": "^8.6.0",
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/vitest-runner": "^9.6.1",
     "@swc/core": "^1.7.0",
     "@types/node": "^22.0.0",
     "@types/supertest": "^6.0.0",

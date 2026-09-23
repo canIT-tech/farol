@@ -233,7 +233,13 @@ describe("useItineraryPolling — bordas do limite e limpeza", () => {
     vi.stubGlobal("fetch", f);
 
     const { result } = renderHook(() => useItineraryPolling("tok", TRIP_ID));
-    await waitFor(() => expect(result.current.loading).toBe(false));
+    // Não dá para usar waitFor com o relógio congelado: o intervalo dele é um
+    // timer falso e nunca dispara (vitest 4). Avançar 0 ms só esvazia as
+    // promises pendentes — o primeiro fetch resolve e o Date.now não se move.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+    expect(result.current.loading).toBe(false);
 
     // Um passo antes do limite ainda repergunta.
     await act(async () => {

@@ -13,8 +13,8 @@
     "test:mutation": "stryker run"
   },
   "devDependencies": {
-    "@stryker-mutator/core": "^8.6.0",
-    "@stryker-mutator/vitest-runner": "^8.6.0"
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/vitest-runner": "^9.6.1"
   },
   "dependencies": {
     "@farol/shared": "workspace:*"
