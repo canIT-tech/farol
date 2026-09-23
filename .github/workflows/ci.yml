@@ -56,6 +56,9 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Dependência de produção com CVE moderada ou pior quebra o PR. Dev-only
+      # (vitest, vite, CLI do Nest) fica com o Dependabot: não roda no ar.
+      - run: pnpm audit --prod --audit-level=moderate
       # O service do Postgres nao monta docker/init-test-db.sql, entao aqui o
       # banco de teste e criado a mao.
       - run: PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE farol_test"

@@ -26,7 +26,10 @@
   },
   "pnpm": {
     "overrides": {
-      "drizzle-orm": "0.33.0"
+      "drizzle-orm": "0.45.3",
+      "qs": "^6.16.0",
+      "postcss": "^8.5.23",
+      "ajv@^8": "^8.18.0"
     }
   }
 }
