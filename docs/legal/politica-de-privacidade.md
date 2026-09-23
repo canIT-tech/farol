@@ -3,15 +3,15 @@
 > **Texto em revisão jurídica.** Publicado em `/privacy` para o período de teste; os campos
 > `[ENTRE COLCHETES]` são preenchidos antes do lançamento comercial (ver `docs/legal/README.md`).
 
-**Vigência a partir de:** [DATA DE PUBLICAÇÃO]
-**Última atualização:** [DATA]
+**Vigência a partir de:** 23/09/2026
+**Última atualização:** 23/09/2026
 
 Esta Política explica como o **Farol** (`farolviagens.com`), operado por
-**[RAZÃO SOCIAL], CNPJ [00.000.000/0000-00]**, sede em **[ENDEREÇO]** ("nós",
+**IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51**, sede em **Rua Osvaldo Cruz, 1138 E, São Cristóvão, Chapecó/SC, CEP 89803-360** ("nós",
 "operador", "controlador"), trata dados pessoais, em conformidade com a
 **Lei nº 13.709/2018 (LGPD)**.
 
-**Encarregado pelo tratamento de dados pessoais (DPO):** `[E-MAIL DO ENCARREGADO]`.
+**Canal de comunicação sobre dados pessoais:** `privacidade@ignaulin.com`.
 
 ---
 
@@ -74,11 +74,11 @@ indicado:
 | Terceiro | O que recebe | Para quê |
 |---|---|---|
 | **Supabase** (infraestrutura) | conta, perfil, dados de viagem, chat | autenticação, banco de dados e armazenamento |
-| **Anthropic (Claude)** | preferências e dados da viagem, mensagens do chat (sem seu e-mail) | gerar e ajustar o roteiro por IA |
+| **Groq** | preferências e dados da viagem, mensagens do chat (sem seu e-mail) | gerar e ajustar o roteiro por IA |
 | **Google Places** | nome da cidade/região e termos de busca de pontos de interesse | trazer restaurantes e POIs para o roteiro |
 | **Travelpayouts / Aviasales / Hotellook** | parâmetros de busca (origem, destino, datas) ao montar os links; identificador de afiliado (`marker`) no clique | indicações de voo e hospedagem e mensuração de comissão — **controlador independente** quanto à navegação no site do parceiro |
 | **Stripe** (pagamento) | dados que você insere no checkout; e-mail; valor | processar o pagamento — **controlador independente** dos dados do cartão |
-| **[PROVEDOR DE E-MAIL]** | seu e-mail e o conteúdo da mensagem transacional | entregar os e-mails do serviço |
+| **Resend** | seu e-mail e o conteúdo da mensagem transacional | entregar os e-mails do serviço |
 
 > **Analytics não faz parte do MVP** (decisão 2026-08-31: instrumentação de produto
 > fica para uma fase posterior). Quando uma ferramenta de analytics (PostHog) for
@@ -93,7 +93,7 @@ Política.
 
 ## 5. Transferência internacional
 
-Alguns operadores acima (por exemplo, **Anthropic**, **Stripe**, **Supabase**,
+Alguns operadores acima (por exemplo, **Groq**, **Stripe**, **Supabase**,
 **Google**) podem tratar dados **fora do Brasil**. Nesses casos, adotamos as
 salvaguardas do art. 33 da LGPD — cláusulas contratuais padrão e compromissos de
 segurança equivalentes ao padrão brasileiro.
@@ -127,7 +127,7 @@ Você pode, a qualquer tempo:
 - ser informado sobre a possibilidade de **não fornecer** consentimento e as
   consequências.
 
-Para exercer, escreva para `[E-MAIL DO ENCARREGADO]`. Podemos pedir confirmação de
+Para exercer, escreva para `privacidade@ignaulin.com`. Podemos pedir confirmação de
 identidade. Respondemos no prazo legal. Se não ficar satisfeito, você pode reclamar à
 **ANPD** (Autoridade Nacional de Proteção de Dados).
 
@@ -184,5 +184,5 @@ e-mail antes da vigência. A data no topo indica a última atualização.
 
 ## 12. Contato
 
-- Encarregado (DPO): `[E-MAIL DO ENCARREGADO]`
-- Operador: [RAZÃO SOCIAL], CNPJ [00.000.000/0000-00], [ENDEREÇO].
+- Canal de privacidade: `privacidade@ignaulin.com`
+- Operador: IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51, Rua Osvaldo Cruz, 1138 E, São Cristóvão, Chapecó/SC, CEP 89803-360.

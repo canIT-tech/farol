@@ -7,7 +7,7 @@ test.describe("páginas legais", () => {
     const res = await page.goto("/terms");
     expect(res?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Termos de Uso");
-    await expect(page.getByText("7 (sete) dias corridos")).toBeVisible();
+    await expect(page.getByText("7 (sete) dias", { exact: false }).first()).toBeVisible();
     await expect(page.getByText("primeiro roteiro da sua conta")).toBeVisible();
   });
 

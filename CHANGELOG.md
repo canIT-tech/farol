@@ -7,6 +7,14 @@ BREAKING → major. `bin/release` faz o corte; o processo está no skill `ship`.
 
 ## [Unreleased]
 
+### Changed
+- Termos e Privacidade publicados com os dados da isTech (IGNAULIN SOLUCOES TECNOLOGICAS
+  LTDA, CNPJ 49.181.911/0001-51), `contato@ignaulin.com` e `privacidade@ignaulin.com`;
+  provedor de IA corrigido para Groq; uso e compra só para maiores de 18.
+- Arrependimento conforme o CDC art. 49: reembolso integral em até 7 dias, sem a condição
+  de "crédito não usado" (cláusula nula pelo art. 51). Rodapé da landing e da página de
+  compra identifica o fornecedor (Decreto 7.962/2013, art. 2º).
+
 ## [0.1.1] - 2026-09-23
 
 ### Security

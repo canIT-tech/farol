@@ -1,5 +1,6 @@
 "use client";
 
+import { COMPANY_IDENTIFICATION } from "../lib/company";
 import { type FormEvent, useState } from "react";
 import { submitWaitlist } from "../lib/waitlist";
 import AppEntry from "./_landing/AppEntry";
@@ -187,8 +188,10 @@ export default function HomePage() {
       </main>
 
       <footer className="wrap">
-        Farol · assessor de viagem · nome de trabalho · <a href="/terms">Termos</a> ·{" "}
+        Farol · assessor de viagem · <a href="/terms">Termos</a> ·{" "}
         <a href="/privacy">Privacidade</a>
+        <br />
+        {COMPANY_IDENTIFICATION}
       </footer>
     </div>
   );

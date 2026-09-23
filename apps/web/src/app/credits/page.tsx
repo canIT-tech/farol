@@ -1,5 +1,6 @@
 "use client";
 
+import { COMPANY_IDENTIFICATION } from "../../lib/company";
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -117,9 +118,11 @@ function Creditos({ token }: { token: string }) {
         ) : null}
 
         <p className="credits__footer">
-          Arrependeu? Reembolso integral em até 7 dias, se o crédito não foi usado. O pagamento é
-          feito na Stripe; não guardamos dados do cartão. <Link href="/terms">Termos</Link> ·{" "}
+          Arrependeu? Reembolso integral em até 7 dias (CDC, art. 49). O pagamento é feito na
+          Stripe; não guardamos dados do cartão. <Link href="/terms">Termos</Link> ·{" "}
           <Link href="/privacy">Privacidade</Link>
+          <br />
+          {COMPANY_IDENTIFICATION}
         </p>
       </div>
     </main>

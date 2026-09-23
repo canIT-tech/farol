@@ -19,6 +19,12 @@ test("sem sessão a landing oferece Entrar", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Entrar", exact: true })).toHaveAttribute("href", "/login");
 });
 
+// Decreto 7.962/2013, art. 2º: identificação do fornecedor visível no site.
+test("rodapé da landing identifica o fornecedor", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("footer")).toContainText("CNPJ 49.181.911/0001-51");
+});
+
 test("com sessão: landing → Minhas viagens → Continuar → Sair", async ({ page }) => {
   await installSession(page);
 
