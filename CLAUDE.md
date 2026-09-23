@@ -129,6 +129,25 @@ Canvases publicados (Claude Artifacts):
 
 ---
 
+<!-- ship:start — gerido pelo skill `ship` (~/.claude/skills/ship). Só fatos deste projeto; o método mora no skill. -->
+## Shipping (deploy, CI, release)
+
+Desenvolvimento: Superpowers. Do teste verde até produção: skill **`ship`**.
+
+**Recursos fixados** — os únicos em que uma sessão pode escrever:
+- Repo `canIT-tech/farol` · Render workspace `tea-dac2m3ou01pc73fjhhq0`, serviço `srv-dacanevavr4c73fpn8tg` (https://farol-ekk3.onrender.com)
+- Supabase `vvmnkqgdtgvdhheoqvjt` (**compartilhado** com o felippebutland — migração só com autorização explícita)
+- Doppler `farol` (`dev`, `prd`; `stg` e `dev_personal` existem, sem uso no deploy) · Sentry `canit/farol`
+
+**Gates** (local == CI): `pnpm lint && pnpm typecheck && pnpm build && pnpm test && pnpm test:e2e`, mais o boot smoke. Rodar local com Postgres do `docker compose`, **nunca** com o `DATABASE_URL` do Doppler.
+- Todo fix/mudança de comportamento vem com teste de regressão que falha no código antigo.
+- Mudança visível ao usuário → entrada em `## [Unreleased]` do `CHANGELOG.md`, no mesmo PR.
+
+**Deploy:** merge na `main` → Render deploya depois do CI verde (`autoDeployTrigger: checksPass`). A `main` não tem proteção de branch (repo privado de org no plano free); o gatilho do Render é a trava.
+
+**Pronto** = merge → deploy → `/api/health` mostra o SHA → Sentry recebeu evento → `bin/release` (tag anotada no SHA verificado).
+<!-- ship:end -->
+
 ## Baseline de testes
 
 **Regra:** nenhum passo do backlog é dado como concluído sem testes. Todo PR passa

@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# bin/release [X.Y.Z] — cut a release of the SHA verified live. Never pushes.
+# Adapted from akitaonrails/ai-memory bin/release; see ~/.claude/skills/ship/references/release.md
+set -euo pipefail
+
+cl=CHANGELOG.md
+[ -z "$(git status --porcelain)" ] || { echo "dirty tree"; exit 1; }
+[ "$(git branch --show-current)" = main ] || { echo "not on main"; exit 1; }
+
+unreleased=$(awk '/^## \[Unreleased\]/{f=1;next} /^## \[/{f=0} f' "$cl")
+echo "$unreleased" | grep -q '[^[:space:]]' || { echo "Unreleased is empty, nothing to release"; exit 1; }
+
+last=$(git describe --tags --abbrev=0 2>/dev/null || echo v0.0.0)
+IFS=. read -r ma mi pa <<<"${last#v}"
+if echo "$unreleased" | grep -qi 'BREAKING'; then next="$((ma+1)).0.0"
+elif echo "$unreleased" | grep -qE '^### (Added|Changed|Removed|Deprecated)'; then next="$ma.$((mi+1)).0"
+else next="$ma.$mi.$((pa+1))"; fi
+
+if [ $# -ge 1 ]; then
+  [[ $1 =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "not semver: $1"; exit 1; }
+  [ "$1" = "$next" ] || { echo "requested $1 but Unreleased implies $next — confirm"; exit 1; }
+fi
+tag="v$next"
+git rev-parse -q --verify "refs/tags/$tag" >/dev/null && { echo "$tag exists"; exit 1; }
+
+today=$(date -u +%F)
+awk -v v="$next" -v d="$today" '
+  /^## \[Unreleased\]/ && !done { print; print ""; print "## [" v "] - " d; done=1; next }
+  { print }' "$cl" > "$cl.tmp" && mv "$cl.tmp" "$cl"
+
+git add "$cl"
+git commit -q -m "release: $tag"
+printf 'Release %s\n\n%s\n' "$tag" "$unreleased" | git tag -a --cleanup=verbatim "$tag" -F -
+
+echo "$tag created on $(git rev-parse --short HEAD). Next:"
+echo "  git push origin main && git push origin $tag"

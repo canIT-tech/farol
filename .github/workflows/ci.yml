@@ -4,6 +4,16 @@ on:
   push:
     branches: [main]
   pull_request: {}
+  workflow_dispatch: {}
+
+# Token só de leitura; um job que precise de mais declara o que precisa.
+permissions:
+  contents: read
+
+# Um push novo na mesma branch torna a execução anterior ruído.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check:
@@ -37,9 +47,11 @@ jobs:
       # Pagamento: provider determinístico, nada bate na Stripe no CI.
       PAYMENT_PROVIDER: fake
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: pnpm
@@ -67,3 +79,38 @@ jobs:
       # não faz hoisting, então `pnpm exec` na raiz não acha o binário.
       - run: pnpm --filter @farol/web exec playwright install --with-deps chromium
       - run: pnpm test:e2e
+
+  # CHANGELOG é gate de merge: seção já lançada não se edita. A entrada em
+  # [Unreleased] para mudança visível ao usuário é cobrada na revisão (ver
+  # "Shipping" no CLAUDE.md) — o CI não distingue visível de interno.
+  changelog:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: seções lançadas são imutáveis
+        run: |
+          base="origin/${{ github.base_ref }}"
+          git cat-file -e "$base:CHANGELOG.md" 2>/dev/null || exit 0
+          old=$(git show "$base:CHANGELOG.md" | sed -n '/^## \[[0-9]/,$p')
+          new=$(sed -n '/^## \[[0-9]/,$p' CHANGELOG.md)
+          [ "$old" = "$new" ] || { echo "uma seção já lançada do CHANGELOG foi editada"; exit 1; }
+
+  # Varredura de segredo em todo o histórico alcançável do push/PR.
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      # CLI em container, fixado por digest. A gitleaks-action exige licença
+      # paga em repositório de organização; o binário é o mesmo e é livre.
+      - name: gitleaks (v8.30.1)
+        run: |
+          docker run --rm -v "$PWD:/repo" \
+            ghcr.io/gitleaks/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f \
+            git /repo --redact --verbose

@@ -37,3 +37,4 @@ test-results/
 # Claude Code — permissões pessoais desta máquina
 .claude/settings.local.json
 
+.pnpm-store/
