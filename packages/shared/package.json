@@ -12,9 +12,9 @@
     "test": "vitest run --coverage",
     "test:mutation": "stryker run"
   },
-  "dependencies": { "zod": "^3.25.76" },
+  "dependencies": { "zod": "^4.6.5" },
   "devDependencies": {
-    "@stryker-mutator/core": "^9.6.1",
-    "@stryker-mutator/vitest-runner": "^9.6.1"
+    "@stryker-mutator/core": "^10.0.0",
+    "@stryker-mutator/vitest-runner": "^10.0.0"
   }
 }
