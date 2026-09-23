@@ -143,7 +143,7 @@ Desenvolvimento: Superpowers. Do teste verde até produção: skill **`ship`**.
 - Todo fix/mudança de comportamento vem com teste de regressão que falha no código antigo.
 - Mudança visível ao usuário → entrada em `## [Unreleased]` do `CHANGELOG.md`, no mesmo PR.
 
-**`main` só por PR** — inclusive o commit de release —, sem revisor obrigatório. A proteção de branch não pode ser ligada hoje: repo privado de org no plano free do GitHub (403 em branch protection e rulesets). Até virar GitHub Team ou repo público, a regra vale por convenção.
+**`main` só por PR** — inclusive o commit de release —, sem revisor obrigatório. Proteção ligada por API (2026-09-23): checks `check` e `secrets` obrigatórios, vale para admin, sem force-push. Repo **público** desde 2026-09-23, com secret scanning + push protection, Dependabot e reporte privado de vulnerabilidade.
 
 **Deploy:** merge na `main` → Render deploya. `autoDeployTrigger: checksPass` está no `render.yaml`, mas o serviço foi criado pelo dashboard e ainda não lê o arquivo (ver `docs/SETUP.md`/skill `ship`).
 
