@@ -58,7 +58,7 @@ describe("getRouteOffers", () => {
   // reprovaria a data. O parâmetro precisa sumir, não virar texto.
   it("omite a volta na ida só", async () => {
     const f = fakeFetch();
-    await getRouteOffers("tok", base, f as unknown as typeof fetch);
+    await getRouteOffers("tok", { ...base, return: undefined }, f as unknown as typeof fetch);
     const url = urlOf(f);
     expect(url).not.toContain("return=");
     expect(url).toContain("depart=2027-02-11");

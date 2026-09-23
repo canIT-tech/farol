@@ -50,19 +50,26 @@ export class FlightsService {
   // informação boa. Sem catálogo e sem provider, fica nulo e a UI cai no código
   // cru — nunca em um nome inventado.
   async enrich(offers: FlightOffer[]): Promise<FlightOffer[]> {
-    const airportNames = new Map<string, string | null>();
-    const airlineNames = new Map<string, string | null>();
+    // Guarda a promise, não o valor: as ofertas resolvem em paralelo, e um mapa
+    // de valores só é preenchido depois que todas já perguntaram — dez ofertas
+    // da mesma companhia viravam dez consultas.
+    const airportNames = new Map<string, Promise<string | null>>();
+    const airlineNames = new Map<string, Promise<string | null>>();
 
-    const resolve = async <T extends { name: string }>(
-      cacheMap: Map<string, string | null>,
+    const resolve = <T extends { name: string }>(
+      cacheMap: Map<string, Promise<string | null>>,
       code: string,
       load: (code: string) => Promise<T | null>
     ): Promise<string | null> => {
-      if (!cacheMap.has(code)) {
-        const found = await load(code).catch(() => null);
-        cacheMap.set(code, found === null ? null : found.name);
+      let name = cacheMap.get(code);
+      if (name === undefined) {
+        name = load(code).then(
+          (found) => (found === null ? null : found.name),
+          () => null
+        );
+        cacheMap.set(code, name);
       }
-      return cacheMap.get(code) ?? null;
+      return name;
     };
 
     return Promise.all(

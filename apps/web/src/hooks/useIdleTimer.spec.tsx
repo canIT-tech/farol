@@ -67,6 +67,11 @@ describe("useIdleTimer", () => {
     act(() => {
       vi.advanceTimersByTime(MS * 3);
     });
+    // Atividade depois do disparo não rearma o timer.
+    activity("pointerdown");
+    act(() => {
+      vi.advanceTimersByTime(MS * 3);
+    });
     expect(onIdle).toHaveBeenCalledOnce();
   });
 

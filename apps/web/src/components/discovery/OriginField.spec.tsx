@@ -95,6 +95,25 @@ describe("OriginField — busca no catálogo", () => {
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
   });
 
+  // Quem digita rápido dispara várias buscas; a resposta de um termo antigo que
+  // chega por último não pode trocar a lista pelo resultado velho.
+  it("ignora a resposta atrasada de um termo que já mudou", async () => {
+    let releaseOld: (a: Airport[]) => void = () => {};
+    const stale: Airport = { ...gru, iata: "GIG", name: "Rio — Galeão" };
+    const findAirports = vi.fn((_: string, term: string) =>
+      term === "gu" ? new Promise<Airport[]>((r) => (releaseOld = r)) : Promise.resolve([gru])
+    );
+    render(<OriginField token="tok" value="" onChange={vi.fn()} detectOrigin={noDetect} findAirports={findAirports} />);
+
+    await userEvent.type(screen.getByLabelText("Saindo de"), "gua");
+    expect(await screen.findByRole("button", { name: "São Paulo — Guarulhos (GRU)" })).toBeInTheDocument();
+
+    releaseOld([stale]);
+    await waitFor(() => expect(findAirports).toHaveBeenCalledWith("tok", "gua"));
+    expect(screen.queryByRole("button", { name: /Galeão/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "São Paulo — Guarulhos (GRU)" })).toBeInTheDocument();
+  });
+
   it("lista os aeroportos encontrados a partir de duas letras", async () => {
     const findAirports = vi.fn(() => Promise.resolve([gru]));
     render(<OriginField token="tok" value="" onChange={vi.fn()} detectOrigin={noDetect} findAirports={findAirports} />);
