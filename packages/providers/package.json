@@ -16,12 +16,12 @@
     "record:google-flights": "node scripts/record-google-flights.mjs"
   },
   "devDependencies": {
-    "@stryker-mutator/core": "^8.6.0",
-    "@stryker-mutator/vitest-runner": "^8.6.0",
-    "@types/node": "^22.0.0"
+    "@stryker-mutator/core": "^10.0.0",
+    "@stryker-mutator/vitest-runner": "^10.0.0",
+    "@types/node": "^26.6.2"
   },
   "dependencies": {
     "@farol/shared": "workspace:^",
-    "p-retry": "^8.0.0"
+    "p-retry": "^8.0.1"
   }
 }
