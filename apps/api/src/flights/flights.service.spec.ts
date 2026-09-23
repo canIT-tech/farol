@@ -143,6 +143,44 @@ describe("FlightsService", () => {
     expect(cached[0]?.provider).toBe("travelpayouts-flight");
   });
 
+  // Catálogo fora do ar não pode derrubar a busca: o nome que o provider trouxe
+  // continua valendo, e o que não tinha nome segue nulo.
+  it("enrich mantém o nome do provider quando o catálogo falha", async () => {
+    const brokenGeo = {
+      findAirline: () => Promise.reject(new Error("catálogo fora do ar")),
+      findAirport: () => Promise.reject(new Error("catálogo fora do ar"))
+    } as unknown as GeoService;
+    const service = new FlightsService(db, new FakeFlightProvider(), env, cache, trips, brokenGeo);
+    const offer = { ...FAKE_FLIGHT_OFFERS[0]!, carrierName: "TAP Air Portugal", originName: null };
+
+    const [enriched] = await service.enrich([offer]);
+
+    expect(enriched!.carrierName).toBe("TAP Air Portugal");
+    expect(enriched!.originName).toBeNull();
+  });
+
+  // Dez ofertas da mesma companhia não viram dez consultas ao catálogo.
+  it("enrich consulta cada código uma vez só", async () => {
+    const findAirline = vi.fn(() => Promise.resolve({ code: "TP", name: "TAP Air Portugal", isLowcost: false }));
+    const findAirport = vi.fn((iata: string) => Promise.resolve(iata === "GRU" ? { name: "Guarulhos" } : null));
+    const countingGeo = { findAirline, findAirport } as unknown as GeoService;
+    const service = new FlightsService(db, new FakeFlightProvider(), env, cache, trips, countingGeo);
+    const offer = {
+      ...FAKE_FLIGHT_OFFERS[0]!,
+      carrier: "TP",
+      carrierName: null,
+      originIata: "GRU",
+      originName: "nome do provider"
+    };
+
+    const enriched = await service.enrich([offer, { ...offer, id: "outra" }]);
+
+    expect(findAirline).toHaveBeenCalledOnce();
+    expect(enriched.map((o) => o.carrierName)).toEqual(["TAP Air Portugal", "TAP Air Portugal"]);
+    // Catálogo vence o nome do provider quando tem o código.
+    expect(enriched[0]!.originName).toBe("Guarulhos");
+  });
+
   it("search degrada para { offers: [], error: 'unavailable' } e loga o evento quando o provider falha", async () => {
     const service = new FlightsService(db, new FakeFlightProvider({ fail: true }), env, cache, trips, geo);
     const userId = await makeUser();

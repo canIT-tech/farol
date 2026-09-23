@@ -35,7 +35,6 @@ export function useItineraryPolling(token: string, tripId: string): ItineraryPol
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stalled, setStalled] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Marco de início da espera, num ref: entra na conta do limite sem reiniciar
   // o efeito de polling a cada resposta.
   const waitingSince = useRef<number>(Date.now());
@@ -73,12 +72,8 @@ export function useItineraryPolling(token: string, tripId: string): ItineraryPol
       setStalled(true);
       return;
     }
-    timer.current = setTimeout(() => void load(), POLL_MS);
-    return () => {
-      if (timer.current !== null) {
-        clearTimeout(timer.current);
-      }
-    };
+    const pending = setTimeout(() => void load(), POLL_MS);
+    return () => clearTimeout(pending);
   }, [itinerary, load]);
 
   return { itinerary, loading, error, stalled, refetch };

@@ -61,6 +61,13 @@ describe("priceLevelsBetween", () => {
   it("faixa invertida devolve lista vazia", () => {
     expect(priceLevelsBetween(3, 1)).toEqual([]);
   });
+
+  it("ignora nível fora de 0..4 em vez de mandar enum inválido ao Places", () => {
+    expect(priceLevelsBetween(3, 6)).toEqual([
+      "PRICE_LEVEL_EXPENSIVE",
+      "PRICE_LEVEL_VERY_EXPENSIVE"
+    ]);
+  });
 });
 
 describe("GooglePlacesProvider.textSearch", () => {
