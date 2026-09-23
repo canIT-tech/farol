@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
-import { APP_GUARD } from "@nestjs/core";
+import { APP_FILTER, APP_GUARD } from "@nestjs/core";
+import { SentryGlobalFilter, SentryModule } from "@sentry/nestjs/setup";
 import { ConfigModule } from "./config/config.module";
 import { DbModule } from "./db/db.module";
 import { CreditsModule } from "./credits/credits.module";
@@ -24,6 +25,7 @@ import { PaymentsModule } from "./payments/payments.module";
 
 @Module({
   imports: [
+    SentryModule.forRoot(),
     ConfigModule,
     DbModule,
     CreditsModule,
@@ -48,7 +50,14 @@ import { PaymentsModule } from "./payments/payments.module";
   // Guard global: toda rota exige credencial, e abrir uma vira um @Public()
   // explícito no controller. O arranjo anterior era o inverso — cada controller
   // lembrava do @UseGuards, e esquecer publicava a rota sem que nada acusasse.
-  providers: [{ provide: APP_GUARD, useClass: AuthGuard }]
+  // SentryGlobalFilter reporta ao Sentry só o que não é HttpException (erro de
+  // verdade, não 4xx esperado) e devolve a resposta padrão do Nest. Filtros
+  // mais específicos, como o DomainExceptionFilter do ProfileModule, continuam
+  // valendo para os erros que eles declaram.
+  providers: [
+    { provide: APP_FILTER, useClass: SentryGlobalFilter },
+    { provide: APP_GUARD, useClass: AuthGuard }
+  ]
 })
 export class AppModule {}
 
