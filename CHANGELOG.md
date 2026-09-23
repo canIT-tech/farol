@@ -7,6 +7,8 @@ BREAKING → major. `bin/release` faz o corte; o processo está no skill `ship`.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-23
+
 ### Security
 - NestJS 10 → 11 (Express 5, multer 2.4, file-type 21.3), drizzle-orm 0.33 → 0.45.3 e
   qs/postcss/ajv em versões corrigidas: zera as CVEs moderadas e altas das dependências
