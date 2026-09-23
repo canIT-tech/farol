@@ -3,13 +3,13 @@
 > **Texto em revisão jurídica.** Publicado em `/terms` para o período de teste; os campos
 > `[ENTRE COLCHETES]` são preenchidos antes do lançamento comercial (ver `docs/legal/README.md`).
 
-**Vigência a partir de:** [DATA DE PUBLICAÇÃO]
-**Última atualização:** [DATA]
+**Vigência a partir de:** 23/09/2026
+**Última atualização:** 23/09/2026
 
 Estes Termos de Uso ("Termos") regem o acesso e o uso do **Farol** ("Farol",
 "plataforma", "serviço"), site e aplicativo disponíveis em `farolviagens.com`,
-operados por **[RAZÃO SOCIAL], CNPJ [00.000.000/0000-00]**, com sede em
-**[ENDEREÇO COMPLETO]** ("nós", "operador").
+operados por **IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51**, com sede em
+**Rua Osvaldo Cruz, 1138 E, São Cristóvão, Chapecó/SC, CEP 89803-360** ("nós", "operador").
 
 Ao criar uma conta, entrar na lista de espera ou usar o Farol de qualquer forma,
 você ("usuário", "você") declara que leu, entendeu e concorda com estes Termos e
@@ -56,9 +56,7 @@ não responde por ela (ver seções 8 e 13).
 
 ## 3. Elegibilidade
 
-Você deve ter **18 anos ou mais** e capacidade civil plena para usar o Farol. Menores
-de 18 anos só podem usar o serviço sob supervisão e responsabilidade de um dos pais ou
-do responsável legal, que responde pelo uso.
+Você deve ter **18 anos ou mais** e capacidade civil plena para usar e comprar no Farol.
 
 ---
 
@@ -67,7 +65,7 @@ do responsável legal, que responde pelo uso.
 - O acesso ao app exige cadastro com e-mail. A autenticação é feita por meio de provedor
   terceiro de identidade (ver Política de Privacidade).
 - Você é responsável por manter a confidencialidade das suas credenciais e por toda
-  atividade na sua conta. Avise-nos em `[E-MAIL DE CONTATO]` se suspeitar de uso não
+  atividade na sua conta. Avise-nos em `contato@ignaulin.com` se suspeitar de uso não
   autorizado.
 - Você se compromete a fornecer informações verdadeiras e mantê-las atualizadas.
 - Podemos suspender ou encerrar contas que violem estes Termos (ver seção 12).
@@ -82,8 +80,8 @@ autônomo), com tudo incluído: destino, roteiro dia a dia, ajustes por conversa
 indicações de voo e hospedagem. Uso único por conta.
 
 ### 5.2 Planos pagos
-- **Viagem avulsa:** R$ [39,00] — **1 crédito**.
-- **Pacote:** R$ [89,00] — **3 créditos**.
+- **Viagem avulsa:** R$ 39,00 — **1 crédito**.
+- **Pacote:** R$ 89,00 — **3 créditos**.
 - Os créditos **não expiram**. Cada crédito destrava o roteiro completo de **uma viagem**
   (descoberta com seleção de destino, roteiro dia a dia, chat de ajuste ilimitado naquela
   viagem e indicações de voo e hospedagem).
@@ -106,19 +104,11 @@ Se, por falha técnica nossa, um roteiro não for gerado, o crédito corresponde
 ## 6. Direito de arrependimento e reembolso
 
 Nos termos do **art. 49 do Código de Defesa do Consumidor**, você pode desistir da
-compra em até **7 (sete) dias corridos** contados da confirmação do pagamento:
+compra em até **7 (sete) dias**, a contar da contratação ou do recebimento do serviço, com
+devolução **integral e imediata** do valor pago, monetariamente atualizado.
 
-- **Nenhum crédito daquela compra utilizado:** reembolso **integral**.
-- **Pacote com parte dos créditos utilizada:** reembolso **proporcional aos créditos não
-  utilizados** (valor do pacote dividido pelo número de créditos).
-- **Após 7 dias, ou com todos os créditos da compra utilizados:** não há reembolso em
-  dinheiro, salvo falha comprovada do serviço, caso em que se aplica a devolução de
-  crédito da seção 5.4.
-- Créditos já utilizados **não são reembolsados**: o estorno devolve apenas os créditos
-  não usados daquela compra, e eles saem da sua conta no momento do estorno.
-
-Solicite o reembolso por `[E-MAIL DE CONTATO]`. O estorno é feito pelo mesmo meio de
-pagamento, no prazo da processadora.
+Solicite o reembolso por `contato@ignaulin.com`. O estorno é feito no cartão usado na
+compra, pela Stripe.
 
 ---
 
@@ -200,7 +190,7 @@ de terceiros.
   descontinuar funcionalidades, e fazer manutenções que interrompam o acesso.
 - Podemos **encerrar ou suspender** seu acesso em caso de violação destes Termos, uso
   fraudulento ou risco à plataforma ou a terceiros. Quando possível, avisaremos antes.
-- Você pode encerrar sua conta a qualquer momento por `[E-MAIL DE CONTATO]`. **Créditos
+- Você pode encerrar sua conta a qualquer momento por `contato@ignaulin.com`. **Créditos
   não utilizados** na data do encerramento por iniciativa sua, fora da hipótese de
   reembolso da seção 6, **não são reembolsáveis**, salvo disposição legal em contrário.
 - Se **nós** descontinuarmos o serviço por completo, comunicaremos com antecedência
@@ -239,12 +229,12 @@ significa concordância. Se não concordar, encerre a conta antes da data indica
 ## 15. Lei aplicável e foro
 
 Estes Termos são regidos pela lei brasileira. Fica eleito o foro da comarca de
-**[CIDADE/UF]**, sem prejuízo de o consumidor optar pelo foro do seu domicílio.
+**Chapecó/SC**, sem prejuízo de o consumidor optar pelo foro do seu domicílio.
 
 ---
 
 ## 16. Contato
 
-- Dúvidas sobre estes Termos: `[E-MAIL DE CONTATO]`
-- Assuntos de privacidade e dados: `[E-MAIL DO ENCARREGADO/DPO]`
-- Operador: [RAZÃO SOCIAL], CNPJ [00.000.000/0000-00], [ENDEREÇO].
+- Dúvidas sobre estes Termos: `contato@ignaulin.com`
+- Assuntos de privacidade e dados: `privacidade@ignaulin.com`
+- Operador: IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51, Rua Osvaldo Cruz, 1138 E, São Cristóvão, Chapecó/SC, CEP 89803-360.

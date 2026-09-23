@@ -16,6 +16,13 @@
 Ambos linkados no rodapé da landing e no formulário da waitlist (checkbox de aceite +
 link), e no fluxo de cadastro/checkout do app.
 
+## Fonte dos dados da empresa (2026-09-23)
+
+Operadora: **isTech** (IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51).
+Dados da empresa, requisitos legais e pendências moram em
+`github.com/rafaignaulin/istech-org` (fonte única para todos os produtos da isTech). Ainda
+em aberto aqui: prazos de retenção (§6 da Privacidade) — trilha "conformidade 100%".
+
 ## Placeholders a preencher antes de publicar
 
 Todo `[ENTRE COLCHETES]` nos dois documentos é fato que só o time tem. Lista:

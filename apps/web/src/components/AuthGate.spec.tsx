@@ -92,10 +92,15 @@ describe("AuthGate", () => {
     render(mostrar());
     await screen.findByText("token: tok-1");
 
-    act(() => {
-      vi.advanceTimersByTime(IDLE_MS);
+    // O timer só arma no efeito que roda depois de a sessão chegar; num runner lento
+    // o avanço podia acontecer antes disso e nada disparava (flaky no CI). Primeiro
+    // esvazia os efeitos pendentes; depois avança em modo assíncrono, que também
+    // resolve a promise do signOut. Sem waitFor aqui: o intervalo dele é timer falso.
+    await act(async () => {});
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(IDLE_MS);
     });
-    await waitFor(() => expect(signOut).toHaveBeenCalledOnce());
+    expect(signOut).toHaveBeenCalledOnce();
     await waitFor(() => expect(replace).toHaveBeenCalledWith("/login"));
   });
 

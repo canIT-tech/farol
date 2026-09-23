@@ -181,6 +181,24 @@ describe("OriginField — busca no catálogo", () => {
     await userEvent.type(screen.getByLabelText("Saindo de"), "gua");
     await waitFor(() => expect(screen.queryByRole("listbox")).not.toBeInTheDocument());
   });
+  // A falha de um termo antigo que chega por último não pode apagar a lista do termo
+  // atual. Controlado à mão: com promises que rejeitam na hora, a ordem dependia do
+  // agendador e a cobertura desse ramo oscilava entre execuções.
+  it("ignora a falha atrasada de um termo que já mudou", async () => {
+    let failOld: (e: Error) => void = () => {};
+    const findAirports = vi.fn((_: string, term: string) =>
+      term === "gu" ? new Promise<Airport[]>((_r, reject) => (failOld = reject)) : Promise.resolve([gru])
+    );
+    render(<OriginField token="tok" value="" onChange={vi.fn()} detectOrigin={noDetect} findAirports={findAirports} />);
+
+    await userEvent.type(screen.getByLabelText("Saindo de"), "gua");
+    expect(await screen.findByRole("button", { name: "São Paulo — Guarulhos (GRU)" })).toBeInTheDocument();
+
+    failOld(new Error("503"));
+    await waitFor(() => expect(findAirports).toHaveBeenCalledWith("tok", "gua"));
+    expect(screen.getByRole("button", { name: "São Paulo — Guarulhos (GRU)" })).toBeInTheDocument();
+  });
+
   it("a lista some quando o foco sai do campo e volta ao focar de novo", async () => {
     render(
       <OriginField

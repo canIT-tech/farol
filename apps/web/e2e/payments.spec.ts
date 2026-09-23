@@ -110,6 +110,18 @@ test.describe("créditos", () => {
     await expect(page.getByRole("status")).toContainText("ainda não está aberta");
   });
 
+  // CDC art. 49: 7 dias sem condição de "crédito não usado" (cláusula que tira o
+  // reembolso é nula, art. 51). E a identificação do fornecedor na página de compra.
+  test("página de compra: reembolso sem condição e fornecedor identificado", async ({ page }) => {
+    await installSession(page);
+    await page.route(`${API}/payments/me`, (route) => route.fulfill(json(me(0, true))));
+    await page.goto("/credits");
+    const footer = page.locator(".credits__footer");
+    await expect(footer).toContainText("Reembolso integral em até 7 dias");
+    await expect(footer).not.toContainText("não foi usado");
+    await expect(footer).toContainText("CNPJ 49.181.911/0001-51");
+  });
+
   test("cancelado não cobra e volta", async ({ page }) => {
     await installSession(page);
     await page.goto("/payment/cancelled");
