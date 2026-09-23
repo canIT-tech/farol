@@ -26,6 +26,9 @@ const baseEnvSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
   STRIPE_PRICE_SINGLE: z.string().min(1).optional(),
   STRIPE_PRICE_PACK3: z.string().min(1).optional(),
+  // Monitoramento. Lido pelo src/instrument.ts antes do Nest subir; declarado
+  // aqui para o boot recusar um DSN malformado em vez de perder erros calado.
+  SENTRY_DSN: z.string().url().optional(),
   // Origem pública do web: monta success_url/cancel_url do checkout.
   APP_URL: z.string().url().default("http://localhost:3000"),
   JOBS_SCHEMA: z.string().min(1).default("pgboss"),

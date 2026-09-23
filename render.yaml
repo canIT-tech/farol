@@ -14,6 +14,14 @@ services:
     plan: free
     region: oregon
     branch: main
+    # Deploy só depois do CI verde no commit: a branch main não tem proteção
+    # (repo privado de org no plano free do GitHub), então é aqui que se garante
+    # que código vermelho não vai ao ar.
+    autoDeployTrigger: checksPass
+    # O commit de release só mexe no CHANGELOG: não redeploya, e o código da tag
+    # fica idêntico ao SHA verificado no ar.
+    buildFilter:
+      ignoredPaths: [CHANGELOG.md, "docs/**"]
     # Migration e seed ficam FORA do build: o banco é compartilhado com outra
     # pessoa, então migrar roda por MCP com autorização explícita, só quando o
     # schema mudar.
@@ -68,6 +76,9 @@ services:
       - key: LLM_MODEL_CHEAP
         value: openai/gpt-oss-20b
       - key: LLM_API_KEY
+        sync: false
+      # Monitoramento (Sentry, projeto canit/farol). Vem do Doppler farol/prd.
+      - key: SENTRY_DSN
         sync: false
       # Pagamento (Passo 11) — Stripe. Sandbox até a conta live da isTech existir.
       - key: PAYMENT_PROVIDER

@@ -1,3 +1,5 @@
+// Primeiro import de propósito: o Sentry instrumenta o que for carregado depois.
+import "./instrument";
 import "reflect-metadata";
 import { resolve } from "node:path";
 import { NestFactory } from "@nestjs/core";

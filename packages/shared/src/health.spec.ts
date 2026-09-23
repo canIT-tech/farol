@@ -6,7 +6,8 @@ describe("healthResponseSchema", () => {
     const ok = healthResponseSchema.parse({
       status: "ok",
       checks: { db: "up" },
-      version: "0.0.0"
+      version: "0.0.0",
+      sha: "dev"
     });
     expect(ok.status).toBe("ok");
   });
@@ -15,7 +16,8 @@ describe("healthResponseSchema", () => {
     const degraded = healthResponseSchema.parse({
       status: "degraded",
       checks: { db: "down" },
-      version: "1.2.3"
+      version: "1.2.3",
+      sha: "a0660ab"
     });
     expect(degraded.status).toBe("degraded");
     expect(degraded.checks.db).toBe("down");
@@ -24,6 +26,12 @@ describe("healthResponseSchema", () => {
   it("rejeita status fora do enum", () => {
     expect(() =>
       healthResponseSchema.parse({ status: "fine", checks: { db: "up" }, version: "0.0.0" })
+    ).toThrow();
+  });
+
+  it("rejeita payload sem sha", () => {
+    expect(() =>
+      healthResponseSchema.parse({ status: "ok", checks: { db: "up" }, version: "0.0.0" })
     ).toThrow();
   });
 

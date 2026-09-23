@@ -7,7 +7,7 @@ afterEach(() => {
   else process.env.NEXT_PUBLIC_API_URL = originalApiUrl;
 });
 
-const okBody = { status: "ok", checks: { db: "up" }, version: "0.0.0" };
+const okBody = { status: "ok", checks: { db: "up" }, version: "0.0.0", sha: "dev" };
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {

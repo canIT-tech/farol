@@ -1,6 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/stryker-mutator/stryker-js/master/packages/api/schema/stryker-schema.json",
+  "_comment": "dryRunTimeoutMinutes: o default de 5 min estourou no nightly (turbo roda a mutação de todos os pacotes em paralelo e o dry run do web ficava sem CPU — 'Initial test run timed out' toda noite desde 2026-09-15). Mesmo valor e motivo do @farol/api; hang de verdade ainda quebra.",
   "testRunner": "vitest",
+  "dryRunTimeoutMinutes": 15,
   "plugins": ["@stryker-mutator/vitest-runner"],
   "reporters": ["progress", "clear-text", "html"],
   "mutate": ["src/lib/**/*.ts", "!src/**/*.spec.ts", "!src/lib/supabase.ts"],
