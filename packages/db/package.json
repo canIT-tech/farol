@@ -17,14 +17,14 @@
     "research:destinations": "node scripts/research-destinations.mjs"
   },
   "dependencies": {
-    "drizzle-orm": "^0.33.0",
+    "drizzle-orm": "^0.45.2",
     "pg": "^8.23.0",
     "postgres": "^3.4.4"
   },
   "devDependencies": {
-    "@stryker-mutator/core": "^8.6.0",
-    "@stryker-mutator/vitest-runner": "^8.6.0",
-    "drizzle-kit": "^0.24.0",
-    "tsx": "^4.19.0"
+    "@stryker-mutator/core": "^10.0.0",
+    "@stryker-mutator/vitest-runner": "^10.0.0",
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.23.15"
   }
 }
