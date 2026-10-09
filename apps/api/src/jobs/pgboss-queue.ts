@@ -74,6 +74,11 @@ export class PgBossQueue implements JobQueue, OnModuleInit, OnModuleDestroy {
       schema: config.schema,
       supervise: true
     });
+    // Sem listener, um 'error' do pool (ex.: 57P01 quando o Postgres derruba as
+    // conexões) vira uncaughtException e mata o processo. O pool reconecta sozinho.
+    this.boss.on("error", (error: Error) => {
+      console.error(JSON.stringify({ event: "job_queue_error", message: error.message }));
+    });
   }
 
   async onModuleInit(): Promise<void> {
