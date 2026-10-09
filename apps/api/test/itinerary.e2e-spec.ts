@@ -28,7 +28,7 @@ const tripBody = {
   party: { adults: 2, children: 0 },
   budgetTotal: 30000,
   durationDays: 3,
-  targetMonth: "2026-09"
+  targetMonth: "2030-09"
 };
 
 async function newUser() {

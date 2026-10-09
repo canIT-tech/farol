@@ -86,7 +86,7 @@ describe("chat e2e", () => {
         budgetTotal: 5000,
         durationDays: 5,
         // tripInputSchema exige datas OU durationDays + targetMonth.
-        targetMonth: "2026-09"
+        targetMonth: "2030-09"
       });
     expect(trip.status).toBe(201);
 
