@@ -4,8 +4,9 @@ name: Nightly mutation
 # pacotes tocados; aqui todos, para nenhum pacote ficar sem cobrir por não ter
 # sido tocado em nenhum PR.
 on:
-  schedule:
-    - cron: "0 5 * * *"
+  # Pausado: falhava toda noite (dry run do @farol/ui quebra). Reativar depois de consertar.
+  # schedule:
+  #   - cron: "0 5 * * *"
   workflow_dispatch: {}
 
 # Token só de leitura; um job que precise de mais declara o que precisa.
