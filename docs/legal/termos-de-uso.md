@@ -8,8 +8,7 @@
 
 Estes Termos de Uso ("Termos") regem o acesso e o uso do **Farol** ("Farol",
 "plataforma", "serviço"), site e aplicativo disponíveis em `farolviagens.com`,
-operados por **IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51**, com sede em
-**Rua Osvaldo Cruz, 1138 E, São Cristóvão, Chapecó/SC, CEP 89803-360** ("nós", "operador").
+operados por **IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51** ("nós", "operador").
 
 Ao criar uma conta, entrar na lista de espera ou usar o Farol de qualquer forma,
 você ("usuário", "você") declara que leu, entendeu e concorda com estes Termos e
@@ -237,4 +236,4 @@ Estes Termos são regidos pela lei brasileira. Fica eleito o foro da comarca de
 
 - Dúvidas sobre estes Termos: `contato@ignaulin.com`
 - Assuntos de privacidade e dados: `privacidade@ignaulin.com`
-- Operador: IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51, Rua Osvaldo Cruz, 1138 E, São Cristóvão, Chapecó/SC, CEP 89803-360.
+- Operador: IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51.

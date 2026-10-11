@@ -7,7 +7,7 @@
 **Última atualização:** 23/09/2026
 
 Esta Política explica como o **Farol** (`farolviagens.com`), operado por
-**IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51**, sede em **Rua Osvaldo Cruz, 1138 E, São Cristóvão, Chapecó/SC, CEP 89803-360** ("nós",
+**IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51** ("nós",
 "operador", "controlador"), trata dados pessoais, em conformidade com a
 **Lei nº 13.709/2018 (LGPD)**.
 
@@ -185,4 +185,4 @@ e-mail antes da vigência. A data no topo indica a última atualização.
 ## 12. Contato
 
 - Canal de privacidade: `privacidade@ignaulin.com`
-- Operador: IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51, Rua Osvaldo Cruz, 1138 E, São Cristóvão, Chapecó/SC, CEP 89803-360.
+- Operador: IGNAULIN SOLUCOES TECNOLOGICAS LTDA, CNPJ 49.181.911/0001-51.
