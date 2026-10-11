@@ -79,6 +79,27 @@ describe("PgBossQueue construção", () => {
   it("constrói com config mínima (usa o polling default)", () => {
     expect(() => new PgBossQueue({ url: "postgres://x", schema: "s" })).not.toThrow();
   });
+
+  // Regressão 2026-10-09: o Supabase derrubou as conexões (57P01) e o pg-boss
+  // reemitiu o erro do pool sem listener — o Node transformou em
+  // uncaughtException e a api morreu.
+  it("loga erro do pg-boss em vez de derrubar o processo", () => {
+    const q = new PgBossQueue({ url: "postgres://x", schema: "s" });
+    const boss = (q as unknown as { boss: { emit(e: string, a: unknown): boolean } }).boss;
+    const original = console.error;
+    const lines: string[] = [];
+    console.error = (msg: string) => lines.push(msg);
+    try {
+      expect(() => boss.emit("error", new Error("terminating connection"))).not.toThrow();
+    } finally {
+      console.error = original;
+    }
+    expect(lines).toHaveLength(1);
+    expect(JSON.parse(lines[0]!)).toEqual({
+      event: "job_queue_error",
+      message: "terminating connection"
+    });
+  });
 });
 
 describe("assertJobId", () => {
