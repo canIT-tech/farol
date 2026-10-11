@@ -74,7 +74,10 @@ describe("MonthField — seletor", () => {
 
   it("escolher um mês devolve a chave e fecha", async () => {
     const onChange = vi.fn();
-    render(<MonthField label="Mês" value="" onChange={onChange} initialYear={2026} />);
+    // today fixo: sem ele, setembro/2026 vira mês passado (desabilitado) quando o calendário passa dele.
+    render(
+      <MonthField label="Mês" value="" onChange={onChange} initialYear={2026} today={new Date(2026, 0, 15)} />
+    );
     await abrir();
     await userEvent.click(screen.getByRole("button", { name: "set" }));
 

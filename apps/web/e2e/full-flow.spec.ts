@@ -67,8 +67,10 @@ test("nova viagem → descoberta → destino → roteiro → ajuste por chat", a
 
   await page.goto("/trips/new");
   await page.getByLabel("Saindo de").fill("GRU");
-  // O seletor de mês abre em 2026.
+  // O seletor abre no ano corrente, onde setembro pode já ter passado (desabilitado):
+  // avança um ano para o teste não depender da data em que roda.
   await page.getByRole("button", { name: /^Mês/ }).click();
+  await page.getByRole("button", { name: "Próximo ano" }).click();
   await page.getByRole("button", { name: "set", exact: true }).click();
   await page.getByRole("button", { name: "Buscar destinos" }).click();
 

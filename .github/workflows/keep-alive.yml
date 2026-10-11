@@ -1,0 +1,28 @@
+name: Keep alive
+
+# O Supabase free pausa o projeto depois de 7 dias sem uso, e aí o pooler
+# responde "tenant/user not found" e a api morre no boot (o pg-boss não
+# conecta). Foi o que derrubou produção em 2026-10-07.
+#
+# O /api/health consulta o banco, então cada chamada conta como uso no
+# Supabase. A cada 10 min também segura o Render free acordado (ele dorme com
+# 15 min sem tráfego e a primeira visita espera ~1 min de boot). O cron do
+# GitHub atrasa às vezes, então um ou outro boot frio ainda pode escapar.
+# Falhar aqui = produção fora do ar.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # O free do Render dorme sem tráfego; o primeiro request espera o boot.
+      - name: GET /api/health
+        run: |
+          curl -fsS --retry 3 --retry-delay 30 --retry-all-errors -m 120 \
+            https://farol-ekk3.onrender.com/api/health

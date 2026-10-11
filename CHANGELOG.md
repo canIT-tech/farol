@@ -15,6 +15,11 @@ BREAKING → major. `bin/release` faz o corte; o processo está no skill `ship`.
   de "crédito não usado" (cláusula nula pelo art. 51). Rodapé da landing e da página de
   compra identifica o fornecedor (Decreto 7.962/2013, art. 2º).
 
+### Fixed
+- Queda de conexão com o banco não derruba mais o app: o erro é logado e a fila reconecta.
+- App deixa de dormir no plano free (ping a cada 10 min), sem a espera de ~1 min na
+  primeira visita, e o banco não pausa mais por inatividade.
+
 ## [0.1.1] - 2026-09-23
 
 ### Security
