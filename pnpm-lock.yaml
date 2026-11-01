@@ -54,13 +54,13 @@ importers:
     dependencies:
       '@ai-sdk/anthropic':
         specifier: 4.0.46
-        version: 4.0.46(zod@3.25.76)
+        version: 4.0.46(zod@4.6.6)
       '@ai-sdk/groq':
         specifier: 4.0.35
-        version: 4.0.35(zod@3.25.76)
+        version: 4.0.35(zod@4.6.6)
       '@ai-sdk/openai':
         specifier: 4.0.53
-        version: 4.0.53(zod@3.25.76)
+        version: 4.0.53(zod@4.6.6)
       '@farol/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -87,7 +87,7 @@ importers:
         version: 11.0.0(@nestjs/common@11.2.6(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.2.6)(rollup@4.63.1)(webpack@5.106.2(@swc/core@1.16.1)(esbuild@0.28.2))
       ai:
         specifier: 7.0.87
-        version: 7.0.87(zod@3.25.76)
+        version: 7.0.87(zod@4.6.6)
       drizzle-orm:
         specifier: 0.45.3
         version: 0.45.3(@opentelemetry/api@1.9.1)(pg@8.23.0)(postgres@3.4.9)
@@ -110,8 +110,8 @@ importers:
         specifier: 22.6.2
         version: 22.6.2(@types/node@22.20.1)
       zod:
-        specifier: ^3.25.76
-        version: 3.25.76
+        specifier: ^4.6.6
+        version: 4.6.6
     devDependencies:
       '@nestjs/cli':
         specifier: ^11.0.24
@@ -168,8 +168,8 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       zod:
-        specifier: ^3.25.76
-        version: 3.25.76
+        specifier: ^4.6.6
+        version: 4.6.6
     devDependencies:
       '@playwright/test':
         specifier: ^1.47.0
@@ -320,8 +320,8 @@ importers:
   packages/shared:
     dependencies:
       zod:
-        specifier: ^3.25.76
-        version: 3.25.76
+        specifier: ^4.6.6
+        version: 4.6.6
     devDependencies:
       '@stryker-mutator/core':
         specifier: ^9.6.1
@@ -591,6 +591,10 @@ packages:
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.29.6
+
+  '@babel/runtime@7.29.10':
+    resolution: {integrity: sha512-NpugTzbKgGrNe45Ui32cN8vCFFMxVtP/9rtfwv0nP5FRDAjvYBxJcLVpYA9mr1jxP6cnIT7x9LUzuDTbWYYNRA==}
+    engines: {node: '>=6.9.0'}
 
   '@babel/runtime@7.29.7':
     resolution: {integrity: sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw==}
@@ -4674,49 +4678,46 @@ packages:
     resolution: {integrity: sha512-xYqdZFUK/VYazNl/oCDYN+3WloWQwMfZxBoiNt6qNyk+xfOdi598muWE42rNZFp1kNOiqW936q5RhUdnpqElSg==}
     engines: {node: '>=18'}
 
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
-
-  zod@4.6.5:
-    resolution: {integrity: sha512-v5l/aFXZQeai4awLbOpSoHecE9UiMrnfx75tEXLjNonXVARxQ5mOeipTjROUchszUNCqnE+hqAMujRsRHsut2Q==}
+  zod@4.6.6:
+    resolution: {integrity: sha512-4UmzQUF5fxvfcYHlbjBmejU+w+hbDnWFx4aS8kBx7nPBHcO2SqPbpAG8snbdg+Xse4pRefR98hgjFgIMCI/UhA==}
 
 snapshots:
 
   '@adobe/css-tools@4.5.0': {}
 
-  '@ai-sdk/anthropic@4.0.46(zod@3.25.76)':
+  '@ai-sdk/anthropic@4.0.46(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.9
-      '@ai-sdk/provider-utils': 5.0.34(zod@3.25.76)
-      zod: 3.25.76
+      '@ai-sdk/provider-utils': 5.0.34(zod@4.6.6)
+      zod: 4.6.6
 
-  '@ai-sdk/gateway@4.0.70(zod@3.25.76)':
+  '@ai-sdk/gateway@4.0.70(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.9
-      '@ai-sdk/provider-utils': 5.0.34(zod@3.25.76)
+      '@ai-sdk/provider-utils': 5.0.34(zod@4.6.6)
       '@vercel/oidc': 3.2.0
-      zod: 3.25.76
+      zod: 4.6.6
 
-  '@ai-sdk/groq@4.0.35(zod@3.25.76)':
+  '@ai-sdk/groq@4.0.35(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.9
-      '@ai-sdk/provider-utils': 5.0.34(zod@3.25.76)
-      zod: 3.25.76
+      '@ai-sdk/provider-utils': 5.0.34(zod@4.6.6)
+      zod: 4.6.6
 
-  '@ai-sdk/openai@4.0.53(zod@3.25.76)':
+  '@ai-sdk/openai@4.0.53(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.9
-      '@ai-sdk/provider-utils': 5.0.34(zod@3.25.76)
-      zod: 3.25.76
+      '@ai-sdk/provider-utils': 5.0.34(zod@4.6.6)
+      zod: 4.6.6
 
-  '@ai-sdk/provider-utils@5.0.34(zod@3.25.76)':
+  '@ai-sdk/provider-utils@5.0.34(zod@4.6.6)':
     dependencies:
       '@ai-sdk/provider': 4.0.9
       '@standard-schema/spec': 1.1.0
       '@workflow/serde': 4.1.0
       eventsource-parser: 3.1.1
       undici: 7.30.0
-      zod: 3.25.76
+      zod: 4.6.6
 
   '@ai-sdk/provider@4.0.9':
     dependencies:
@@ -4986,6 +4987,8 @@ snapshots:
       '@babel/plugin-transform-typescript': 7.29.7(@babel/core@7.29.7)
     transitivePeerDependencies:
       - supports-color
+
+  '@babel/runtime@7.29.10': {}
 
   '@babel/runtime@7.29.7': {}
 
@@ -6249,7 +6252,7 @@ snapshots:
   '@testing-library/dom@10.4.1':
     dependencies:
       '@babel/code-frame': 7.29.7
-      '@babel/runtime': 7.29.7
+      '@babel/runtime': 7.29.10
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       dom-accessibility-api: 0.5.16
@@ -6642,12 +6645,12 @@ snapshots:
 
   agent-base@7.1.4: {}
 
-  ai@7.0.87(zod@3.25.76):
+  ai@7.0.87(zod@4.6.6):
     dependencies:
-      '@ai-sdk/gateway': 4.0.70(zod@3.25.76)
+      '@ai-sdk/gateway': 4.0.70(zod@4.6.6)
       '@ai-sdk/provider': 4.0.9
-      '@ai-sdk/provider-utils': 5.0.34(zod@3.25.76)
-      zod: 3.25.76
+      '@ai-sdk/provider-utils': 5.0.34(zod@4.6.6)
+      zod: 4.6.6
 
   ajv-formats@2.1.1(ajv@8.18.0):
     optionalDependencies:
@@ -7704,7 +7707,7 @@ snapshots:
 
   mutation-server-protocol@0.4.1:
     dependencies:
-      zod: 4.6.5
+      zod: 4.6.6
 
   mutation-testing-elements@3.7.3: {}
 
@@ -8676,6 +8679,4 @@ snapshots:
 
   yoctocolors@2.2.0: {}
 
-  zod@3.25.76: {}
-
-  zod@4.6.5: {}
+  zod@4.6.6: {}
