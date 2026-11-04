@@ -28,6 +28,7 @@ monta o dia a dia e ajusta tudo por conversa.
 | Manual de marca (fontes) | `docs/design/brand/*.dc.html` + `docs/design/brand/canvas.json` |
 | Telas do app (fontes) | `docs/design/app/*.dc.html` + `docs/design/app/canvas.json` |
 | Backoffice / hub da documentação | `docs/index.html` (shell local: sidebar + iframe; aponta para os `.html` de `docs/`. Vai virar backoffice com dados de assinatura) |
+| SEO (relatórios antes/depois, pendências de painel: Cloudflare AI Crawl, Search Console, domínio) | `docs/seo/2026-11-03-relatorio-seo-inicial.md` · `docs/seo/2026-11-03-relatorio-seo-final.md` |
 | **Setup do ambiente (pessoa nova no time)** — Doppler, banco local, rodar, testar, credenciais dev/prd, Render | `docs/SETUP.md` |
 
 Canvases publicados (Claude Artifacts):

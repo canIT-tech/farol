@@ -54,7 +54,7 @@ export default function Modes() {
       <div className="mode-panel" key={mode} role="tabpanel">
         {CONTENT[mode].map((item) => (
           <div className="cardlet" key={item.h}>
-            <h4>{item.h}</h4>
+            <h3>{item.h}</h3>
             <p>{item.p}</p>
           </div>
         ))}

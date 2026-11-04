@@ -1,6 +1,6 @@
 "use client";
 
-import { COMPANY_IDENTIFICATION } from "../../lib/company";
+import { CompanyIdentification } from "../../components/common/CompanyIdentification";
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -122,7 +122,7 @@ function Creditos({ token }: { token: string }) {
           Stripe; não guardamos dados do cartão. <Link href="/terms">Termos</Link> ·{" "}
           <Link href="/privacy">Privacidade</Link>
           <br />
-          {COMPANY_IDENTIFICATION}
+          <CompanyIdentification />
         </p>
       </div>
     </main>

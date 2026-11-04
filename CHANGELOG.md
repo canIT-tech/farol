@@ -7,7 +7,22 @@ BREAKING → major. `bin/release` faz o corte; o processo está no skill `ship`.
 
 ## [Unreleased]
 
+### Added
+- Guias públicos de destino em `/destinations` e `/destinations/<cidade>` (23 cidades do
+  catálogo): melhor época, custo estimado de 7 dias saindo de SP e destinos parecidos.
+- Seção "Perguntas frequentes" e vitrine de destinos na landing.
+- Imagem de compartilhamento (WhatsApp, redes sociais), ícone para iPhone, `manifest`,
+  `sitemap.xml` e `robots.txt` com sitemap.
+
 ### Changed
+- Landing com título e descrição de busca para "planejador de viagem com IA", dados
+  estruturados (organização, app com preços, FAQ, trilha) e canonical.
+- Landing mais rápida no celular: fontes servidas pelo próprio site, script de afiliado
+  carregado depois da página, SDK de login fora do carregamento inicial (JS inicial de
+  191 kB para 128 kB).
+- Área logada (`/login`, `/trips`, `/onboarding`, `/credits`, `/auto`, `/payment`) fora
+  do índice do Google, com título próprio na aba.
+- Contraste de textos e botões ajustado ao mínimo WCAG AA.
 - Termos e Privacidade publicados com os dados da isTech (IGNAULIN SOLUCOES TECNOLOGICAS
   LTDA, CNPJ 49.181.911/0001-51), `contato@ignaulin.com` e `privacidade@ignaulin.com`;
   provedor de IA corrigido para Groq; uso e compra só para maiores de 18.
@@ -16,6 +31,8 @@ BREAKING → major. `bin/release` faz o corte; o processo está no skill `ship`.
   compra identifica o fornecedor (Decreto 7.962/2013, art. 2º).
 
 ### Fixed
+- Erro de hidratação em toda visita à landing: o e-mail do rodapé, reescrito pelo
+  Cloudflare, forçava o React a refazer a página inteira no navegador.
 - Queda de conexão com o banco não derruba mais o app: o erro é logado e a fila reconecta.
 - App deixa de dormir no plano free (ping a cada 10 min), sem a espera de ~1 min na
   primeira visita, e o banco não pausa mais por inatividade.

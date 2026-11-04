@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSupabaseBrowserClient } from "../../lib/supabase";
 
 // Porta de entrada da landing para o app. Sem sessão: "Entrar". Com sessão no
 // browser: "Minhas viagens". Até a leitura resolver, mostra "Entrar" — a
-// página inteira nunca fica esperando o Supabase.
+// página inteira nunca fica esperando o Supabase. O SDK (~60 kB) entra por
+// import dinâmico: fica fora do JS inicial das páginas públicas.
 export default function AppEntry() {
   const [signedIn, setSignedIn] = useState(false);
 
   useEffect(() => {
-    void getSupabaseBrowserClient()
-      .auth.getSession()
+    void import("../../lib/supabase")
+      .then(({ getSupabaseBrowserClient }) => getSupabaseBrowserClient().auth.getSession())
       .then(({ data }) => setSignedIn(data.session !== null))
       .catch(() => setSignedIn(false));
   }, []);

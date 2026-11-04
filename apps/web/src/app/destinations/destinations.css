@@ -1,0 +1,108 @@
+/* Guias de destino (/destinations e /destinations/[slug]). Tokens da landing. */
+.guides {
+  padding-block: clamp(2rem, 1.5rem + 3vw, 4rem) clamp(3rem, 2rem + 4vw, 5rem);
+}
+
+.guides h1 {
+  font-size: clamp(2.2rem, 1.5rem + 3.4vw, 3.8rem);
+  max-width: 20ch;
+}
+
+.guides > .lead,
+.guides article > .lead {
+  margin-bottom: 1rem;
+}
+
+.crumbs {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  margin-bottom: 1.6rem;
+}
+
+.crumbs a {
+  color: var(--ink-soft);
+}
+
+.guide-region {
+  margin-top: 3rem;
+}
+
+.guide-region h2,
+.guide-cta-box h2,
+.guide-faq h2 {
+  font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem);
+}
+
+.guide-facts {
+  margin: 2rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.8rem;
+  max-width: 52rem;
+}
+
+.guide-facts > div {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.guide-facts > div.total {
+  background: var(--sun-wash);
+  border-color: transparent;
+}
+
+.guide-facts dt {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.guide-facts dd {
+  margin: 0.3rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.guide-note {
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+  max-width: 52rem;
+}
+
+.guide-cta-box {
+  margin-top: 3rem;
+  padding: clamp(1.4rem, 1rem + 2vw, 2.2rem);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  max-width: 52rem;
+}
+
+.guide-cta-box p {
+  margin: 0.7rem 0 1.3rem;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+
+.guide-faq {
+  margin-top: 3rem;
+}
+
+.guide-cta {
+  margin-top: 3rem;
+}
+
+.cta-button {
+  display: inline-block;
+  padding: 0.9rem 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--sun-strong);
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+
+.cta-button:hover {
+  background: #8f3d24;
+}
