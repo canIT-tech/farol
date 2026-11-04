@@ -1,33 +1,28 @@
 # Relatório de SEO — final (2026-11-03)
 
 Comparação com o [relatório inicial](./2026-11-03-relatorio-seo-inicial.md).
-Medição "depois": Lighthouse 12, build de produção (`next build && next start`) local.
-Produção só muda quando o PR entrar e o deploy rodar. Medir de novo em
-`https://farol.butland.sbs/` depois do deploy.
+Medição "depois": Lighthouse 12 contra **produção** (`https://farol.butland.sbs/`), depois
+do deploy de 2026-11-03.
 
-## Notas Lighthouse
+## Notas Lighthouse (produção)
 
 | Categoria | Antes (mobile / desktop) | Depois: home | Depois: `/destinations/lisboa` |
 |---|---|---|---|
 | Performance | 68 / 99 | **98 / 100** | **99 / 100** |
 | Acessibilidade | 95 / 95 | **100 / 100** | **100 / 100** |
-| Boas práticas | 96 / 96 | 100* | 100* |
+| Boas práticas | 96 / 96 | **100 / 100** | **100 / 100** |
 | SEO | 91 / 91 | **100 / 100** | **100 / 100** |
 
-\* 100 com o script da Travelpayouts bloqueado. No localhost ele roda num domínio não
-verificado e gera erros de console (403, `config is not valid`) que derrubam a nota
-para 79. Em produção, com o domínio verificado, esses erros não aparecem.
-
-Métricas mobile da home: LCP 4,1 s → **2,4 s** · FCP 3,2 s → **0,8 s** · TBT 470 ms → **60 ms** · CLS 0 → 0.
-JS inicial da home: 191 kB → **128 kB**.
+Métricas mobile da home: LCP 4,1 s → **2,2 s** · TBT 470 ms → **80 ms** · CLS 0 → 0.
+JS inicial da home: 191 kB → **128 kB**. Sem erro de console (a hidratação #418 sumiu).
 
 ## O que foi feito (por achado do relatório inicial)
 
 | # | Achado | Status | Como |
 |---|---|---|---|
 | C1 | Sem sitemap | ✅ | `app/sitemap.ts`: home, `/destinations`, 23 guias, termos e privacidade |
-| C2 | robots sem sitemap | ✅ código / ⚠️ painel | `app/robots.ts` com `Sitemap:`. A diretiva `Content-Signal` é injetada pelo Cloudflare e só sai pelo painel (ver pendências) |
-| C3 | Cloudflare bloqueia buscadores de IA e Applebot | ⚠️ painel | Zona `butland.sbs`: `ai_search=block`, `ai_user=block`. Precisa de decisão (afeta todos os subdomínios) |
+| C2 | robots sem sitemap | ✅ | `app/robots.ts` com `Sitemap:`. A `Content-Signal` vinha do *Bot Preference Sync* do Cloudflare, agora desligado |
+| C3 | Cloudflare bloqueia buscadores de IA e Applebot | ✅ | Zona `butland.sbs`: `ai_search` e `ai_user` passaram para `disabled` (liberados), `ai_training` segue `block` na borda, `cf_robots_variant=off` e `bot_preference_sync_enabled=false` |
 | C4 | Sem canonical / OG / Twitter | ✅ | `metadataBase`, canonical por página, OG + Twitter Card, imagem 1200×630 gerada (`opengraph-image.tsx`) |
 | C5 | Sem JSON-LD | ✅ | `Organization`, `WebSite`, `WebApplication` com as 3 ofertas, `FAQPage`; nos guias, `TouristDestination` + `BreadcrumbList` + `FAQPage` |
 | C6 | Palavra-chave ausente | ✅ | Título "Farol: planejador de viagem com IA e roteiro pronto"; H1 com "Planejador de viagem com IA"; descrição; FAQ que responde "O que é um planejador de viagem com IA?" |
@@ -67,23 +62,33 @@ Também: `X-Powered-By` removido; `theme-color`; `formatDetection` desligado.
 
 Em ordem de impacto para aparecer em buscas por "viagens" e "planejador de viagem":
 
-1. **Liberar buscadores de IA no Cloudflare.** Em *AI Crawl Control*, `ai_search` e `ai_user`
-   passam de `block` para `allow` (o treino pode seguir bloqueado). Sem isso, ChatGPT Search,
-   Perplexity e Siri/Spotlight (Applebot) não citam o Farol. A mudança vale para a zona inteira.
-2. **Google Search Console.** Verificar a propriedade (meta tag via env ou DNS), enviar
+1. **Google Search Console.** Verificar a propriedade (meta tag via env ou DNS), enviar
    `/sitemap.xml` e pedir indexação da home e de `/destinations`. Fazer o mesmo no Bing Webmaster,
    que também alimenta o ChatGPT.
-3. **Registrar `farolviagens.com`**, apontar `NEXT_PUBLIC_SITE_URL` para ele e fazer 301 de
+2. **Registrar `farolviagens.com`**, apontar `NEXT_PUBLIC_SITE_URL` para ele e fazer 301 de
    `farol.butland.sbs`. Subdomínio de `.sbs` não acumula autoridade de marca.
-4. **Backlinks e menções**: diretórios de ferramentas de IA, blogs e newsletters de viagem,
+3. **Backlinks e menções**: diretórios de ferramentas de IA, blogs e newsletters de viagem,
    Product Hunt, imprensa de startup.
-5. **Conteúdo contínuo**: cada cidade nova no catálogo vira uma página. Expandir de 23 para
+4. **Conteúdo contínuo**: cada cidade nova no catálogo vira uma página. Expandir de 23 para
    ~200 (curadoria já documentada) multiplica as entradas de cauda longa.
 
 ## Expectativa
 
 Tecnicamente o site está no teto: SEO 100, Core Web Vitals no verde, rich results válidos.
 A primeira página para termos genéricos como "viagens" depende de autoridade de domínio,
-que se constrói com os itens 1–5, não com código. Termos de cauda longa ("planejador de
+que se constrói com os itens 1–4, não com código. Termos de cauda longa ("planejador de
 viagem com IA", "roteiro em Bariloche quando ir") são alcançáveis em semanas depois da
 indexação.
+
+## Cloudflare (aplicado em 2026-11-03, zona `butland.sbs` inteira)
+
+| Configuração | Antes | Depois |
+|---|---|---|
+| `ai_search` (OAI-SearchBot, PerplexityBot, Applebot…) | block | disabled (liberado) |
+| `ai_user` (ChatGPT-User, Perplexity-User…) | block | disabled (liberado) |
+| `ai_training` (GPTBot, CCBot, Google-Extended…) | block | block |
+| `cf_robots_variant` | policy_only | off |
+| `bot_preference_sync_enabled` | true | false: o robots.txt servido é o do próprio site |
+
+Vale para todos os subdomínios (blog, altavia…). O treino de IA continua bloqueado na
+borda, só não aparece mais como `Disallow` no robots.txt de cada site.
