@@ -3,6 +3,7 @@ import {
   DEFAULT_SITE_URL,
   HOME_FAQ,
   PLANS,
+  AI_TRAINING_BOTS,
   CRAWL_BLOCKED_PATHS,
   NOINDEX_PATHS,
   SITE,
@@ -12,6 +13,7 @@ import {
   faqPageLd,
   organizationLd,
   resolveSiteUrl,
+  robotsRules,
   serializeJsonLd,
   softwareApplicationLd,
   splitEmailForDisplay,
@@ -269,5 +271,40 @@ describe("pageOpenGraph", () => {
 
   it("aceita outro tipo (artigo)", () => {
     expect(pageOpenGraph({ url: "/x", title: "T", description: "D", type: "article" }).type).toBe("article");
+  });
+});
+
+describe("robotsRules", () => {
+  // O Cloudflare "Block AI training crawlers" barrava o próprio Googlebot (403
+  // no Search Console, 2026-11-04). O treino de IA sai da borda e vira regra do
+  // robots.txt, que é como o Google separa busca (Googlebot) de treino (Google-Extended).
+  it("libera tudo para os buscadores e fecha só a api", () => {
+    expect(robotsRules()[0]).toEqual({ userAgent: "*", allow: "/", disallow: ["/api/"] });
+  });
+
+  it("bloqueia os robôs de treino de IA, nunca os de busca", () => {
+    const training = robotsRules()[1];
+    expect(training).toEqual({ userAgent: [...AI_TRAINING_BOTS], disallow: "/" });
+    expect(AI_TRAINING_BOTS).toEqual([
+      "GPTBot",
+      "ClaudeBot",
+      "anthropic-ai",
+      "CCBot",
+      "Google-Extended",
+      "Applebot-Extended",
+      "Bytespider",
+      "meta-externalagent",
+      "cohere-ai",
+      "Diffbot",
+      "Amazonbot",
+      "omgili"
+    ]);
+    for (const searchBot of ["Googlebot", "Bingbot", "Applebot", "OAI-SearchBot", "PerplexityBot", "ChatGPT-User"]) {
+      expect(AI_TRAINING_BOTS).not.toContain(searchBot);
+    }
+  });
+
+  it("são só essas duas regras", () => {
+    expect(robotsRules()).toHaveLength(2);
   });
 });

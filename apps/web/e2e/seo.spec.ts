@@ -59,6 +59,10 @@ test.describe("arquivos de rastreamento", () => {
     // área logada fica rastreável para o Google ler o noindex dela
     expect(body).not.toContain("Disallow: /trips");
     expect(body).toMatch(/Sitemap: https?:\/\/.+\/sitemap\.xml/);
+    // treino de IA fica fora; busca (Googlebot) não aparece em nenhum Disallow
+    expect(body).toMatch(/User-Agent: GPTBot[\s\S]*Disallow: \/\n/);
+    expect(body).toContain("User-Agent: Google-Extended");
+    expect(body).not.toMatch(/User-Agent: Googlebot\b/);
   });
 
   test("sitemap.xml lista home, destinos e páginas legais, sem a área logada", async ({ request }) => {

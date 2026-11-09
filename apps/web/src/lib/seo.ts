@@ -64,6 +64,35 @@ export const NOINDEX_PATHS = [
 // Só a api sai do rastreamento: é JSON, não página.
 export const CRAWL_BLOCKED_PATHS = ["/api/"] as const;
 
+// Robôs que coletam conteúdo para TREINAR modelos de IA. Ficam fora pelo
+// robots.txt, e não pela borda do Cloudflare: o "Block AI training crawlers"
+// barrava o próprio Googlebot (403 no Search Console, 2026-11-04).
+// Google-Extended e Applebot-Extended são tokens só de robots.txt: separam o
+// treino da busca, que segue liberada (Googlebot, Applebot, OAI-SearchBot…).
+export const AI_TRAINING_BOTS = [
+  "GPTBot",
+  "ClaudeBot",
+  "anthropic-ai",
+  "CCBot",
+  "Google-Extended",
+  "Applebot-Extended",
+  "Bytespider",
+  "meta-externalagent",
+  "cohere-ai",
+  "Diffbot",
+  "Amazonbot",
+  "omgili"
+] as const;
+
+export type RobotsRule = { userAgent: string | string[]; allow?: string; disallow: string | string[] };
+
+export function robotsRules(): RobotsRule[] {
+  return [
+    { userAgent: "*", allow: "/", disallow: [...CRAWL_BLOCKED_PATHS] },
+    { userAgent: [...AI_TRAINING_BOTS], disallow: "/" }
+  ];
+}
+
 export type Plan = { name: string; price: number; description: string; featured: boolean };
 
 export const PLANS: readonly Plan[] = [

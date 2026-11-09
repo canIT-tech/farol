@@ -92,3 +92,17 @@ indexação.
 
 Vale para todos os subdomínios (blog, altavia…). O treino de IA continua bloqueado na
 borda, só não aparece mais como `Disallow` no robots.txt de cada site.
+
+### Correção de 2026-11-04: Googlebot barrado
+
+O teste ao vivo do Search Console deu **403**. Nos logs do Cloudflare, o Googlebot real
+(`66.249.71.x`) foi bloqueado pela regra gerenciada **"Block AI training crawlers"**
+(`ai_training=block`). Ou seja, o bloqueio de treino de IA na borda impedia a indexação.
+
+- `ai_training`: `block` → `disabled`. A borda não bloqueia mais nenhum robô.
+- O treino de IA passou a ser recusado no `robots.txt` do Farol (`AI_TRAINING_BOTS` em
+  `apps/web/src/lib/seo.ts`: GPTBot, ClaudeBot, CCBot, Google-Extended, Applebot-Extended,
+  Bytespider…). Google-Extended e Applebot-Extended são tokens de robots: separam o treino
+  da busca, que segue liberada.
+- Efeito na zona: os outros subdomínios de `butland.sbs` (blog etc.) perderam o bloqueio de
+  treino na borda. Para recuperar, é preciso declarar as mesmas regras no robots.txt de cada um.

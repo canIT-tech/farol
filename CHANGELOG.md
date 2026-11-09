@@ -31,6 +31,8 @@ BREAKING → major. `bin/release` faz o corte; o processo está no skill `ship`.
   compra identifica o fornecedor (Decreto 7.962/2013, art. 2º).
 
 ### Fixed
+- Googlebot não era mais barrado: o bloqueio de robôs de treino de IA saiu da borda do
+  Cloudflare (pegava o próprio Googlebot) e virou regra do `robots.txt`.
 - Erro de hidratação em toda visita à landing: o e-mail do rodapé, reescrito pelo
   Cloudflare, forçava o React a refazer a página inteira no navegador.
 - Queda de conexão com o banco não derruba mais o app: o erro é logado e a fila reconecta.
