@@ -7,6 +7,13 @@ BREAKING → major. `bin/release` faz o corte; o processo está no skill `ship`.
 
 ## [Unreleased]
 
+### Security
+- Next.js 15.5.27 → 15.5.29: corrige execução remota de código na otimização de imagem
+  (GHSA-2464-fhr4-w9xw, crítica) e DoS em Server Actions (GHSA-p3m5-59mp-jv5r).
+- zod 3 → 4 (GHSA-mrhx-c7xc-m3w5, DoS de memória em coleções grandes; a v3 não tem correção).
+- body-parser 2.4, multer 2.5, qs 6.17, undici 7.30, fast-uri 3.1.9, glob 14 e minimatch 11
+  por `overrides`: zera o `pnpm audit --prod`.
+
 ### Changed
 - Termos e Privacidade publicados com os dados da isTech (IGNAULIN SOLUCOES TECNOLOGICAS
   LTDA, CNPJ 49.181.911/0001-51), `contato@ignaulin.com` e `privacidade@ignaulin.com`;

@@ -21,7 +21,7 @@ export const orderStatusSchema = z.enum(["pending", "paid", "expired", "refunded
 export type OrderStatus = z.infer<typeof orderStatusSchema>;
 
 export const orderSummarySchema = z.object({
-  id: z.string().uuid(),
+  id: z.guid(),
   product: productIdSchema,
   credits: z.number().int().positive(),
   amountCents: z.number().int().positive(),
