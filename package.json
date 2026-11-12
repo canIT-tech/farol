@@ -28,17 +28,21 @@
   "pnpm": {
     "overrides": {
       "drizzle-orm": "0.45.3",
-      "qs": "^6.16.0",
+      "qs": "^6.17.1",
       "postcss": "^8.5.23",
       "ajv@^8": "^8.18.0",
       "@babel/core": "^7.29.6",
       "vite": "^7.3.6",
       "proxy-addr": "^2.0.8",
-      "undici@^7": "^7.29.1",
-      "fast-uri@^3": "^3.1.8",
+      "undici@^7": "^7.30.2",
+      "fast-uri@^3": "^3.1.9",
       "brace-expansion@>=4 <6": "^5.0.12",
       "source-map-js": "^1.2.2",
-      "sharp": "^0.35.5"
+      "sharp": "^0.35.5",
+      "body-parser@^2": "^2.4.0",
+      "multer@^2": "^2.5.0",
+      "glob@>=9 <15": "^14.0.6",
+      "minimatch@>=7 <12": "^11.0.8"
     }
   }
 }

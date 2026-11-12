@@ -25,8 +25,8 @@ export type TasteProfileInput = z.infer<typeof tasteProfileInputSchema>;
 
 // Perfil como a api devolve (input + campos gerados no servidor).
 export const tasteProfileSchema = tasteProfileInputSchema.extend({
-  id: z.string().uuid(),
-  userId: z.string().uuid(),
+  id: z.guid(),
+  userId: z.guid(),
   updatedAt: z.string()
 });
 export type TasteProfile = z.infer<typeof tasteProfileSchema>;

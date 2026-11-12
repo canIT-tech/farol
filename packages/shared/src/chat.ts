@@ -6,13 +6,13 @@ export type ChatMessageRole = z.infer<typeof ChatMessageRoleSchema>;
 export const ToolCallSchema = z.object({
   id: z.string(),
   name: z.string(),
-  args: z.record(z.unknown())
+  args: z.record(z.string(), z.unknown())
 });
 export type ToolCall = z.infer<typeof ToolCallSchema>;
 
 export const ChatMessageDtoSchema = z.object({
-  id: z.string().uuid().optional(),
-  tripId: z.string().uuid().optional(),
+  id: z.guid().optional(),
+  tripId: z.guid().optional(),
   role: ChatMessageRoleSchema,
   content: z.string().nullable().optional(),
   toolCalls: z.array(ToolCallSchema).nullable().optional(),
@@ -29,6 +29,6 @@ export type ChatRequestDto = z.infer<typeof ChatRequestDtoSchema>;
 
 export const ChatResponseDtoSchema = z.object({
   message: ChatMessageDtoSchema,
-  tripState: z.record(z.unknown())
+  tripState: z.record(z.string(), z.unknown())
 });
 export type ChatResponseDto = z.infer<typeof ChatResponseDtoSchema>;

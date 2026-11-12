@@ -27,7 +27,7 @@ import {
 } from "@farol/shared";
 import { apiFetch, apiSend } from "./api-client";
 
-const chooseDestinationResponseSchema = z.object({ itineraryId: z.string().uuid() });
+const chooseDestinationResponseSchema = z.object({ itineraryId: z.guid() });
 
 export function getTrip(token: string, tripId: string, f?: typeof fetch): Promise<TripState> {
   return apiFetch({ path: `/trips/${tripId}`, schema: tripStateSchema, token }, f);

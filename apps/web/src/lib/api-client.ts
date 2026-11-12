@@ -1,9 +1,9 @@
-import type { ZodType, ZodTypeDef } from "zod";
+import type { ZodType } from "zod";
 
 // O corpo da resposta é JSON não confiável: o schema recebe `unknown` de
 // entrada e devolve T. Sem isso, schema com `.default()` não casa com
 // ZodType<T>, que assumiria entrada igual à saída.
-type ResponseSchema<T> = ZodType<T, ZodTypeDef, unknown>;
+type ResponseSchema<T> = ZodType<T, unknown>;
 
 export function apiBase(): string {
   // A api serve sob /api (o prefixo evita colidir com as rotas do Next no

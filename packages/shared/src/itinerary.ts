@@ -9,7 +9,7 @@ export type ItineraryStatus = z.infer<typeof itineraryStatusEnum>;
 
 // Item de um dia como a api devolve ao web (design §5.1).
 export const itineraryItemSchema = z.object({
-  id: z.string().uuid(),
+  id: z.guid(),
   slot: slotEnum,
   type: itemTypeEnum,
   title: z.string().min(1),
@@ -28,7 +28,7 @@ export const itineraryItemSchema = z.object({
 export type ItineraryItem = z.infer<typeof itineraryItemSchema>;
 
 export const itineraryDaySchema = z.object({
-  id: z.string().uuid(),
+  id: z.guid(),
   dayIndex: z.number().int().min(1),
   date: z.string().nullable(),
   notes: z.string().nullable(),
@@ -37,8 +37,8 @@ export const itineraryDaySchema = z.object({
 export type ItineraryDay = z.infer<typeof itineraryDaySchema>;
 
 export const itinerarySchema = z.object({
-  id: z.string().uuid(),
-  tripId: z.string().uuid(),
+  id: z.guid(),
+  tripId: z.guid(),
   version: z.number().int().min(1),
   status: itineraryStatusEnum,
   error: z.string().nullable(),
