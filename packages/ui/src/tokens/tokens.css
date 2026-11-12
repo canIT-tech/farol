@@ -49,8 +49,10 @@
   --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
 
   /* tipografia */
-  --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
-  --font-text: "Instrument Sans", system-ui, -apple-system, sans-serif;
+  /* --font-bricolage / --font-instrument: next/font (apps/web/src/app/layout.tsx); o nome
+     cru fica de fallback para quem usa os tokens fora do Next. */
+  --font-display: var(--font-bricolage, "Bricolage Grotesque"), var(--font-instrument, "Instrument Sans"), system-ui, sans-serif;
+  --font-text: var(--font-instrument, "Instrument Sans"), system-ui, -apple-system, sans-serif;
 
   /* espaçamento (base 4) */
   --space-2: 2px;

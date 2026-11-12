@@ -1,106 +1,34 @@
-"use client";
-
-import { COMPANY_IDENTIFICATION } from "../lib/company";
-import { type FormEvent, useState } from "react";
-import { submitWaitlist } from "../lib/waitlist";
-import AppEntry from "./_landing/AppEntry";
+import { GUIDES } from "./destinations/_catalog";
+import { JsonLd } from "./_seo/JsonLd";
+import { HOME_FAQ, PLANS, faqPageLd, resolveSiteUrl, softwareApplicationLd } from "../lib/seo";
 import ChatDemo from "./_landing/ChatDemo";
 import Modes from "./_landing/Modes";
 import Screens from "./_landing/Screens";
+import SiteFooter from "./_landing/SiteFooter";
+import SiteNav from "./_landing/SiteNav";
 import TasteDemo from "./_landing/TasteDemo";
+import WaitlistForm from "./_landing/WaitlistForm";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+// Server Component: o HTML chega pronto (conteúdo, FAQ, links dos guias) e só
+// as demos e o formulário hidratam. Antes a página inteira era "use client".
+const siteUrl = resolveSiteUrl(process.env.NEXT_PUBLIC_SITE_URL);
 
-type Status = "idle" | "sending" | "ok" | "error";
-
-function WaitlistForm({ source }: { source: string }) {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<Status>("idle");
-  const [message, setMessage] = useState("");
-
-  async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const value = email.trim();
-    if (!EMAIL_RE.test(value)) {
-      setStatus("error");
-      setMessage("Confere o e-mail — parece incompleto.");
-      return;
-    }
-    setStatus("sending");
-    setMessage("");
-    try {
-      const result = await submitWaitlist(value, source);
-      setStatus("ok");
-      setMessage(
-        result.created
-          ? "A gente avisa quando abrir o acesso."
-          : "Esse e-mail já estava na lista — a gente avisa quando abrir."
-      );
-      setEmail(value);
-    } catch {
-      setStatus("error");
-      setMessage("Não deu para salvar agora. Tenta de novo em instantes.");
-    }
-  }
-
-  if (status === "ok") {
-    return (
-      <div className="signup-done" role="status">
-        <strong>Você está na lista.</strong>
-        <p>
-          {message} Guardamos <b>{email}</b>.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <form
-      className="signup"
-      onSubmit={onSubmit}
-      aria-label="Entrar na lista de espera"
-      noValidate
-    >
-      <input
-        type="email"
-        inputMode="email"
-        autoComplete="email"
-        placeholder="seu@email.com"
-        aria-label="E-mail"
-        value={email}
-        onChange={(event) => setEmail(event.target.value)}
-      />
-      <button type="submit" disabled={status === "sending"}>
-        {status === "sending" ? "Enviando…" : "Quero ser dos primeiros"}
-      </button>
-      <p className="note" data-tone={status === "error" ? "error" : undefined} role="status">
-        {message}
-      </p>
-    </form>
-  );
-}
+const FEATURED_SLUGS = ["lisboa", "buenos-aires", "cartagena", "bariloche", "fernando-de-noronha", "cidade-do-mexico", "gramado", "cancun"];
+const FEATURED = GUIDES.filter((guide) => FEATURED_SLUGS.includes(guide.slug));
 
 export default function HomePage() {
   return (
     <div className="landing">
-      <nav className="nav">
-        <div className="wrap nav-inner">
-          <span className="brand">Farol</span>
-          <div className="nav-links">
-            <a href="#experiencia">Como funciona</a>
-            <a href="#precos">Preços</a>
-            <AppEntry />
-            <a href="#lista" className="nav-cta">
-              Entrar na lista
-            </a>
-          </div>
-        </div>
-      </nav>
+      <JsonLd data={[softwareApplicationLd(siteUrl), faqPageLd(HOME_FAQ)]} />
+      <SiteNav />
 
       <main>
         <section className="hero wrap" id="lista">
           <p className="eyebrow">Lista de primeiros usuários</p>
-          <h1>Você não precisa saber para onde ir.</h1>
+          <h1>
+            <span className="hero-kicker">Planejador de viagem com IA</span>{" "}
+            Você não precisa saber para onde ir.
+          </h1>
           <p className="deck">
             O Farol parte do seu gosto, acha o destino, monta o dia a dia e ajusta tudo por
             conversa. Ainda estamos construindo — entre na lista e teste antes de todo mundo.
@@ -150,21 +78,13 @@ export default function HomePage() {
           <p className="eyebrow">Preços (planejado)</p>
           <h2 className="h2">Sem assinatura. Você paga a viagem que montar.</h2>
           <div className="pay">
-            <div>
-              <h3>Grátis</h3>
-              <p className="price">R$ 0</p>
-              <small>Sua primeira viagem, completa: destino, roteiro e ajustes por conversa.</small>
-            </div>
-            <div className="feature">
-              <h3>Viagem</h3>
-              <p className="price">R$ 39</p>
-              <small>Produto completo com chat de ajuste. Pagamento único.</small>
-            </div>
-            <div>
-              <h3>Pacote 3 viagens</h3>
-              <p className="price">R$ 89</p>
-              <small>Para quem já sabe que vai planejar mais de uma.</small>
-            </div>
+            {PLANS.map((plan) => (
+              <div key={plan.name} className={plan.featured ? "feature" : undefined}>
+                <h3>{plan.name}</h3>
+                <p className="price">R$ {plan.price}</p>
+                <small>{plan.description}</small>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -180,6 +100,43 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section className="wrap reveal" id="destinos">
+          <p className="eyebrow">Para onde ir</p>
+          <h2 className="h2">Destinos com roteiro, época certa e custo estimado.</h2>
+          <p className="lead">
+            Guias do catálogo curado do Farol: quando ir, quanto custa uma viagem de 7 dias saindo
+            de São Paulo e para quem cada lugar combina.
+          </p>
+          <ul className="guide-grid">
+            {FEATURED.map((guide) => (
+              <li key={guide.slug}>
+                <a href={`/destinations/${guide.slug}`} className="guide-card">
+                  <strong>{guide.city}</strong>
+                  <span>{guide.country}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="guide-more">
+            <a href="/destinations">Ver todos os {GUIDES.length} destinos →</a>
+          </p>
+        </section>
+
+        <section className="wrap reveal faq" id="perguntas">
+          <p className="eyebrow">Dúvidas</p>
+          <h2 className="h2">Perguntas frequentes</h2>
+          <dl className="faq-list">
+            {HOME_FAQ.map((item) => (
+              <div key={item.question} className="faq-item">
+                <dt>
+                  <h3>{item.question}</h3>
+                </dt>
+                <dd>{item.answer}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
         <section className="final wrap reveal">
           <p className="eyebrow">Lista de primeiros usuários</p>
           <h2>Entre agora e teste antes de todo mundo.</h2>
@@ -187,12 +144,7 @@ export default function HomePage() {
         </section>
       </main>
 
-      <footer className="wrap">
-        Farol · assessor de viagem · <a href="/terms">Termos</a> ·{" "}
-        <a href="/privacy">Privacidade</a>
-        <br />
-        {COMPANY_IDENTIFICATION}
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

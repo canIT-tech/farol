@@ -8,7 +8,8 @@
   --surface-2: #faf8f5;
   --ink: #1c1b19;
   --ink-soft: #6b6963;
-  --ink-faint: #9b9992;
+  /* #9b9992 dava 2,85:1 no branco (WCAG pede 4,5). #726f68 = 4,9:1 e segue "apagado". */
+  --ink-faint: #726f68;
   --line: #ece9e2;
   --line-soft: #f4f2ec;
   --sun: #c25a38;
@@ -19,8 +20,10 @@
   --sea-wash: #edf3f0;
   --focus: #1c6feb;
 
-  --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
-  --font-body: "Instrument Sans", system-ui, -apple-system, sans-serif;
+  /* --font-bricolage / --font-instrument: next/font (apps/web/src/app/layout.tsx); o nome
+     cru fica de fallback para quem usa os tokens fora do Next. */
+  --font-display: var(--font-bricolage, "Bricolage Grotesque"), var(--font-instrument, "Instrument Sans"), system-ui, sans-serif;
+  --font-body: var(--font-instrument, "Instrument Sans"), system-ui, -apple-system, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, monospace;
 
   --step: clamp(1rem, 0.95rem + 0.25vw, 1.15rem);
@@ -36,7 +39,7 @@
   --surface-2: #211e1b;
   --ink: #f4efe6;
   --ink-soft: #b9b2a6;
-  --ink-faint: #8b8478;
+  --ink-faint: #a09a8e; /* #8b8478 dava 4,2:1 no cartão #262320 */
   --line: #38342d;
   --line-soft: #322e28;
   --sun: #e8895f;
@@ -150,7 +153,7 @@ p {
 
 .nav-cta {
   font-weight: 600;
-  color: var(--sun);
+  color: var(--sun-strong);
 }
 
 @media (max-width: 640px) {
@@ -171,7 +174,8 @@ p {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--sun);
+  /* texto pequeno: o terracota puro (#c25a38) dá 4,36:1 no branco; o forte passa de 5,8 */
+  color: var(--sun-strong);
   margin-bottom: 1.1rem;
 }
 
@@ -196,12 +200,12 @@ p {
       animation-range: entry 0% entry 42%;
     }
     @keyframes reveal-in {
+      /* só movimento, sem opacidade: texto meio transparente reprova contraste
+         (axe/Lighthouse) e o crawler pode ler a seção como escondida */
       from {
-        opacity: 0;
         transform: translateY(18px);
       }
       to {
-        opacity: 1;
         transform: none;
       }
     }
@@ -266,7 +270,8 @@ p {
   font: inherit;
   font-weight: 600;
   color: #fff;
-  background: var(--sun);
+  /* branco sobre #c25a38 = 4,36:1, abaixo do AA para 16px; o tom forte dá 5,9 */
+  background: var(--sun-strong);
   border: 1px solid var(--sun-strong);
   border-radius: var(--radius);
   cursor: pointer;
@@ -276,7 +281,7 @@ p {
 }
 
 .signup button:hover {
-  background: var(--sun-strong);
+  background: #8f3d24;
   transform: translateY(-1px);
 }
 
@@ -364,6 +369,12 @@ p {
   background: var(--sun);
   border-color: var(--sun-strong);
   color: #fff;
+}
+
+/* na faixa escura o terracota claro (#e8895f) com texto branco dá 2,6:1;
+   texto escuro sobre ele passa de 6 */
+.band-dark .chip-btn[aria-pressed="true"] {
+  color: #1a1714;
 }
 
 .demo-hint {
@@ -630,7 +641,8 @@ p {
   font-size: 0.95rem;
   font-weight: 600;
   color: #fff;
-  background: var(--sun);
+  /* branco sobre #c25a38 = 4,36:1 (abaixo do AA); o tom forte dá 5,9 */
+  background: var(--sun-strong);
   border: 1px solid var(--sun-strong);
   border-radius: var(--radius);
   padding: 0.8rem 1.4rem;
@@ -643,7 +655,7 @@ p {
 }
 
 .flow-next:hover {
-  background: var(--sun-strong);
+  background: #8f3d24;
   transform: translateY(-1px);
 }
 
@@ -965,7 +977,7 @@ p {
   margin-bottom: 11px;
 }
 
-.day-h h4 {
+.day-h h3 {
   font-family: var(--font-display);
   font-size: 12px;
   font-weight: 600;
@@ -1198,7 +1210,7 @@ p {
   background: var(--sun);
 }
 
-.ob h4 {
+.ob h3 {
   font-family: var(--font-display);
   font-size: 16px;
   font-weight: 600;
@@ -1537,7 +1549,7 @@ p {
   background: var(--surface);
 }
 
-.mode-panel .cardlet h4 {
+.mode-panel .cardlet h3 {
   font-size: 1.1rem;
   margin-bottom: 0.4rem;
 }
@@ -1607,4 +1619,93 @@ footer {
   border-top: 1px solid var(--line-soft);
   color: var(--ink-faint);
   font-size: 0.85rem;
+}
+
+/* ---- SEO: chamada do H1, guias de destino e perguntas frequentes ---- */
+.nav .brand {
+  text-decoration: none;
+}
+
+.hero-kicker {
+  display: block;
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--sun-strong);
+  margin-bottom: 0.6rem;
+}
+
+.guide-grid {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.8rem;
+}
+
+.guide-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  height: 100%;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-decoration: none;
+  transition:
+    border-color 120ms var(--ease),
+    transform 120ms var(--ease);
+}
+
+.guide-card:hover {
+  border-color: var(--sun);
+  transform: translateY(-1px);
+}
+
+.guide-card strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.guide-card span,
+.guide-card small {
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.guide-more {
+  margin-top: 1.4rem;
+  font-weight: 600;
+}
+
+.guide-more a {
+  color: var(--sun-strong);
+}
+
+.faq-list {
+  margin: 2rem 0 0;
+  display: grid;
+  gap: 0.8rem;
+  max-width: 52rem;
+}
+
+.faq-item {
+  padding: 1.2rem 1.3rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.faq-item dt h3 {
+  font-size: 1.15rem;
+}
+
+.faq-item dd {
+  margin: 0.5rem 0 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
 }

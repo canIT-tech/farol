@@ -85,7 +85,7 @@ function StageOnboarding({
         <div className="prog">
           <i style={{ width: "25%" }} />
         </div>
-        <h4>O que te move numa viagem?</h4>
+        <h3>O que te move numa viagem?</h3>
         <p className="obsub">Escolha o que curte e o ritmo. Isso ajusta destino e roteiro.</p>
         <div className="ob-grid">
           {ONB_TASTES.map((taste) => (
@@ -138,7 +138,7 @@ function StageDiscovery({
       <div className="mini">
         <MiniSide dest={`Gostos · ${gostos}`} step={1} />
         <div className="mini-main">
-          <h4 className="mini-h">Destinos pra você</h4>
+          <h3 className="mini-h">Destinos pra você</h3>
           <p className="mini-sub">Ordenados por aderência ao seu perfil. Toque para ver o roteiro.</p>
           <div className="dgrid">
             {top.map((row, i) => (
@@ -202,7 +202,7 @@ function StageItinerary({
       <div className="mini">
         <MiniSide dest={`Destino · ${city}`} step={2} />
         <div className="mini-main">
-          <h4 className="mini-h">{city} · 7 dias</h4>
+          <h3 className="mini-h">{city} · 7 dias</h3>
           <p className="mini-sub">
             10 – 17 de maio · ritmo {paceLabel.toLowerCase()} · foco em {gostos.toLowerCase()}
           </p>
@@ -216,7 +216,7 @@ function StageItinerary({
             <span>Dia 7</span>
           </div>
           <div className="day-h">
-            <h4>Dia 1 — Chegada e primeiro passeio</h4>
+            <h3>Dia 1 — Chegada e primeiro passeio</h3>
             <span className="chip">{temp}</span>
             <span className="chip">R$ 210 no dia</span>
           </div>
@@ -278,7 +278,7 @@ function StageFlights({ city, cost }: { city: string; cost: string }) {
       <div className="mini">
         <MiniSide dest={`Roteiro · 7 dias montados`} step={3} />
         <div className="mini-main">
-          <h4 className="mini-h">Voo &amp; hotel</h4>
+          <h3 className="mini-h">Voo &amp; hotel</h3>
           <p className="mini-sub">
             Voos para {city} · 10 – 17 mai. A reserva é concluída no site do parceiro.
           </p>
