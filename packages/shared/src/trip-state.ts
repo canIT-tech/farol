@@ -5,8 +5,8 @@ import { isoDateSchema, tripPartySchema, tripStatusEnum, yearMonthSchema } from 
 // A viagem como a api devolve. Vive aqui, e não em apps/api, porque o apps/web
 // precisa validar a resposta e não pode depender do back.
 export const tripSchema = z.object({
-  id: z.string().uuid(),
-  userId: z.string().uuid(),
+  id: z.guid(),
+  userId: z.guid(),
   status: tripStatusEnum,
   title: z.string().nullable(),
   originIata: z.string().length(3),
@@ -17,7 +17,7 @@ export const tripSchema = z.object({
   party: tripPartySchema,
   budgetTotal: z.number().nullable(),
   currency: z.string(),
-  chosenDestinationId: z.string().uuid().nullable(),
+  chosenDestinationId: z.guid().nullable(),
   createdAt: z.string(),
   updatedAt: z.string()
 });
